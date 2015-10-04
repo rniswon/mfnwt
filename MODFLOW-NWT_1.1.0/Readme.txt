@@ -1,7 +1,7 @@
 
 
-                      MODFLOW-NWT - Version: 1.1.0
-                  Newton Formulation for MODFLOW-2005
+                     MODFLOW-NWT - Version: 1.1.0
+                 Newton Formulation for MODFLOW-2005
 
 
 NOTE: Any use of trade, product or firm names is for descriptive purposes 
