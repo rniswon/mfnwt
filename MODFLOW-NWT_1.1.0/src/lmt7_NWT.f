@@ -2094,30 +2094,32 @@ C--WRITE WELL LOCATION AND RATE ONE AT A TIME
 C
 C--IF CELL IS EXTERNAL Q=0
         Q=ZERO
-        IF(IBOUND(IC,IR,IL).GT.0) Q=WELL(4,L)
-        IF ( IUNITUPW.GT.0 ) THEN
-        IF ( LAYTYPUPW(il).GT.0 ) THEN
-          bbot = Botm(IC, IR, Lbotm(IL))
-          ttop = Botm(IC, IR, Lbotm(IL)-1)
-          Hh = HNEW(ic,ir,il)
-          x = (Hh-bbot)
-          s = PSIRAMP
-          s = s*(Ttop-Bbot)
-          aa = -1.0d0/(s**2.0d0)
-          b = 2.0d0/s
-          cof1 = x**2.0D0
-          cof2 = -(2.0D0*x)/(s**3.0D0)
-          cof3 = 3.0D0/(s**2.0D0)
-          Qp = cof1*(cof2+cof3)
-          IF ( x.LT.0.0D0 ) THEN
-            Qp = 0.0D0
-          ELSEIF ( x-s.GT.-1.0e-14 ) THEN
-            Qp = 1.0D0
+        IF(IBOUND(IC,IR,IL).GT.0) THEN
+          Q=WELL(4,L)
+          IF ( IUNITUPW.GT.0 ) THEN
+            IF ( LAYTYPUPW(il).GT.0 ) THEN
+              bbot = Botm(IC, IR, Lbotm(IL))
+              ttop = Botm(IC, IR, Lbotm(IL)-1)
+              Hh = HNEW(ic,ir,il)
+              x = (Hh-bbot)
+              s = PSIRAMP
+              s = s*(Ttop-Bbot)
+              aa = -1.0d0/(s**2.0d0)
+              b = 2.0d0/s
+              cof1 = x**2.0D0
+              cof2 = -(2.0D0*x)/(s**3.0D0)
+              cof3 = 3.0D0/(s**2.0D0)
+              Qp = cof1*(cof2+cof3)
+              IF ( x.LT.0.0D0 ) THEN
+                Qp = 0.0D0
+              ELSEIF ( x-s.GT.-1.0e-14 ) THEN
+                Qp = 1.0D0
+              END IF
+              IF ( Qp.LT.1.0 ) THEN
+                Q = Q*Qp
+              END IF
+            END IF
           END IF
-          IF ( Qp.LT.1.0 ) THEN
-            Q = Q*Qp
-          END IF
-        END IF
         END IF
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) IL,IR,IC,Q
