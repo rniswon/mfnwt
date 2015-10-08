@@ -614,7 +614,15 @@ C5------WILL BE PRODUCED.
             ALLOCATE(DDREF(NCOL,NROW,NLAY))
             CALL SGWF2BAS7PSV(IGRID)
          END IF
-         DDREF=HNEW
+! RGN 10-7-2015 made explcit do for setting DDREF=HNEW
+         DO il = 1, NLAY
+           DO ir = 1, NROW
+              DO ic = 1, NCOL
+                DDREF(ic,ir,il)=HNEW(ic,ir,il)
+              END DO
+           END DO
+         END DO
+!
          WRITE(IOUT,99)
    99    FORMAT(1X,'Drawdown Reference has been reset to the',
      1               ' end of this time step')
