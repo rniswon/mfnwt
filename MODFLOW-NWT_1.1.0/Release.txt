@@ -32,6 +32,14 @@ LAK7 packages that is required for simulating transport in the unsaturated zone,
 streams, and lakes. Refer to the MT3D-USGS documentation report 
 (Bedekar and others, 2015) for details.
 
+NWT1_solver.f
+
+Previous versions of MODFLOW-NWT reported a warning when the difference between
+a specified cell top and cell bottom was less than 100*Thickfact, where Thickfact 
+is an input variable specified within the NWT solver input file. These cells were 
+set to inactive by setting IBOUND=0. This conditions is now treated as an error
+and the model will stop if TOP-BOT<100*Thickfact. 
+
 Streamflow Routing (SFR2) Package
 
 Some variables in the SFR2 Package were initialized. Some variables were changed

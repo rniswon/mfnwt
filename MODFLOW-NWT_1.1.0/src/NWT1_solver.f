@@ -34,7 +34,7 @@
 !!      REAL akappadum, gammadum, Breducdum, Btoldum, Thickdum,ZERO
 !!      INTEGER IANAME,KHANI,N,KK,nc,nr,nl,j,k,NCNVRT,NHANI,NWETD
 ! Memory use variables
-      INTEGER lrwrk,liwrk,NODES,MBLACK,NJAF
+      INTEGER lrwrk,liwrk,NODES,MBLACK,NJAF,ICHECK
 !!      REAL Memuse1,Memuse2
 !     ------------------------------------------------------------------
 !
@@ -234,29 +234,31 @@ C3B-----GET OPTIONS.
       II = 0
       ICELL = 0
       DIAG = 0
- ! Check heads and set to be above bottom. 
+! Check heads and set to be above bottom. 
+      ICHECK = 0
       Do il = 1, Nlay
         Do ir = 1, Nrow
           Do ic = 1, Ncol
             IF ( IBOUND(ic,ir,il).GT.0 ) THEN
               IF ( dble(BOTM(ic,ir,LBOTM(il)-1)) - 
      +             dble(BOTM(ic,ir,LBOTM(il))).LT.100.0*Thickfact ) THEN
-                WRITE(IOUT,*) 'Extremely thin cell for Column = ',ic,
-     +                         ' and Row = ',ir,' and Layer = ',il,
-     +                         ' Check input, Setting IBOUND = 0'
-                IBOUND(ic,ir,il) = 0
+      WRITE(IOUT,*) 'TOP-BOT < 100.0*Thickfact (Lay,Row,Col) =',il,ir,ic
+!                IBOUND(ic,ir,il) = 0
+                ICHECK = 1
               END IF    
- ! these next three lines could cause slow convergence when using a solution for IC.            
-!              IF ( HNEW(ic,ir,il).LT.BOTM(ic,ir,LBOTM(il)) ) THEN
-!                HNEW(ic,ir,il) = BOTM(ic,ir,LBOTM(il))+HEPS
-!              END IF
             END IF
             Hiter(ic,ir,il) = HNEW(ic,ir,il)
           End do
         End do
       End do
- !  Determine the number of active cells and then numnber of elements
- !  in linear matrix for allocating arrays.
+      IF ( ICHECK==1 ) THEN
+        WRITE(IOUT,*)
+        WRITE(IOUT,*)'CHECK INPUT'
+        WRITE(IOUT,*)'MODEL STOPPING'
+        CALL USTOP('')
+      END IF
+!  Determine the number of active cells and then numnber of elements
+!  in linear matrix for allocating arrays.
       CALL ORDERCELL()
       CALL COUNTACTIVE(jj)
       IF ( Numactive.LT.2 ) THEN
