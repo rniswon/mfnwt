@@ -2880,9 +2880,9 @@ C--DUMMY VARIABLE QSW NOT USED, SET TO 0
 C
 C--SAVE TO OUTPUT FILE
           IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) IL,IR,IC,Q,IDwell,QSW
+            WRITE(IUMT3D) IL,IR,IC,Q,iw,QSW
           ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) IL,IR,IC,Q,IDwell,QSW
+            WRITE(IUMT3D,*) IL,IR,IC,Q,iw,QSW
           ENDIF
         enddo
       ENDDO
