@@ -2343,9 +2343,21 @@ cdebug              if(iqslv.ne.0.and.kiter.gt.1.and.kiter.lt.NoMoIter) then
               if(iqslv.ne.0.and.kiter.gt.1) then
                 hhnew=hnew(ic,ir,il)
                 qact = ( hlim - hhnew) * cond
+                if ( mnw2(5,iw) < 0.0 .and. abs(MNW2(2,iw)).eq.1) then  !RGN 1/15/16
+                  if ( qact > 0.0 ) then
+                      qact = 0.0
+                      cond = 0.0
+                  end if
+                end if                                                  !RGN to hear
 !RGN modifications for NWT. 3/21/12
                 IF ( Iuupw.GT.0 ) THEN
                   qact2 = cond*(hwel-hhnew)
+                  if ( mnw2(5,iw) < 0.0 .and. abs(MNW2(2,iw)).eq.1) then  !RGN 1/15/16
+                    if ( qact > 0.0 ) then
+                        qact2 = 0.0
+                        cond = 0.0
+                    end if
+                  end if                                               !RGN to hear
                   hlim = hwel
                 END IF
                 hcof(ic,ir,il) = hcof(ic,ir,il) - cond
@@ -2503,7 +2515,10 @@ c
                  END IF
               hcell=hnew(ic,ir,il)
               cond = MNWNOD(14,INODE)
-              q = cond*(hwell-hcell)
+              q = cond*(hwell-hcell)    !RGN 1/15/16
+              if ( mnw2(5,iw) < 0.0 .and. abs(MNW2(2,iw)).eq.1) then
+                if ( q > 0.0 ) q = 0.0
+              end if                    !to hear
               END IF
 c
 c              ioch = 0
@@ -2596,6 +2611,9 @@ c-lfk
                 hcell=hnew(ic,ir,il)
                 cond = MNWNOD(14,INODE)
                 q = cond*(hwell-hcell)
+                if ( mnw2(5,iw) < 0.0 ) then
+                  if ( q > 0.0 ) q = 0.0
+                end if
               END IF
               if( q.le.0.0D0 ) then
                 qin = qin  + q                                          !seb CHANGED MNWNOD(4,INODE) to q   --SCOTT SHOULDN'T qin and qout be used for ratin and ratout, rather than q?
