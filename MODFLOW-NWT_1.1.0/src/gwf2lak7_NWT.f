@@ -1436,11 +1436,12 @@ C2B --- SUM UP OVERLAND RUNOFF INTO LAKE.
       DO LAKE = 1,NLAKES
 C EDM - Add indices to RUNF and RUNOFF because these terms need to be 
 C       saved for each lake in the simulation for writing to the FTL file by LMT
+          
         IF(RNF(LAKE).GE.0.0) RUNF(LAKE) = RNF(LAKE)
         IF(RNF(LAKE).LT.0.0) RUNF(LAKE) =-RNF(LAKE)*PRCPLK(LAKE)
      1                                    *BGAREA(LAKE)
         IF (IUNITUZF.GT.0) THEN
-          RUNOFF = OVRLNDRNF(LAKE)
+          RUNOFF(LAKE) = OVRLNDRNF(LAKE)
         ELSE
           RUNOFF(LAKE) = 0.0
         END IF
