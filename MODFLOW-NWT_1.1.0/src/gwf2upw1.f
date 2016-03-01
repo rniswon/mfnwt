@@ -2173,7 +2173,8 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
       ELSEIF(X.LT.1.0D0)THEN
         X = 1.0 - X
         Y = - ACOF * x / (EPS * (Ttop - Bbot))
-        Y = 1.0-Y
+!        Y = 1.0-Y
+        Y = -Y     !2-26-16. 1 should go away for derivative
       ELSE
         Y = 0.0
       ENDIF
