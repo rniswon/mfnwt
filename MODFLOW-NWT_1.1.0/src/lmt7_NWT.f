@@ -16,9 +16,13 @@ C ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 C
 C
       MODULE LMTMODULE
-         INTEGER, SAVE, POINTER ::ISSMT3D,IUMT3D,ILMTFMT
+         INTEGER, SAVE, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
+     +                            IUZFSFRCONNECT,IUZFLAKCONNECT,
+     +                            NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS
         TYPE LMTTYPE
-         INTEGER, POINTER ::ISSMT3D,IUMT3D,ILMTFMT
+         INTEGER, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
+     +                      IUZFSFRCONNECT,IUZFLAKCONNECT,NPCKGTXT,
+     +                      IUZFFLOWS,ISFRFLOWS,ILAKFLOWS
         END TYPE
         TYPE(LMTTYPE), SAVE  ::LMTDAT(10)
       END MODULE LMTMODULE
@@ -39,11 +43,14 @@ C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
 C      
       USE GLOBAL,   ONLY:NCOL,NROW,NLAY,NPER,NODES,NIUNIT,IUNIT,
      &                   ISSFLG,IBOUND,IOUT
-      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT 
-
+      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,IUZFLAKCONNECT,
+     &                   IUZFSFRCONNECT,ISFRLAKCONNECT,NPCKGTXT,
+     &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS
+      USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND
+      USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
 C--USE FILE SPECIFICATION of MODFLOW-2005
       INCLUDE 'openspec.inc'
-      LOGICAL       LOP
+      LOGICAL       LOP,FIRSTVAL
       CHARACTER*4   CUNIT(NIUNIT)
       CHARACTER*200 LINE,FNAME,NME
       CHARACTER*8   OUTPUT_FILE_HEADER
@@ -53,7 +60,9 @@ C--USE FILE SPECIFICATION of MODFLOW-2005
      &              MTIBS,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF
      &             /22*0/
 C     -----------------------------------------------------------------    
-      ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT)
+      ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT,IUZFSFRCONNECT,IUZFLAKCONNECT,
+     +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS)
+      NPCKGTXT=0
 C
 C--SET POINTERS FOR THE CURRENT GRID 
 cswm: already set in main (GWF2BAS7OC)      CALL SGWF2BAS7PNT(IGRID)     
@@ -63,6 +72,7 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
       DO IU=1,NIUNIT
         IF(CUNIT(IU).EQ.'LMT6') THEN
           INLMT=IUNIT(IU)
+          
         ELSEIF(CUNIT(IU).EQ.'BCF6') THEN
           MTBCF=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'LPF ') THEN
@@ -81,33 +91,45 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
           MTRIV=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'STR ') THEN
           MTSTR=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'GHB ') THEN
           MTGHB=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'RES ') THEN
           MTRES=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'FHB ') THEN
           MTFHB=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'DRT ') THEN
           MTDRT=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'ETS ') THEN
           MTETS=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'SUB ') THEN
           MTSUB=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'IBS ') THEN
           MTIBS=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'LAK ') THEN
           MTLAK=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'MNW1') THEN
           MTMNW1=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'MNW2') THEN
 !swm: store separate to not get clobbered by MNW1
           MTMNW2=IUNIT(IU)   
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'SWT ') THEN
-          MTSWT=IUNIT(IU)        
+          MTSWT=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'SFR ') THEN
           MTSFR=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'UZF ') THEN
           MTUZF=IUNIT(IU)
+          NPCKGTXT = NPCKGTXT + 1
         ENDIF
       ENDDO            
 !swm: SET MTMNW IF EITHER MNW1 OR MNW2 IS ACTIVE
@@ -134,6 +156,14 @@ C--ASSIGN DEFAULTS TO LMT INPUT VARIABLES AND OUTPUT FILE NAME
       FNAME=NME(1:IFLEN)//'.FTL'     
 C
 C--READ ONE LINE OF LMT PACKAGE INPUT FILE
+      FIRSTVAL=.TRUE.
+      IUZFSFRCONNECT=0
+      ISFRLAKCONNECT=0
+      IUZFLAKCONNECT=0
+      IUZFFLOWS=0
+      ISFRFLOWS=0
+      ILAKFLOWS=0
+C
    10 READ(INLMT,'(A)',END=1000) LINE
       IF(LINE.EQ.' ') GOTO 10
       IF(LINE(1:1).EQ.'#') GOTO 10
@@ -194,6 +224,153 @@ C--CHECK FOR "OUTPUT_FILE_FORMAT" KEYWORD AND GET INPUT VALUE
           CALL USTOP(' ')
         ENDIF
 C
+C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT 
+      ELSEIF(LINE(ITYP1:ITYP2).EQ.'PACKAGE_FLOWS') THEN
+        ISTOP=ITYP2
+   20   ISTART=ISTOP + 1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,N,R,IOUT,INLMT)
+        IF(LINE(ISTART:ISTOP).EQ.' ') THEN
+          IF(FIRSTVAL) THEN 
+            WRITE(IOUT,15) 
+            GOTO 1000
+          ELSE
+            CONTINUE
+          ENDIF
+        ELSEIF(LINE(ISTART:ISTOP).EQ.'ALL') THEN ! ALL = "all available"
+          !Activate connections in SFR, LAK, and UZF, provided they are active
+          IF(MTUZF.NE.0.AND.IUZOPT.NE.0) THEN
+            IUZFFLOWS=1
+            NPCKGTXT = NPCKGTXT + 1
+          ENDIF
+          IF(MTSFR.NE.0) THEN
+            ISFRFLOWS=1
+            NPCKGTXT = NPCKGTXT + 1
+          ENDIF
+          IF(MTLAK.NE.0) THEN
+            ILAKFLOWS=1
+            NPCKGTXT = NPCKGTXT + 1
+          ENDIF
+          !edm: Determine which combinations of packages is active to determine 
+          !     how many CONNECTions there are
+          IF(IUZFFLOWS.EQ.1.AND.ISFRFLOWS.EQ.1.AND.
+     &                        IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
+            DO I=1,NROW
+              DO J=1,NCOL
+                IF(IRUNBND(J,I).GT.0) THEN ! check IRUNBND for at least 1 positive connection
+                  IUZFSFRCONNECT=1
+                  NPCKGTXT = NPCKGTXT + 1
+                  EXIT
+                ENDIF
+              ENDDO
+            ENDDO
+          ENDIF
+          IF(IUZFFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1.AND.
+     &                        IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
+            DO I=1,NROW
+              DO J=1,NCOL
+                IF(IRUNBND(J,I).LT.0) THEN ! check IRUNBND for at least 1 negative (lake) connection
+                  IUZFLAKCONNECT=1
+                  NPCKGTXT = NPCKGTXT + 1
+                  EXIT
+                ENDIF
+              ENDDO
+            ENDDO
+          ENDIF
+C--EDM Cycle through all IUPSEG and IOUTSEG variables to see if there is a negative value, 
+C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
+          IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
+            DO I=1,NSS
+              IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+                ISFRLAKCONNECT=1
+                NPCKTXT = NPCKTXT + 1
+                EXIT
+              ENDIF              
+            ENDDO
+          ENDIF
+        ELSEIF(LINE(ISTART:ISTOP).EQ.'SFR'.OR.
+     +         LINE(ISTART:ISTOP).EQ.'LAK'.OR.
+     +         LINE(ISTART:ISTOP).EQ.'UZF') THEN
+          SELECT CASE (LINE(ISTART:ISTOP))
+            CASE ('SFR')
+              IF(MTSFR.NE.0) THEN
+                ISFRFLOWS=1
+                NPCKGTXT = NPCKGTXT + 1
+              ENDIF
+              ! Determine if a LAK connection exists. UZF connections only exist 
+              ! if the UZF package is active and can be set at that time.
+              ! Because the ISFRLAKCONNECT could have already been set by the 
+              ! call to CASE('LAK'), need to check that it hasn't been set yet.
+              IF(.NOT.ISFRLAKCONNECT.EQ.1) THEN
+                IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
+                  DO I=1,NSS
+                    IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+                      ISFRLAKCONNECT=1
+                      NPCKTXT = NPCKTXT + 1
+                      EXIT
+                    ENDIF
+                  ENDDO
+                ENDIF
+              ENDIF
+              FIRSTVAL=.FALSE.
+            CASE ('LAK')
+              IF(MTLAK.NE.0) THEN
+                ILAKFLOWS=1
+                NPCKGTXT = NPCKGTXT + 1
+              ENDIF
+              ! Determine if a SFR connection exists. UZF connections only exist 
+              ! if the UZF package is active and can be set at that time.
+              ! Because the ISFRLAKCONNECT could have already been set by the 
+              ! call to CASE('SFR'), need to check that it hasn't been set yet.
+              IF(.NOT.ISFRLAKCONNECT.EQ.1) THEN
+                IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
+                  DO I=1,NSS
+                    IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+                      ISFRLAKCONNECT=1
+                      NPCKTXT = NPCKTXT + 1
+                      EXIT
+                    ENDIF
+                  ENDDO
+                ENDIF
+              ENDIF
+              FIRSTVAL=.FALSE.
+            CASE ('UZF')
+              IF(MTUZF.NE.0) THEN
+                IUZFFLOWS=1
+                NPCKGTXT = NPCKGTXT + 1
+              ENDIF
+              ! Determine if SFR/LAK connections exist and set on a case by case basis. 
+              IF(IUZFFLOWS.EQ.1.AND.MTSFR.NE.0.AND.
+     &                            IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
+                DO I=1,NROW
+                  DO J=1,NCOL
+                    IF(IRUNBND(J,I).GT.0) THEN ! check IRUNBND for at least 1 positive connection
+                      IUZFSFRCONNECT=1
+                      NPCKGTXT = NPCKGTXT + 1
+                      EXIT
+                    ENDIF
+                  ENDDO
+                ENDDO
+              ENDIF
+              IF(IUZFFLOWS.EQ.1.AND.MTLAK.NE.0.AND.
+     &                            IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
+                DO I=1,NROW
+                  DO J=1,NCOL
+                    IF(IRUNBND(J,I).LT.0) THEN ! check IRUNBND for at least 1 negative (lake) connection
+                      IUZFLAKCONNECT=1
+                      NPCKGTXT = NPCKGTXT + 1
+                      EXIT
+                    ENDIF
+                  ENDDO
+                ENDDO
+              ENDIF
+              FIRSTVAL=.FALSE.
+          END SELECT
+          GOTO 20
+        ELSE
+          WRITE(IOUT,16) LINE(ISTART:ISTOP)
+          CALL USTOP(' ')
+        ENDIF
+C
 C--ERROR DECODING LMT INPUT KEYWORDS
       ELSE
         WRITE(IOUT,28) LINE
@@ -210,6 +387,11 @@ C
      & /1X,'INVALID OUTPUT_FILE_HEADER CODE: ',A)
    14 FORMAT(/1X,'ERROR READING LMT PACKAGE INPUT DATA:',
      & /1X,'INVALID OUTPUT_FILE_FORMAT SPECIFIER: ',A)
+   15 FORMAT(/1X,'SURFACE FLOW CONNECTIONS WILL NOT BE ',
+     & 'WRITTEN TO THE FLOW-TRANSPORT LINK FILE')
+   16 FORMAT(/1X,'THE FOLLOWING PACKAGE HAS NO SUPPORT ',
+     & 'FOR SURFACE FLOW CONNECTIONS OR IS',
+     & /1X,'AN UNRECOGNIZED KEYWORD IN THE LMT INPUT FILE: ',A)
    28 FORMAT(/1X,'ERROR READING LMT PACKAGE INPUT DATA:',
      & /1X,'UNRECOGNIZED KEYWORD: ',A)
   120 FORMAT(/1X,'WARNING READING LMT PACKAGE INPUT DATA:',
@@ -4026,6 +4208,13 @@ C
       DEALLOCATE(LMTDAT(IGRID)%ISSMT3D)
       DEALLOCATE(LMTDAT(IGRID)%IUMT3D)
       DEALLOCATE(LMTDAT(IGRID)%ILMTFMT)
+      DEALLOCATE(IUZFLAKCONNECT)
+      DEALLOCATE(IUZFSFRCONNECT)
+      DEALLOCATE(ISFRLAKCONNECT)
+      DEALLOCATE(NPCKGTXT)
+      DEALLOCATE(IUZFFLOWS)
+      DEALLOCATE(ISFRFLOWS)
+      DEALLOCATE(ILAKFLOWS)
 C
       RETURN
       END
