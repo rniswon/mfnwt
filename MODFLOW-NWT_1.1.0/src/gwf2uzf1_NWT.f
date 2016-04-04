@@ -3051,50 +3051,50 @@ C31-----UPDATE RATES AND BUFFERS WITH ET FOR UZF OR MODFLOW BUDGET ITEMS.
 C
 C Print net recharge as ascii to a separate output file
 !      IF ( INETFLUX.GT.0 ) THEN
-!        TIMEPRINT = TIMEPRINT + DELT
-!        DO ir = 1, NROW
-!          DO ic = 1, NCOL
-!            IF ( IUZFBND(ic,ir).NE.0 ) THEN
-!              dum1 = 0.0
-!              dum2 = 0.0
-!              IF ( Iunitsfr.GT.0 ) THEN
-!                IF ( FNETSEEP(ic,ir).GT.0.0 ) THEN
-!                  dum1 = FNETSEEP(ic,ir)*DELT
-!                ELSE
-!                  dum2 = FNETSEEP(ic,ir)*DELT
-!                END IF
-!              END IF
-!              IF (Iunitlak.GT.0 ) THEN
-!                IF ( LAKSEEP(ic,ir).GT. 0.0 ) THEN
-!                  dum1 = dum1 + LAKSEEP(ic,ir)*DELT
-!                ELSE
-!                  dum2 = dum2 + LAKSEEP(ic,ir)*DELT
-!                END IF
-!              END IF
-!              FNETEXFIL1(ic, ir) = FNETEXFIL1(ic, ir) + dum1 + 
-!     +                             UZFLWT(ic, ir)
-!              FNETEXFIL2(ic, ir) = FNETEXFIL2(ic, ir) -SEEPOUT(ic, ir)
-!     +                             -GWET(ic, ir)+dum2
-!            END IF
-!          END DO
-!        END DO
+        TIMEPRINT = TIMEPRINT + DELT
+        DO ir = 1, NROW
+          DO ic = 1, NCOL
+            IF ( IUZFBND(ic,ir).NE.0 ) THEN
+              dum1 = 0.0
+              dum2 = 0.0
+              IF ( Iunitsfr.GT.0 ) THEN
+                IF ( FNETSEEP(ic,ir).GT.0.0 ) THEN
+                  dum1 = FNETSEEP(ic,ir)*DELT
+                ELSE
+                  dum2 = FNETSEEP(ic,ir)*DELT
+                END IF
+              END IF
+              IF (Iunitlak.GT.0 ) THEN
+                IF ( LAKSEEP(ic,ir).GT. 0.0 ) THEN
+                  dum1 = dum1 + LAKSEEP(ic,ir)*DELT
+                ELSE
+                  dum2 = dum2 + LAKSEEP(ic,ir)*DELT
+                END IF
+              END IF
+              FNETEXFIL1(ic, ir) = FNETEXFIL1(ic, ir) + dum1 + 
+     +                             UZFLWT(ic, ir)
+              FNETEXFIL2(ic, ir) = FNETEXFIL2(ic, ir) -SEEPOUT(ic, ir)
+     +                             -GWET(ic, ir)+dum2
+            END IF
+          END DO
+        END DO
 !!        IF ( ibd.NE.0 .OR. ibduzf.NE.0 ) THEN
 !!         IF ( ABS(TIMEPRINT-10).LT.0.1 ) THEN
-!           OPEN(991,file='Netrech.txt')
-!           OPEN(992,file='Netdis.txt')
-!           write(991,*)kkper, kkstp
-!           DO ir = 1, NROW
-!             WRITE(991,221)(FNETEXFIL1(ic, ir)/TIMEPRINT,ic=1,NCOL)
-!             WRITE(992,221)(FNETEXFIL2(ic, ir)/TIMEPRINT,ic=1,NCOL)
-!             DO ic = 1, NCOL
-!               FNETEXFIL1(ic, ir) = 0.0
-!               FNETEXFIL2(ic, ir) = 0.0
-!             END DO
-!           END DO
-!           TIMEPRINT = 0.0
-!!          END IF
-!!        END IF
-!  221 FORMAT(5000e20.10)
+           OPEN(991,file='Netrech.txt')
+           OPEN(992,file='Netdis.txt')
+           write(991,*)kkper, kkstp
+           DO ir = 1, NROW
+             WRITE(991,221)(FNETEXFIL1(ic, ir)/TIMEPRINT,ic=1,NCOL)
+             WRITE(992,221)(FNETEXFIL2(ic, ir)/TIMEPRINT,ic=1,NCOL)
+             DO ic = 1, NCOL
+               FNETEXFIL1(ic, ir) = 0.0
+               FNETEXFIL2(ic, ir) = 0.0
+             END DO
+           END DO
+           TIMEPRINT = 0.0
+!          END IF
+!        END IF
+  221 FORMAT(5000e20.10)
 !       END IF
 C
 C31-----UPDATE RATES AND BUFFERS WITH ET FOR UZF OR MODFLOW BUDGET ITEMS.
@@ -3313,7 +3313,7 @@ C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
      +             .AND. IUZFBND(ic,ir).NE.0 ) THEN
                 ill = LAYNUM(ic, ir)
                 IF ( ill.GT.0 ) THEN
-              BUFF(ic, ir, ill) = + EXCESPP(ic, ir) + REJ_INF(ic, ir)
+              BUFF(ic, ir, ill) = EXCESPP(ic, ir) + REJ_INF(ic, ir)
                 END IF
               END IF
             END DO
@@ -3328,14 +3328,6 @@ C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
       END IF
-      
-C41-----SAVE UNSATURATED STORAGE TO UNFORMATTED FILE.
-        IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textexfl, IUZFCB1, 
-     +                            BUFF, NCOL, NROW, NLAY, IOUT)
-        IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textexfl,  
-     +                               IUZFCB2, BUFF, LAYNUM, NUZTOP,
-     +                               NCOL, NROW, NLAY, IOUT, DELT,  
-     +                               PERTIM, TOTIM, IBOUND)
 C
 C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
@@ -3346,7 +3338,7 @@ C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
      +             .AND. IUZFBND(ic,ir).NE.0 ) THEN
                 ill = LAYNUM(ic, ir)
                 IF ( ill.GT.0 ) THEN
-              BUFF(ic, ir, ill) = + DELSTOR(IC,IR)/delt
+              BUFF(ic, ir, ill) = DELSTOR(IC,IR)/delt
                 END IF
               END IF
             END DO
