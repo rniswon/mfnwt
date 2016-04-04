@@ -84,7 +84,7 @@ C     ------------------------------------------------------------------
       INTEGER nseg, nreach, krch, irch, jrch, jseg, ireach, ksfropt
       INTEGER krck, irck, jrck, jsegck, ireachck, kkptflg, ib
       INTEGER lstsum, lstbeg, numinst, idum(1), ip, iterp, mstrmar
-      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG, ITRFLG
+      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
       REAL epsslpe
@@ -102,7 +102,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
-      ALLOCATE (NINTOT)                                    !EDM - FOR LMT
+      ALLOCATE (NINTOT,ITRFLG)                                    !EDM - FOR LMT
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /, ' SFR7 -- STREAMFLOW ROUTING PACKAGE, '
@@ -1040,8 +1040,9 @@ C     READ STREAM DATA FOR STRESS PERIOD
 C     Compute three new tables for lake outflow
 C     ******************************************************************
       USE GWFSFRMODULE
+      USE LMTMODULE,    ONLY: NFLOWTYPE,FLOWTYPE
       USE GLOBAL,       ONLY: IOUT, ISSFLG, IBOUND, BOTM, HNEW, NLAY, 
-     +                        LAYHDT
+     +                        LAYHDT, IUNIT
       USE PARAMMODULE,  ONLY: MXPAR, PARTYP, IACTIVE, IPLOC
       USE ICHKSTRBOT_MODULE
       IMPLICIT NONE
@@ -1065,7 +1066,7 @@ C     ------------------------------------------------------------------
       INTEGER i, ic, icalc, ichk, icp, iflginit, ii, ik, il, ilay, ip,
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
-     +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval, iunit,
+     +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
      +        Ltyp,ierr,IFLG
 C     ------------------------------------------------------------------
 C
@@ -1279,6 +1280,10 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
+        FLOWTYPE(1) = 'NA'
+        FLOWTYPE(2) = 'NA'
+        FLOWTYPE(3) = 'NA'
+        FLOWTYPE(4) = 'NA'
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -1287,6 +1292,33 @@ C18-----COMPUTE STREAM REACH VARIABLES.
           etsw = SEG(4, nseg)
           pptsw = SEG(5, nseg)
           sumlen = 0.0
+C
+C--SET SOME VALUES NEEDED BY THE LMT PACKAGE
+C--AS EACH SEGMENT IS READ, DETERMINE IF ANY OF THE FOLLOWING ARE ACTIVE
+C  (1) STORAGE (TRANSIENT ROUTING); (2) PRECIP; (3) EVAP; (4) USER-SPECIFIED RUNOFF; 
+C  (5) RUNOFF FROM UZF1 PACKAGE; (6) UNSATURATED FLOW BENEATH REACH (NOT AVAILABLE YET)
+          IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+            NFLOWTYPE=0
+            IF(ITRFLG.EQ.1.AND.FLOWTYPE(1).EQ.'NA') THEN 
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(1)='STORAGE'
+            ENDIF
+            IF(SEG(4,nseg).NE.0.AND.FLOWTYPE(2).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER EVAP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(2)='EVAP'
+              EXIT
+            ENDIF
+            IF(SEG(5,nseg).NE.0.AND.FLOWTYPE(3).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER PRECIP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(3)='PRECIP'
+              EXIT
+            ENDIF
+            IF(SEG(3,nseg).NE.0.AND.FLOWTYPE(4).EQ.'NA') THEN  ! CHECK FOR USER-SPECIFIED RUNOFF
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(4)='RUNOFF'
+              EXIT
+            ENDIF
+          ENDIF
 C
 C19-----COMPUTE VARIABLES NEEDED FOR STREAM LEAKAGE.
           IF ( icalc.EQ.0 .OR. icalc.EQ.1 ) THEN
@@ -1816,9 +1848,9 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             WRITE(iout,9033)ISFRLIST(1,i),ISFRLIST(3,i)
             WRITE(iout,9031)
             numval = ISFRLIST(2,i)
-            iunit = ISFRLIST(3,i)
+            iunitnum = ISFRLIST(3,i)
             DO j = 1, numval
-              READ(iunit,*)TABTIME(j,ISFRLIST(1,i)),
+              READ(iunitnum,*)TABTIME(j,ISFRLIST(1,i)),
      +                     TABFLOW(j,ISFRLIST(1,i))
               IF ( TABFLOW(j,ISFRLIST(1,i)).LT.0.0 ) THEN
                 TABFLOW(j,ISFRLIST(1,i)) = 0.0
