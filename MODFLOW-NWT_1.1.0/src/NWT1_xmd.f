@@ -139,31 +139,31 @@ cmi
         IREDSYS = 1
         RRCTOLS = 0.0
         IDROPTOL = 1
-        EPSRNS = 1.0e-3
-        HCLOSEXMDDUM = 1.0e-4
+        EPSRNS = 5.0e-3
+        HCLOSEXMDDUM = 1.0e-3
         MXITERXMD = 50
       ELSEIF ( IFDPARAM.EQ.2 ) THEN
-        IACL = 2
-        NORDER = 0
-        LEVEL = 5
-        NORTH = 5
+        IACL = 1               !3/25/16
+        NORDER = 0                
+        LEVEL = 10             !3/25/16
+        NORTH = 10             !3/25/16
         IREDSYS = 1
         RRCTOLS = 0.0
         IDROPTOL = 1
-        EPSRNS = 1.0e-4
-        HCLOSEXMDDUM = 1.0e-4
-        MXITERXMD = 50
+        EPSRNS = 5.0e-3        !3/25/16
+        HCLOSEXMDDUM = 1.0e-3  !3/25/16
+        MXITERXMD = 100        !3/25/16
       ELSEIF ( IFDPARAM.EQ.3 ) THEN
         IACL = 2
-        NORDER = 1
-        LEVEL = 5
-        NORTH = 7
+        NORDER = 0  !3/25/16
+        LEVEL = 15  !3/25/16
+        NORTH = 15  !3/25/16
         IREDSYS = 1
         RRCTOLS = 0.0
         IDROPTOL = 1
-        EPSRNS = 1.0e-5
-        HCLOSEXMDDUM = 1.0e-5
-        MXITERXMD = 50
+        EPSRNS = 1.0e-3        !3/25/16
+        HCLOSEXMDDUM = 1.0e-4  !3/25/16
+        MXITERXMD = 200        !3/25/16
       END IF    
       HCLOSEXMD = dble(HCLOSEXMDDUM)
 !

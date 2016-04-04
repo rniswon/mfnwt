@@ -142,7 +142,7 @@ C3B-----GET OPTIONS.
         Breducdum = 0.97
       ELSEIF ( IFDPARAM.EQ.2 ) THEN
         thetadum = 0.90
-        akappadum = 0.0001
+        akappadum = 0.00001   !3/25/16
         gammadum = 0.00
         amomentdum = 0.1
         Btrack = 0

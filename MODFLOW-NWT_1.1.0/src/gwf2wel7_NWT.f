@@ -471,7 +471,6 @@ C     ******************************************************************
 C     SMOOTHLY REDUCES PUMPING TO ZERO FOR DEWATERED CONDITIONS
 C     ******************************************************************
 ! h is the depth 
-! dC is the derivative of well conductance with respect to well head
       USE GWFWELMODULE,ONLY:PSIRAMP
       IMPLICIT NONE
       DOUBLE PRECISION s, aa, bb, x
