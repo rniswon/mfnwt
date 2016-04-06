@@ -1,0 +1,237 @@
+#		
+# Makefile --		
+#	In addition, the lib directory and file libmf2k5.a are required and not part of the MF-NWT download	I got it from the GSFLOW download.
+# Top-level makefile for the MF_NWT		
+#		
+MODFLOWDIR  = .
+BINDIR      = ../bin
+LIBDIR      = ../lib
+TARGET      = $(BINDIR)/MODFLOW_NWT
+MF2K5LIB    = $(LIBDIR)/libmf2k5.a
+		
+#########################################################		
+# Configure tags for each system		
+##########################################################		
+#ARC		#NAME?
+#ARC		#NAME?
+		
+#OPTLEVEL	#NAME?	
+#OPTLEVEL	#NAME?	
+LDFLAGS		=$(OPTLEVEL)
+		
+##########################################################		
+# Define the Fortran compile flags		
+##########################################################		
+#FFLAGS= $(OPTLEVEL) -fbounds-check -Wall
+FFLAGS= $(OPTLEVEL)
+FC		= gfortran
+CC		= gcc
+		
+##########################################################		
+# Define the libraries		
+##########################################################		
+MATHLIB		= -lm
+GFLIB		= -lgfortran -lgcc $(MATHLIB)
+		
+##########################################################		
+# Unix system commands		
+##########################################################		
+RM		= rm -f
+AR  		= ar ruv
+RANLIB		= ranlib
+MAKE		= make
+LN		= ln -s
+CD		= cd
+CP		= cp
+		
+#		
+# Standard Targets for Users		
+#		
+		
+all: $(TARGET)		
+		
+$(TARGET): $(MF2K5LIB) MF_NWT.o		
+#	$(RM) $(TARGET)	
+	$(FC) $(FFLAGS) -o $(TARGET) MF_NWT.o $(MF2K5LIB) $(GFLIB)	
+		
+LIBOBJS = gwf2bas7_NWT.o utl7.o gwfuzfmodule_NWT.o gwfsfrmodule_NWT.o NWT1_module.o mach_mod.o pcg7_NWT.o sip7_NWT.o de47_NWT.o nogmg.o mhc7.o lmt7_NWT.o NWT1_ilupc_mod.o gwf2bcf7.o gwf2lpf7.o gwf2huf7.o hufutl7.o gwf2upw1.o gwf2lak7_NWT.o gwf2sfr7_NWT.o gwf2uzf1_NWT.o gwf2wel7_NWT.o gwf2ghb7_NWT.o gwf2fhb7.o gwf2mnw27_NWT.o gwf2mnw17_NWT.o gwf2mnw2i7.o NWT1_xmdlib.o NWT1_xmd.o NWT1_gmres.o NWT1_solver.o gwf2chd7.o gwf2hfb7_NWT.o gwf2rch7.o gwf2res7.o gwf2riv7_NWT.o gsol7.o gwf2swr7_NWT.o gwf2swt7.o gwf2str7.o gwf2drn7_NWT.o gwf2drt7.o gwf2ets7.o gwf2evt7.o gwf2sub7.o gwf2ibs7.o gwf2hydmod7.o gwf2gag7.o parutl7.o obs2bas7.o obs2chd7.o obs2drn7.o obs2riv7.o obs2str7.o obs2ghb7.o
+		
+		
+$(MF2K5LIB): $(LIBOBJS)
+	echo $(MF2K5LIB)
+	$(RM) $(MF2K5LIB)	
+	$(AR) $(MF2K5LIB) $(LIBOBJS)	
+	$(RANLIB) $(MF2K5LIB)	
+		
+clean:		
+	$(RM) *.o *.mod *~ $(MF2K5LIB) $(TARGET)	
+		
+MF_NWT.o: MF_NWT.f openspec.inc gwf2bas7_NWT.o gwf2huf7.o gwf2evt7.o gwf2rch7.o gwf2lak7_NWT.o gwfsfrmodule_NWT.o NWT1_module.o pcg7_NWT.o sip7_NWT.o de47_NWT.o nogmg.o		
+	$(FC) -c $(CFLAGS) MF_NWT.f	
+		
+mhc7.o: mhc7.f		
+	$(FC) -c $(CFLAGS) mhc7.f	
+		
+nogmg.o: nogmg.f gwf2bas7_NWT.o		
+	$(FC) -c $(CFLAGS) nogmg.f	
+		
+modules.o: modules.f90 mach_mod.o		
+	$(FC) -c $(CFLAGS) modules.f90	
+		
+mach_mod.o: mach_mod.f90		
+	$(FC) -c $(CFLAGS) mach_mod.f90	
+		
+NWT1_ilupc_mod.o: NWT1_ilupc_mod.f90 mach_mod.o gwf2bas7_NWT.o		
+	$(FC) -c $(CFLAGS) NWT1_ilupc_mod.f90	
+		
+NWT1_module.o: NWT1_module.f		
+	$(FC) -c $(CFLAGS) NWT1_module.f	
+		
+NWT1_xmd.o: NWT1_xmd.f NWT1_xmdlib.o gwf2bas7_NWT.o NWT1_module.o		
+	$(FC) -c $(CFLAGS) NWT1_xmd.f	
+		
+NWT1_xmdlib.o: NWT1_xmdlib.f		
+	$(FC) -c $(CFLAGS) NWT1_xmdlib.f	
+		
+NWT1_gmres.o: NWT1_gmres.f90 gwf2bas7_NWT.o mach_mod.o NWT1_module.o		
+	$(FC) -c $(CFLAGS) NWT1_gmres.f90	
+		
+NWT1_solver.o: NWT1_solver.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o NWT1_xmd.o NWT1_gmres.o NWT1_ilupc_mod.o mach_mod.o		
+	$(FC) -c $(CFLAGS) NWT1_solver.f	
+		
+utl7.o: utl7.f openspec.inc		
+	$(FC) $(FFLAGS) -c utl7.f	
+		
+gwf2bas7_NWT.o: gwf2bas7_NWT.f openspec.inc		
+	$(FC) $(FFLAGS) -c gwf2bas7_NWT.f	
+		
+gwf2bcf7.o: gwf2bcf7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2bcf7.f	
+		
+gwf2rch7.o: gwf2rch7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2rch7.f	
+		
+gwf2str7.o: gwf2str7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2str7.f	
+		
+gwf2sub7.o: gwf2sub7.f gwf2bas7_NWT.o sip7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2sub7.f	
+		
+gwf2swt7.o: gwf2swt7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2swt7.f	
+		
+hufutl7.o: hufutl7.f gwf2bas7_NWT.o gwf2huf7.o		
+	$(FC) $(FFLAGS) -c hufutl7.f	
+		
+gwf2upw7.o: gwf2upw1.f gwf2bas7_NWT.o NWT1_module.o		
+	$(FC) $(FFLAGS) -c gwf2upw1.f	
+		
+gwf2res7.o: gwf2res7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2res7.f	
+		
+lmt7_NWT.o: lmt7_NWT.f openspec.inc gwf2bas7_NWT.o gwf2bcf7.o gwf2lpf7.o gwf2upw1.o NWT1_module.o gwf2huf7.o gwf2wel7_NWT.o gwf2drn7_NWT.o gwf2riv7_NWT.o gwf2rch7.o gwf2evt7.o gwf2ghb7_NWT.o gwf2fhb7.o gwf2res7.o gwf2str7.o gwf2mnw17_NWT.o gwf2mnw27_NWT.o gwf2ets7.o gwf2drt7.o gwfuzfmodule_NWT.o		
+	$(FC) $(FFLAGS) -c lmt7_NWT.f	
+		
+gwf2wel7.o: gwf2wel7.f gwf2bas7_NWT.o NWT1_module.o gwf2upw1.o		
+	$(FC) $(FFLAGS) -c gwf2wel7.f	
+		
+gwf2sfr7_NWT.o: gwf2sfr7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwf2lak7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2sfr7_NWT.f	
+		
+gwf2uzf1_NWT.o: gwf2uzf1_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwf2lpf7.o gwf2bcf7.o gwf2huf7.o gwf2upw1.o gwfuzfmodule_NWT.o NWT1_module.o gwf2lak7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2uzf1_NWT.f	
+		
+gwf2riv7_NWT.o: gwf2riv7_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2riv7_NWT.f	
+		
+gwf2swr7_NWT.o: gwf2swr7_NWT.f openspec.inc gwf2bas7_NWT.o gwf2bcf7.o gwf2lpf7.o gwf2huf7.o gwf2upw1.o NWT1_module.o		
+	$(FC) $(FFLAGS) -c gwf2swr7_NWT.f	
+		
+gwf2mnw17_NWT.o: gwf2mnw17_NWT.f gwf2bas7_NWT.o sip7_NWT.o de47_NWT.o pcg7_NWT.o nogmg.o NWT1_module.o gwf2bcf7.o gwf2lpf7.o gwf2huf7.o gwf2upw1.o		
+	$(FC) $(FFLAGS) -c gwf2mnw17_NWT.f	
+		
+gwf2mnw27_NWT.o: gwf2mnw27_NWT.f gwf2bas7_NWT.o sip7_NWT.o de47_NWT.o pcg7_NWT.o nogmg.o NWT1_module.o gwf2bcf7.o gwf2lpf7.o gwf2huf7.o gwf2upw1.o		
+	$(FC) $(FFLAGS) -c gwf2mnw27_NWT.f	
+		
+gwf2mnw2i7.o: gwf2mnw2i7.f gwf2bas7_NWT.o gwf2mnw27_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2mnw2i7.f	
+		
+gwf2chd7.o: gwf2chd7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2chd7.f	
+		
+gwf2drt7.o: gwf2drt7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2drt7.f	
+		
+gwf2ets7.o: gwf2ets7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2ets7.f	
+		
+gwf2evt7.o: gwf2evt7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2evt7.f	
+		
+gwf2fbh7.o: gwf2fhb7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2fhb7.f	
+		
+gwf2gag7.o: gwf2gag7.f gwf2bas7_NWT.o gwf2lak7_NWT.o gwf2sfr7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2gag7.f	
+		
+gwf2ghb7_NWT.o: gwf2ghb7_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2ghb7_NWT.f	
+		
+gwf2drn7_NWT.o: gwf2drn7_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2drn7_NWT.f	
+		
+gwf2ibs7.o: gwf2ibs7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2ibs7.f	
+		
+gwf2lpf7.o: gwf2lpf7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2lpf7.f	
+		
+gwf2hydmod7.o: gwf2hydmod7.f gwf2bas7_NWT.o gwf2ibs7.o gwf2sub7.o gwf2str7.o gwfsfrmodule_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2hydmod7.f	
+		
+gwf2hfb7_NWT.o: gwf2hfb7_NWT.f openspec.inc gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c gwf2hfb7_NWT.f	
+		
+gwf2lak7_NWT.o: gwf2lak7_NWT.f gwf2bas7_NWT.o gwfsfrmodule_NWT.o gwfuzfmodule_NWT.o gwf2bcf7.o gwf2lpf7.o gwf2upw1.o gwf2huf7.o		
+	$(FC) $(FFLAGS) -c gwf2lak7_NWT.f	
+		
+de47_NWT.o: de47_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c de47_NWT.f	
+ 		
+pcg7_NWT.o: pcg7_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c pcg7_NWT.f	
+ 		
+sip7_NWT.o: sip7_NWT.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c sip7_NWT.f	
+ 		
+parutl7.o: parutl7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c parutl7.f	
+ 		
+obs2bas7.o: obs2bas7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c obs2bas7.f	
+ 		
+obs2chd7.o: obs2chd7.f gwf2bas7_NWT.o		
+	$(FC) $(FFLAGS) -c obs2chd7.f	
+ 		
+obs2drn7.o: obs2drn7.f gwf2bas7_NWT.o gwf2drn7_NWT.o		
+	$(FC) $(FFLAGS) -c obs2drn7.f	
+ 		
+obs2ghb7.o: obs2ghb7.f gwf2bas7_NWT.o gwf2ghb7_NWT.o		
+	$(FC) $(FFLAGS) -c obs2ghb7.f	
+ 		
+obs2riv7.o: obs2riv7.f gwf2bas7_NWT.o gwf2riv7_NWT.o		
+	$(FC) $(FFLAGS) -c obs2riv7.f	
+ 		
+obs2str7.o: obs2str7.f gwf2bas7_NWT.o gwf2str7.o		
+	$(FC) $(FFLAGS) -c obs2str7.f	
+ 		
+gwfsfrmodule_NWT.o: gwfsfrmodule_NWT.f		
+	$(FC) $(FFLAGS) -c gwfsfrmodule_NWT.f	
+ 		
+gwfuzfmodule_NWT.o: gwfuzfmodule_NWT.f		
+	$(FC) $(FFLAGS) -c gwfuzfmodule_NWT.f	
+ 		
+gsol7.o: gsol7.f		
+	$(FC) $(FFLAGS) -c gsol7.f	
+		
+#  end		
