@@ -169,9 +169,9 @@ C  Observation allocate and read
       IF(IUNIT(36).GT.0) CALL OBS2STR7AR(IUNIT(36),IUNIT(18),IGRID)
       IF(IUNIT(38).GT.0) CALL OBS2CHD7AR(IUNIT(38),IGRID)
 ! Modify conductance for HFB when using UPW.
-      IF ( IUNIT(62).GT.0 ) THEN
-        IF(IUNIT(21).GT.0) CALL GWF2HFB7UPW(IGRID)
-      END IF
+      !IF ( IUNIT(62).GT.0 ) THEN
+      !  IF(IUNIT(21).GT.0) CALL GWF2HFB7UPW(IGRID)
+      !END IF
 C
 C7------SIMULATE EACH STRESS PERIOD.
       DO 100 KPER = 1, NPER

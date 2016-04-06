@@ -40,12 +40,28 @@ is an input variable specified within the NWT solver input file. These cells wer
 set to inactive by setting IBOUND=0. This conditions is now treated as an error
 and the model will stop if TOP-BOT<100*Thickfact. 
 
+One of the default solver settings for MODERATE were changed:
+akappadum = 0.00001
+
+An error was fixed in the calculation of the derivative for smoothing conductunce  
+during complete wetting of a cell. Testing using several problems indicated that 
+this change has minimal affects on the solution.
+
+gwf2upw1.f
+
+NWT1_xmd.f
+
+
+An error was fixed in the calculation of the derivative for smoothing conductunce  
+during complete wetting of a cell. Testing using several problems indicated that 
+this change has minimal affects on the solution.
+
 Streamflow Routing (SFR2) Package
 
 Some variables in the SFR2 Package were initialized. Some variables were changed
 to arrays in order to save data for MT3D-USGS.
 
-Unsaturated-Zone Flow (UZF) Package.
+Unsaturated-Zone Flow (UZF) Package
 
 Some variables in the UZF Package for calculating runoff were initialized.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
