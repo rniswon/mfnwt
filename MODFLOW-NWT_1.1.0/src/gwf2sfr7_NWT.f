@@ -8027,7 +8027,8 @@ C8------EXIT LOOP IF delq LESS THAN TOLERANCE.
       END DO CONVERGE
       stor = Strlen*(ad2+ac)/(2.0D0*Deltinc) - 
      +       Strlen*(ab+aa)/(2.0D0*Deltinc)
-      Chanstor = Qc - Qd - stor - FLOBOT
+!      Chanstor = Qc - Qd - stor - FLOBOT
+      Chanstor = stor
       IF ( i.GE.maxiter ) WRITE(IOUT,*) 'Non-convergence in ROUTE_CHAN',
      +                                  L, delq
       IF ( Qd.LT.tol ) tol = 0.0D0
