@@ -4136,7 +4136,7 @@ C
       CHARACTER*16 TEXT
       INTEGER MXSGMT,MXRCH,LASTRCH,L,NREACH,LL,IL,IC,IR,ILAY,
      &        KSTP,KPER,IUMT3D,ISTSG,ILMTFMT,ISSMT3D,IGRID
-      INTEGER I,III,JJJ,LK,IDISP,NINFLOW,ITRIB
+      INTEGER I,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
@@ -4283,6 +4283,18 @@ C  FLOW RATES FOR THE DIFFERENT FLOW TYPES.
         ENDDO
       ENDDO
 C
+C-------NOTES ON INDICES
+C       Istrm(4, L): SEGMENT NUMBER
+C       Istrm(5, L): REACH NUMBER
+C       Strm(1, L) : STRLEN (Set above)
+C       Strm(9, L) : FLOW OUT OF REACH
+C       Strm(10, L): FLOW INTO REACH
+C       Strm(11, L): FLOW TO AQUIFER
+C       Strm(12, L): SPECIFIED volumetric rate of overland runoff into stream reach
+C       Strm(13, L): Volumetric rate of evapotranspiration from stream reach.
+C       Strm(14, L): Volumetric rate of precipitation to stream reach.
+C       Strm(31, L): Cross-sectional area
+C
 C--WRITE THE CONNECTION INFORMATION
       DO L=1,Nstrm
 C
@@ -4409,26 +4421,26 @@ C
 C22-----SET INFLOW EQUAL TO OUTFLOW FROM UPSTREAM REACH WHEN REACH
 C         IS GREATER THAN 1.
         ELSE IF(NREACH.GT.1) THEN
+          LL=L-1
           FLOWIN = STRM(9, LL)
           NINFLOW = 1
           IDISP = 1
           III=ISTRM(4, LL)
           JJJ=ISTRM(5, LL)
+          I=1 
+          DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
+            IUPSEG = ISTRM(4, I)
+            IUPRCH = ISTRM(5, I)
+            IF(IUPSEG.EQ.III.AND.IUPRCH.EQ.JJJ) EXIT
+            I=I+1
+          ENDDO  
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
+          ENDIF
         END IF
-C---------------------------------------------------------------
-C
-C-------NOTES ON INDICES
-C       Istrm(4, L): SEGMENT NUMBER
-C       Istrm(5, L): REACH NUMBER
-C       Strm(1, L) : STRLEN (Set above)
-C       Strm(9, L) : FLOW OUT OF REACH
-C       Strm(10, L): FLOW INTO REACH
-C       Strm(11, L): FLOW TO AQUIFER
-C       Strm(12, L): SPECIFIED volumetric rate of overland runoff into stream reach
-C       Strm(13, L): Volumetric rate of evapotranspiration from stream reach.
-C       Strm(14, L): Volumetric rate of precipitation to stream reach.
-C       Strm(31, L): Cross-sectional area
-C
+      ENDDO
 C--IF "SFR FLOWS" IS ENTERED IN PCKGTXT, WRITE STREAM NETWORK FLOW TERMS
 !       IF(ILMTFMT.EQ.0) THEN
 !         WRITE(IUMT3D) IL, IR, IC, ISTRM(4,L), ISTRM(5, L),
@@ -4445,46 +4457,45 @@ C--IF "SFR FLOWS" IS ENTERED IN PCKGTXT, WRITE STREAM NETWORK FLOW TERMS
 !       ENDIF
 C
 C-------WRITE INFLOW SEGMENT, REACH, FLOW RATE, AND DISPERSION FLAG
-        IF(NINFLOW.EQ.1) THEN
-          IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
-          ENDIF
-        ELSEIF(NINFLOW.GT.1) THEN
-          IDISP=1
-          IF(NREACH.EQ.1) THEN
-            IF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN
-              ITRIB = 1
-              FLOWIN = 0.0D0
-              DO WHILE(ITRIB.LE.NSS)
-                IF(ISTSG.EQ.IOTSG(ITRIB) ) THEN
-                  TRBFLW = SGOTFLW(ITRIB)
-                  FLOWIN = TRBFLW
-                  III=ITRIB
-                  JJJ=LASTRCH(III)
-                  IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
-                  ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
-                  ENDIF
-                END IF
-                ITRIB = ITRIB + 1
-              END DO
-              FLOWIN = SEG(2, ISTSG)
-              IDISP = 0
-              III = -ISTSG
-              JJJ = -NREACH
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
-              ENDIF
-            ENDIF
-          ENDIF
-        ENDIF
+        !IF(NINFLOW.EQ.1) THEN
+        !  IF(ILMTFMT.EQ.0) THEN
+        !    WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
+        !  ELSEIF(ILMTFMT.EQ.1) THEN
+        !    WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
+        !  ENDIF
+        !ELSEIF(NINFLOW.GT.1) THEN
+        !  IDISP=1
+        !  IF(NREACH.EQ.1) THEN
+        !    IF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN
+        !      ITRIB = 1
+        !      FLOWIN = 0.0D0
+        !      DO WHILE(ITRIB.LE.NSS)
+        !        IF(ISTSG.EQ.IOTSG(ITRIB) ) THEN
+        !          TRBFLW = SGOTFLW(ITRIB)
+        !          FLOWIN = TRBFLW
+        !          III=ITRIB
+        !          JJJ=LASTRCH(III)
+        !          IF(ILMTFMT.EQ.0) THEN
+        !            WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
+        !          ELSEIF(ILMTFMT.EQ.1) THEN
+        !            WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
+        !          ENDIF
+        !        END IF
+        !        ITRIB = ITRIB + 1
+        !      END DO
+        !      FLOWIN = SEG(2, ISTSG)
+        !      IDISP = 0
+        !      III = -ISTSG
+        !      JJJ = -NREACH
+        !      IF(ILMTFMT.EQ.0) THEN
+        !        WRITE(IUMT3D) III,JJJ,FLOWIN,IDISP
+        !      ELSEIF(ILMTFMT.EQ.1) THEN
+        !        WRITE(IUMT3D,*) III,JJJ,FLOWIN,IDISP
+        !      ENDIF
+        !    ENDIF
+        !  ENDIF
+        !ENDIF
 C
-      ENDDO
 C
       RETURN
       END
