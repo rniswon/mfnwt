@@ -4366,12 +4366,13 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
                 NINFLOW=1
                 IDISP=0
                 III=IDIVAR(1,ISTSG) !IDIVAR(1,nseg): segment number from which flow is diverted
-                DO I=1  !Find the nstrm index for the strm/rch from which flow is diverted
+                I=1 
+                DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
                   IUPSEG = ISTRM(4, I)
                   IUPRCH = ISTRM(5, I)
                   IF(IUPSEG.EQ.IDIVAR(1,ISTSG).AND.IUPRCH.EQ.1) EXIT
                   I=I+1
-                WHILE(I.LT.NSTRM)  
+                ENDDO  
                 !JJJ=LASTRCH(III)
               ENDIF
               IF(ILMTFMT.EQ.0) THEN
@@ -4381,22 +4382,28 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
               ENDIF
             END IF
 C
-C21-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
-          ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN
+C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNECTIONS TO THE DOWNSTREAM SEGMENT.
+          ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN  !ISEG(3,ISTSG).EQ.7=tributary inflows
             ITRIB = 1
             FLOWIN = 0.0D0
             NINFLOW=0
+            XSA=ISTRM(31,L)
+            IDISP=1
             DO WHILE(ITRIB.LE.NSS)
               IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
                 TRBFLW = SGOTFLW(ITRIB)
-                FLOWIN = FLOWIN + TRBFLW
+                I=LASTRCH(ITRIB)
                 NINFLOW = NINFLOW+1
+                IF(ILMTFMT.EQ.0) THEN
+                  WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
+                ELSEIF(ILMTFMT.EQ.1) THEN
+                  WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
+                ENDIF
               END IF
               ITRIB = ITRIB + 1
             END DO
-            FLOWIN = FLOWIN + SEG(2,ISTSG)
+            !FLOWIN = FLOWIN + SEG(2,ISTSG)
             NINFLOW = NINFLOW + 1
-            IDISP = 1
           ENDIF
 C
 C22-----SET INFLOW EQUAL TO OUTFLOW FROM UPSTREAM REACH WHEN REACH
