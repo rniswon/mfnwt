@@ -4136,10 +4136,13 @@ C
       CHARACTER*16 TEXT
       INTEGER MXSGMT,MXRCH,LASTRCH,L,NREACH,LL,IL,IC,IR,ILAY,
      &        KSTP,KPER,IUMT3D,ISTSG,ILMTFMT,ISSMT3D,IGRID
-      INTEGER I,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH
+      INTEGER I,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,LENGTH
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
+      REAL, DIMENSION(4,NSS)     :: SFRFLOWVAL
+      CHARACTER*16, DIMENSION(4) :: PRNTSFRQTYP
+      LOGICAL, DIMENSION(4)      :: MASK
 C
       DIMENSION LASTRCH(NSS)
 C
@@ -4167,7 +4170,6 @@ C--WRITE AN IDENTIFYING HEADER
         WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
         WRITE(IUMT3D,*) TEXT,NSTRM,NINTOT,MXSGMT,MXRCH
       ENDIF      
-C
 C
 C--IF THERE ARE NO STREAM CELLS, SKIP.
       IF (NSTRM.LE.0) RETURN
@@ -4208,80 +4210,147 @@ C       Strm(11, L): FLOW TO/FROM AQUIFER
       ENDDO
 C
 C--LOOP THROUGH EACH STREAM CELL AND WRITE EXCHANGE WITH OTHER STREAM REACHES
-      TEXT='SFR FLOWS'
+      IF(ISFRFLOWS.NE.0) THEN
+        TEXT='SFR FLOWS'
 C
 C--WRITE AN IDENTIFYING HEADER
-      IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,MXRCH
-      ELSEIF(ILMTFMT.EQ.1) THEN
-        WRITE(IUMT3D,*) KPER,KSTP
-        WRITE(IUMT3D,*) TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,MXRCH
-      ENDIF
+        IF(ILMTFMT.EQ.0) THEN
+          WRITE(IUMT3D) KPER,KSTP,TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,
+     &                  MXRCH
+        ELSEIF(ILMTFMT.EQ.1) THEN
+          WRITE(IUMT3D,*) KPER,KSTP
+          WRITE(IUMT3D,*) TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,MXRCH
+        ENDIF
 C
 C--WILL WRITE CFLOWTYPE A TOTAL OF NFLOWTYPE TIMES [MAX(NFLOWTYPE)=4]
-      DO I=1,4 
-        WRITEVAL=.FALSE.
-        SELECT CASE (FLOWTYPE(I))
-          CASE ('STORAGE')
-            TEXT=FLOWTYPE(I)
-            WRITEVAL=.TRUE.
-          CASE ('EVAP')
-            TEXT=FLOWTYPE(I)
-            WRITEVAL=.TRUE.
-          CASE ('PRECIP')
-            TEXT=FLOWTYPE(I)
-            WRITEVAL=.TRUE.
-          CASE ('RUNOFF')
-            TEXT=FLOWTYPE(I)
-            WRITEVAL=.TRUE.
-        END SELECT
-        IF(ILMTFMT.EQ.0.AND.WRITEVAL) THEN
-          WRITE(IUMT3D) TEXT
-        ELSEIF(ILMTFMT.EQ.1.AND.WRITEVAL) THEN
-          WRITE(IUMT3D,*) TEXT
-        ENDIF  
-      ENDDO 
+        MASK=.FALSE.
+        IF(FLOWTYPE(1).EQ.'STORAGE') THEN
+          MASK(1) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(FLOWTYPE(2).EQ.'PRECIP') THEN
+          MASK(2) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(FLOWTYPE(3).EQ.'EVAP') THEN
+          MASK(3) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(FLOWTYPE(4).EQ.'RUNOFF') THEN
+          MASK(4) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        PRNTSFRQTYP = PACK(FLOWTYPE, MASK)
+C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATED.
+        IF(NFLOWTYPE.EQ.1) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) FLOWTYPE(1)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) FLOWTYPE(1)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.2) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.3) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.4) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3), 
+     &                    FLOWTYPE(4)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3), 
+     &                    FLOWTYPE(4)
+          ENDIF
+        ENDIF
+        !DO I=1,4  ! 4 TYPES OF FLOW TO BE RECORED: STORAGE, PRECIP, EVAP, RUNOFF
+        !  WRITEVAL=.FALSE.
+        !  SELECT CASE (FLOWTYPE(I))
+        !    CASE ('STORAGE')
+        !      TEXT=FLOWTYPE(I)
+        !      WRITEVAL=.TRUE.
+        !    CASE ('EVAP')
+        !      TEXT=FLOWTYPE(I)
+        !      WRITEVAL=.TRUE.
+        !    CASE ('PRECIP')
+        !      TEXT=FLOWTYPE(I)
+        !      WRITEVAL=.TRUE.
+        !    CASE ('RUNOFF')
+        !      TEXT=FLOWTYPE(I)
+        !      WRITEVAL=.TRUE.
+        !  END SELECT
+        !  IF(ILMTFMT.EQ.0.AND.WRITEVAL) THEN
+        !    WRITE(IUMT3D) TEXT
+        !  ELSEIF(ILMTFMT.EQ.1.AND.WRITEVAL) THEN
+        !    WRITE(IUMT3D,*) TEXT
+        !  ENDIF  
+        !ENDDO 
 C
-C--WRITE A 2D ARRAY OF SFRFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
-C  FLOW RATES FOR THE DIFFERENT FLOW TYPES.
-      DO L=1,NSTRM
-        transtor = STRM(30, L)
-        runof = STRM(12, L)
-        etsw = STRM(13, L)
-        pptsw = STRM(14, L)
-        DO I=1, NFLOWTYPE
-          ! Only write non-zero flows, no need to clutter FTL file with values of zero
-          ! Order of terms must remain fixed as STORAGE, PREC, EVAP, PREC, RUNOF
-          IF(transtor.ne.0.AND.ITRFLG.EQ.1) THEN
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) transtor
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) transtor
-            ENDIF
-          ENDIF
-          IF(pptsw.ne.0) THEN
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) pptsw
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) pptsw
-            ENDIF
-          ENDIF
-          IF(etsw.ne.0) THEN
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) etsw
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) etsw
-            ENDIF
-          ENDIF
-          IF(runof.ne.0) THEN
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) runof
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) runof
-            ENDIF
-          ENDIF
+C--FILL A 2D ARRAY OF SFRFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
+C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
+        DO L=1,NSTRM 
+          SFRFLOWVAL(1,L) = STRM(30, L)   ! transtor 
+          SFRFLOWVAL(2,L) = STRM(14, L)   ! precip
+          SFRFLOWVAL(3,L) = STRM(13, L)   ! etsw (surf wat evap)
+          SFRFLOWVAL(4,L) = STRM(12, L)   ! user-specified runoff (variable 'runof')
         ENDDO
-      ENDDO
+C
+C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
+        USED=4
+        IF(NFLOWTYPE.GT.0) THEN
+          DO I=3,1,-1
+            IF(FLOWTYPE(I).EQ.'NA') THEN
+              LENGTH=USED-(I+1)
+              SFRFLOWVAL(:,I:I+LENGTH)=SFRFLOWVAL(:,(I+1):USED)
+              USED=USED-1
+            ENDIF
+          ENDDO
+        ENDIF
+C
+C--WRITE THE ARRAY TO THE FTL FILE.
+        IF(NFLOWTYPE.EQ.1) THEN
+          DO L=1,NSTRM
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) SFRFLOWVAL(1,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) SFRFLOWVAL(1,L)
+            ENDIF
+          ENDDO
+        ELSEIF(NFLOWTYPE.EQ.2) THEN
+          DO L=1,NSTRM
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L)
+            ENDIF
+          ENDDO
+        ELSEIF(NFLOWTYPE.EQ.3) THEN
+          DO L=1,NSTRM
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L), 
+     &                      SFRFLOWVAL(3,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L),   
+     &                        SFRFLOWVAL(3,L)
+            ENDIF
+          ENDDO
+        ELSEIF(NFLOWTYPE.EQ.4) THEN
+          DO L=1,NSTRM
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L), 
+     &                      SFRFLOWVAL(3,L), SFRFLOWVAL(4,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) SFRFLOWVAL(1,L), SFRFLOWVAL(2,L), 
+     &                        SFRFLOWVAL(3,L), SFRFLOWVAL(4,L)
+            ENDIF
+          ENDDO
+        ENDIF
 C
 C-------NOTES ON INDICES
 C       Istrm(4, L): SEGMENT NUMBER
@@ -4295,152 +4364,153 @@ C       Strm(13, L): Volumetric rate of evapotranspiration from stream reach.
 C       Strm(14, L): Volumetric rate of precipitation to stream reach.
 C       Strm(31, L): Cross-sectional area
 C
-C--WRITE THE CONNECTION INFORMATION
-      DO L=1,Nstrm
+C--WRITE THE REACH-BY-REACH CONNECTION INFORMATION
+        DO L=1,Nstrm
 C
 C6------DETERMINE STREAM SEGMENT AND REACH NUMBER.
-        ISTSG = ISTRM(4, L)
-        NREACH = ISTRM(5, L)
-        STRLEN = STRM(1, L)
-C
-        FLOWIN = 0.0D0
-        NINFLOW = 0
-        IDISP = 0
-        III = 0
-        JJJ = 0
+          ISTSG = ISTRM(4, L)
+          NREACH = ISTRM(5, L)
+          STRLEN = STRM(1, L)
+C        
+          FLOWIN = 0.0D0
+          NINFLOW = 0
+          IDISP = 0
+          III = 0
+          JJJ = 0
 C
 C---------------------------------------------------------------
 C-------DETERMINE ALL INFLOW NODES, RATES, DISPERSION IDENTIFIER
 C       Check to see if the reach at hand is the first, in which
 C       case sources of inflow could be multiple streams, lakes,  
 C       or specified.
-        IF(NREACH.EQ.1) THEN  
-          IF(ISEG(3,ISTSG).EQ.5) THEN  !If true, means no trib inflow
-            FLOWIN = SEG(2,ISTSG)      !Set flowin equal to specified inflow
-            NINFLOW = 1
-            IDISP = 0
-            III = -ISTSG
-            JJJ = -NREACH
-            XSA = STRM(31,L)
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) -999,L,IDISP,FLOWIN,XSA
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) -999,L,IDISP,FLOWIN,XSA
-            ENDIF
+          IF(NREACH.EQ.1) THEN  
+            IF(ISEG(3,ISTSG).EQ.5) THEN  !If true, means no trib inflow
+              FLOWIN = SEG(2,ISTSG)      !Set flowin equal to specified inflow
+              NINFLOW = 1
+              IDISP = 0
+              III = -ISTSG
+              JJJ = -NREACH
+              XSA = STRM(31,L)
+              IF(ILMTFMT.EQ.0) THEN
+                WRITE(IUMT3D) -999,L,IDISP,FLOWIN,XSA
+              ELSEIF(ILMTFMT.EQ.1) THEN
+                WRITE(IUMT3D,*) -999,L,IDISP,FLOWIN,XSA
+              ENDIF
 C
 C9--------COMPUTE INFLOW OF A STREAM SEGMENT EMANATING FROM A LAKE [IUNIT(22)].
 Cdep      Revised this section because outflow computed in Lake Package.
 C     IDIVAR(1,nseg): segment number to which flow is diverted
-          ELSEIF((IUNIT(22).GT.0).AND.(IDIVAR(1,ISTSG).LT.0)) THEN
-            LK = IABS(IDIVAR(1,ISTSG))
-            III = LK
-            JJJ = 0
+            ELSEIF((IUNIT(22).GT.0).AND.(IDIVAR(1,ISTSG).LT.0)) THEN
+              LK = IABS(IDIVAR(1,ISTSG))
+              III = LK
+              JJJ = 0
 C--THE FOLLOWING LINES ARE NEEDED AT THE END OF THE LMT7LAK3 SUBROUTINE
-            NSFRLAK = NSFRLAK + 1
-            ILKSEG(NSFRLAK) = ISTSG
-            ILKRCH(NSFRLAK) = 1
-            LAKSFR(NSFRLAK) = LK
-            XSA = STRM(31,L)
-            IF(SEG(2,ISTSG).GT.CLOSEZERO.AND.VOL(LK).GT.CLOSEZERO) THEN
-              FLOWIN = FXLKOT(ISTSG)
-              NINFLOW = 1
-              IDISP = 0
-            END IF
+              NSFRLAK = NSFRLAK + 1
+              ILKSEG(NSFRLAK) = ISTSG
+              ILKRCH(NSFRLAK) = 1
+              LAKSFR(NSFRLAK) = LK
+              XSA = STRM(31,L)
+              IF(SEG(2,ISTSG).GT.CLOSEZERO.AND.VOL(LK).GT.CLOSEZERO)THEN
+                FLOWIN = FXLKOT(ISTSG)
+                NINFLOW = 1
+                IDISP = 0
+              END IF
 C
 C10-----SPECIFIED FLOW FROM LAKE IS ZERO AND ICALC IS ZERO.
-            IF (ISEG(1,ISTSG).EQ.0) THEN  !ISEG(1,x)=ICALC
-              FLOWIN = FXLKOT(ISTSG)
-              NINFLOW=1
-              IDISP=0
-            END IF
+              IF (ISEG(1,ISTSG).EQ.0) THEN  !ISEG(1,x)=ICALC
+                FLOWIN = FXLKOT(ISTSG)
+                NINFLOW=1
+                IDISP=0
+              END IF
 C10Bdep    OUTFLOW FROM LAKE NOW COMPUTED IN LAKE PACKAGE.
-            IF(FXLKOT(ISTSG).LE.CLOSEZERO ) THEN  
-              FLOWIN = STROUT(ISTSG)
-              NINFLOW=1
-              IDISP=0
-            END IF
-            SWLAK(NSFRLAK)=FLOWIN
-            IF(ILMTFMT.EQ.0) THEN
-              WRITE(IUMT3D) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
-            ELSEIF(ILMTFMT.EQ.1) THEN
-              WRITE(IUMT3D,*) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
-            ENDIF
+              IF(FXLKOT(ISTSG).LE.CLOSEZERO ) THEN  
+                FLOWIN = STROUT(ISTSG)
+                NINFLOW=1
+                IDISP=0
+              END IF
+              SWLAK(NSFRLAK)=FLOWIN
+              IF(ILMTFMT.EQ.0) THEN
+                WRITE(IUMT3D) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
+              ELSEIF(ILMTFMT.EQ.1) THEN
+                WRITE(IUMT3D,*) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
+              ENDIF
 C
 C14-----COMPUTE ONE OR MORE DIVERSIONS FROM UPSTREAM SEGMENT.
 Crgn&dep   revised computation of diversions and added subroutine
-          ELSEIF(ISTSG.GT.1)THEN
+            ELSEIF(ISTSG.GT.1)THEN
 C
 C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
-            XSA = STRM(31,L)
-            IF( ISEG(3,ISTSG).EQ.6 ) THEN !ISEG(3,x).EQ.6: A diversion
-              IF(IDIVAR(1,ISTSG).GT.0 ) THEN !IUPSEG # of the current ISTSG (segment number from which flow is diverted)
-                FLOWIN = DVRSFLW(ISTSG)
-                NINFLOW=1
-                IDISP=0
-                III=IDIVAR(1,ISTSG) !IDIVAR(1,nseg): segment number from which flow is diverted
-                I=1 
-                DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
-                  IUPSEG = ISTRM(4, I)
-                  IUPRCH = ISTRM(5, I)
-                  IF(IUPSEG.EQ.IDIVAR(1,ISTSG).AND.IUPRCH.EQ.1) EXIT
-                  I=I+1
-                ENDDO  
-                !JJJ=LASTRCH(III)
-              ENDIF
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
-              ENDIF
-            END IF
-C
-C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNECTIONS TO THE DOWNSTREAM SEGMENT.
-          ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN  !ISEG(3,ISTSG).EQ.7=tributary inflows
-            ITRIB = 1
-            FLOWIN = 0.0D0
-            NINFLOW=0
-            XSA=ISTRM(31,L)
-            IDISP=1
-            DO WHILE(ITRIB.LE.NSS)
-              IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
-                TRBFLW = SGOTFLW(ITRIB)
-                I=LASTRCH(ITRIB)
-                NINFLOW = NINFLOW+1
+              XSA = STRM(31,L)
+              IF( ISEG(3,ISTSG).EQ.6 ) THEN !ISEG(3,x).EQ.6: A diversion
+                IF(IDIVAR(1,ISTSG).GT.0 ) THEN !IUPSEG # of the current ISTSG (segment number from which flow is diverted)
+                  FLOWIN = DVRSFLW(ISTSG)
+                  NINFLOW=1
+                  IDISP=0
+                  III=IDIVAR(1,ISTSG) !IDIVAR(1,nseg): segment number from which flow is diverted
+                  I=1 
+                  DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
+                    IUPSEG = ISTRM(4, I)
+                    IUPRCH = ISTRM(5, I)
+                    IF(IUPSEG.EQ.IDIVAR(1,ISTSG).AND.IUPRCH.EQ.1) EXIT
+                    I=I+1
+                  ENDDO  
+                  !JJJ=LASTRCH(III)
+                ENDIF
                 IF(ILMTFMT.EQ.0) THEN
-                  WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
+                  WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
                 ELSEIF(ILMTFMT.EQ.1) THEN
-                  WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
+                  WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
                 ENDIF
               END IF
-              ITRIB = ITRIB + 1
-            END DO
-            !FLOWIN = FLOWIN + SEG(2,ISTSG)
-            NINFLOW = NINFLOW + 1
-          ENDIF
+C
+C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNECTIONS TO THE DOWNSTREAM SEGMENT.
+            ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN  !ISEG(3,ISTSG).EQ.7=tributary inflows
+              ITRIB = 1
+              FLOWIN = 0.0D0
+              NINFLOW=0
+              XSA=ISTRM(31,L)
+              IDISP=1
+              DO WHILE(ITRIB.LE.NSS)
+                IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
+                  TRBFLW = SGOTFLW(ITRIB)
+                  I=LASTRCH(ITRIB)
+                  NINFLOW = NINFLOW+1
+                  IF(ILMTFMT.EQ.0) THEN
+                    WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
+                  ELSEIF(ILMTFMT.EQ.1) THEN
+                    WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
+                  ENDIF
+                END IF
+                ITRIB = ITRIB + 1
+              END DO
+              !FLOWIN = FLOWIN + SEG(2,ISTSG)
+              NINFLOW = NINFLOW + 1
+            ENDIF
 C
 C22-----SET INFLOW EQUAL TO OUTFLOW FROM UPSTREAM REACH WHEN REACH
-C         IS GREATER THAN 1.
-        ELSE IF(NREACH.GT.1) THEN
-          LL=L-1
-          FLOWIN = STRM(9, LL)
-          NINFLOW = 1
-          IDISP = 1
-          III=ISTRM(4, LL)
-          JJJ=ISTRM(5, LL)
-          I=1 
-          DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
-            IUPSEG = ISTRM(4, I)
-            IUPRCH = ISTRM(5, I)
-            IF(IUPSEG.EQ.III.AND.IUPRCH.EQ.JJJ) EXIT
-            I=I+1
-          ENDDO  
-          IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
-          ENDIF
-        END IF
-      ENDDO
+C       IS GREATER THAN 1.
+          ELSE IF(NREACH.GT.1) THEN
+            LL=L-1
+            FLOWIN = STRM(9, LL)
+            NINFLOW = 1
+            IDISP = 1
+            III=ISTRM(4, LL)
+            JJJ=ISTRM(5, LL)
+            I=1 
+            DO WHILE(I.LT.NSTRM)  !Find the nstrm index for the strm/rch from which flow is diverted
+              IUPSEG = ISTRM(4, I)
+              IUPRCH = ISTRM(5, I)
+              IF(IUPSEG.EQ.III.AND.IUPRCH.EQ.JJJ) EXIT
+              I=I+1
+            ENDDO  
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
+            ENDIF
+          END IF
+        ENDDO
+      ENDIF
 C--IF "SFR FLOWS" IS ENTERED IN PCKGTXT, WRITE STREAM NETWORK FLOW TERMS
 !       IF(ILMTFMT.EQ.0) THEN
 !         WRITE(IUMT3D) IL, IR, IC, ISTRM(4,L), ISTRM(5, L),
@@ -4511,32 +4581,23 @@ C DATE CREATED: 7-25-2013
      &                       PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,FLOB,
      &                       NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK,
      &                       DELVOLLAK
+      USE LMTMODULE,    ONLY:ILAKFLOWS
       CHARACTER*16 TEXT
-      INTEGER NN,L,IL,IR,IC,LAKE
+      INTEGER NN,L,IL,IR,IC,LAKE,NLKFLWTYP
       REAL    Q
+      INTEGER, DIMENSION(4)     :: LKFLOWTYP
+      REAL, DIMENSION(NLAKES,4) :: LKFLOWVAL,CONSOLIDATED
+      LOGICAL WRITEVAL
 C
       TEXT='LAK'
 C
 C--WRITE AN IDENTIFYING HEADER
       IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,NLAKES,LKNODE,
-     &                NSFRLAK
+        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,LKNODE,NLAKES
       ELSEIF(ILMTFMT.EQ.1) THEN
         WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT,NLAKES,LKNODE,NSFRLAK
-      ENDIF      
-C
-C-----WRITE LAKE SPECIFIC TERMS
-      DO NN=1,NLAKES
-        IF(ILMTFMT.EQ.0) THEN
-C---------!-222 STANDIN FOR VIVEK'S DELVOLLAK?
-          WRITE(IUMT3D) NN,VOLOLD(NN),DELVOLLAK(NN),PRECIP(NN),  
-     1                EVAP(NN),RUNF(NN),WITHDRW(NN)  !RUNOFF
-        ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) NN,VOLOLD(NN),DELVOLLAK(NN),PRECIP(NN),
-     1                  EVAP(NN),RUNF(NN),WITHDRW(NN)  !Removed RUNOFF
-        ENDIF        
-      ENDDO
+        WRITE(IUMT3D,*) TEXT,LKNODE,NLAKES
+      ENDIF 
 C
 C-----WRITE EXCHANGE TERMS WITH GW. LKNODE=# OF LAK-AQIF INTERFACES
       DO L=1,LKNODE
@@ -4552,14 +4613,148 @@ C-----WRITE EXCHANGE TERMS WITH GW. LKNODE=# OF LAK-AQIF INTERFACES
         ENDIF        
       ENDDO
 C
-C-----WRITE EXCHANGE TERMS WITH SFR
-      DO I=1,NSFRLAK
-        IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
-        ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
-        ENDIF        
-      ENDDO
+C-----WRITE LAKE SPECIFIC TERMS
+      NLKFLWTYP=0
+      IF(ILAKFLOW.NE.0) THEN
+        TEXT='LAK FLOWS'
+        LKFLOWTYP=0
+        DO I=1,4 ! 4 TYPES OF FLOW TO BE RECORED: STORAGE, PRECIP, EVAP, RUNOFF
+          WRITEVAL=.FALSE.
+          SELECT CASE(I)
+            CASE (1) ! STORAGE
+              DO NN=1,NLAKES
+                IF(DELVOLLAK(NN).NE.0.) THEN
+                  LKFLOWTYP(I)=1
+                  TEXT='STORAGE'
+                  WRITEVAL=.TRUE.
+                ENDIF
+                LKFLOWVAL(NN,1) = DELVOLLAK(NN)
+              ENDDO
+              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
+            CASE(2) ! PRECIPITATION
+              DO NN=1,NLAKES
+                IF(PRECIP(NN).NE.0.) THEN
+                  LKFLOWTYP(I)=1
+                  TEXT='PRECIP'
+                  WRITEVAL=.TRUE.
+                ENDIF
+                LKFLOWVAL(NN,2) = PRECIP(NN)
+              ENDDO
+              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
+            CASE(3) ! EVAPORATION
+              DO NN=1,NLAKES
+                IF(EVAP(NN).NE.0.) THEN
+                  LKFLOWTYP(I)=1
+                  TEXT='EVAP'
+                  WRITEVAL=.TRUE.
+                ENDIF
+                LKFLOWVAL(NN,3) = EVAP(NN)
+              ENDDO
+              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
+            CASE(4)
+              DO NN=1,NLAKES
+                IF(RUNF(NN).NE.0.) THEN
+                  LKFLOWTYP(I)=1
+                  TEXT='RUNOFF'
+                  WRITEVAL=.TRUE.
+                ENDIF
+                LKFLOWVAL(NN,4) = RUNF(NN)
+              ENDDO
+              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
+          END SELECT
+          IF(ILMTFMT.EQ.0.AND.WRITEVAL) THEN
+            WRITE(IUMT3D) TEXT
+          ELSEIF(ILMTFMT.EQ.1.AND.WRITEVAL) THEN
+            WRITE(IUMT3D,*) TEXT
+          ENDIF   
+        ENDDO
+C
+C--WRITE ARRAY OF SIZE (LKFLOWTYP,NLAKE)
+C  IN ORDER TO WRITE A VARIABLE NUMBER OF TERMS IN CONSOLIDATED FASHION, NEED TO 
+C  CONDENSE THE 2D ARRAY SUCH THAT ONLY LKFLOWTYP TERMS APPEAR IN FIRST X NUMBER
+C  OF COLUMNS (EFFECTIVELY REMOVE COLUMNS THAT CONTAIN ONLY ZEROS...THE COLUMNS
+C  ARE STILL THERE BUT WON'T BE PRINTED).  THIS APPROACH IS FLEXIBLE ENOUGH TO 
+C  ADAPT WITH EACH TIME STEP IN AN EFFORT TO KEEP THE FTL FILE AS SLIM AS POSSIBLE
+        USED=4
+        IF(NFLOWTYP.GT.0) THEN
+          DO I=3,1,-1
+            IF(LKFLOWTYP(I).EQ.0) THEN
+              LENGTH=USED-(I+1)
+              LKFLOWVAL(:,I:I+LENGTH)=LKFLOWVAL(:,(I+1):USED)
+              USED=USED-1
+            ENDIF
+          ENDDO
+        ENDIF
+        ! AT THIS POINT, THE 2D ARRAY TO BE PRINTED IS CONSOLIDATED
+        ! THE IF STATEMENTS THAT FOLLOW REQUIRE CONSOLIDATION
+        IF(NFLOWTYPE.EQ.1) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D) LKFLOWVAL(NN,1)
+            ENDDO
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D,*) LKFLOWVAL(NN,1)
+            ENDDO
+          ENDIF 
+        ELSEIF(NFLOWTYPE.EQ.2) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2)
+            ENDDO
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2)
+            ENDDO
+          ENDIF 
+        ELSEIF(NFLOWTYPE.EQ.3) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
+     &                      LKFLOWVAL(NN,3)
+            ENDDO
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
+     &                        LKFLOWVAL(NN,3)
+            ENDDO
+          ENDIF 
+        ELSEIF(NFLOWTYPE.EQ.4) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
+     &                      LKFLOWVAL(NN,3),LKFLOWVAL(NN,4)
+            ENDDO
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            DO NN=1,NLAKES
+              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
+     &                        LKFLOWVAL(NN,3),LKFLOWVAL(NN,4)
+            ENDDO
+          ENDIF 
+        ENDIF
+      ENDIF
+C
+C--AT THIS POINT THERE IS NO NEED TO SUPPORT 'LAK CONNECT' SINCE LAKE COALESCING 
+C  ISN'T SUPPORTED IN THIS RELEASE.
+C
+!        DO NN=1,NLAKES
+!          IF(ILMTFMT.EQ.0) THEN
+!            WRITE(IUMT3D) NN,VOLOLD(NN),DELVOLLAK(NN),PRECIP(NN),  
+!     1                  EVAP(NN),RUNF(NN),WITHDRW(NN)  !RUNOFF
+!          ELSEIF(ILMTFMT.EQ.1) THEN
+!            WRITE(IUMT3D,*) NN,VOLOLD(NN),DELVOLLAK(NN),PRECIP(NN),
+!     1                    EVAP(NN),RUNF(NN),WITHDRW(NN)  !Removed RUNOFF
+!          ENDIF        
+!        ENDDO
+!C
+!C-----WRITE EXCHANGE TERMS WITH SFR
+!      DO I=1,NSFRLAK
+!        IF(ILMTFMT.EQ.0) THEN
+!          WRITE(IUMT3D) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
+!        ELSEIF(ILMTFMT.EQ.1) THEN
+!          WRITE(IUMT3D,*) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
+!        ENDIF        
+!      ENDDO
 C
       RETURN
       END
