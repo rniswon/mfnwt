@@ -21,11 +21,13 @@ C
      +                            NPCKGTXT,IUZFFLOWS,ISFRFLOWS,
      +                            ILAKFLOWS,NFLOWTYPE
          CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
+         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: LKFLOWTYPE
         TYPE LMTTYPE
          INTEGER, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
      +                      IUZFSFRCONNECT,IUZFLAKCONNECT,NPCKGTXT,
      +                      IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,NFLOWTYPE
          CHARACTER*16, DIMENSION(:), POINTER :: FLOWTYPE
+         CHARACTER*16, DIMENSION(:), POINTER :: LKFLOWTYPE
         END TYPE
         TYPE(LMTTYPE), SAVE  ::LMTDAT(10)
       END MODULE LMTMODULE
@@ -48,7 +50,8 @@ C
      &                   ISSFLG,IBOUND,IOUT
       USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,IUZFLAKCONNECT,
      &                   IUZFSFRCONNECT,ISFRLAKCONNECT,NPCKGTXT,
-     &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,FLOWTYPE
+     &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,FLOWTYPE,
+     &                   LKFLOWTYPE
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND
       USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
 C--USE FILE SPECIFICATION of MODFLOW-2005
@@ -67,6 +70,7 @@ C     -----------------------------------------------------------------
      +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS)
       NPCKGTXT=0
       ALLOCATE(FLOWTYPE(4)) ! POSITION 1: STORAGE; 2: PRECIP; 3: EVAP; 4: RUNOFF
+      ALLOCATE(LKFLOWTYPE(5)) ! POSITION 1: STORAGE; 2: PRECIP; 3: EVAP; 4: RUNOFF; 5: WITHDRAWL
 C
 C--SET POINTERS FOR THE CURRENT GRID 
 cswm: already set in main (GWF2BAS7OC)      CALL SGWF2BAS7PNT(IGRID)     
@@ -630,10 +634,10 @@ C--UNSATURATED-ZONE FLOWS
          CALL LMT7UZFET(ILMTFMT,ISSMT3D,IUMT3D,KKSTP,KKPER,IGRID)
         ENDIF
 C--SURFACE WATER NETWORK: Q's with GW (& NETWORK CONNECTIONS IF ISFRFLOW=1)
-        IF(IUNIT(44).GT.0.AND.ISFRFLOWS.EQ.0)
-     &   CALL LMT7SFR2(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
         IF(IUNIT(22).GT.0)
      &   CALL LMT7LAK3(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
+        IF(IUNIT(44).GT.0.AND.ISFRFLOWS.EQ.0)
+     &   CALL LMT7SFR2(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
 C--UNSATURATED-ZONE RUNOFF AND SFR/LAK CONNECTIONS
         IF(IUNIT(55).GT.0.AND.(IUZFSFRCONNECT.NE.0.OR.
      &                         IUZFLAKCONNECT.NE.0))
@@ -4570,6 +4574,32 @@ C
       RETURN
       END
 C
+C--
+      SUBROUTINE LMT7SFRLAKCONNECT(ILMTFMT,IUMT3D,KSTP,KPER,IGRID)
+C ******************************************************************
+C SAVE SFR2 INTERACTIONS WITH LAKES FOR USE BY MT3D-USGS
+C ******************************************************************
+C DATE CREATED: 7-25-2013
+C
+      USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT
+      USE GWFLAKMODULE, ONLY:LAKSFR,ILKSEG,ILKRCH,SWLAK,NSFRLAK
+C
+      IMPLICIT NONE
+C
+      INTEGER I,ILMTFMT,IUMT3D,KSTP,KPER,IGRID
+C
+C-----WRITE EXCHANGE TERMS WITH SFR
+      DO I=1,NSFRLAK
+        IF(ILMTFMT.EQ.0) THEN
+          WRITE(IUMT3D) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
+        ELSEIF(ILMTFMT.EQ.1) THEN
+          WRITE(IUMT3D,*) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
+        ENDIF        
+      ENDDO      
+C
+      RETURN
+      END SUBROUTINE LMT7SFRLAKCONNECT
+C
 C
       SUBROUTINE LMT7LAK3(ILMTFMT,IUMT3D,KSTP,KPER,IGRID)
 C ******************************************************************
@@ -4580,13 +4610,15 @@ C DATE CREATED: 7-25-2013
       USE GWFLAKMODULE, ONLY:VOL,NLAKES,LKNODE,ILAKE,MXLKND,VOLOLD,
      &                       PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,FLOB,
      &                       NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK,
-     &                       DELVOLLAK
-      USE LMTMODULE,    ONLY:ILAKFLOWS
+     &                       DELVOLLAK,EVAPLK,RNF,PRCPLK,WTHDRW
+      USE LMTMODULE,    ONLY:ILAKFLOWS,LKFLOWTYPE
       CHARACTER*16 TEXT
       INTEGER NN,L,IL,IR,IC,LAKE,NLKFLWTYP
       REAL    Q
       INTEGER, DIMENSION(4)     :: LKFLOWTYP
-      REAL, DIMENSION(NLAKES,4) :: LKFLOWVAL,CONSOLIDATED
+      LOGICAL, DIMENSION(5)     :: MASK
+      REAL, DIMENSION(NLAKES,5) :: LKFLOWVAL,CONSOLIDATED
+      CHARACTER*16, DIMENSION(5):: PRNTLAKQTYP
       LOGICAL WRITEVAL
 C
       TEXT='LAK'
@@ -4618,119 +4650,136 @@ C-----WRITE LAKE SPECIFIC TERMS
       IF(ILAKFLOW.NE.0) THEN
         TEXT='LAK FLOWS'
         LKFLOWTYP=0
-        DO I=1,4 ! 4 TYPES OF FLOW TO BE RECORED: STORAGE, PRECIP, EVAP, RUNOFF
-          WRITEVAL=.FALSE.
-          SELECT CASE(I)
-            CASE (1) ! STORAGE
-              DO NN=1,NLAKES
-                IF(DELVOLLAK(NN).NE.0.) THEN
-                  LKFLOWTYP(I)=1
-                  TEXT='STORAGE'
-                  WRITEVAL=.TRUE.
-                ENDIF
-                LKFLOWVAL(NN,1) = DELVOLLAK(NN)
-              ENDDO
-              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
-            CASE(2) ! PRECIPITATION
-              DO NN=1,NLAKES
-                IF(PRECIP(NN).NE.0.) THEN
-                  LKFLOWTYP(I)=1
-                  TEXT='PRECIP'
-                  WRITEVAL=.TRUE.
-                ENDIF
-                LKFLOWVAL(NN,2) = PRECIP(NN)
-              ENDDO
-              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
-            CASE(3) ! EVAPORATION
-              DO NN=1,NLAKES
-                IF(EVAP(NN).NE.0.) THEN
-                  LKFLOWTYP(I)=1
-                  TEXT='EVAP'
-                  WRITEVAL=.TRUE.
-                ENDIF
-                LKFLOWVAL(NN,3) = EVAP(NN)
-              ENDDO
-              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
-            CASE(4)
-              DO NN=1,NLAKES
-                IF(RUNF(NN).NE.0.) THEN
-                  LKFLOWTYP(I)=1
-                  TEXT='RUNOFF'
-                  WRITEVAL=.TRUE.
-                ENDIF
-                LKFLOWVAL(NN,4) = RUNF(NN)
-              ENDDO
-              IF(WRITEVAL) THEN NLKFLWTYP=NLKFLWTYP+1
-          END SELECT
-          IF(ILMTFMT.EQ.0.AND.WRITEVAL) THEN
-            WRITE(IUMT3D) TEXT
-          ELSEIF(ILMTFMT.EQ.1.AND.WRITEVAL) THEN
-            WRITE(IUMT3D,*) TEXT
-          ENDIF   
+        MASK=.FALSE.
+        IF(LKFLOWTYPE(1).EQ.'STORAGE') THEN
+          MASK(1) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(LKFLOWTYPE(2).EQ.'PRECIP') THEN
+          MASK(2) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(LKFLOWTYPE(3).EQ.'EVAP') THEN
+          MASK(3) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(LKFLOWTYPE(4).EQ.'RUNOFF') THEN
+          MASK(4) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        IF(LKFLOWTYPE(5).EQ.'WITHDRAW') THEN
+          MASK(5) = .TRUE.
+          NFLOWTYPE = NFLOWTYPE + 1
+        ENDIF
+        PRNTLAKQTYP = PACK(LKFLOWTYPE, MASK)
+C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATED.
+        IF(NFLOWTYPE.EQ.1) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) LKFLOWTYPE(1)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) LKFLOWTYPE(1)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.2) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) LKFLOWTYPE(1), LKFLOWTYPE(2)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) LKFLOWTYPE(1), LKFLOWTYPE(2)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.3) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.4) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3), 
+     &                    LKFLOWTYPE(4)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3),
+     &                      LKFLOWTYPE(4)
+          ENDIF
+        ELSEIF(NFLOWTYPE.EQ.5) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3), 
+     &                    LKFLOWTYPE(4), LKFLOWTYPE(5)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) LKFLOWTYPE(1), LKFLOWTYPE(2), LKFLOWTYPE(3),
+     &                      LKFLOWTYPE(4), LKFLOWTYPE(5)
+          ENDIF
+        ENDIF
+C
+C--FILL A 2D ARRAY OF LAKFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
+C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
+        DO L=1,NSTRM 
+          LKFLOWVAL(1,L) = DELVOLLAK(L)   ! transtor 
+          LKFLOWVAL(2,L) = PRCPLK(L)      ! precip
+          LKFLOWVAL(3,L) = EVAPLK(L)      ! etsw (surf wat evap)
+          LKFLOWVAL(4,L) = RNF(L)         ! user-specified runoff (variable 'runof')
+          LKFLOWVAL(5,L) = WTHDRW(L)      ! user-specified withdraw
         ENDDO
 C
-C--WRITE ARRAY OF SIZE (LKFLOWTYP,NLAKE)
-C  IN ORDER TO WRITE A VARIABLE NUMBER OF TERMS IN CONSOLIDATED FASHION, NEED TO 
-C  CONDENSE THE 2D ARRAY SUCH THAT ONLY LKFLOWTYP TERMS APPEAR IN FIRST X NUMBER
-C  OF COLUMNS (EFFECTIVELY REMOVE COLUMNS THAT CONTAIN ONLY ZEROS...THE COLUMNS
-C  ARE STILL THERE BUT WON'T BE PRINTED).  THIS APPROACH IS FLEXIBLE ENOUGH TO 
-C  ADAPT WITH EACH TIME STEP IN AN EFFORT TO KEEP THE FTL FILE AS SLIM AS POSSIBLE
-        USED=4
-        IF(NFLOWTYP.GT.0) THEN
-          DO I=3,1,-1
-            IF(LKFLOWTYP(I).EQ.0) THEN
+C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
+        USED=5
+        IF(NFLOWTYPE.GT.0) THEN
+          DO I=4,1,-1
+            IF(LKFLOWTYPE(I).EQ.'NA') THEN
               LENGTH=USED-(I+1)
               LKFLOWVAL(:,I:I+LENGTH)=LKFLOWVAL(:,(I+1):USED)
               USED=USED-1
             ENDIF
           ENDDO
         ENDIF
-        ! AT THIS POINT, THE 2D ARRAY TO BE PRINTED IS CONSOLIDATED
-        ! THE IF STATEMENTS THAT FOLLOW REQUIRE CONSOLIDATION
+C
+C--WRITE THE ARRAY TO THE FTL FILE.
         IF(NFLOWTYPE.EQ.1) THEN
-          IF(ILMTFMT.EQ.0) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D) LKFLOWVAL(NN,1)
-            ENDDO
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D,*) LKFLOWVAL(NN,1)
-            ENDDO
-          ENDIF 
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L)
+            ENDIF
+          ENDDO
         ELSEIF(NFLOWTYPE.EQ.2) THEN
-          IF(ILMTFMT.EQ.0) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2)
-            ENDDO
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2)
-            ENDDO
-          ENDIF 
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L), LKFLOWVAL(2,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L)
+            ENDIF
+          ENDDO
         ELSEIF(NFLOWTYPE.EQ.3) THEN
-          IF(ILMTFMT.EQ.0) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
-     &                      LKFLOWVAL(NN,3)
-            ENDDO
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
-     &                        LKFLOWVAL(NN,3)
-            ENDDO
-          ENDIF 
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                      LKFLOWVAL(3,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L),   
+     &                        LKFLOWVAL(3,L)
+            ENDIF
+          ENDDO
         ELSEIF(NFLOWTYPE.EQ.4) THEN
-          IF(ILMTFMT.EQ.0) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
-     &                      LKFLOWVAL(NN,3),LKFLOWVAL(NN,4)
-            ENDDO
-          ELSEIF(ILMTFMT.EQ.1) THEN
-            DO NN=1,NLAKES
-              WRITE(IUMT3D,*) LKFLOWVAL(NN,1),LKFLOWVAL(NN,2), 
-     &                        LKFLOWVAL(NN,3),LKFLOWVAL(NN,4)
-            ENDDO
-          ENDIF 
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                      LKFLOWVAL(3,L), LKFLOWVAL(4,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                        LKFLOWVAL(3,L), LKFLOWVAL(4,L)
+            ENDIF
+          ENDDO
+        ELSEIF(NFLOWTYPE.EQ.5) THEN
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                      LKFLOWVAL(3,L), LKFLOWVAL(4,L), 
+     &                      LKFLOWVAL(5,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                        LKFLOWVAL(3,L), LKFLOWVAL(4,L), 
+     &                        LKFLOWVAL(5,L)
+            ENDIF
+          ENDDO
         ENDIF
       ENDIF
 C
@@ -4746,15 +4795,6 @@ C
 !     1                    EVAP(NN),RUNF(NN),WITHDRW(NN)  !Removed RUNOFF
 !          ENDIF        
 !        ENDDO
-!C
-!C-----WRITE EXCHANGE TERMS WITH SFR
-!      DO I=1,NSFRLAK
-!        IF(ILMTFMT.EQ.0) THEN
-!          WRITE(IUMT3D) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
-!        ELSEIF(ILMTFMT.EQ.1) THEN
-!          WRITE(IUMT3D,*) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
-!        ENDIF        
-!      ENDDO
 C
       RETURN
       END
