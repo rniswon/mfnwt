@@ -3398,7 +3398,7 @@ c***********************************************************************
      [   k, i, n, mmax
 c
 c----initialize tag
-      free = 0 !rgn
+      free = 1 !rgn
       tag = mark(ek)
 c
 c----for each vertex vi in ek

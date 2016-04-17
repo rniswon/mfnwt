@@ -134,7 +134,7 @@ cmi
       ELSEIF ( IFDPARAM.EQ.1 ) THEN
         IACL = 1
         NORDER = 0
-        LEVEL = 3
+        LEVEL = 1
         NORTH = 5
         IREDSYS = 1
         RRCTOLS = 0.0
@@ -145,7 +145,7 @@ cmi
       ELSEIF ( IFDPARAM.EQ.2 ) THEN
         IACL = 1               !3/25/16
         NORDER = 0                
-        LEVEL = 10             !3/25/16
+        LEVEL = 1             !3/25/16
         NORTH = 10             !3/25/16
         IREDSYS = 1
         RRCTOLS = 0.0
@@ -157,7 +157,7 @@ cmi
         IACL = 2
         NORDER = 0  !3/25/16
         LEVEL = 15  !3/25/16
-        NORTH = 15  !3/25/16
+        NORTH = 1  !3/25/16
         IREDSYS = 1
         RRCTOLS = 0.0
         IDROPTOL = 1

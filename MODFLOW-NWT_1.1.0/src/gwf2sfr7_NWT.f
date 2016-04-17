@@ -160,11 +160,11 @@ C         DLEAK, ISTCB1, ISTCB2.
          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
          IF(MAXVAL.LT.0) MAXVAL=0
          WRITE(IOUT,31) NUMTAB,MAXVAL
-   31    FORMAT(1X,I10,' Specifed inflow files will be read ',
+   31    FORMAT(1X,I10,' Specified inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
          READ(IN,'(A)') LINE
       ELSE
-         WRITE(IOUT,'(A)') ' No specifed inflow files'
+         WRITE(IOUT,'(A)') ' No specified inflow files'
       END IF
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
