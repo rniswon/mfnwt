@@ -63,8 +63,8 @@ C--USE FILE SPECIFICATION of MODFLOW-2005
       CHARACTER*11  OUTPUT_FILE_FORMAT      
       DATA          INLMT,MTBCF,MTLPF,MTHUF,MTWEL,MTDRN,MTRCH,MTEVT,
      &              MTRIV,MTSTR,MTGHB,MTRES,MTFHB,MTDRT,MTETS,MTSUB,
-     &              MTIBS,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF
-     &             /22*0/
+     &              MTIBS,MTTLK,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF,MTSWR
+     &             /24*0/
 C     -----------------------------------------------------------------    
       ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT,IUZFSFRCONNECT,IUZFLAKCONNECT,
      +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS)
@@ -79,8 +79,7 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
       IUMT3D=0
       DO IU=1,NIUNIT
         IF(CUNIT(IU).EQ.'LMT6') THEN
-          INLMT=IUNIT(IU)
-          
+          INLMT=IUNIT(IU)     
         ELSEIF(CUNIT(IU).EQ.'BCF6') THEN
           MTBCF=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'LPF ') THEN
@@ -119,6 +118,9 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
         ELSEIF(CUNIT(IU).EQ.'IBS ') THEN
           MTIBS=IUNIT(IU)
           IF(MTIBS.GT.0) NPCKGTXT = NPCKGTXT + 1
+        ELSEIF(CUNIT(IU).EQ.'TLK ') THEN
+          MTTLK=IUNIT(IU)
+          IF(MTTLK.GT.0) NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'LAK ') THEN
           MTLAK=IUNIT(IU)
           IF(MTLAK.GT.0) NPCKGTXT = NPCKGTXT + 1
@@ -636,7 +638,7 @@ C--UNSATURATED-ZONE FLOWS
 C--SURFACE WATER NETWORK: Q's with GW (& NETWORK CONNECTIONS IF ISFRFLOW=1)
         IF(IUNIT(22).GT.0)
      &   CALL LMT7LAK3(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
-        IF(IUNIT(44).GT.0.AND.ISFRFLOWS.EQ.0)
+        IF(IUNIT(44).GT.0)
      &   CALL LMT7SFR2(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
 C--UNSATURATED-ZONE RUNOFF AND SFR/LAK CONNECTIONS
         IF(IUNIT(55).GT.0.AND.(IUZFSFRCONNECT.NE.0.OR.
@@ -4144,12 +4146,13 @@ C
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
-      REAL, DIMENSION(4,NSS)     :: SFRFLOWVAL
+      REAL, DIMENSION(4,NSTRM)     :: SFRFLOWVAL
       CHARACTER*16, DIMENSION(4) :: PRNTSFRQTYP
       LOGICAL, DIMENSION(4)      :: MASK
 C
       DIMENSION LASTRCH(NSS)
 C
+      PRNTSFRQTYP=''
       TEXT='SFR'
       CLOSEZERO = 1.0e-15
 C
@@ -4465,30 +4468,29 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
                 ELSEIF(ILMTFMT.EQ.1) THEN
                   WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
                 ENDIF
-              END IF
 C
 C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNECTIONS TO THE DOWNSTREAM SEGMENT.
-            ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN  !ISEG(3,ISTSG).EQ.7=tributary inflows
-              ITRIB = 1
-              FLOWIN = 0.0D0
-              NINFLOW=0
-              XSA=ISTRM(31,L)
-              IDISP=1
-              DO WHILE(ITRIB.LE.NSS)
-                IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
-                  TRBFLW = SGOTFLW(ITRIB)
-                  I=LASTRCH(ITRIB)
-                  NINFLOW = NINFLOW+1
-                  IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
-                  ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
-                  ENDIF
-                END IF
-                ITRIB = ITRIB + 1
-              END DO
-              !FLOWIN = FLOWIN + SEG(2,ISTSG)
-              NINFLOW = NINFLOW + 1
+              ELSEIF(ISTSG.GE.1.AND.ISEG(3,ISTSG).EQ.7) THEN  !ISEG(3,ISTSG).EQ.7=tributary inflows
+                ITRIB = 1
+                FLOWIN = 0.0D0
+                NINFLOW=0
+                IDISP=1
+                DO WHILE(ITRIB.LE.NSS)
+                  IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
+                    TRBFLW = SGOTFLW(ITRIB)
+                    I=LASTRCH(ITRIB)
+                    NINFLOW = NINFLOW+1
+                    IF(ILMTFMT.EQ.0) THEN
+                      WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
+                    ELSEIF(ILMTFMT.EQ.1) THEN
+                      WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
+                    ENDIF
+                  END IF
+                  ITRIB = ITRIB + 1
+                END DO
+                !FLOWIN = FLOWIN + SEG(2,ISTSG)
+                NINFLOW = NINFLOW + 1
+              END IF
             ENDIF
 C
 C22-----SET INFLOW EQUAL TO OUTFLOW FROM UPSTREAM REACH WHEN REACH
