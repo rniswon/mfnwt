@@ -3187,35 +3187,35 @@ C Print net recharge as ascii to a separate output file
              END DO
            END DO
            txthold = netrchtext
-        END IF
 C 
 C-----SAVE NET RECHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.
-        IF ( ibd.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
+          IF ( ibd.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                               UNITRECH, BUFF, LAYNUM, 1,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
-        txthold = netdistext
-        DO ir = 1, NROW
-          DO ic = 1, NCOL
-            IF ( IUZFBND(ic,ir).NE.0 ) THEN
-              BUFF(ic, ir, 1) = FNETEXFIL2(ic, ir)/TIMEPRINT
-            END IF
+          txthold = netdistext
+          DO ir = 1, NROW
+            DO ic = 1, NCOL
+              IF ( IUZFBND(ic,ir).NE.0 ) THEN
+                BUFF(ic, ir, 1) = FNETEXFIL2(ic, ir)/TIMEPRINT
+              END IF
+            END DO
           END DO
-      END DO
 C 
 C-----SAVE NET DISCHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.                
-      IF ( ibd.GT.0 ) THEN
-          CALL UBDSV3(Kkstp, Kkper, txthold,  
+          IF ( ibd.GT.0 ) THEN
+            CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                               UNITDIS, BUFF, LAYNUM, 1,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
-          DO ir = 1, NROW
-            DO ic = 1, NCOL
-              FNETEXFIL1(ic, ir) = 0.0
-              FNETEXFIL2(ic, ir) = 0.0    
+            DO ir = 1, NROW
+              DO ic = 1, NCOL
+                FNETEXFIL1(ic, ir) = 0.0
+                FNETEXFIL2(ic, ir) = 0.0    
+              END DO
             END DO
-          END DO
-      END IF       
+          END IF
+        END IF
 
 C
 C31-----UPDATE RATES AND BUFFERS WITH ET FOR UZF OR MODFLOW BUDGET ITEMS.
