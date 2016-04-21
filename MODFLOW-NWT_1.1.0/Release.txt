@@ -30,31 +30,87 @@ Changes to MODFLOW-NWT to support MT3D-USGS were made to the source file
 lmt7_NWT.f. These changes include writing output for the UZF, SFR2, and 
 LAK7 packages that is required for simulating transport in the unsaturated zone,
 streams, and lakes. Refer to the MT3D-USGS documentation report 
-(Bedekar and others, 2015) for details.
+(Bedekar and others, 2016) for details.
 
-NWT1_solver.f
+gwf2upw1.f
+
+An error was fixed in the calculation of the derivative for smoothing conductunce  
+during complete wetting of a cell. Testing using several problems indicated that 
+this change has minimal affects on the solution.
+
+NWT1_solver.f and NWT1_xmd.f
 
 Previous versions of MODFLOW-NWT reported a warning when the difference between
 a specified cell top and cell bottom was less than 100*Thickfact, where Thickfact 
 is an input variable specified within the NWT solver input file. These cells were 
 set to inactive by setting IBOUND=0. This conditions is now treated as an error
-and the model will stop if TOP-BOT<100*Thickfact. 
-
-One of the default solver settings for MODERATE were changed:
-akappadum = 0.00001
+and the model will stop if TOP-BOT<100*Thickfact.
 
 An error was fixed in the calculation of the derivative for smoothing conductunce  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal affects on the solution.
 
-gwf2upw1.f
+Default solver input values for the xmd solver (Linmeth=2) were modified to improve 
+convergence. Solver input values for the SIMPLE, MODERATE, and COMPLEX default options
+are:
 
-NWT1_xmd.f
-
-
-An error was fixed in the calculation of the derivative for smoothing conductunce  
-during complete wetting of a cell. Testing using several problems indicated that 
-this change has minimal affects on the solution.
+Simple:
+        DBDTHETA     = 0.97
+        DBDKAPPA     = 0.0001
+        DBDGAMMA     = 0.0
+        MOMFACT      = 0.0
+        BACKFLAG     = 0
+        MAXBACKITER  = 20
+        BACKTOL      = 1.5
+        BACKREDUCE   = 0.97
+        IACL         = 1
+        NORDER       = 0
+        LEVEL        = 1
+        NORTH        = 5
+        IREDSYS      = 1
+        RRCTOLS      = 0.0
+        IDROPTOL     = 1
+        EPSRNS       = 5.0e-3
+        HCLOSEXMD    = 1.0e-3
+        MXITERXMD    = 50
+Moderate:
+        DBDTHETA     = 0.90
+        DBDKAPPA     = 0.00001
+        DBDGAMMA     = 0.0
+        MOMFACT      = 0.1
+        BACKFLAG     = 0
+        MAXBACKITER  = 20
+        BACKTOL      = 1.1
+        BACKREDUCE   = 0.9
+        IACL         = 1         
+        NORDER       = 0                
+        LEVEL        = 1        
+        NORTH        = 10     
+        IREDSYS      = 1
+        RRCTOLS      = 0.0
+        IDROPTOL     = 1
+        EPSRNS       = 5.0e-3  
+        HCLOSEXMD    = 1.0e-3  
+        MXITERXMD    = 100      
+Complex:
+        DBDTHETA     = 0.85
+        DBDKAPPA     = 0.00001
+        DBDGAMMA     = 0.0
+        MOMFACT      = 0.1
+        BACKFLAG     = 1
+        MAXBACKITER  = 50
+        BACKTOL      = 1.1
+        BACKREDUCE   = 0.7
+        IACL         = 2
+        NORDER       = 0
+        LEVEL        = 15
+        NORTH        = 1
+        IREDSYS      = 1
+        RRCTOLS      = 0.0
+        IDROPTOL     = 1
+        EPSRNS       = 1.0e-3
+        HCLOSEXMD    = 1.0e-4
+        MXITERXMD    = 200
 
 Streamflow Routing (SFR2) Package
 
@@ -66,6 +122,39 @@ Unsaturated-Zone Flow (UZF) Package
 Some variables in the UZF Package for calculating runoff were initialized.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
 beneath lakes.
+
+New Options were added to UZF1 to allow the hydraulic conducitvity used to
+calculate rejected infiltration and surface leakage to be different than
+the vertical hydraulic conductivity (UZF1 input variable VKS) used to route 
+water through the unsaturated zone. Optional Key words for UZF1
+in order of specification are:
+
+DATA SET 1A:
+SPECIFYTHTR SPECIFYTHTI NOSURFLEAK SPECIFYSURFK REJECTSURFK SEEPSURFK    
+
+Definitions:
+
+SPECIFYSURFK - Key word for specifying variable SURFK.
+
+REJECTSURFK - Key word for using SURFK instead of VKS for calculating
+              rejected infiltration
+SEEPSURFK - Key word for using SURFK instead of VKS for calculating
+            surface leakage. 
+
+DATA 1b:             
+NETFLUX Unitrech Unitdis                                                 
+
+Definitions:
+
+NETFLUX - Key word for writing net recharge and net discharge output to
+          two separate formatted text output files. Includes all UZF1 
+          groundwater recharge values cell by cell. Values are output as
+          2-d arrays (NCOL, NROW) 
+
+DATA 4b:
+SURFK(NCOL, NROW)--U2DRL An array of positive real values used to define the 
+                            saturated vertical hydraulic conductivity of the 
+                            unsaturated zone (LT-1).
 
 Lake (LAK) Package
 
