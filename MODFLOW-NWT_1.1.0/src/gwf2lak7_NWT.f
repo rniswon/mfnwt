@@ -543,9 +543,12 @@ C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE
-      USE LMTMODULE,    ONLY: LKFLOWTYPE
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       USE GLOBAL,       ONLY: IOUT, NCOL, NROW, NLAY, IFREFM, IBOUND,
      +                        LBOTM, BOTM, DELR, DELC, ISSFLG,IUNIT
+C
+      IMPLICIT NONE
+C
 C     USE GWFSFRMODULE, ONLY: NSS
 C     ------------------------------------------------------------------
 C     FUNCTIONS
@@ -553,6 +556,12 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION VOLTERP
       EXTERNAL VOLTERP
 C     ------------------------------------------------------------------
+      INTEGER IGRID,ISS,LM,IUNITGWT,IN,ISOL,L1,I,J,K,KK,LK,ITMP,ITMP1,
+     &        INC,NSOL,N,I2,K1,K2,K3,K4,I1,IC,IS,JK,NSLMS,
+     &        IUNITSFR,LAKEFLG,LAKE,NTYP,J2,KKPER,IOUTS,IUNITNUM,L,
+     &        IL,IR,ITYPE,IUNITBCF,IUNITLPF,IUNITHUF,IUNITUPW,
+     &        IUNITUZF,IC1,II,IFACE,LID,M
+      REAL BOTIJ,TBNC,TBELV,TOPMST,GTSDPH,EVOL,BOTLK
       CHARACTER*24 ANAME(2)
 !     CHARACTER*30 LFRMAT
 !dep  added STGINIT as double precision
@@ -1104,6 +1113,7 @@ C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
         LKFLOWTYPE(3)='NA'
         LKFLOWTYPE(4)='NA'
         LKFLOWTYPE(5)='NA'
+        NLKFLWTYP=0
       ENDIF
 C
       DO 300 LM=1,NLAKES
@@ -1121,10 +1131,22 @@ C
 C
 C--EDM: SET FOLLOWING VALUES FOR LMT
         IF(IUNIT(49).NE.0) THEN
-          IF(PRCPLK(LM).NE.0) LKFLOWTYPE(2)='PRECIP'
-          IF(EVAPLK(LM).NE.0) LKFLOWTYPE(3)='EVAP'
-          IF(RNF(LM).NE.0)    LKFLOWTYPE(4)='RUNOFF'
-          IF(WTHDRW(LM).NE.0) LKFLOWTYPE(5)='WITHDRAW'
+          IF(PRCPLK(LM).NE.0.AND.LKFLOWTYPE(2).EQ.'NA') THEN
+            LKFLOWTYPE(2)='PRECIP'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(EVAPLK(LM).NE.0.AND.LKFLOWTYPE(3).EQ.'NA') THEN 
+            LKFLOWTYPE(3)='EVAP'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(RNF(LM).NE.0.AND.LKFLOWTYPE(4).EQ.'NA') THEN
+            LKFLOWTYPE(4)='RUNOFF'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(WTHDRW(LM).NE.0.AND.LKFLOWTYPE(5).EQ.'NA') THEN
+            LKFLOWTYPE(5)='WITHDRAW'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
         ENDIF
 C
         IF(ISS.NE.0.AND.KKPER.GT.1)WRITE(IOUT,9)LM,PRCPLK(LM),EVAPLK(LM)
@@ -1875,7 +1897,7 @@ C     ------------------------------------------------------------------
      +                        HNOFLO, VBVL, VBNM
       USE GWFSFRMODULE, ONLY: STRIN, DLKSTAGE, SLKOTFLW
       USE GWFUZFMODULE, ONLY: SURFDEP,IUZFBND,FINF,VKS
-      USE LMTMODULE,    ONLY: LKFLOWTYPE
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       IMPLICIT NONE
       !rsr: argument IUNITSFR not used
       CHARACTER*16 TEXT
@@ -2757,10 +2779,14 @@ C-lfk
               ELSE
                 DELVOL(NN)=VOL(NN)-VOLOLD(NN)
               END IF
-C-EDM
-              IF(IUNIT(49).NE.0.AND.DELVOLLAK(NN).NE.0.) 
-     +          LKFLOWTYPE(1)='STORAGE'
+C
               DELVOLLAK(NN)=DELVOL(NN)/DELT
+C-EDM
+              IF(IUNIT(49).NE.0.AND.DELVOLLAK(NN).NE.0
+     +            .AND.LKFLOWTYPE(1).EQ.'NA') THEN
+                LKFLOWTYPE(1)='STORAGE'
+                NLKFLWTYP = NLKFLWTYP + 1
+              ENDIF
 C
               IF(LWRT.GT.0.OR.ICBCFL.LE.0) GO TO 1100
               IF(IUNITUZF.EQ.0) THEN

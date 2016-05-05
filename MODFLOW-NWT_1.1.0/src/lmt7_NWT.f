@@ -19,13 +19,14 @@ C
          INTEGER, SAVE, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
      +                            IUZFSFRCONNECT,IUZFLAKCONNECT,
      +                            NPCKGTXT,IUZFFLOWS,ISFRFLOWS,
-     +                            ILAKFLOWS,NFLOWTYPE
+     +                            ILAKFLOWS,NFLOWTYPE,NLKFLWTYP
          CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
          CHARACTER*16, SAVE, DIMENSION(:), POINTER :: LKFLOWTYPE
         TYPE LMTTYPE
          INTEGER, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
      +                      IUZFSFRCONNECT,IUZFLAKCONNECT,NPCKGTXT,
-     +                      IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,NFLOWTYPE
+     +                      IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,NFLOWTYPE,
+     +                      NLKFLWTYP
          CHARACTER*16, DIMENSION(:), POINTER :: FLOWTYPE
          CHARACTER*16, DIMENSION(:), POINTER :: LKFLOWTYPE
         END TYPE
@@ -51,7 +52,7 @@ C
       USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,IUZFLAKCONNECT,
      &                   IUZFSFRCONNECT,ISFRLAKCONNECT,NPCKGTXT,
      &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,FLOWTYPE,
-     &                   LKFLOWTYPE
+     &                   LKFLOWTYPE,NLKFLWTYP
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND
       USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
 C--USE FILE SPECIFICATION of MODFLOW-2005
@@ -67,7 +68,8 @@ C--USE FILE SPECIFICATION of MODFLOW-2005
      &             /24*0/
 C     -----------------------------------------------------------------    
       ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT,IUZFSFRCONNECT,IUZFLAKCONNECT,
-     +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS)
+     +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
+     +         NLKFLWTYP)
       NPCKGTXT=0
       ALLOCATE(FLOWTYPE(4)) ! POSITION 1: STORAGE; 2: PRECIP; 3: EVAP; 4: RUNOFF
       ALLOCATE(LKFLOWTYPE(5)) ! POSITION 1: STORAGE; 2: PRECIP; 3: EVAP; 4: RUNOFF; 5: WITHDRAWL
@@ -250,15 +252,12 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
           !Activate connections in SFR, LAK, and UZF, provided they are active
           IF(MTUZF.NE.0.AND.IUZOPT.NE.0) THEN
             IUZFFLOWS=1
-            NPCKGTXT = NPCKGTXT + 1
           ENDIF
           IF(MTSFR.NE.0) THEN
             ISFRFLOWS=1
-            NPCKGTXT = NPCKGTXT + 1
           ENDIF
           IF(MTLAK.NE.0) THEN
             ILAKFLOWS=1
-            NPCKGTXT = NPCKGTXT + 1
           ENDIF
           !edm: Determine which combinations of packages is active to determine 
           !     how many CONNECTions there are
@@ -304,7 +303,6 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
             CASE ('SFR')
               IF(MTSFR.NE.0) THEN
                 ISFRFLOWS=1
-                NPCKGTXT = NPCKGTXT + 1
               ENDIF
               ! Determine if a LAK connection exists. UZF connections only exist 
               ! if the UZF package is active and can be set at that time.
@@ -325,7 +323,6 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
             CASE ('LAK')
               IF(MTLAK.NE.0) THEN
                 ILAKFLOWS=1
-                NPCKGTXT = NPCKGTXT + 1
               ENDIF
               ! Determine if a SFR connection exists. UZF connections only exist 
               ! if the UZF package is active and can be set at that time.
@@ -346,7 +343,6 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
             CASE ('UZF')
               IF(MTUZF.NE.0) THEN
                 IUZFFLOWS=1
-                NPCKGTXT = NPCKGTXT + 1
               ENDIF
               ! Determine if SFR/LAK connections exist and set on a case by case basis. 
               IF(IUZFFLOWS.EQ.1.AND.MTSFR.NE.0.AND.
@@ -492,14 +488,10 @@ C--WRITE A HEADER TO MODFLOW-MT3DMS LINK FILE
       IF(OUTPUT_FILE_HEADER.EQ.'EXTENDED') THEN        
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) HDRTXT,
-     &     MTWEL,MTDRN,MTRCH,MTEVT,MTRIV,MTGHB,MTCHD,MTISS,MTNPER,
-     &     MTSTR,MTRES,MTFHB,MTDRT,MTETS,MTSUB,MTIBS,MTLAK,MTMNW,
-     &     MTSWT,MTSFR,MTUZF
+     &     MTWEL,MTDRN,MTRCH,MTEVT,MTRIV,MTGHB,MTCHD,MTISS,MTNPER !,MTSTR,MTRES,MTFHB,MTDRT,MTETS,MTSUB,MTIBS,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF
         ELSEIF(ILMTFMT.EQ.1) THEN
           WRITE(IUMT3D,*) HDRTXT,
-     &     MTWEL,MTDRN,MTRCH,MTEVT,MTRIV,MTGHB,MTCHD,MTISS,MTNPER,
-     &     MTSTR,MTRES,MTFHB,MTDRT,MTETS,MTSUB,MTIBS,MTLAK,MTMNW,
-     &     MTSWT,MTSFR,MTUZF
+     &     MTWEL,MTDRN,MTRCH,MTEVT,MTRIV,MTGHB,MTCHD,MTISS,MTNPER !,MTSTR,MTRES,MTFHB,MTDRT,MTETS,MTSUB,MTIBS,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF
         ENDIF
       ENDIF
 C
@@ -525,12 +517,16 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTUZF.NE.0) WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0)
      &                   WRITE(IUMT3D)   '           UZF FLOWS'
-          IF(MTLAK.NE.0) WRITE(IUMT3D)   '                 LAK'  ! Lake package
-          IF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) 
-     &                   WRITE(IUMT3D)   '           LAK FLOWS'
-          IF(MTSFR.NE.0) WRITE(IUMT3D)   '                 SFR'  ! Streamflow Routing package
-          IF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) 
-     &                   WRITE(IUMT3D)   '           SFR FLOWS'
+          IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN 
+                         WRITE(IUMT3D)   '                 LAK'  ! Lake package
+          ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
+                         WRITE(IUMT3D)   '           LAK FLOWS'
+          ENDIF
+          IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
+                         WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
+          ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
+                         WRITE(IUMT3D,*) '           SFR FLOWS'
+          ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D)   '                 SWR'  ! Surface-water Routing package
           IF(IUZFSFRCONNECT.NE.0) 
      &                   WRITE(IUMT3D)   '     CONNECT UZF SFR'
@@ -551,12 +547,16 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTUZF.NE.0) WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0) 
      &                   WRITE(IUMT3D,*) '           UZF FLOWS'
-          IF(MTLAK.NE.0) WRITE(IUMT3D,*) '                 LAK'  ! Lake package
-          IF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) 
-     &                   WRITE(IUMT3D,*) '           LAK FLOWS'
-          IF(MTSFR.NE.0) WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
-          IF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) 
-     &                   WRITE(IUMT3D,*) '           SFR FLOWS'
+          IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN
+                         WRITE(IUMT3D,*) '                 LAK'  ! Lake package
+          ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
+                         WRITE(IUMT3D,*) '           LAK FLOWS'
+          ENDIF
+          IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
+                         WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
+          ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
+                         WRITE(IUMT3D,*) '           SFR FLOWS'
+          ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D,*) '                 SWR'  ! Surface-water Routing package
           IF(IUZFSFRCONNECT.NE.0) 
      &                   WRITE(IUMT3D,*) '     CONNECT UZF SFR'
@@ -4147,7 +4147,8 @@ C
       CHARACTER*16 TEXT
       INTEGER MXSGMT,MXRCH,LASTRCH,L,NREACH,LL,IL,IC,IR,ILAY,
      &        KSTP,KPER,IUMT3D,ISTSG,ILMTFMT,ISSMT3D,IGRID
-      INTEGER I,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,LENGTH
+      INTEGER I,J,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,
+     &        LENGTH
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
@@ -4158,7 +4159,11 @@ C
       DIMENSION LASTRCH(NSS)
 C
       PRNTSFRQTYP=''
-      TEXT='SFR'
+      IF(ISFRFLOWS.EQ.0) THEN
+        TEXT='SFR'
+      ELSEIF(ISFRFLOWS.NE.0) THEN
+        TEXT='SFR FLOWS'
+      ENDIF
       CLOSEZERO = 1.0e-15
 C
 C--STORE LAST REACH NUMBER OF EACH SEGMENT
@@ -4176,11 +4181,10 @@ C--DETERMINE MAX REACHES AND SEGMENTS
 C
 C--WRITE AN IDENTIFYING HEADER
       IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,NSTRM,NINTOT,MXSGMT,
-     1    MXRCH
+        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,NSTRM  !,NINTOT,MXSGMT,MXRCH
       ELSEIF(ILMTFMT.EQ.1) THEN
         WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT,NSTRM,NINTOT,MXSGMT,MXRCH
+        WRITE(IUMT3D,*) TEXT,NSTRM  !,NINTOT,MXSGMT,MXRCH
       ENDIF      
 C
 C--IF THERE ARE NO STREAM CELLS, SKIP.
@@ -4227,58 +4231,53 @@ C--LOOP THROUGH EACH STREAM CELL AND WRITE EXCHANGE WITH OTHER STREAM REACHES
 C
 C--WRITE AN IDENTIFYING HEADER
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) KPER,KSTP,TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,
-     &                  MXRCH
+          WRITE(IUMT3D) KPER,KSTP,TEXT,NSTRM,NFLOWTYPE,NINTOT
         ELSEIF(ILMTFMT.EQ.1) THEN
           WRITE(IUMT3D,*) KPER,KSTP
-          WRITE(IUMT3D,*) TEXT,NSTRM,NFLOWTYPE,NINTOT,MXSGMT,MXRCH
+          WRITE(IUMT3D,*) TEXT,NSTRM,NFLOWTYPE,NINTOT
         ENDIF
 C
 C--WILL WRITE CFLOWTYPE A TOTAL OF NFLOWTYPE TIMES [MAX(NFLOWTYPE)=4]
         MASK=.FALSE.
         IF(FLOWTYPE(1).EQ.'STORAGE') THEN
           MASK(1) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(FLOWTYPE(2).EQ.'PRECIP') THEN
           MASK(2) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(FLOWTYPE(3).EQ.'EVAP') THEN
           MASK(3) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(FLOWTYPE(4).EQ.'RUNOFF') THEN
           MASK(4) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         PRNTSFRQTYP = PACK(FLOWTYPE, MASK)
 C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATED.
         IF(NFLOWTYPE.EQ.1) THEN
           IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) FLOWTYPE(1)
+            WRITE(IUMT3D) PRNTSFRQTYP(1)
           ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) FLOWTYPE(1)
+            WRITE(IUMT3D,*) PRNTSFRQTYP(1)
           ENDIF
         ELSEIF(NFLOWTYPE.EQ.2) THEN
           IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2)
+            WRITE(IUMT3D) PRNTSFRQTYP(1),PRNTSFRQTYP(2)
           ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2)
+            WRITE(IUMT3D,*) PRNTSFRQTYP(1),PRNTSFRQTYP(2)
           ENDIF
         ELSEIF(NFLOWTYPE.EQ.3) THEN
           IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3)
+            WRITE(IUMT3D) PRNTSFRQTYP(1),PRNTSFRQTYP(2),PRNTSFRQTYP(3)
           ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3)
+            WRITE(IUMT3D,*) PRNTSFRQTYP(1),PRNTSFRQTYP(2),PRNTSFRQTYP(3)
           ENDIF
         ELSEIF(NFLOWTYPE.EQ.4) THEN
           IF(ILMTFMT.EQ.0) THEN
-            WRITE(IUMT3D) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3), 
-     &                    FLOWTYPE(4)
+            WRITE(IUMT3D) PRNTSFRQTYP(1),PRNTSFRQTYP(2),PRNTSFRQTYP(3),
+     &                    PRNTSFRQTYP(4)
           ELSEIF(ILMTFMT.EQ.1) THEN
-            WRITE(IUMT3D,*) FLOWTYPE(1), FLOWTYPE(2), FLOWTYPE(3), 
-     &                    FLOWTYPE(4)
+            WRITE(IUMT3D,*)PRNTSFRQTYP(1),PRNTSFRQTYP(2),PRNTSFRQTYP(3),
+     &                     PRNTSFRQTYP(4)
           ENDIF
         ENDIF
         !DO I=1,4  ! 4 TYPES OF FLOW TO BE RECORED: STORAGE, PRECIP, EVAP, RUNOFF
@@ -4306,7 +4305,7 @@ C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATE
 C
 C--FILL A 2D ARRAY OF SFRFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
 C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
-        DO L=1,NSTRM 
+        DO L=1,NSTRM
           SFRFLOWVAL(1,L) = STRM(30, L)   ! transtor 
           SFRFLOWVAL(2,L) = STRM(14, L)   ! precip
           SFRFLOWVAL(3,L) = STRM(13, L)   ! etsw (surf wat evap)
@@ -4319,7 +4318,7 @@ C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL Z
           DO I=3,1,-1
             IF(FLOWTYPE(I).EQ.'NA') THEN
               LENGTH=USED-(I+1)
-              SFRFLOWVAL(:,I:I+LENGTH)=SFRFLOWVAL(:,(I+1):USED)
+              SFRFLOWVAL(I:I+LENGTH,:)=SFRFLOWVAL((I+1):USED,:)
               USED=USED-1
             ENDIF
           ENDDO
@@ -4397,6 +4396,7 @@ C       case sources of inflow could be multiple streams, lakes,
 C       or specified.
           IF(NREACH.EQ.1) THEN  
             IF(ISEG(3,ISTSG).EQ.5) THEN  !If true, means no trib inflow
+              CONTINUE
               FLOWIN = SEG(2,ISTSG)      !Set flowin equal to specified inflow
               NINFLOW = 1
               IDISP = 0
@@ -4410,6 +4410,7 @@ C       or specified.
               ENDIF
 C
 C9--------COMPUTE INFLOW OF A STREAM SEGMENT EMANATING FROM A LAKE [IUNIT(22)].
+C         RESULTS OF THIS CALCULATION WILL BE USED LATER IN 'CONNECT SFR LAK'
 Cdep      Revised this section because outflow computed in Lake Package.
 C     IDIVAR(1,nseg): segment number to which flow is diverted
             ELSEIF((IUNIT(22).GT.0).AND.(IDIVAR(1,ISTSG).LT.0)) THEN
@@ -4441,18 +4442,17 @@ C10Bdep    OUTFLOW FROM LAKE NOW COMPUTED IN LAKE PACKAGE.
                 IDISP=0
               END IF
               SWLAK(NSFRLAK)=FLOWIN
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,*) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
-              ENDIF
+              !IF(ILMTFMT.EQ.0) THEN
+              !  WRITE(IUMT3D) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
+              !ELSEIF(ILMTFMT.EQ.1) THEN
+              !  WRITE(IUMT3D,*) IDIVAR(1,ISTSG),L,IDISP,FLOWIN,XSA
+              !ENDIF
 C
 C14-----COMPUTE ONE OR MORE DIVERSIONS FROM UPSTREAM SEGMENT.
 Crgn&dep   revised computation of diversions and added subroutine
             ELSEIF(ISTSG.GT.1)THEN
 C
 C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
-              XSA = STRM(31,L)
               IF( ISEG(3,ISTSG).EQ.6 ) THEN !ISEG(3,x).EQ.6: A diversion
                 IF(IDIVAR(1,ISTSG).GT.0 ) THEN !IUPSEG # of the current ISTSG (segment number from which flow is diverted)
                   FLOWIN = DVRSFLW(ISTSG)
@@ -4468,6 +4468,7 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
                   ENDDO  
                   !JJJ=LASTRCH(III)
                 ENDIF
+                XSA = STRM(31,L)
                 IF(ILMTFMT.EQ.0) THEN
                   WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
                 ELSEIF(ILMTFMT.EQ.1) THEN
@@ -4484,17 +4485,24 @@ C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNE
                   IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
                     TRBFLW = SGOTFLW(ITRIB)
                     I=LASTRCH(ITRIB)
-                    NINFLOW = NINFLOW+1
+                    !IDENTIFY THE INDEX WITHIN STRM THAT IS CONTRIBUTING TRIBUTARY
+                    !INFLOW TO THE CURRENT REACH.
+                    DO J=1,NSTRM
+                      IF(ISTRM(4,J).EQ.ITRIB.AND.ISTRM(5,J).EQ.I) EXIT
+                    ENDDO
+                    XSA = STRM(31,J)
+C                    NINFLOW = NINFLOW+1
+                    !AT THIS POINT, THE INDEX J IS EQUAL TO THE LIST # OF THE REACH POURING INTO THE CURRENT REACH
                     IF(ILMTFMT.EQ.0) THEN
-                      WRITE(IUMT3D) I,L,IDISP,TRBFLW,XSA
+                      WRITE(IUMT3D) J,L,IDISP,TRBFLW,XSA
                     ELSEIF(ILMTFMT.EQ.1) THEN
-                      WRITE(IUMT3D,*) I,L,IDISP,TRBFLW,XSA
+                      WRITE(IUMT3D,*) J,L,IDISP,TRBFLW,XSA
                     ENDIF
                   END IF
                   ITRIB = ITRIB + 1
                 END DO
                 !FLOWIN = FLOWIN + SEG(2,ISTSG)
-                NINFLOW = NINFLOW + 1
+C                NINFLOW = NINFLOW + 1
               END IF
             ENDIF
 C
@@ -4503,7 +4511,7 @@ C       IS GREATER THAN 1.
           ELSE IF(NREACH.GT.1) THEN
             LL=L-1
             FLOWIN = STRM(9, LL)
-            NINFLOW = 1
+C            NINFLOW = 1
             IDISP = 1
             III=ISTRM(4, LL)
             JJJ=ISTRM(5, LL)
@@ -4513,13 +4521,22 @@ C       IS GREATER THAN 1.
               IUPRCH = ISTRM(5, I)
               IF(IUPSEG.EQ.III.AND.IUPRCH.EQ.JJJ) EXIT
               I=I+1
-            ENDDO  
+            ENDDO
+            XSA = STRM(31,L)
             IF(ILMTFMT.EQ.0) THEN
               WRITE(IUMT3D) I,L,IDISP,FLOWIN,XSA
             ELSEIF(ILMTFMT.EQ.1) THEN
               WRITE(IUMT3D,*) I,L,IDISP,FLOWIN,XSA
             ENDIF
           END IF
+          IF(IOTSG(ISTSG).EQ.0.AND.NREACH.EQ.ISEG(4,ISTSG)) THEN
+            XSA = STRM(31,L)
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) L,-999,IDISP,STRM(9,L),XSA
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) L,-999,IDISP,STRM(9,L),XSA
+            ENDIF
+          ENDIF
         ENDDO
       ENDIF
 C--IF "SFR FLOWS" IS ENTERED IN PCKGTXT, WRITE STREAM NETWORK FLOW TERMS
@@ -4590,18 +4607,37 @@ C DATE CREATED: 7-25-2013
 C
       USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT
       USE GWFLAKMODULE, ONLY:LAKSFR,ILKSEG,ILKRCH,SWLAK,NSFRLAK
+      USE GWFSFRMODULE, ONLY:NSTRM,ISTRM
 C
       IMPLICIT NONE
 C
-      INTEGER I,ILMTFMT,IUMT3D,KSTP,KPER,IGRID
+      INTEGER I,J,ILMTFMT,IUMT3D,KSTP,KPER,IGRID,SEG,RCH
+      CHARACTER*16 TEXT
 C
+      TEXT='CONNECT SFR LAK'
+C
+C--WRITE AN IDENTIFYING HEADER
+      IF(ILMTFMT.EQ.0) THEN
+        WRITE(IUMT3D) KPER,KSTP,TEXT,NSFRLAK
+      ELSEIF(ILMTFMT.EQ.1) THEN
+        WRITE(IUMT3D,*) KPER,KSTP
+        WRITE(IUMT3D,*) TEXT,NSFRLAK
+      ENDIF 
 C-----WRITE EXCHANGE TERMS WITH SFR
       DO I=1,NSFRLAK
+        DO J=1,NSTRM  !FIND THE INDEX IN THE STREAM REACH LIST THAT HAS CURRENT SEGMENT, REACH
+          SEG=ISTRM(4,J)
+          RCH=ISTRM(5,J)
+          IF(ILKSEG(I).EQ.SEG.AND.ILKRCH(I).EQ.RCH) THEN
+            EXIT
+          ENDIF
+        ENDDO
+!       Sign convention for SWLAK is - negative: SFR -> LAK; positive: LAK -> SFR
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
+          WRITE(IUMT3D) J,LAKSFR(I),SWLAK(I)
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) LAKSFR(I),ILKSEG(I),ILKRCH(I),SWLAK(I)
-        ENDIF        
+          WRITE(IUMT3D,*) J,LAKSFR(I),SWLAK(I)
+        ENDIF
       ENDDO      
 C
       RETURN
@@ -4618,13 +4654,13 @@ C DATE CREATED: 7-25-2013
      &                       PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,FLOB,
      &                       NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK,
      &                       DELVOLLAK,EVAPLK,RNF,PRCPLK,WTHDRW
-      USE LMTMODULE,    ONLY:ILAKFLOWS,LKFLOWTYPE
+      USE LMTMODULE,    ONLY:ILAKFLOWS,LKFLOWTYPE,NLKFLWTYP
       CHARACTER*16 TEXT
-      INTEGER NN,L,IL,IR,IC,LAKE,NLKFLWTYP
+      INTEGER NN,L,IL,IR,IC,LAKE
       REAL    Q
-      INTEGER, DIMENSION(4)     :: LKFLOWTYP
+C      INTEGER, DIMENSION(4)     :: LKFLOWTYP
       LOGICAL, DIMENSION(5)     :: MASK
-      REAL, DIMENSION(NLAKES,5) :: LKFLOWVAL,CONSOLIDATED
+      REAL, DIMENSION(5,NLAKES) :: LKFLOWVAL,CONSOLIDATED
       CHARACTER*16, DIMENSION(5):: PRNTLAKQTYP
       LOGICAL WRITEVAL
 C
@@ -4653,30 +4689,24 @@ C-----WRITE EXCHANGE TERMS WITH GW. LKNODE=# OF LAK-AQIF INTERFACES
       ENDDO
 C
 C-----WRITE LAKE SPECIFIC TERMS
-      NLKFLWTYP=0
       IF(ILAKFLOW.NE.0) THEN
         TEXT='LAK FLOWS'
         LKFLOWTYP=0
         MASK=.FALSE.
         IF(LKFLOWTYPE(1).EQ.'STORAGE') THEN
           MASK(1) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(LKFLOWTYPE(2).EQ.'PRECIP') THEN
           MASK(2) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(LKFLOWTYPE(3).EQ.'EVAP') THEN
           MASK(3) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(LKFLOWTYPE(4).EQ.'RUNOFF') THEN
           MASK(4) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         IF(LKFLOWTYPE(5).EQ.'WITHDRAW') THEN
           MASK(5) = .TRUE.
-          NFLOWTYPE = NFLOWTYPE + 1
         ENDIF
         PRNTLAKQTYP = PACK(LKFLOWTYPE, MASK)
 C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATED.
@@ -4718,7 +4748,7 @@ C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATE
 C
 C--FILL A 2D ARRAY OF LAKFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
 C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
-        DO L=1,NSTRM 
+        DO L=1,NLAKES 
           LKFLOWVAL(1,L) = DELVOLLAK(L)   ! transtor 
           LKFLOWVAL(2,L) = PRCPLK(L)      ! precip
           LKFLOWVAL(3,L) = EVAPLK(L)      ! etsw (surf wat evap)
@@ -4854,13 +4884,17 @@ C
       DEALLOCATE(LMTDAT(IGRID)%ISSMT3D)
       DEALLOCATE(LMTDAT(IGRID)%IUMT3D)
       DEALLOCATE(LMTDAT(IGRID)%ILMTFMT)
-      DEALLOCATE(IUZFLAKCONNECT)
-      DEALLOCATE(IUZFSFRCONNECT)
-      DEALLOCATE(ISFRLAKCONNECT)
-      DEALLOCATE(NPCKGTXT)
-      DEALLOCATE(IUZFFLOWS)
-      DEALLOCATE(ISFRFLOWS)
-      DEALLOCATE(ILAKFLOWS)
+      DEALLOCATE(LMTDAT(IGRID)%IUZFLAKCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%IUZFSFRCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%ISFRLAKCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%NPCKGTXT)
+      DEALLOCATE(LMTDAT(IGRID)%NLKFLWTYP)
+      DEALLOCATE(LMTDAT(IGRID)%NFLOWTYPE)
+      DEALLOCATE(LMTDAT(IGRID)%IUZFFLOWS)
+      DEALLOCATE(LMTDAT(IGRID)%ISFRFLOWS)
+      DEALLOCATE(LMTDAT(IGRID)%ILAKFLOWS)
+C      DEALLOCATE(LMTDAT(IGRID)%FLOWTYPE)
+c      DEALLOCATE(LMTDAT(IGRID)%LKFLOWTYPE)
 C
       RETURN
       END
