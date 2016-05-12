@@ -2782,9 +2782,8 @@ C-lfk
 C
               DELVOLLAK(NN)=DELVOL(NN)/DELT
 C-EDM
-              IF(IUNIT(49).NE.0.AND.DELVOLLAK(NN).NE.0
-     +            .AND.LKFLOWTYPE(1).EQ.'NA') THEN
-                LKFLOWTYPE(1)='STORAGE'
+              IF(IUNIT(49).NE.0.AND.LKFLOWTYPE(1).EQ.'NA') THEN
+                LKFLOWTYPE(1)='VOLUME'
                 NLKFLWTYP = NLKFLWTYP + 1
               ENDIF
 C
