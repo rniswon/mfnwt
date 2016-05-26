@@ -18,7 +18,7 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.0 09/11/2015:
+o Version 1.1.0 05/01/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
 means that MODFLOW-2005 source files used in MODFLOW-NWT were updated to
@@ -32,13 +32,13 @@ LAK7 packages that is required for simulating transport in the unsaturated zone,
 streams, and lakes. Refer to the MT3D-USGS documentation report 
 (Bedekar and others, 2016) for details.
 
-gwf2upw1.f
+Upstream Weigthing (UPW) Package
 
 An error was fixed in the calculation of the derivative for smoothing conductunce  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal affects on the solution.
 
-NWT1_solver.f and NWT1_xmd.f
+NWT solver (NWT) Package
 
 Previous versions of MODFLOW-NWT reported a warning when the difference between
 a specified cell top and cell bottom was less than 100*Thickfact, where Thickfact 
@@ -49,6 +49,9 @@ and the model will stop if TOP-BOT<100*Thickfact.
 An error was fixed in the calculation of the derivative for smoothing conductunce  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal affects on the solution.
+
+A minor memory allocation error was fixed in GMRES that affected compilations using 
+the gfortran compiler
 
 Default solver input values for the xmd solver (Linmeth=2) were modified to improve 
 convergence. Solver input values for the SIMPLE, MODERATE, and COMPLEX default options
@@ -114,8 +117,24 @@ Complex:
 
 Streamflow Routing (SFR2) Package
 
+A new option was added to allow specfication of a multipication factor for reducing
+the streambed hydraulic conductivity for losing condition. 
+
+New Data Set 1C: 
+[LOSSFACTOR Factor]
+
+Definitions:
+
+LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
+              real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
+              to calculate seepage loss from streams. Calculation of groundwater 
+              seepage to streams is unchanged.
+
+Note: The original Data Set 1C is now called Data Set 1D.
+
+
 Some variables in the SFR2 Package were initialized. Some variables were changed
-to arrays in order to save data for MT3D-USGS.
+to arrays for use in MT3D-USGS.
 
 Unsaturated-Zone Flow (UZF) Package
 
@@ -125,36 +144,49 @@ beneath lakes.
 
 New Options were added to UZF1 to allow the hydraulic conducitvity used to
 calculate rejected infiltration and surface leakage to be different than
-the vertical hydraulic conductivity (UZF1 input variable VKS) used to route 
-water through the unsaturated zone. Optional Key words for UZF1
-in order of specification are:
+the vertical hydraulic conductivity of the unsaturated zone (VKS). 
+
+Optional Key words for UZF1 in order of specification are:
 
 DATA SET 1A:
-SPECIFYTHTR SPECIFYTHTI NOSURFLEAK SPECIFYSURFK REJECTSURFK SEEPSURFK    
+[SPECIFYTHTR] [SPECIFYTHTI] [NOSURFLEAK] [SPECIFYSURFK] [REJECTSURFK] [SEEPSURFK]    
 
 Definitions:
 
-SPECIFYSURFK - Key word for specifying variable SURFK.
+SPECIFYSURFK -- An optional character variable. When SPECIFYSURFK is specified, the 
+                variable SURFK is specfied in Data Set 4b.
 
-REJECTSURFK - Key word for using SURFK instead of VKS for calculating
-              rejected infiltration
-SEEPSURFK - Key word for using SURFK instead of VKS for calculating
-            surface leakage. 
+REJECTSURFK -- An optional character variable. When REJECTSURFK is specified, SURFK 
+               instead of VKS is used for for calculating rejected infiltration. 
+               REJECTSURFK only is included if SPECIFYSURFK is included.
+              
+SEEPSURFK -- An optional character variable. When SEEPSURFK is specified, SURFK 
+             instead of VKS is used for calculating surface leakage. SEEPSURFK 
+             only is included if SPECIFYSURFK is included.
 
-DATA 1b:             
-NETFLUX Unitrech Unitdis                                                 
+DATA SET 1b:             
+[NETFLUX Unitrech Unitdis]                                               
 
 Definitions:
 
-NETFLUX - Key word for writing net recharge and net discharge output to
-          two separate formatted text output files. Includes all UZF1 
-          groundwater recharge values cell by cell. Values are output as
-          2-d arrays (NCOL, NROW) 
+NETFLUX -- An optional character variable. When NETFLUX is specified, the sum 
+           of recharge (L3/T) and the sum of discharge (L3/T) is written to separate 
+           unformatted files using module UBDSV3. Unitrech and Unitdis are the unit   
+           numbers to which these values are written when “SAVE BUDGET” is specified 
+           in Output Control. Values written to Unitrech are the sum of recharge  
+           values for the UZF, SFR2, and LAK packages, and values written 
+           to Unitdis are the sum of discharge values for the UZF, SFR2, and 
+           LAK packages. Values are averaged over the period between output times.
 
-DATA 4b:
-SURFK(NCOL, NROW)--U2DRL An array of positive real values used to define the 
-                            saturated vertical hydraulic conductivity of the 
-                            unsaturated zone (LT-1).
+
+DATA SET 4b:
+
+[SURFK (NCOL, NROW)] -- U2DREL
+
+SURFK -- An optional array of positive real values used to define the hydraulic 
+         conductivity (LT-1). SURFK is used for calculating the rejected infiltration  
+         and/or surface leakage. IF SURFK is set greater than VKS then it is
+         set equal to VKS.
 
 Lake (LAK) Package
 
@@ -165,12 +197,7 @@ beneath lakes.
 Multi-Node Well (MNW2) Package
 
 A bug was fixed to correct budget calculations when the UPW Package was
-used with MNW2
-
-Generalized Minimum Residual algorithm file (gmres.f90)
-
-A minor memory allocation error was fixed that affected compilations using 
-the gfortran compiler.
+used with MNW2.
 
 Surface Water Routing (SWR) Process
 
@@ -180,7 +207,8 @@ and gsol7.f to gwf2swr7util.f.
 
 Source files that were modified include: gwf2uzf1_NWT.f,gwfuzfmodule_NWT.f,
 gwf2sfr7_NWT.f,gwfsfrmodule_NWT.f,gwf2lak7_NWT.f, NWT1_gmres.f90, gwf2swr7.f,
-gwf2swr7util.f
+gwf2swr7util.f, gwf2mnw27_NWT.f, gmres.f90, NWT1_solver.f and NWT1_xmd.f, and
+lmt7_NWT.f.
 
 o Version 1.0.9 07/01/2014:
 
