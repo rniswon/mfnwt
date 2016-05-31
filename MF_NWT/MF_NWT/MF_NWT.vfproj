@@ -84,7 +84,7 @@
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfsfrmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfuzfmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\hufutl7.f"/>
-		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\lmt7_NWT.f"/>
+		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\lmt8_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\mach_mod.f90"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\MF_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\mhc7.f"/>
