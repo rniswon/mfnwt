@@ -1,4 +1,143 @@
 C
+C
+C     ******************************************************************
+C     SIMULATE ET
+C     ******************************************************************
+      MODULE SIMET_MODULE
+      USE ETLIN_MODULE
+      USE ETNLIN_MODULE
+      implicit none
+      type SIM_ET
+        DOUBLE PRECISION hh,s,x,c,trhs,thcof,dET
+      end type SIM_ET
+      public SIM_ET
+      CONTAINS
+      FUNCTION SIMUZET(SELF,ETOPT)
+      type (SIM_ET), intent(inout) :: SELF
+      integer, intent(in) :: ETOPT
+      type (LIN_ET) :: flin
+      type (NLIN_ET) :: fnlin
+      DOUBLE PRECISION SIMUZET
+      SIMUZET = 0.0D0
+      IF ( ETOPT.EQ.1 ) THEN
+        flin%trhs = SELF%trhs
+        flin%thcof = SELF%thcof
+        flin%hh = SELF%hh
+        flin%s = SELF%s
+        flin%x = SELF%x
+        flin%c = SELF%c
+        SIMUZET = ETFUNC_LIN(flin)
+        SELF%trhs = flin%trhs
+        SELF%thcof = flin%thcof
+        SELF%dET = 0.0
+      ELSE IF ( ETOPT.EQ.2 ) THEN
+        fnlin%trhs = SELF%trhs
+        fnlin%thcof = SELF%thcof
+        fnlin%hh = SELF%hh
+        fnlin%s = SELF%s
+        fnlin%x = SELF%x
+        fnlin%c = SELF%c
+        SIMUZET = ETFUNC_NLIN(fnlin)
+        SELF%trhs = fnlin%trhs
+        SELF%thcof = fnlin%thcof
+!        SELF%dET = fnlin%dET
+        SELF%dET = 0.0
+      END IF
+      END FUNCTION SIMUZET
+      END MODULE SIMET_MODULE
+!
+      MODULE ETLIN_MODULE
+      implicit none
+      type LIN_ET
+        DOUBLE PRECISION hh,s,x,c,trhs,thcof,dET
+      end type LIN_ET
+      public LIN_ET
+      CONTAINS
+      FUNCTION ETFUNC_LIN(flin)
+      type (LIN_ET), intent(inout) :: flin
+      double precision etgw, ETFUNC_LIN
+! Between ET surface and extintion depth
+      IF ( flin%hh.GT.(flin%s-flin%x) .AND. flin%hh.LT.flin%s ) THEN
+        etgw = (flin%c*(flin%hh-(flin%s-flin%x))/flin%x)
+        IF ( etgw.GT.flin%c ) THEN
+          etgw = flin%c
+          flin%trhs = etgw
+        ELSE
+          flin%trhs = flin%c - flin%c*flin%s/flin%x
+          flin%thcof = -flin%c/flin%x
+          etgw = flin%trhs-(flin%thcof*flin%hh)
+        END IF
+! Above land surface
+      ELSE IF ( flin%hh.GE.flin%s ) THEN           
+        flin%trhs = flin%c
+        etgw = flin%c
+! Below extintion depth
+      ELSE
+        etgw = 0.0
+      END IF
+      ETFUNC_LIN = etgw
+      END FUNCTION ETFUNC_LIN
+      END MODULE
+!
+      MODULE ETNLIN_MODULE
+      USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      implicit none
+      type NLIN_ET
+        DOUBLE PRECISION hh,s,x,c,trhs,thcof,dET
+      end type NLIN_ET
+      public NLIN_ET
+      CONTAINS
+      FUNCTION ETFUNC_NLIN(fnlin)
+      type (NLIN_ET), intent(inout) :: fnlin
+      EXTERNAL smoothuz
+      DOUBLE PRECISION smoothuz, smint
+      double precision etgw, ETFUNC_NLIN, depth, smoothick,
+     +                 detdh
+      depth = fnlin%hh - (fnlin%s - fnlin%x)
+      if ( depth.lt.0.0 ) depth = 0.0
+      etgw = fnlin%c
+      detdh = 0.0d0
+      smint = 0.15*fnlin%x
+      if ( depth>1.0e-7) then
+          etgw = etgw*smoothuz(depth,detdh,smint)
+      else
+          etgw = 0.0d0
+      end if
+      fnlin%trhs = etgw
+      fnlin%dET = detdh
+      ETFUNC_NLIN = etgw
+      END FUNCTION ETFUNC_NLIN
+      END MODULE
+!
+      DOUBLE PRECISION FUNCTION smoothuz(h,dwdh,smint)
+! h is the depth above extinction
+! dwdh is the derivative
+      IMPLICIT NONE
+      DOUBLE PRECISION h, s, aa, bb, x, y, dwdh, smint
+      DOUBLE PRECISION cof1, cof2, cof3
+      smoothuz = 0.0D0
+      s = smint
+      if ( s<1.0d-3 ) s = 1.0d-3
+      x = h
+      aa = -6.0d0/(s**3.0d0)
+      bb = -6.0d0/(s**2.0d0)
+      cof1 = x**2.0D0
+      cof2 = -(2.0D0*x)/(s**3.0D0)
+      cof3 = 3.0D0/(s**2.0D0)
+      y = cof1*(cof2+cof3)
+ !     dwdh = (aa*x**2.0D0-bb*x)
+      dwdh = 0.0d0
+      IF ( x.LE.0.0 ) THEN
+        y = 0.0D0
+        dwdh = 0.0D0
+      ELSE IF ( x-s.GT.-1.0e-14 ) THEN
+        y = 1.0D0
+        dwdh = 0.0D0
+      END IF
+      smoothuz = y
+      END FUNCTION smoothuz
+! end of et function options
+C
 C-------SUBROUTINE GWF2UZF1AR
       SUBROUTINE GWF2UZF1AR(In, Iunitbcf, Iunitlpf, Iunithuf, 
      +                      Iunitupw, Igrid)
@@ -62,12 +201,13 @@ C     ------------------------------------------------------------------
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
       ALLOCATE (NUZGAG, NUZGAGAR, NUZCL, NUZRW, TOTRUNOFF)
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
-      ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD)
+      ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
       ALLOCATE (INETFLUX,UNITRECH,UNITDIS)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
       IETBUD = 0
+      ETOPT = 2
       MXVL = 0
       NPP = 0
       UNITRECH = 0
@@ -517,7 +657,7 @@ C12b-----READ SURFACE CONDUCTIVITY FROM UZF INPUT FILE.
       IF ( Ireadsurfk > 0 ) THEN
         CALL U2DREL(SURFK, aname(9), NROW, NCOL, 0, In, IOUT)
 C
-C13b-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
+C13b-----CHECK FOR ERRORS IN SURFACE K
         DO nrck = 1, NROW
           DO ncck = 1, NCOL
             iflgbnd = 1
@@ -527,6 +667,14 @@ C13b-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
  9030           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
      +                  I5, ', COL. ', I5, ' IS LESS THAN OR EQUAL TO ',
      +                 'ZERO-- SETTING LAND SURFACE K EQUAL TO ', 
+     +                 'UNSAT. K')
+                iflgbnd = 0
+              END IF
+              IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
+                WRITE (IOUT, 9031) nrck, ncck
+ 9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
+     +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
+     +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
      +                 'UNSAT. K')
                 iflgbnd = 0
               END IF
@@ -1059,7 +1207,6 @@ C1------SET POINTERS FOR THE CURRENT GRID.
 C      
 C2------READ INFILTRATION RATES FOR UZF CELLS AT THE BEGINNING OF EACH
 C       STRESS PERIOD.
-          
       iss = ISSFLG(Kkper)
       iflginit = 0
       excespp = 0.0 !rgn 9/11/2014
@@ -1530,10 +1677,12 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE SIMET_MODULE
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
+      type (SIM_ET) :: uzfm_et
 C     -----------------------------------------------------------------
 C     FUNCTIONS
 C     -----------------------------------------------------------------
@@ -1858,107 +2007,24 @@ C6------GROUNDWATER IS DISCHARGING TO LAND SURFACE.
           END IF
           REJ_INF(ic, ir) = cellarea * ( finfhold - finfact )
 C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
-          IF ( IETFLG.GT.0 .AND. ibnd.NE.0 ) THEN
-            etdp = celtop - ROOTDPTH(ic, ir)
-            rhsnew = 0.0D0
-            rhsold = 0.0D0
-            hcofnew = 0.0D0
-            hcofold = 0.0D0
-            trhs = 0.0D0
-            thcof = 0.0D0
-            idr = 1
-            c = PETRATE(ic, ir)- etact/DELT
-            IF ( c.GT.0.0 ) THEN
-            IF ( Iunitnwt.GT.0 ) idr = 2
-            DO I = 1, idr
-              c = PETRATE(ic, ir)- etact/DELT
-              IF ( i.EQ.2 ) h = h + Heps
-              IF ( h.GT.etdp .AND. h.LT.celtop ) THEN
-                s = celtop
-                x = ROOTDPTH(ic, ir)
-!                c = PETRATE(ic, ir)- etact/DELT
-                IF ( c.GT.0.0 ) THEN
-                  c = c*cellarea
-                ELSE
-                  c = 0.0
-                END IF
-                etgw = (c*(h-(s-x))/x)
-                IF ( etgw/cellarea+etact/DELT.GT.PETRATE(ic, ir)
-     +                ) THEN
-! Suppress ET beneath a lake
-                  IF ( lakflginf.NE.1 ) THEN
-                    etgw = (PETRATE(ic, ir)-etact/DELT)*cellarea
-                    IF ( etgw.lt.0.0 ) THEN
-                      c = 0.0
-                      etgw = 0.0
-                    END IF
-                    IF ( i.EQ.1 ) THEN
-                      RHSOLD = etgw
-                      RHS(ic, ir, il) = RHS(ic, ir, il) + etgw
-                    ELSE
-                      RHSNEW = etgw
-                    END IF
-                  ELSE
-                    etgw = 0.0
-                    c = 0.0
-                  END IF
-                ELSE
-! Suppress ET beneath a lake
-                  IF ( lakflginf.NE.1 ) THEN
-                    trhs = c - c*s/x
-                    thcof = -c/x
-                  ELSE
-                    trhs = 0.0
-                    thcof = 0.0
-                    c = 0.0
-                  END IF
-                  IF ( i.EQ.1 ) THEN
-                    RHS(ic, ir, il) = RHS(ic, ir, il) + trhs
-                    HCOF(ic, ir, il) = HCOF(ic, ir, il) + thcof
-                    RHSOLD = trhs
-                    HCOFOLD = thcof
-                    etgw = trhs-(thcof*h)
-                  ELSE
-                    RHSNEW = trhs
-                    HCOFNEW = thcof
-                  END IF
-                END IF
-              ELSE IF ( h.GE.celtop ) THEN
-! Suppress ET beneath a lake              
-                IF ( lakflginf.NE.1 ) THEN
-                  c = PETRATE(ic, ir) - etact/DELT
-                ELSE
-                  c = 0.0
-                END IF
-                IF ( c.GT.0.0 ) THEN
-                  c = c*cellarea
-                ELSE
-                  c = 0.0
-                END IF
-                IF ( i.EQ.1 ) THEN
-                  RHSOLD = c
-                  RHS(ic, ir, il) = RHS(ic, ir, il) + c
-                ELSE
-                  RHSNEW = c
-                END IF
-                etgw = c
-              ELSE
-                etgw = 0.0
-              END IF
-            END DO
-            IF ( Iunitnwt.GT.0 ) THEN
-              ij = Icell(ic, ir, il)
-              IF ( abs(trhs).GT.CLOSEZERO ) THEN
+          IF ( IETFLG.GT.0 .AND. lakflginf.NE.1 ) THEN
+            etgw = 0.0
+            uzfm_et%trhs = 0.0d0
+            uzfm_et%thcof = 0.0d0
+            uzfm_et%s = celtop
+            uzfm_et%x = ROOTDPTH(ic, ir)
+            uzfm_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
+            uzfm_et%hh = H
+            IF ( uzfm_et%c.LT.0.0d0 ) uzfm_et%c = 0.0d0
+            etgw = SIMUZET(uzfm_et,ETOPT)
+            RHS(ic, ir, il) = RHS(ic, ir, il) + uzfm_et%trhs
+            HCOF(ic, ir, il) = HCOF(ic, ir, il) + uzfm_et%thcof
 ! Derivative for RHS
-                A(IA(ij)) = A(IA(ij)) - (RHSNEW-RHSOLD)/Heps
-              END IF
-              IF ( abs(thcof).GT.CLOSEZERO ) THEN
-! Derivative for HCOF
-                A(IA(ij)) = A(IA(ij)) + h*(HCOFNEW-HCOFOLD)/Heps
-              END IF
+            IF ( Iunitnwt.GT.0 ) THEN
+              ij = Icell(IC,IR,IL)
+              A(IA(ij)) = A(IA(ij)) + uzfm_et%dET
             END IF
-            UZFETOUT(ic, ir) = etact*cellarea + etgw*DELT
-            END IF
+!            UZFETOUT(ic, ir) = etact*cellarea + etgw*DELT  !not used in Fm?
           END IF
         END IF
       END DO
@@ -2105,9 +2171,11 @@ C     ******************************************************************
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
       USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE, FNETSEEP
+      USE SIMET_MODULE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
+      type (SIM_ET) :: uzbd_et
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
@@ -2411,21 +2479,12 @@ C
 C9------CALCULATE ET FROM GROUND WATER.
 ! Suppress ET beneath a lake
             IF ( IETFLG.GT.0 .AND. lakflginf.NE.1 ) THEN
-              c = PETRATE(ic, ir)
-              IF ( c.GT.0.0 ) THEN
-                c = c*cellarea
-              ELSE
-                c = 0.0
-              END IF
-              etgw = c
-              IF ( etgw/cellarea.GT.PETRATE(ic, ir) ) THEN
-                etgw = PETRATE(ic, ir)*cellarea
-                c = etgw
-                IF ( c.lt.0.0 ) THEN
-                  c = 0.0
-                  etgw = 0.0
-                END IF
-              END IF
+              etgw = 0.0
+              uzbd_et%s = celtop
+              uzbd_et%x = ROOTDPTH(ic, ir)
+              uzbd_et%c = PETRATE(ic, ir)*CELLAREA
+              uzbd_et%hh = H
+              etgw = SIMUZET(uzbd_et,ETOPT)
               UZFETOUT(ic, ir) = 0.0
               GWET(ic, ir) = etgw
             END IF
@@ -2519,22 +2578,15 @@ C
 C12-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
 ! Suppress ET beneath a lake
             IF ( IETFLG.GT.0 .AND. lakflginf.NE.1 ) THEN
-              c = PETRATE(ic, ir) - etact/DELT
-              IF ( c.GT.0.0 ) THEN
-                c = c*cellarea
-              ELSE
-                c = 0.0
-              END IF
-              etgw = c
-              IF ( etgw/cellarea+etact/DELT.GT.PETRATE(ic, ir)
-     +              ) THEN
-                etgw = (PETRATE(ic, ir)-etact/DELT)*cellarea
-                c = etgw
-                IF ( c.lt.0.0 ) THEN
-                  c = 0.0
-                  etgw = 0.0
-                END IF
-              END IF
+              etgw = 0.0
+              uzbd_et%trhs = 0.0d0
+              uzbd_et%thcof = 0.0d0
+              uzbd_et%s = celtop
+              uzbd_et%x = ROOTDPTH(ic, ir)
+              uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
+              uzbd_et%hh = H
+              IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
+              etgw = SIMUZET(uzbd_et,ETOPT)
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -2895,30 +2947,15 @@ C
 C25-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
 ! Suppress ET beneath a lake
             IF ( IETFLG.GT.0 .AND. lakflginf.NE.1 ) THEN
-              etdp = celtop - ROOTDPTH(ic, ir)
-              IF ( h.GT.etdp ) THEN
-                s = celtop
-                x = ROOTDPTH(ic, ir)
-                c = PETRATE(ic, ir) - etact/DELT
-                IF ( c.GT.0.0 ) THEN
-                  c = c*cellarea
-                ELSE
-                  c = 0.0
-                END IF
-                etgw = c*(h-(s-x))/x
-              ELSE
-                etgw = 0.0
-              END IF
-              c = etgw
-              IF ( etgw/cellarea+etact/DELT.GT.PETRATE(ic, ir)
-     +             ) THEN
-                etgw = (PETRATE(ic, ir)-etact/DELT)*cellarea
-                c = etgw
-                IF ( c.lt.0.0 ) THEN
-                  c = 0.0
-                  etgw = 0.0
-                END IF
-              END IF           
+              etgw = 0.0
+              uzbd_et%trhs = 0.0d0
+              uzbd_et%thcof = 0.0d0
+              uzbd_et%s = celtop
+              uzbd_et%x = ROOTDPTH(ic, ir)
+              uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
+              uzbd_et%hh = H
+              IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
+              etgw = SIMUZET(uzbd_et,ETOPT)           
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -3021,30 +3058,15 @@ C27-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
 C
 ! Suppress ET beneath a lake
             IF ( IETFLG.GT.0 .AND. lakflginf.NE.1 ) THEN
-              etdp = celtop - ROOTDPTH(ic, ir)
-              IF ( h.GT.etdp ) THEN
-                s = celtop
-                x = ROOTDPTH(ic, ir)
-                c = PETRATE(ic, ir) - etact/DELT
-                IF ( c.GT.0.0 ) THEN
-                  c = c*cellarea
-                ELSE
-                  c = 0.0
-                END IF
-                etgw = c*(h-(s-x))/x
-              ELSE
-                etgw = 0.0
-              END IF
-              c = etgw
-              IF ( etgw/cellarea+etact/DELT.GT.PETRATE(ic, ir)
-     +           ) THEN
-                etgw = (PETRATE(ic, ir)-etact/DELT)*cellarea
-                c = etgw
-                IF ( c.lt.0.0 ) THEN
-                  c = 0.0
-                  etgw = 0.0
-                END IF
-              END IF      
+             etgw = 0.0
+              uzbd_et%trhs = 0.0d0
+              uzbd_et%thcof = 0.0d0
+              uzbd_et%s = celtop
+              uzbd_et%x = ROOTDPTH(ic, ir)
+              uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
+              uzbd_et%hh = H
+              IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
+              etgw = SIMUZET(uzbd_et,ETOPT)           
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -3123,7 +3145,7 @@ C30-----NO UNSATURATED ZONE AND GROUND WATER DISCHARGES TO SURFACE.
           CUMUZVOL(5) = CUMUZVOL(5) + (SEEPOUT(ic, ir))*DELT
           UZTSRAT(5) = UZTSRAT(5) + (SEEPOUT(ic, ir))
         END IF
-        ratout = ratout + c
+        ratout = ratout + ETGW
         IF ( IUZFOPT.GT.0 .AND. ibnd.GT.0 ) THEN
           IF ( iss.EQ.0 ) THEN
             ratin = ratin + UZFLWT(ic, ir)/DELT
@@ -3450,7 +3472,7 @@ C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
      +                               PERTIM, TOTIM, IBOUND)
       END IF
 C
-C40-----UPDATE RATES AND BUFFERS FOR REJECTED INFILTRATON RATES.
+C40-----UPDATE RATES AND BUFFERS FOR STORAGE CHANGES.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
           DO ir = 1, NROW
@@ -5366,6 +5388,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%IUZFB22)
       DEALLOCATE (GWFUZFDAT(Igrid)%IUZFB11)
       DEALLOCATE (GWFUZFDAT(Igrid)%NTRAIL)
+      DEALLOCATE (GWFUZFDAT(Igrid)%ETOPT)
       DEALLOCATE (GWFUZFDAT(Igrid)%NWAV)
       DEALLOCATE (GWFUZFDAT(Igrid)%NSETS)
       DEALLOCATE (GWFUZFDAT(Igrid)%IGSFLOW)
@@ -5461,6 +5484,7 @@ C     ------------------------------------------------------------------
       IUZFB22=>GWFUZFDAT(Igrid)%IUZFB22
       IUZFB11=>GWFUZFDAT(Igrid)%IUZFB11
       NTRAIL=>GWFUZFDAT(Igrid)%NTRAIL
+      ETOPT=>GWFUZFDAT(Igrid)%ETOPT
       NWAV=>GWFUZFDAT(Igrid)%NWAV
       NSETS=>GWFUZFDAT(Igrid)%NSETS
       IGSFLOW=>GWFUZFDAT(Igrid)%IGSFLOW
@@ -5555,6 +5579,7 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%IUZFCB2=>IUZFCB2
       GWFUZFDAT(Igrid)%IUZFB22=>IUZFB22
       GWFUZFDAT(Igrid)%IUZFB11=>IUZFB11
+      GWFUZFDAT(Igrid)%ETOPT=>ETOPT
       GWFUZFDAT(Igrid)%NTRAIL=>NTRAIL
       GWFUZFDAT(Igrid)%NWAV=>NWAV
       GWFUZFDAT(Igrid)%NSETS=>NSETS

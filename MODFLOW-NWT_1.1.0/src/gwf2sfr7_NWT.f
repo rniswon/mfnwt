@@ -37,7 +37,7 @@ C     ******************************************************************
       END IF
       IF ( self%IFLAG.GT.0 .AND. self%IRCHNUM.EQ.NSTRM ) THEN
         WRITE(self%IUNIT,*)' MODEL STOPPING DUE TO REACH ALTITUDE ERROR'
-        CALL USTOP(' ')
+!        CALL USTOP(' ')
       END IF
   100 FORMAT(5I7,2F15.7)
       END FUNCTION ICHKSTRBOT
