@@ -17,20 +17,21 @@ C
 C
       MODULE LMTMODULE
          INTEGER, SAVE, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
-     +                            IUZFSFRCONNECT,IUZFLAKCONNECT,
-     +                            NPCKGTXT,IUZFFLOWS,ISFRFLOWS,
-     +                            ILAKFLOWS,NFLOWTYPE,NLKFLWTYP,NLAKCON
+     +                            ISFRUZFCONNECT,ILAKUZFCONNECT,
+     +                            ISNKUZFCONNECT,NPCKGTXT,IUZFFLOWS,
+     +                            ISFRFLOWS,ILAKFLOWS,NFLOWTYPE,
+     +                            NLKFLWTYP,NLAKCON
          CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
          CHARACTER*16, SAVE, DIMENSION(:), POINTER :: LKFLOWTYPE
         TYPE LMTTYPE
-         INTEGER, POINTER ::ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
-     +                      IUZFSFRCONNECT,IUZFLAKCONNECT,NPCKGTXT,
-     +                      IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,NFLOWTYPE,
-     +                      NLKFLWTYP,NLAKCON
+         INTEGER, POINTER :: ISSMT3D,IUMT3D,ILMTFMT,ISFRLAKCONNECT,
+     +                       ISFRUZFCONNECT,ILAKUZFCONNECT,NPCKGTXT,
+     +                       ISNKUZFCONNECT,IUZFFLOWS,ISFRFLOWS,
+     +                       ILAKFLOWS,NFLOWTYPE,NLKFLWTYP,NLAKCON
          CHARACTER*16, DIMENSION(:), POINTER :: FLOWTYPE
          CHARACTER*16, DIMENSION(:), POINTER :: LKFLOWTYPE
         END TYPE
-        TYPE(LMTTYPE), SAVE  ::LMTDAT(13)
+        TYPE(LMTTYPE), SAVE  ::LMTDAT(14)
       END MODULE LMTMODULE
 C
       SUBROUTINE LMT8BAS7AR(INUNIT,CUNIT,IGRID)
@@ -49,14 +50,19 @@ C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
 C      
       USE GLOBAL,   ONLY:NCOL,NROW,NLAY,NPER,NODES,NIUNIT,IUNIT,
      &                   ISSFLG,IBOUND,IOUT
-      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,IUZFLAKCONNECT,
-     &                   IUZFSFRCONNECT,ISFRLAKCONNECT,NPCKGTXT,
-     &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,FLOWTYPE,
-     &                   LKFLOWTYPE,NLKFLWTYP,NLAKCON
-      USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND
+      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,ILAKUZFCONNECT,
+     &                   ISFRUZFCONNECT,ISFRLAKCONNECT,ISNKUZFCONNECT,
+     &                   NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
+     &                   FLOWTYPE,LKFLOWTYPE,NLKFLWTYP,NLAKCON
+      USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND,IUZFBND
       USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
+C
 C--USE FILE SPECIFICATION of MODFLOW-2005
-      INCLUDE 'openspec.inc'
+      INTEGER       I,INUNIT,IGRID,IU,ILMTHEAD,INLMT,IFLEN,NC,LLOC,
+     &              ITYP1,ITYP2,N,INAME,INAM1,INAM2,ISTART,ISTOP,J,K
+     &              
+      REAL          R
+      INCLUDE       'openspec.inc'
       LOGICAL       LOP,FIRSTVAL
       CHARACTER*4   CUNIT(NIUNIT)
       CHARACTER*200 LINE,FNAME,NME
@@ -65,14 +71,14 @@ C--USE FILE SPECIFICATION of MODFLOW-2005
       DATA          INLMT,MTBCF,MTLPF,MTHUF,MTWEL,MTDRN,MTRCH,MTEVT,
      &              MTRIV,MTSTR,MTGHB,MTRES,MTFHB,MTDRT,MTETS,MTSUB,
      &              MTIBS,MTTLK,MTLAK,MTMNW,MTSWT,MTSFR,MTUZF,MTSWR
-     &             /24*0/
+     &              /24*0/
 C     -----------------------------------------------------------------    
-      ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT,IUZFSFRCONNECT,IUZFLAKCONNECT,
-     +         ISFRLAKCONNECT,NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
-     +         NLKFLWTYP,NLAKCON)
+      ALLOCATE(ISSMT3D,IUMT3D,ILMTFMT,ISFRUZFCONNECT,ILAKUZFCONNECT,
+     +         ISFRLAKCONNECT,ISNKUZFCONNECT,NPCKGTXT,IUZFFLOWS,
+     +         ISFRFLOWS,ILAKFLOWS,NLKFLWTYP,NLAKCON)
       NPCKGTXT=0
       ALLOCATE(FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
-      ALLOCATE(LKFLOWTYPE(5)) ! POSITION 1: STORAGE; 2: PRECIP; 3: EVAP; 4: RUNOFF; 5: WITHDRAWL
+      ALLOCATE(LKFLOWTYPE(6)) ! POSITION 1: STORAGE; 2: DELVOL; 3: PRECIP; 4: EVAP; 5: RUNOFF; 6: WITHDRAWL
 C
 C--SET POINTERS FOR THE CURRENT GRID 
 cswm: already set in main (GWF2BAS7OC)      CALL SGWF2BAS7PNT(IGRID)     
@@ -169,12 +175,21 @@ C--ASSIGN DEFAULTS TO LMT INPUT VARIABLES AND OUTPUT FILE NAME
 C
 C--READ ONE LINE OF LMT PACKAGE INPUT FILE
    5  FIRSTVAL=.TRUE.
-      IUZFSFRCONNECT=0
       ISFRLAKCONNECT=0
-      IUZFLAKCONNECT=0
+      ISFRUZFCONNECT=0
+      ILAKUZFCONNECT=0
+      ISNKUZFCONNECT=0
       IUZFFLOWS=0
       ISFRFLOWS=0
       ILAKFLOWS=0
+C
+C--IF UZF IS ACTIVE, THEN NPCKGTXT SHOULD AUTOMATICALLY BE INCREMENTED BY 1 BY VIRTUE OF THE
+C  FACT THAT 'CONNECT SNK UZF' IS ACTIVE NO MATTER WHICH OPTIONS ARE OR ARE NOT SPECIFIED.
+C  (REGARDLESS OF WHETHER UZF IS ROUTING FLOW OR IS ONLY ACTING AS A BOUNDARY CONDITION)
+      IF(MTUZF.NE.0) THEN
+        NPCKGTXT = NPCKGTXT + 1
+        ISNKUZFCONNECT=1
+      ENDIF
 C
   10  READ(INLMT,'(A)',END=1000) LINE
       IF(LINE.EQ.' ') GOTO 10
@@ -250,7 +265,7 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
           ENDIF
         ELSEIF(LINE(ISTART:ISTOP).EQ.'ALL') THEN ! ALL = "all available"
           !Activate connections in SFR, LAK, and UZF, provided they are active
-          IF(MTUZF.NE.0.AND.IUZOPT.NE.0) THEN
+          IF(MTUZF.NE.0.AND.IUZFOPT.NE.0) THEN
             IUZFFLOWS=1
           ENDIF
           IF(MTSFR.NE.0) THEN
@@ -260,25 +275,25 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
             ILAKFLOWS=1
           ENDIF
           !edm: Determine which combinations of packages is active to determine 
-          !     how many CONNECTions there are
+          !     how many CONNECTions there are (UZF -> SFR)
           IF(IUZFFLOWS.EQ.1.AND.ISFRFLOWS.EQ.1.AND.
      &                        IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
             DO I=1,NROW
               DO J=1,NCOL
-                IF(IRUNBND(J,I).GT.0) THEN ! check IRUNBND for at least 1 positive connection
-                  IUZFSFRCONNECT=1
+                IF(IRUNBND(J,I).GT.0.AND.ISFRUZFCONNECT.NE.1) THEN ! check IRUNBND for at least 1 positive connection
+                  ISFRUZFCONNECT=1
                   NPCKGTXT = NPCKGTXT + 1
                   EXIT
                 ENDIF
               ENDDO
             ENDDO
           ENDIF
-          IF(IUZFFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1.AND.
+          IF(IUZFFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1.AND.   ! (UZF -> LAK)
      &                        IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
             DO I=1,NROW
               DO J=1,NCOL
-                IF(IRUNBND(J,I).LT.0) THEN ! check IRUNBND for at least 1 negative (lake) connection
-                  IUZFLAKCONNECT=1
+                IF(IRUNBND(J,I).LT.0.AND.ILAKUZFCONNECT.NE.1) THEN ! check IRUNBND for at least 1 negative (lake) connection
+                  ILAKUZFCONNECT=1
                   NPCKGTXT = NPCKGTXT + 1
                   EXIT
                 ENDIF
@@ -289,7 +304,8 @@ C--EDM Cycle through all IUPSEG and IOUTSEG variables to see if there is a negat
 C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
           IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
             DO I=1,NSS
-              IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+              IF(IOTSG(I).LT.0.OR.IDIVAR(1,I).LT.0.AND.
+     &                                  ISFRLAKCONNECT.NE.1) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
                 ISFRLAKCONNECT=1
                 NPCKGTXT = NPCKGTXT + 1
                 EXIT
@@ -350,7 +366,7 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
                 DO I=1,NROW
                   DO J=1,NCOL
                     IF(IRUNBND(J,I).GT.0) THEN ! check IRUNBND for at least 1 positive connection
-                      IUZFSFRCONNECT=1
+                      ISFRUZFCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
                       EXIT
                     ENDIF
@@ -362,7 +378,7 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
                 DO I=1,NROW
                   DO J=1,NCOL
                     IF(IRUNBND(J,I).LT.0) THEN ! check IRUNBND for at least 1 negative (lake) connection
-                      IUZFLAKCONNECT=1
+                      ILAKUZFCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
                       EXIT
                     ENDIF
@@ -514,7 +530,8 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTTLK.NE.0) WRITE(IUMT3D)   '                 TLK'  ! Transient Leakage
           IF(MTMNW.NE.0) WRITE(IUMT3D)   '                 MNW'  ! Multi-node well package
           IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
-          IF(MTUZF.NE.0) WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
+          IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0)
+     &                   WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0)
      &                   WRITE(IUMT3D)   '           UZF FLOWS'
           IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN 
@@ -528,12 +545,14 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
                          WRITE(IUMT3D,*) '           SFR FLOWS'
           ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D)   '                 SWR'  ! Surface-water Routing package
-          IF(IUZFSFRCONNECT.NE.0) 
-     &                   WRITE(IUMT3D)   '     CONNECT UZF SFR'
-          IF(IUZFLAKCONNECT.NE.0) 
-     &                   WRITE(IUMT3D)   '     CONNECT UZF LAK'
           IF(ISFRLAKCONNECT.NE.0) 
      &                   WRITE(IUMT3D)   '     CONNECT SFR LAK'
+          IF(ISFRUZFCONNECT.NE.0) 
+     &                   WRITE(IUMT3D)   '     CONNECT SFR UZF'
+          IF(ILAKUZFCONNECT.NE.0) 
+     &                   WRITE(IUMT3D)   '     CONNECT LAK UZF'
+          IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
+     &                   WRITE(IUMT3D)   '     CONNECT SNK UZF'
         ELSEIF(ILMTFMT.EQ.1) THEN
           IF(MTSTR.NE.0) WRITE(IUMT3D,*) '                 STR'  ! Stream package
           IF(MTRES.NE.0) WRITE(IUMT3D,*) '                 RES'  ! Reservoir package
@@ -544,7 +563,8 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTTLK.NE.0) WRITE(IUMT3D,*) '                 TLK'  ! Transient Leakage
           IF(MTMNW.NE.0) WRITE(IUMT3D,*) '                 MNW'  ! Multi-node well package
           IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
-          IF(MTUZF.NE.0) WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
+          IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0) 
+     &                   WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0) 
      &                   WRITE(IUMT3D,*) '           UZF FLOWS'
           IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN
@@ -558,12 +578,14 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
                          WRITE(IUMT3D,*) '           SFR FLOWS'
           ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D,*) '                 SWR'  ! Surface-water Routing package
-          IF(IUZFSFRCONNECT.NE.0) 
-     &                   WRITE(IUMT3D,*) '     CONNECT UZF SFR'
-          IF(IUZFLAKCONNECT.NE.0) 
-     &                   WRITE(IUMT3D,*) '     CONNECT UZF LAK'
           IF(ISFRLAKCONNECT.NE.0) 
      &                   WRITE(IUMT3D,*) '     CONNECT SFR LAK'
+          IF(ISFRUZFCONNECT.NE.0) 
+     &                   WRITE(IUMT3D,*) '     CONNECT SFR UZF'
+          IF(ILAKUZFCONNECT.NE.0) 
+     &                   WRITE(IUMT3D,*) '     CONNECT LAK UZF'
+          IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
+     &                   WRITE(IUMT3D,*) '     CONNECT SNK UZF'
         ENDIF
       ENDIF
 C------SAVE POINTER DATA TO ARRARYS
@@ -583,8 +605,8 @@ C **********************************************************************
 C last modified: 02-12-2010
 C     
       USE GLOBAL,ONLY:IOUT,IUNIT
-      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,IUZFLAKCONNECT,
-     &                   IUZFSFRCONNECT,ISFRLAKCONNECT,NPCKGTXT,
+      USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,ILAKUZFCONNECT,
+     &                   ISFRUZFCONNECT,ISFRLAKCONNECT,NPCKGTXT,
      &                   IUZFFLOWS,ISFRFLOWS,ILAKFLOWS
 
 C--SWM: SWAP POINTERS FOR LMT DATA TO CURRENT GRID
@@ -633,10 +655,10 @@ C--COLLECT AND SAVE ALL RELEVANT FLOW MODEL INFORMATION
         IF(IUNIT(50).GT.0) 
      &   CALL LMT8MNW27(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
 C--UNSATURATED-ZONE FLOWS
-        IF(IUNIT(55).GT.0.AND.IUZFLOWS.EQ.0) THEN
+        IF(IUNIT(55).GT.0.AND.IUZFFLOWS.EQ.0) THEN
          !Write only the flows that interact with the saturated zone.
          CALL LMT8UZF1GW(ILMTFMT,ISSMT3D,IUMT3D,KKSTP,KKPER,IGRID)
-        ELSEIF(IUNIT(55).GT.0.AND.IUZFLOWS.EQ.1) THEN
+        ELSEIF(IUNIT(55).GT.0.AND.IUZFFLOWS.EQ.1) THEN
          CALL LMT8UZF1(ILMTFMT,ISSMT3D,IUMT3D,KKSTP,KKPER,IGRID) 
          CALL LMT8UZFET(ILMTFMT,ISSMT3D,IUMT3D,KKSTP,KKPER,IGRID)
         ENDIF
@@ -645,12 +667,16 @@ C--SURFACE WATER NETWORK: Q's with GW (& NETWORK CONNECTIONS IF ISFRFLOW=1)
      &   CALL LMT8LAK3(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
         IF(IUNIT(44).GT.0)
      &   CALL LMT8SFR2(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
-C--UNSATURATED-ZONE RUNOFF AND SFR/LAK CONNECTIONS
-        IF(IUNIT(55).GT.0.AND.(IUZFSFRCONNECT.NE.0.OR.
-     &                         IUZFLAKCONNECT.NE.0))
-     &   CALL LMT8UZFCONNECT(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
+C--SURFACE WATER CONNECTIONS
         IF(IUNIT(44).GT.0.AND.IUNIT(22).GT.0.AND.ISFRLAKCONNECT.NE.0)
      &   CALL LMT8SFRLAKCONNECT(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)  
+C--UNSATURATED-ZONE RUNOFF AND SFR/LAK CONNECTIONS
+        IF(IUNIT(55).GT.0) THEN
+         IF(ISFRUZFCONNECT.NE.0.OR.ILAKUZFCONNECT.NE.0) THEN
+           CALL LMT8UZFCONNECT(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
+         ENDIF
+         CALL LMT8UZFSNKCONNECT(ILMTFMT,IUMT3D,KKSTP,KKPER,IGRID)
+        ENDIF
 C
       RETURN
       END
@@ -3407,8 +3433,9 @@ C last modified: 03-31-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,HOLD,
      &                      BUFF,BOTM,DELR,DELC
+      USE LMTMODULE,   ONLY:IUZFFLOWS
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
-     &                      NUZTOP,GWET
+     &                      NUZTOP,GWET,UZFLWT,IETFLG
 C
       IMPLICIT NONE
 C
@@ -3419,7 +3446,7 @@ C
 C--SET POINTERS FOR THE CURRENT GRID      
 C  ALREADY SET IN GWF2RCH7BD?
 C     CALL SGWF2UZF1PNT(IGRID)
-      TEXT='UZF RECHAGE'
+      TEXT='UZF RECHARGE'
       ZERO=0.
 C
 C--CLEAR THE BUFFER.
@@ -3435,22 +3462,13 @@ C
 C--DETERMINE WHICH LAYER THE RECHARGE IS HAPPENING IN, SINCE IT NEEDS TO BE SPECIFIED.
 C  ACCOMPLISH THIS BY STORING ALL FLUXES IN BUFF AND THEN ADJUSTING VALUES OF BUFF BACK
 C  TO 0 THAT ARE ABOVE THE CELL WITH THE WATER TABLE.  
-      DO K = 1, NLAY
-        l = 0
-        DO ll = 1, numcells
-          I = IUZHOLD(1, ll)
-          J = IUZHOLD(2, ll)
-          IF( IUZFBND(J,I).NE.0 ) THEN
-            l = l + 1
-            IF( K.GE.IUZFBND(J,I) ) THEN
-                cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=RTSOLFL(K,ll)*cellarea !BUFF now stores all uzflow
-                IF(abs(BUFF(J,I,K)).LT.1.0e-10)
-     +               BUFF(J,I,K) = 0.0
-            END IF
-          END IF
-        ENDDO
-      END DO
+      DO ll = 1, numcells
+        I = IUZHOLD(1, ll)
+        J = IUZHOLD(2, ll)
+        IF(IUZFBND(J,I).NE.0) THEN
+          BUFF(J,I,1) = UZFLWT(J,I)
+        END IF
+      ENDDO
 C--Initialize IUZFRCH integer array
       DO I=1,NROW
         DO J=1,NCOL
@@ -3472,17 +3490,19 @@ C--MANIPULATE IUZFRCH
           ENDDO
         ENDDO
       ELSEIF(NUZTOP.EQ.3) THEN
-        DO K=1,NLAY
-          DO I=1,NROW
-            DO J=1,NCOL
+        DO I=1,NROW
+          DO J=1,NCOL
+            DO K=1,NLAY  
               IF(IBOUND(J,I,K).GT.0) THEN
+                IF(J.EQ.169) THEN
+                  CONTINUE
+                ENDIF
                 IF(HNEW(J,I,K).GT.BOTM(J,I,0)) THEN ! water table above land surface
                   IUZFRCH(J,I)=1
-                  ! Can leave BUFF(J,I,1) alone since it is already storing the correct
-                  ! value in this case.
+                  EXIT
                 ELSEIF(HNEW(J,I,K).GT.BOTM(J,I,K)) THEN ! water table in the first layer
                   IUZFRCH(J,I)=K
-                  BUFF(J,I,1)=BUFF(J,I,K)
+                  EXIT
                 ENDIF
               ENDIF
             ENDDO
@@ -3508,64 +3528,67 @@ C
       ELSEIF(ILMTFMT.EQ.1) THEN
         WRITE(IUMT3D,*) ((BUFF(J,I,1),J=1,NCOL),I=1,NROW)
       ENDIF
+!C
+!C--WRITE SEEPAGE TO LAND SURFACE, WHICH ACTS AS A SINK ON THE SATURATED ZONE
+!C  AND IS NECESSARY WHEN "UZF" IS ACTIVE IN THE MODEL
+!      TEXT='GWQOUT'
+!C
+!C--WRITE AN IDENTIFYING HEADER
+!      IF(ILMTFMT.EQ.0) THEN
+!        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT
+!      ELSEIF(ILMTFMT.EQ.1) THEN
+!        WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
+!        WRITE(IUMT3D,*) TEXT
+!      ENDIF
+!C
+!      IF(ILMTFMT.EQ.0) THEN
+!        WRITE(IUMT3D)   ((SEEPOUT(J,I),J=1,NCOL),I=1,NROW)
+!      ELSEIF(ILMTFMT.EQ.1) THEN
+!        WRITE(IUMT3D,*) ((SEEPOUT(J,I),J=1,NCOL),I=1,NROW)
+!      ENDIF
 C
-C--WRITE SEEPAGE TO LAND SURFACE, WHICH ACTS AS A SINK ON THE SATURATED ZONE
-C  AND IS NECESSARY WHEN "UZF" IS ACTIVE IN THE MODEL
-      TEXT='GWQOUT'
-C
-C--WRITE AN IDENTIFYING HEADER
-      IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT
-      ELSEIF(ILMTFMT.EQ.1) THEN
-        WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT
-      ENDIF
-C
-      IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D)   ((SEEPOUT(J,I),J=1,NCOL),I=1,NROW)
-      ELSEIF(ILMTFMT.EQ.1) THEN
-        WRITE(IUMT3D,*) ((SEEPOUT(J,I),J=1,NCOL),I=1,NROW)
-      ENDIF
-C
+C--IF ET IS NOT BEING SIMULATED, THEN SKIP
+      IF(IUZFFLOWS.EQ.0.OR.(IUZFFLOWS.EQ.1.AND.IETFLG.NE.0)) THEN
 C--CLEAR THE BUFFERS FOR GW-ET
-      TEXT='GW-ET'
-      DO IR=1,NROW
-        DO IC=1,NCOL
-          IGWET(IC,IR)=0
-        ENDDO   
-      ENDDO
-C
-      DO IL=1,NLAY
+        TEXT='GW-ET'
         DO IR=1,NROW
           DO IC=1,NCOL
-            BUFF(IC,IR,IL)=0.0
+            IGWET(IC,IR)=0
           ENDDO   
-        ENDDO   
-      ENDDO
+        ENDDO
+C       
+        DO IL=1,NLAY
+          DO IR=1,NROW
+            DO IC=1,NCOL
+              BUFF(IC,IR,IL)=0.0
+            ENDDO   
+          ENDDO   
+        ENDDO
 C
 C--FOR EACH CELL CALCULATE GW ET & STORE IN BUFFER
-      DO I=1,NROW
-        DO J=1,NCOL
-          K = ABS(IUZFBND(J,I))
-          IF(K.NE.0) THEN
-            IF(IBOUND(J,I,K).GT.0) THEN
-              IGWET(J,I)=K
-              BUFF(J,I,1)=-GWET(J,I)
+        DO I=1,NROW
+          DO J=1,NCOL
+            K = ABS(IUZFBND(J,I))
+            IF(K.NE.0) THEN
+              IF(IBOUND(J,I,K).GT.0) THEN
+                IGWET(J,I)=K
+                BUFF(J,I,1)=-GWET(J,I)
+              END IF
             END IF
-          END IF
+          ENDDO
         ENDDO
-      ENDDO
 C
 C--RECORD CONTENTS OF BUFFER.
-      IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D)   KPER,KSTP,NCOL,NROW,NLAY,TEXT2
-        WRITE(IUMT3D)   ((IGWET(J,I),J=1,NCOL),I=1,NROW)
-        WRITE(IUMT3D)   ((BUFF(J,I,1),J=1,NCOL),I=1,NROW)
-      ELSEIF(ILMTFMT.EQ.1) THEN
-        WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT2
-        WRITE(IUMT3D,*) ((IGWET(J,I),J=1,NCOL),I=1,NROW)
-        WRITE(IUMT3D,*) ((BUFF(J,I,1),J=1,NCOL),I=1,NROW)
+        IF(ILMTFMT.EQ.0) THEN
+          WRITE(IUMT3D)   KPER,KSTP,NCOL,NROW,NLAY,TEXT
+          WRITE(IUMT3D)   ((IGWET(J,I),J=1,NCOL),I=1,NROW)
+          WRITE(IUMT3D)   ((BUFF(J,I,1),J=1,NCOL),I=1,NROW)
+        ELSEIF(ILMTFMT.EQ.1) THEN
+          WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
+          WRITE(IUMT3D,*) TEXT
+          WRITE(IUMT3D,*) ((IGWET(J,I),J=1,NCOL),I=1,NROW)
+          WRITE(IUMT3D,*) ((BUFF(J,I,1),J=1,NCOL),I=1,NROW)
+        ENDIF
       ENDIF
 C
 C--RETURN
@@ -3593,7 +3616,7 @@ C
 C
       INTEGER I,J,K,L,LL,IR,IC,IL,KPER,KSTP,ILMTFMT,IUMT3D,ISSMT3D,
      &        IGRID,numcells
-      CHARACTER*16 TEXT1, TEXT2, TEXT3, TEXT4
+      CHARACTER*16 TEXT1, TEXT2, TEXT3
       REAL cellarea
 C--SET POINTERS FOR THE CURRENT GRID      
       CALL SGWF2UZF1PNT(IGRID)
@@ -3602,7 +3625,6 @@ C
       TEXT1='WATER CONTENT'
       TEXT2='UZ FLUX'
       TEXT3='UZQSTO'
-      TEXT4='GWQOUT'
 C
 C--CLEAR THE BUFFER
       DO IL=1,NLAY
@@ -3853,280 +3875,348 @@ C THIS SUBROUTINE IS CALLED ONLY IF THE 'UZF1' AND 'SFR2' OR IF
 C 'UZF1' AND 'LAK3' PACKAGES ARE USED IN THE MODFLOW SOLUTION.
 C ******************************************************************
 C DATE CREATED: 8-14-2013
+      USE LMTMODULE,    ONLY:ISFRUZFCONNECT,ILAKUZFCONNECT,
+     &                       ISNKUZFCONNECT
       USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT,IBOUND,IUNIT
       USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,STRM,ISEG,NSEGDIM,SEG,NSS,
      &                       STROUT,NINTOT
       USE GWFLAKMODULE, ONLY:VOL,NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK
-      USE GWFUZFMODULE, ONLY:IRUNBND,REJ_INF,EXCESPP,SEEPOUT,LAYNUM
+      USE GWFUZFMODULE, ONLY:IRUNBND,REJ_INF,EXCESPP,SEEPOUT,LAYNUM,
+     &                       IUZFBND,IRUNFLG
 C
       IMPLICIT NONE
 C
-      CHARACTER*16 TEXT
-      CHARACTER*4  TEXT2,TEXT3
-      INTEGER IC,IR,KK,NCON,NSEGRCH,SEGNUM,SEG_INFO,KPER,KSTP,ILMTFMT
-      INTEGER OL,OR,OC,ISTSG,NREACH,LK,IUMT3D,IGRID,NLAKREJ
+      CHARACTER*16 TEXT_SFR, TEXT_LAK
+      INTEGER IC,IR,KK,NSFRCON,NLAKCON,NSEGRCH,SEGNUM,SEG_INFO,
+     &        KPER,KSTP,ILMTFMT
+      INTEGER OL,OR,OC,ISTSG,NREACH,LK,IUMT3D,IGRID,N
       INTEGER CT,NCLOSE,NSFRGRW,NSFREXC,NSFRREJ,NLAKGRW,NLAKEXC
-      INTEGER NLAKEREJ,NSNKGRW,NSNKEXC,NSNKREJ  !EDM
+      INTEGER NLAKEREJ
       REAL    Q,LEN_FRAC,CLOSEZERO
       DIMENSION SEG_INFO(2,NSS)  !FOR STORING NRCH PER SEG
-      TEXT='UZF CONNECTIONS'
+      TEXT_SFR='CONNECT SFR UZF'
+      TEXT_LAK='CONNECT LAK UZF'
       CLOSEZERO=1E-15
 C
 C--DETERMINE HOW MANY LIST ITEMS THERE ARE
-      NCON=0
+      NSFRCON=0
+      NLAKCON=0
       DO IR=1,NROW
         DO IC=1,NCOL
-          SEGNUM=IRUNBND(IC,IR)
-C
-          IF(SEGNUM.GT.0) THEN
-            IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
-              NSEGRCH=ISEG(4,SEGNUM)
-              NCON=NCON+NSEGRCH
-            ENDIF
+          IF(IUZFBND(IC,IR).NE.0.AND.IRUNBND(IC,IR).NE.0) THEN
+            SEGNUM=IRUNBND(IC,IR)
 C           
-            IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K_vert
-              NSEGRCH=ISEG(4,SEGNUM)
-              NCON=NCON+NSEGRCH
-            ENDIF
-C     
-            IF(REJ_INF(IC,IR).NE.0.) THEN  !SHAL GW INHIBITING INFIL
-              NSEGRCH=ISEG(4,SEGNUM)
-              NCON=NCON+NSEGRCH
-            ENDIF
-C
-          ELSEIF(SEGNUM.LT.0) THEN  !1 ENTRY NEEDED FOR Q TO LK PER CELL
-C
-            IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
-              NCON=NCON+1
-            ENDIF
+            IF(SEGNUM.GT.0) THEN
+              IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
+                NSEGRCH=ISEG(4,SEGNUM)
+                NSFRCON=NSFRCON+NSEGRCH
+              ENDIF
+C             
+              IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K_vert
+                NSEGRCH=ISEG(4,SEGNUM)
+                NSFRCON=NSFRCON+NSEGRCH
+              ENDIF
 C           
-            IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K_vert
-              NCON=NCON+1
+              IF(REJ_INF(IC,IR).NE.0.) THEN  !SHAL GW INHIBITING INFIL
+                NSEGRCH=ISEG(4,SEGNUM)
+                NSFRCON=NSFRCON+NSEGRCH
+              ENDIF
+C           
+            ELSEIF(SEGNUM.LT.0) THEN  !1 ENTRY NEEDED FOR Q TO LK PER CELL
+C           
+              IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
+                NLAKCON=NLAKCON+1
+              ENDIF
+C             
+              IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K_vert
+                NLAKCON=NLAKCON+1
+              ENDIF
+C           
+              IF(REJ_INF(IC,IR).NE.0.) THEN  !SHAL GW INHIBITING INFIL
+                NLAKCON=NLAKCON+1
+              ENDIF
             ENDIF
-C     
-            IF(REJ_INF(IC,IR).NE.0.) THEN  !SHAL GW INHIBITING INFIL
-              NCON=NCON+1
-            ENDIF
+          ENDIF
+        ENDDO
+      ENDDO
 C
-          ELSE
+C--WRITE 'CONNECT SFR UZF' TERMS FIRST
+      IF(ISFRUZFCONNECT.GT.0.AND.IRUNFLG.NE.0) THEN
+C
+C--WRITE AN IDENTIFYING HEADER
+        IF(ILMTFMT.EQ.0) THEN
+          WRITE(IUMT3D) KPER,KSTP,TEXT_SFR,NSFRCON
+        ELSEIF(ILMTFMT.EQ.1) THEN
+          WRITE(IUMT3D,*) KPER,KSTP
+          WRITE(IUMT3D,*) TEXT_SFR,NSFRCON
+        ENDIF
+C
+C--IF THERE ARE NO CONNECTIONS RETURN
+        IF(NSFRCON.EQ.0) GO TO 90
+C
+C--WRITE CONNECTION INFORMATION AS FOLLOWS: NPKG1, NPKG2, P2PFLOW, IP2PFLAG
+C
+        DO IR=1,NROW
+          DO IC=1,NCOL
+            SEGNUM=IRUNBND(IC,IR)
+            IF(SEGNUM.GT.0) THEN   !IF POSITIVE THEN OUTFLOW TO STREAM
+              IF(SEEPOUT(IC,IR).NE.0. .OR. EXCESPP(IC,IR).NE.0. .OR. 
+     &           REJ_INF(IC,IR).NE.0.) THEN
+C       
+                OL=LAYNUM(IC,IR)
+                OR=IR
+                OC=IC
+                N = (OL-1)*NROW*NCOL + (OR-1)*NCOL + OC  !IS A SINGLE VALUE WITH THE I,J,K EMBEDDED IN IT
+C
+                DO KK=1,ISEG(4,SEGNUM) !FOR EACH REACH IN THE SEGMENT
+C                
+C--FOR THE CURRENT SEGMENT/REACH COMBO, FIND CORRESPONDING INDEX IN ISTRM, THIS IS THE NODE USED BY MT3D-USGS
+                  CT=1
+                  DO WHILE(.NOT.((ISTRM(4,CT).EQ.SEGNUM).AND.
+     &                           (ISTRM(5,CT).EQ.KK)))
+                    CT=CT+1
+                  ENDDO
+                  LEN_FRAC=STRM(1,CT)/SEG(1,SEGNUM)
+C       
+C--GROUNDWATER DISCHARGE -> STREAM SEGMENT
+                  IF(SEEPOUT(IC,IR).NE.0.) THEN
+                    Q=SEEPOUT(IC,IR)
+                    IF(Q.LT.CLOSEZERO) CYCLE
+                    !1:GRW, 2:EXC, 3:REJ
+                    IF(ILMTFMT.EQ.0) THEN
+                      WRITE(IUMT3D) CT,N,-1*ABS(Q*LEN_FRAC),1
+                    ELSEIF(ILMTFMT.EQ.1) THEN
+                      WRITE(IUMT3D,991) CT,N,-1*ABS(Q*LEN_FRAC),1
+  991                 FORMAT(2I16,F18.9,I2)
+                    ENDIF
+                  ENDIF
+C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> STREAM SEGMENT
+                  IF(EXCESPP(IC,IR).NE.0.) THEN
+                    Q=EXCESPP(IC,IR)
+                    IF(Q.LT.CLOSEZERO) CYCLE
+                    !1:GRW, 2:EXC, 3:REJ
+                    IF(ILMTFMT.EQ.0) THEN
+                      WRITE(IUMT3D) CT,N,-1*ABS(Q*LEN_FRAC),2
+                    ELSEIF(ILMTFMT.EQ.1) THEN
+                      WRITE(IUMT3D,991) CT,N,-1*ABS(Q*LEN_FRAC),2
+                    ENDIF
+                  ENDIF
+C--REJECTED INFILTRATION DUE TO APPLICATION RATE > Kv -> STREAM SEGMENT
+                  IF(REJ_INF(IC,IR).NE.0.) THEN
+                    Q=REJ_INF(IC,IR)
+                    IF(Q.LT.CLOSEZERO) CYCLE
+                    !1:GRW, 2:EXC, 3:REJ
+                    IF(ILMTFMT.EQ.0) THEN
+                      WRITE(IUMT3D) CT,N,-1*ABS(Q*LEN_FRAC),3
+                    ELSEIF(ILMTFMT.EQ.1) THEN
+                      WRITE(IUMT3D,991) CT,N,-1*ABS(Q*LEN_FRAC),3
+                    ENDIF
+                  ENDIF
+                ENDDO
+              ENDIF
+            ENDIF
+          ENDDO
+        ENDDO    
+      ENDIF
+C
+C--WRITE 'CONNECT LAK UZF' TERMS FIRST
+90    IF(ILAKUZFCONNECT.GT.0.AND.IRUNFLG.NE.0) THEN
+C
+C--WRITE AN IDENTIFYING HEADER
+        IF(ILMTFMT.EQ.0) THEN
+          WRITE(IUMT3D) KPER,KSTP,TEXT_LAK,NLAKCON
+        ELSEIF(ILMTFMT.EQ.1) THEN
+          WRITE(IUMT3D,*) KPER,KSTP
+          WRITE(IUMT3D,*) TEXT_LAK,NLAKCON
+        ENDIF
+C
+C--IF THERE ARE NO CONNECTIONS RETURN
+        IF(NLAKCON.EQ.0) GO TO 9999
+C
+        DO IR=1,NROW
+          DO IC=1,NCOL
+            LK=IRUNBND(IC,IR)
+            IF(LK.LT.0) THEN   !IF NEGATIVE THEN OUTFLOW TO LAKE
+              IF(SEEPOUT(IC,IR).NE.0. .OR. EXCESPP(IC,IR).NE.0. .OR. 
+     &           REJ_INF(IC,IR).NE.0.) THEN
+C
+                OL=LAYNUM(IC,IR)
+                OR=IR
+                OC=IC 
+                N = (OL-1)*NROW*NCOL + (OR-1)*NCOL + OC  !IS A SINGLE VALUE WITH THE I,J,K EMBEDDED IN IT
+C
+C--GROUNDWATER DISCHARGE -> LAKE
+                IF(SEEPOUT(IC,IR).NE.0.) THEN
+                  Q=SEEPOUT(IC,IR)
+                  IF(Q.LT.CLOSEZERO) CYCLE
+                  !1:GRW, 2:EXC, 3:REJ
+                  IF(ILMTFMT.EQ.0) THEN
+                    WRITE(IUMT3D) ABS(LK),N,-1*ABS(Q),1
+                  ELSEIF(ILMTFMT.EQ.1) THEN
+                    WRITE(IUMT3D,992) ABS(LK),N,-1*ABS(Q),1
+  992               FORMAT(2I16,F18.9,I2)
+                  ENDIF
+                ENDIF
+C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> LAKE
+                IF(EXCESPP(IC,IR).NE.0.) THEN
+                  Q=EXCESPP(IC,IR)
+                  IF(Q.LT.CLOSEZERO) CYCLE
+                  !1:GRW, 2:EXC, 3:REJ
+                  IF(ILMTFMT.EQ.0) THEN
+                    WRITE(IUMT3D) ABS(LK),N,-1*ABS(Q),2
+                  ELSEIF(ILMTFMT.EQ.1) THEN
+                    WRITE(IUMT3D,992) ABS(LK),N,-1*ABS(Q),2
+                  ENDIF
+                ENDIF
+C--REJECTED INFILTRATION DUE TO APPLICATION RATE > Kv -> LAKE
+                IF(REJ_INF(IC,IR).NE.0.) THEN
+                  Q=REJ_INF(IC,IR)
+                  IF(Q.LT.CLOSEZERO) CYCLE
+                  !1:GRW, 2:EXC, 3:REJ
+                  IF(ILMTFMT.EQ.0) THEN
+                    WRITE(IUMT3D) ABS(LK),N,-1*ABS(Q),3
+                  ELSEIF(ILMTFMT.EQ.1) THEN
+                    WRITE(IUMT3D,992) ABS(LK),N,-1*ABS(Q),3
+                  ENDIF
+                ENDIF
+              ENDIF
+            ENDIF
+          ENDDO
+        ENDDO
+      ENDIF  
+C               
+C
+9999  RETURN
+      END
+C
+C
+      SUBROUTINE LMT8UZFSNKCONNECT(ILMTFMT,IUMT3D,KSTP,KPER,IGRID)
+C ******************************************************************
+C SAVE UZF -> SNK CONNECTIONS
+C THIS SUBROUTINE IS CALLED WHEN THE 'UZF1' PACKAGE IS ACTIVE
+C ******************************************************************
+C DATE CREATED: 8-14-2013
+      USE LMTMODULE,    ONLY:ISFRUZFCONNECT,ILAKUZFCONNECT,
+     &                       ISNKUZFCONNECT
+      USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT,IBOUND,IUNIT
+      USE GWFUZFMODULE, ONLY:IRUNBND,REJ_INF,EXCESPP,SEEPOUT,LAYNUM,
+     &                       IUZFBND,IRUNFLG
+C
+      IMPLICIT NONE
+C
+      CHARACTER*16 TEXT_SNK
+      INTEGER      IC,IR,KK,NSNKCON,KPER,KSTP,ILMTFMT
+      INTEGER      OL,OR,OC,IUMT3D,IGRID,SNK,N
+      INTEGER      CT,NCLOSE
+      REAL         Q,CLOSEZERO
+C
+      TEXT_SNK='CONNECT SNK UZF'
+      CLOSEZERO=1E-15
+C
+C--DETERMINE HOW MANY LIST ITEMS THERE ARE
+      NSNKCON=0
+      DO IR=1,NROW
+        DO IC=1,NCOL
+          IF(IRUNFLG.EQ.0) THEN
             IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
-              NCON=NCON+1
+              NSNKCON=NSNKCON+1
             ENDIF
 C
             IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K VERT
-              NCON=NCON+1
+              NSNKCON=NSNKCON+1
             ENDIF
 C
-            IF(REJ_INF(IC,IR).NE.0) THEN     !SHAL GW INHIBITING INFIL
-              NCON=NCON+1
+            IF(REJ_INF(IC,IR).NE.0) THEN   !SHAL GW INHIBITING INFIL
+              NSNKCON=NSNKCON+1
+            ENDIF
+          ELSEIF(IUZFBND(IC,IR).NE.0.AND.IRUNBND(IC,IR).EQ.0) THEN
+            IF(SEEPOUT(IC,IR).NE.0.) THEN  !GROUNDWATER DISCHARGE
+              NSNKCON=NSNKCON+1
+            ENDIF
+C
+            IF(EXCESPP(IC,IR).NE.0.) THEN  !INFIL EXCEEDING K VERT
+              NSNKCON=NSNKCON+1
+            ENDIF
+C
+            IF(REJ_INF(IC,IR).NE.0) THEN   !SHAL GW INHIBITING INFIL
+              NSNKCON=NSNKCON+1
             ENDIF
           ENDIF
 C
         ENDDO
       ENDDO
 C
+C--'CONNECT SNK UZF' TERMS WILL BE WRITTEN WHETHER OR NOT FULL UZF TRANSPORT IS SIMULATED.
+C   EVEN IF UZF IS ONLY BEING USED AS A BOUNDARY PACKAGE, THIS IS NEEDED FOR WHEN GW DISCHARGES
+C   TO LAND SURFACE
+C
 C--WRITE AN IDENTIFYING HEADER
-      IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,NCON
+92    IF(ILMTFMT.EQ.0) THEN
+        WRITE(IUMT3D) KPER,KSTP,TEXT_SNK,NSNKCON
       ELSEIF(ILMTFMT.EQ.1) THEN
-        WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT,NCON
+        WRITE(IUMT3D,*) KPER,KSTP
+        WRITE(IUMT3D,*) TEXT_SNK,NSNKCON
       ENDIF
 C
 C--IF THERE ARE NO CONNECTIONS RETURN
-      IF(NCON.EQ.0) GO TO 9999
+      IF(NSNKCON.EQ.0) GO TO 9999
 C
-C--WRITE CONNECTION INFORMATION AS FOLLOWS:
-C  TYPE(GRW/EXC/REJ),DESTINATION(S/L),Origin L/R/C, Destination REACH L/R/C (IF STRM) ELSE LAK #, Q (L^3)
-C
-      NSFRGRW=0
-      NSFREXC=0
-      NSFRREJ=0
-      NLAKGRW=0
-      NLAKEXC=0
-      NLAKREJ=0
-      NSNKGRW=0
-      NSNKEXC=0
-      NSNKREJ=0
-      NCLOSE=0
       DO IR=1,NROW
         DO IC=1,NCOL
-          SEGNUM=IRUNBND(IC,IR)
-          IF(SEGNUM.GT.0) THEN   !IF POSITIVE THEN OUTFLOW TO STREAM
+          SNK=IRUNBND(IC,IR)
+          IF(SNK.EQ.0.) THEN !IRUNFLG=0 OR IRUNBND(J,I)=0 (EITHER WAY, WATER LEAVES SYSTEM)
             IF(SEEPOUT(IC,IR).NE.0. .OR. EXCESPP(IC,IR).NE.0. .OR. 
      &         REJ_INF(IC,IR).NE.0.) THEN
 C
               OL=LAYNUM(IC,IR)
               OR=IR
-              OC=IC
+              OC=IC 
+              N = (OL-1)*NROW*NCOL + (OR-1)*NCOL + OC  !IS A SINGLE VALUE WITH THE I,J,K EMBEDDED IN IT
 C
-              DO KK=1,ISEG(4,SEGNUM) !FOR EACH REACH IN THE SEGMENT
-                TEXT3='SFR'
-C              
-C--FOR THE CURRENT SEGMENT/REACH COMBO, FIND CORRESPONDING LAY,ROW,COL INFO IN ISTRM
-                CT=1
-                DO WHILE(.NOT.((ISTRM(4,CT).EQ.SEGNUM).AND.
-     &                         (ISTRM(5,CT).EQ.KK)))
-                  CT=CT+1
-                ENDDO
-                LEN_FRAC=STRM(1,CT)/SEG(1,SEGNUM)
-C
-C--GROUNDWATER DISCHARGE -> STREAM SEGMENT
-                IF(SEEPOUT(IC,IR).NE.0.) THEN
-                  Q=SEEPOUT(IC,IR)
-                  IF(Q.LT.CLOSEZERO) CYCLE
-                    NSFRGRW=NSFRGRW+1
-                  TEXT2='GRW'
-                  IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) TEXT3,TEXT2
-                    WRITE(IUMT3D) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-                  ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                    WRITE(IUMT3D,991) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-  991               FORMAT(5I6,F10.6)
-                  ENDIF
-                ENDIF
-C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> STREAM SEGMENT
-                IF(EXCESPP(IC,IR).NE.0.) THEN
-                  Q=EXCESPP(IC,IR)
-                  IF(Q.LT.CLOSEZERO) CYCLE
-                  NSFREXC=NSFREXC+1
-                  TEXT2='EXC'
-                  IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) TEXT3,TEXT2
-                    WRITE(IUMT3D) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-                  ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                    WRITE(IUMT3D,991) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-                  ENDIF
-                ENDIF
-C--REJECTED INFILTRATION DUE TO APPLICATION RATE > Kv -> STREAM SEGMENT
-                IF(REJ_INF(IC,IR).NE.0.) THEN
-                  Q=REJ_INF(IC,IR)
-                  IF(Q.LT.CLOSEZERO) CYCLE
-                  NSFRREJ=NSFRREJ+1
-                  TEXT2='REJ'
-                  IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) TEXT3,TEXT2
-                    WRITE(IUMT3D) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-                  ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                    WRITE(IUMT3D,991) OL,OR,OC,SEGNUM,KK,Q*LEN_FRAC
-                  ENDIF
-                ENDIF
-              ENDDO
-            ENDIF
-C
-          ELSEIF(SEGNUM.LT.0) THEN  !RUNOFF GOES TO LAKE
-C
-            LK=ABS(IRUNBND(IC,IR))
-            OL=LAYNUM(IC,IR)
-            OR=IR
-            OC=IC
-            TEXT3='LAK'
-C--GROUNDWATER DISCHARGE -> LAKE
-            IF(SEEPOUT(IC,IR).NE.0.) THEN
-              Q=SEEPOUT(IC,IR)
-              IF(Q.LT.CLOSEZERO) CYCLE
-              TEXT2='GRW'
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) TEXT3,TEXT2
-                WRITE(IUMT3D) OL,OR,OC,LK,Q
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                WRITE(IUMT3D,992) OL,OR,OC,LK,Q
-  992           FORMAT(4I6,F10.6)
-              ENDIF
-            ENDIF
-C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> LAKE
-            IF(EXCESPP(IC,IR).NE.0.) THEN
-              Q=EXCESPP(IC,IR)
-              IF(Q.LT.CLOSEZERO) CYCLE
-              NLAKEXC=NLAKEXC+1
-              TEXT2='EXC'
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) TEXT3,TEXT2
-                WRITE(IUMT3D) OL,OR,OC,LK,Q
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                WRITE(IUMT3D,992) OL,OR,OC,LK,Q
-              ENDIF
-            ENDIF
-C--REJECTED INFILTRATION DUE TO APPLICATION RATE > Kv -> LAKE
-            IF(REJ_INF(IC,IR).NE.0.) THEN
-              Q=REJ_INF(IC,IR)
-              IF(Q.LT.CLOSEZERO) CYCLE
-              NLAKREJ=NLAKREJ+1
-              TEXT2='REJ'
-              IF(ILMTFMT.EQ.0) THEN
-                WRITE(IUMT3D) TEXT3,TEXT2
-                WRITE(IUMT3D) OL,OR,OC,LK,Q
-              ELSEIF(ILMTFMT.EQ.1) THEN
-                WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                WRITE(IUMT3D,992) OL,OR,OC,LK,Q
-              ENDIF
-            ENDIF
-C
-          ELSE  !IRUNFLG=0 OR IRUNBND(J,I)=0 (EITHER WAY, WATER LEAVES SYSTEM)
-C
-            IF(SEEPOUT(IC,IR).NE.0. .OR. EXCESPP(IC,IR).NE.0. .OR. 
-     &         REJ_INF(IC,IR).NE.0.) THEN
-              TEXT3='SNK'
-              OL=LAYNUM(IC,IR)
-              OR=IR
-              OC=IC
 C--GROUNDWATER DISCHARGE -> SINK
               IF(SEEPOUT(IC,IR).NE.0.) THEN
                 Q=SEEPOUT(IC,IR)
                 IF(Q.LT.CLOSEZERO) CYCLE
-                NSNKGRW=NSNKGRW+1
-                TEXT2='GRW'
+                !1:GRW, 2:EXC, 3:REJ
                 IF(ILMTFMT.EQ.0) THEN
-                  WRITE(IUMT3D) TEXT3,TEXT2
-                  WRITE(IUMT3D) OL,OR,OC,Q  
+                  WRITE(IUMT3D) -999,N,-1*ABS(Q),1
                 ELSEIF(ILMTFMT.EQ.1) THEN
-                  WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                  WRITE(IUMT3D,993) OL,OR,OC,Q
-  993             FORMAT(3I6,F10.6)
+                  WRITE(IUMT3D,993) -999,N,-1*ABS(Q),1
+  993             FORMAT(2I16,F18.9,I2)
                 ENDIF
               ENDIF
+C
 C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> SINK
               IF(EXCESPP(IC,IR).NE.0.) THEN
                 Q=EXCESPP(IC,IR)
                 IF(Q.LT.CLOSEZERO) CYCLE
-                NSNKEXC=NSNKEXC+1
-                TEXT2='EXC'
+                !1:GRW, 2:EXC, 3:REJ
                 IF(ILMTFMT.EQ.0) THEN
-                  WRITE(IUMT3D) TEXT3,TEXT2
-                  WRITE(IUMT3D) OL,OR,OC,Q
+                  WRITE(IUMT3D) -999,N,-1*ABS(Q),2
                 ELSEIF(ILMTFMT.EQ.1) THEN
-                  WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                  WRITE(IUMT3D,993) OL,OR,OC,Q
+                  WRITE(IUMT3D,993) -999,N,-1*ABS(Q),2
                 ENDIF
               ENDIF
 C--REJECTED INFILTRATION DUE TO APPLICATION RATE > Kv -> SINK
               IF(REJ_INF(IC,IR).NE.0.) THEN
                 Q=REJ_INF(IC,IR)
                 IF(Q.LT.CLOSEZERO) CYCLE
-                NSNKREJ=NSNKREJ+1
-                TEXT2='REJ'
+                !1:GRW, 2:EXC, 3:REJ
                 IF(ILMTFMT.EQ.0) THEN
-                  WRITE(IUMT3D) TEXT3,TEXT2
-                  WRITE(IUMT3D) OL,OR,OC,Q
+                  WRITE(IUMT3D) -999,N,-1*ABS(Q),3
                 ELSEIF(ILMTFMT.EQ.1) THEN
-                  WRITE(IUMT3D,'(2A6)') TEXT3,TEXT2
-                  WRITE(IUMT3D,993) OL,OR,OC,Q
+                  WRITE(IUMT3D,993) -999,N,-1*ABS(Q),3
                 ENDIF
               ENDIF
-C
             ENDIF
           ENDIF
         ENDDO
-      ENDDO
+      ENDDO  
+C               
 C
 9999  RETURN
       END
-C      
+C
 C
       SUBROUTINE LMT8SFR2(ILMTFMT,IUMT3D,KSTP,KPER,IGRID)
 C ******************************************************************
@@ -4204,6 +4294,7 @@ C--LOOP THROUGH EACH STREAM CELL AND WRITE EXCHANGE WITH AQUIFER
         IL = ISTRM(1, L)
         IR = ISTRM(2, L)
         IC = ISTRM(3, L)
+        STRLEN = STRM(1, L)
 C
 C25-----SEARCH FOR UPPER MOST ACTIVE CELL IN STREAM REACH.
         ILAY = IL
@@ -4219,9 +4310,9 @@ C
 C-------WRITE GW-SW INTERACTION TERMS TO FTL FILE UNDER THE HEADING "SFR"
 C       Strm(11, L): FLOW TO/FROM AQUIFER
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) IL,IR,IC,STRM(11,L)
+          WRITE(IUMT3D) IL,IR,IC,STRM(11,L),STRLEN
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L) 
+          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L),STRLEN
         ENDIF
       ENDDO
 C
@@ -4661,11 +4752,11 @@ C-----WRITE EXCHANGE TERMS WITH SFR
             EXIT
           ENDIF
         ENDDO
-!       Sign convention for SWLAK is - negative: SFR -> LAK; positive: LAK -> SFR
+!       Sign convention for SWLAK is - positive: SFR -> LAK; negative: LAK -> SFR
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) J,LAKSFR(I),SWLAK(I)
+          WRITE(IUMT3D) J,LAKSFR(I),-1*SWLAK(I),0  ! 0 is a dummy place holder
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) J,LAKSFR(I),SWLAK(I)
+          WRITE(IUMT3D,*) J,LAKSFR(I),-1*SWLAK(I),0  
         ENDIF
       ENDDO      
 C
@@ -4692,9 +4783,9 @@ C
      &        LENGTH
       REAL    Q
 C      INTEGER, DIMENSION(4)     :: LKFLOWTYP
-      LOGICAL, DIMENSION(5)     :: MASK
-      REAL, DIMENSION(5,NLAKES) :: LKFLOWVAL,CONSOLIDATED
-      CHARACTER*16, DIMENSION(5):: PRNTLAKQTYP
+      LOGICAL, DIMENSION(6)     :: MASK
+      REAL, DIMENSION(6,NLAKES) :: LKFLOWVAL,CONSOLIDATED
+      CHARACTER*16, DIMENSION(6):: PRNTLAKQTYP
       LOGICAL WRITEVAL
 C
       IF(ILAKFLOWS.EQ.0) THEN
@@ -4705,10 +4796,10 @@ C
 C
 C--WRITE AN IDENTIFYING HEADER
       IF(ILMTFMT.EQ.0) THEN
-        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,LKNODE,NLAKES
+        WRITE(IUMT3D) KPER,KSTP,NCOL,NROW,NLAY,TEXT,LKNODE
       ELSEIF(ILMTFMT.EQ.1) THEN
         WRITE(IUMT3D,*) KPER,KSTP,NCOL,NROW,NLAY
-        WRITE(IUMT3D,*) TEXT,LKNODE,NLAKES
+        WRITE(IUMT3D,*) TEXT,LKNODE
       ENDIF 
 C
 C-----WRITE EXCHANGE TERMS WITH GW. LKNODE=# OF LAK-AQIF INTERFACES
@@ -4719,9 +4810,9 @@ C-----WRITE EXCHANGE TERMS WITH GW. LKNODE=# OF LAK-AQIF INTERFACES
         LAKE=ILAKE(4,L)
         Q=FLOB(L)
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) LAKE,IL,IR,IC,Q
+          WRITE(IUMT3D) IL,IR,IC,Q,LAKE,0
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) LAKE,IL,IR,IC,Q
+          WRITE(IUMT3D,*) IL,IR,IC,Q,LAKE,0
         ENDIF        
       ENDDO
 C
@@ -4742,17 +4833,20 @@ C-----WRITE AN IDENTIFYING HEADER
         IF(LKFLOWTYPE(1).EQ.'VOLUME') THEN
           MASK(1) = .TRUE.
         ENDIF
-        IF(LKFLOWTYPE(2).EQ.'PRECIP') THEN
+        IF(LKFLOWTYPE(2).EQ.'DELVOL') THEN
           MASK(2) = .TRUE.
         ENDIF
-        IF(LKFLOWTYPE(3).EQ.'EVAP') THEN
+        IF(LKFLOWTYPE(3).EQ.'PRECIP') THEN
           MASK(3) = .TRUE.
         ENDIF
-        IF(LKFLOWTYPE(4).EQ.'RUNOFF') THEN
+        IF(LKFLOWTYPE(4).EQ.'EVAP') THEN
           MASK(4) = .TRUE.
         ENDIF
-        IF(LKFLOWTYPE(5).EQ.'WITHDRAW') THEN
+        IF(LKFLOWTYPE(5).EQ.'RUNOFF') THEN
           MASK(5) = .TRUE.
+        ENDIF
+        IF(LKFLOWTYPE(6).EQ.'WITHDRAW') THEN
+          MASK(6) = .TRUE.
         ENDIF
         PRNTLAKQTYP = PACK(LKFLOWTYPE, MASK)
 C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATED.
@@ -4790,22 +4884,31 @@ C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATE
             WRITE(IUMT3D,*)PRNTLAKQTYP(1),PRNTLAKQTYP(2),PRNTLAKQTYP(3),
      &                     PRNTLAKQTYP(4),PRNTLAKQTYP(5)
           ENDIF
+        ELSEIF(NLKFLWTYP.EQ.6) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D)PRNTLAKQTYP(1), PRNTLAKQTYP(2), PRNTLAKQTYP(3),
+     &                   PRNTLAKQTYP(4), PRNTLAKQTYP(5), PRNTLAKQTYP(6)
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*)PRNTLAKQTYP(1),PRNTLAKQTYP(2),PRNTLAKQTYP(3),
+     &                     PRNTLAKQTYP(4),PRNTLAKQTYP(5),PRNTLAKQTYP(6)
+          ENDIF
         ENDIF
 C
 C--FILL A 2D ARRAY OF LAKFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
 C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
         DO L=1,NLAKES 
-          LKFLOWVAL(1,L) = VOL(L)         ! lake volume
-          LKFLOWVAL(2,L) = PRCPLK(L)      ! precip
-          LKFLOWVAL(3,L) = EVAPLK(L)      ! etsw (surf wat evap)
-          LKFLOWVAL(4,L) = RNF(L)         ! user-specified runoff (variable 'runof')
-          LKFLOWVAL(5,L) = WTHDRW(L)      ! user-specified withdraw
+          LKFLOWVAL(1,L) = VOLOLD(L)      ! lake volume
+          LKFLOWVAL(2,L) = DELVOLLAK(L)   ! change in lake volume
+          LKFLOWVAL(3,L) = PRECIP(L)      ! precip
+          LKFLOWVAL(4,L) = EVAP(L)        ! etsw (surf wat evap)
+          LKFLOWVAL(5,L) = RUNF(L)        ! user-specified runoff (variable 'runof')
+          LKFLOWVAL(6,L) = WTHDRW(L)      ! user-specified withdraw
         ENDDO
 C
 C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
-        USED=5
+        USED=6
         IF(NLKFLWTYP.GT.0) THEN
-          DO I=4,1,-1
+          DO I=5,1,-1
             IF(LKFLOWTYPE(I).EQ.'NA') THEN
               LENGTH=USED-(I+1)
               LKFLOWVAL(I:I+LENGTH,:)=LKFLOWVAL((I+1):USED,:)
@@ -4861,6 +4964,18 @@ C--WRITE THE ARRAY TO THE FTL FILE.
               WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
      &                        LKFLOWVAL(3,L), LKFLOWVAL(4,L), 
      &                        LKFLOWVAL(5,L)
+            ENDIF
+          ENDDO
+       ELSEIF(NLKFLWTYP.EQ.6) THEN
+          DO L=1,NLAKES
+            IF(ILMTFMT.EQ.0) THEN
+              WRITE(IUMT3D) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                      LKFLOWVAL(3,L), LKFLOWVAL(4,L), 
+     &                      LKFLOWVAL(5,L), LKFLOWVAL(6,L)
+            ELSEIF(ILMTFMT.EQ.1) THEN
+              WRITE(IUMT3D,*) LKFLOWVAL(1,L), LKFLOWVAL(2,L), 
+     &                        LKFLOWVAL(3,L), LKFLOWVAL(4,L), 
+     &                        LKFLOWVAL(5,L), LKFLOWVAL(6,L)
             ENDIF
           ENDDO
         ENDIF
@@ -4930,8 +5045,9 @@ C
       DEALLOCATE(LMTDAT(IGRID)%ISSMT3D)
       DEALLOCATE(LMTDAT(IGRID)%IUMT3D)
       DEALLOCATE(LMTDAT(IGRID)%ILMTFMT)
-      DEALLOCATE(LMTDAT(IGRID)%IUZFLAKCONNECT)
-      DEALLOCATE(LMTDAT(IGRID)%IUZFSFRCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%ILAKUZFCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%ISFRUZFCONNECT)
+      DEALLOCATE(LMTDAT(IGRID)%ISNKUZFCONNECT)
       DEALLOCATE(LMTDAT(IGRID)%ISFRLAKCONNECT)
       DEALLOCATE(LMTDAT(IGRID)%NPCKGTXT)
       DEALLOCATE(LMTDAT(IGRID)%NLKFLWTYP)
