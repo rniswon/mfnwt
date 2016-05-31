@@ -1,0 +1,17 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.mod
+*_genmod.f90
+
+# Executables
+*.exe
+*.out
+*.app
+
+# MODFLOW output files
+*.hobs
+*.cbc
+*.hed

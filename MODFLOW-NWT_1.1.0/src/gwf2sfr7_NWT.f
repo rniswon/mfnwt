@@ -58,8 +58,9 @@ C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFSFRMODULE
-      USE GLOBAL,       ONLY: IOUT, IBOUND, BOTM, DELR, DELC,
-     +                        ITRSS,NCOL,NROW,LAYHDT  !CJM added ncol and nrow
+      USE LMTMODULE,    ONLY: NFLOWTYPE
+      USE GLOBAL,       ONLY: IOUT, IBOUND, BOTM, STRT, DELR, DELC, 
+     +                        ITRSS, NCOL, NROW, LAYHDT, IUNIT  !CJM added ncol and nrow
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
       USE GWFBCFMODULE, ONLY: SC1, SC2, LAYCON
       USE GWFHUFMODULE, ONLY: SC2HUF
@@ -84,7 +85,7 @@ C     ------------------------------------------------------------------
       INTEGER nseg, nreach, krch, irch, jrch, jseg, ireach, ksfropt
       INTEGER krck, irck, jrck, jsegck, ireachck, kkptflg, ib
       INTEGER lstsum, lstbeg, numinst, idum(1), ip, iterp, mstrmar
-      INTEGER nssar, nstrmar, NPP, MXVL, IRFG, ITRFLG
+      INTEGER nssar, nstrmar, NPP, MXVL, IRFG
 !!      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG, ITRFLG
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
@@ -103,7 +104,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
-      ALLOCATE (NINTOT)                                    !EDM - FOR LMT
+      ALLOCATE (NINTOT,ITRFLG,NFLOWTYPE)                               !EDM - FOR LMT
       ALLOCATE (FACTOR)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
@@ -1058,8 +1059,9 @@ C     READ STREAM DATA FOR STRESS PERIOD
 C     Compute three new tables for lake outflow
 C     ******************************************************************
       USE GWFSFRMODULE
+      USE LMTMODULE,    ONLY: NFLOWTYPE,FLOWTYPE
       USE GLOBAL,       ONLY: IOUT, ISSFLG, IBOUND, BOTM, HNEW, NLAY, 
-     +                        LAYHDT
+     +                        LAYHDT, IUNIT
       USE PARAMMODULE,  ONLY: MXPAR, PARTYP, IACTIVE, IPLOC
       USE ICHKSTRBOT_MODULE
       IMPLICIT NONE
@@ -1083,9 +1085,8 @@ C     ------------------------------------------------------------------
       INTEGER i, ic, icalc, ichk, icp, iflginit, ii, ik, il, ilay, ip,
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
-     +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval, iunit,
-     +        ierr,IFLG
-!!     +        Ltyp,ierr,IFLG
+     +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
+     +        Ltyp,ierr,IFLG
 C     ------------------------------------------------------------------
 C
 C-------SET POINTERS FOR CURRENT GRID.
@@ -1298,6 +1299,12 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
+        FLOWTYPE(1) = 'NA'
+        FLOWTYPE(2) = 'NA'
+        FLOWTYPE(3) = 'NA'
+        FLOWTYPE(4) = 'NA'
+        FLOWTYPE(5) = 'NA'
+        NFLOWTYPE=0
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -1306,6 +1313,33 @@ C18-----COMPUTE STREAM REACH VARIABLES.
           etsw = SEG(4, nseg)
           pptsw = SEG(5, nseg)
           sumlen = 0.0
+C
+C--SET SOME VALUES NEEDED BY THE LMT PACKAGE
+C--AS EACH SEGMENT IS READ, DETERMINE IF ANY OF THE FOLLOWING ARE ACTIVE
+C  (1) STORAGE (TRANSIENT ROUTING); (2) PRECIP; (3) EVAP; (4) USER-SPECIFIED RUNOFF; 
+C  (5) RUNOFF FROM UZF1 PACKAGE; (6) UNSATURATED FLOW BENEATH REACH (NOT AVAILABLE YET)
+          IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+            IF(FLOWTYPE(1).EQ.'NA') THEN !Originally: (ITRFLG.EQ.1.AND.FLOWTYPE(1).EQ.'NA')
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(1)='VOLUME'
+            ENDIF
+            IF(FLOWTYPE(2).EQ.'NA') THEN
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(2)='RCHLEN'
+            ENDIF
+            IF(SEG(5,nseg).NE.0.AND.FLOWTYPE(3).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER PRECIP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(3)='PRECIP'
+            ENDIF
+            IF(SEG(4,nseg).NE.0.AND.FLOWTYPE(4).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER EVAP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(4)='EVAP'
+            ENDIF
+            IF(SEG(3,nseg).NE.0.AND.FLOWTYPE(5).EQ.'NA') THEN  ! CHECK FOR USER-SPECIFIED RUNOFF
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(5)='RUNOFF'
+            ENDIF
+          ENDIF
 C
 C19-----COMPUTE VARIABLES NEEDED FOR STREAM LEAKAGE.
           IF ( icalc.EQ.0 .OR. icalc.EQ.1 ) THEN
@@ -1835,9 +1869,9 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             WRITE(iout,9033)ISFRLIST(1,i),ISFRLIST(3,i)
             WRITE(iout,9031)
             numval = ISFRLIST(2,i)
-            iunit = ISFRLIST(3,i)
+            iunitnum = ISFRLIST(3,i)
             DO j = 1, numval
-              READ(iunit,*)TABTIME(j,ISFRLIST(1,i)),
+              READ(iunitnum,*)TABTIME(j,ISFRLIST(1,i)),
      +                     TABFLOW(j,ISFRLIST(1,i))
               IF ( TABFLOW(j,ISFRLIST(1,i)).LT.0.0 ) THEN
                 TABFLOW(j,ISFRLIST(1,i)) = 0.0
@@ -3613,7 +3647,7 @@ C7------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
 !EDM - Count connection for LMT
             IF ( ISEG(3, istsg).EQ.5 ) THEN  
               flowin = SEG(2, istsg)
-              NINTOT = NINTOT + 1
+              NINTOT = NINTOT + 1 
             ENDIF
             IF ( IDIVAR(1,istsg).EQ.0 ) 
      +          sfrbudg_in = sfrbudg_in + SEG(2, istsg)
@@ -3640,7 +3674,7 @@ C11-----SET SPECIFIED OUTFLOW FROM LAKE
                 flowin = FXLKOT(istsg)
                 sfrbudg_in = sfrbudg_in + FXLKOT(istsg)
               END IF
-              NINTOT = NINTOT + 1    !EDM
+C              NINTOT = NINTOT + 1    !EDM  WITH NEW FTL FORMAT, THIS INDEX SHOULD NO LONGER BE COUNTED AS 'CONNECT SFR LAK' WILL ACCOUNT FOR IT
             END IF
 C
 C14-----COMPUTE ONE OR MORE DIVERSIONS FROM UPSTREAM SEGMENT.
@@ -3703,10 +3737,10 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
                 END IF
                 itrib = itrib + 1
               END DO
-              flowin = flowin + SEG(2, istsg)
-              NINTOT = NINTOT + 1   !EDM
+              flowin = flowin + SEG(2, istsg)  !SEG(2,istsg) stores specified inflow, and should have a spot in "Headwaters" flows
+c              NINTOT = NINTOT + 1   !EDM
 C
-C23-----CHECK IF "FLOW" IS WITHDRAWAL, THAT WATER IS AVAILABLE.
+C23-----CHECK IF SPECIFIED "FLOW" IS WITHDRAWAL (i.e., negative), THAT WATER IS AVAILABLE.
               IF ( flowin.LT.0.0D0 ) THEN
                 flowin = 0.0D0
  !               WRITE (IOUT, 9003) istsg
@@ -3722,6 +3756,11 @@ C         GREATER THAN 1.
             flowin = STRM(9, ll)
             NINTOT = NINTOT + 1    !EDM
           END IF
+C
+C- EDM -IF OUTSEG=0 THEN SEGMENT IS A NETWORK SINK AND SHOULD BE COUNTED FOR LMT
+          IF(IOTSG(ISTSG).EQ.0.AND.NREACH.EQ.ISEG(4,ISTSG)) THEN
+            NINTOT = NINTOT + 1
+          ENDIF
 C
 C25-----SEARCH FOR UPPER MOST ACTIVE CELL IN STREAM REACH. Revised ERB
           ilay = il

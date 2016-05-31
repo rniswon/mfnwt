@@ -89,9 +89,9 @@ Crsr    Allocate arrays in BD subroutine
         REAL,   SAVE, DIMENSION(:),  POINTER ::FLXINL,VOLOLD,GWIN,GWOUT
         REAL,   SAVE, DIMENSION(:),  POINTER ::DELH,TDELH,SVT,STGADJ
         REAL,   SAVE, DIMENSION(:,:),POINTER ::LAKSEEP
-        INTEGER,SAVE,                POINTER ::NSFRLAK                      !EDM
-        INTEGER,SAVE, DIMENSION(:),  POINTER ::LAKSFR,ILKSEG,ILKRCH         !EDM
-        REAL,   SAVE, DIMENSION(:),  POINTER ::SWLAK,DELVOLLAK              !EDM
+        INTEGER,SAVE,                POINTER ::NSFRLAK                 !EDM
+        INTEGER,SAVE, DIMENSION(:),  POINTER ::LAKSFR,ILKSEG,ILKRCH    !EDM
+        REAL,   SAVE, DIMENSION(:),  POINTER ::SWLAK,DELVOLLAK         !EDM
       TYPE GWFLAKTYPE
         INTEGER,      POINTER   ::NLAKES,NLAKESAR,ILKCB,NSSITR,LAKUNIT
         INTEGER,      POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
@@ -158,9 +158,9 @@ Crsr    Allocate arrays in BD subroutine
         REAL,         DIMENSION(:),  POINTER ::FLXINL,VOLOLD,GWIN,GWOUT
         REAL,         DIMENSION(:),  POINTER ::DELH,TDELH,SVT,STGADJ
         REAL,         DIMENSION(:,:),POINTER ::LAKSEEP
-        INTEGER,                     POINTER ::NSFRLAK                     !EDM
-        INTEGER,      DIMENSION(:),  POINTER ::LAKSFR,ILKSEG,ILKRCH        !EDM
-        REAL,         DIMENSION(:),  POINTER ::SWLAK,DELVOLLAK             !EDM
+        INTEGER,                     POINTER ::NSFRLAK                 !EDM
+        INTEGER,      DIMENSION(:),  POINTER ::LAKSFR,ILKSEG,ILKRCH    !EDM
+        REAL,         DIMENSION(:),  POINTER ::SWLAK,DELVOLLAK         !EDM
       END TYPE
       TYPE(GWFLAKTYPE), SAVE:: GWFLAKDAT(10)
       END MODULE GWFLAKMODULE
@@ -543,8 +543,12 @@ C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       USE GLOBAL,       ONLY: IOUT, NCOL, NROW, NLAY, IFREFM, IBOUND,
-     +                        LBOTM, BOTM, DELR, DELC, ISSFLG
+     +                        LBOTM, BOTM, DELR, DELC, ISSFLG,IUNIT
+C
+      IMPLICIT NONE
+C
 C     USE GWFSFRMODULE, ONLY: NSS
 C     ------------------------------------------------------------------
 C     FUNCTIONS
@@ -552,6 +556,12 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION VOLTERP
       EXTERNAL VOLTERP
 C     ------------------------------------------------------------------
+      INTEGER IGRID,ISS,LM,IUNITGWT,IN,ISOL,L1,I,J,K,KK,LK,ITMP,ITMP1,
+     &        INC,NSOL,N,I2,K1,K2,K3,K4,I1,IC,IS,JK,NSLMS,
+     &        IUNITSFR,LAKEFLG,LAKE,NTYP,J2,KKPER,IOUTS,IUNITNUM,L,
+     &        IL,IR,ITYPE,IUNITBCF,IUNITLPF,IUNITHUF,IUNITUPW,
+     &        IUNITUZF,IC1,II,IFACE,LID,M
+      REAL BOTIJ,TBNC,TBELV,TOPMST,GTSDPH,EVOL,BOTLK
       CHARACTER*24 ANAME(2)
 !     CHARACTER*30 LFRMAT
 !dep  added STGINIT as double precision
@@ -655,11 +665,11 @@ C
       IF ( KKPER==1 .AND. IRDTAB.GT.0 ) THEN
         DO L1=1,NLAKES
           WRITE(IOUT,1399) L1
-          iunit = LAKTAB(L1)
+          iunitnum = LAKTAB(L1)
  1399 FORMAT(//1X,'STAGE/VOLUME RELATION FOR LAKE',I3//6X,'STAGE',
      1        8X,'VOLUME',8X,'AREA'/)
           DO  INC=1,151
-          READ(iunit,*) DEPTHTABLE(INC,L1), VOLUMETABLE(INC,L1),
+          READ(iunitnum,*) DEPTHTABLE(INC,L1), VOLUMETABLE(INC,L1),
      +                    AREATABLE(INC,L1)
           WRITE(IOUT,1315) DEPTHTABLE(INC,L1), VOLUMETABLE(INC,L1),
      +                    AREATABLE(INC,L1)
@@ -1095,46 +1105,80 @@ C
      2     3X,'WITHDRAW',3X,'BOTTOM',5X,'AREA',5X,/70('-'))
       IF (IUNITGWT.GT.0) WRITE (IOUTS,8)
  8    FORMAT (//1X,'LAKE',4X,'SOLUTE',6X,'CPPT',6X,'CRNF',6X,'CAUG'/)
+C
+C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
+      IF(IUNIT(49).NE.0) THEN
+        LKFLOWTYPE(1)='NA'
+        LKFLOWTYPE(2)='NA'
+        LKFLOWTYPE(3)='NA'
+        LKFLOWTYPE(4)='NA'
+        LKFLOWTYPE(5)='NA'
+        LKFLOWTYPE(6)='NA'
+        NLKFLWTYP=0
+      ENDIF
+C
       DO 300 LM=1,NLAKES
-      IF(IFREFM.EQ.0) THEN
-        IF(ISS.NE.0.AND.KKPER.GT.1) READ(IN,'(6F10.4)') PRCPLK(LM),
-     1   EVAPLK(LM),RNF(LM),WTHDRW(LM),SSMN(LM),SSMX(LM)
-        IF(ISS.EQ.0.OR.KKPER.EQ.1) READ(IN,'(6F10.4)') PRCPLK(LM),
-     1   EVAPLK(LM),RNF(LM),WTHDRW(LM)
-      ELSE
-        IF(ISS.NE.0.AND.KKPER.GT.1) READ(IN,*) PRCPLK(LM),EVAPLK(LM),
-     1   RNF(LM),WTHDRW(LM),SSMN(LM),SSMX(LM)
-        IF(ISS.EQ.0.OR.KKPER.EQ.1) READ(IN,*) PRCPLK(LM),EVAPLK(LM),
-     1   RNF(LM),WTHDRW(LM)
-      END IF
-      IF(ISS.NE.0.AND.KKPER.GT.1) WRITE(IOUT,9) LM,PRCPLK(LM),EVAPLK(LM)
-     1 ,RNF(LM),WTHDRW(LM),BOTTMS(LM),BGAREA(LM),SSMN(LM),SSMX(LM)
-9     FORMAT(1X,I3,4X,1P,3E10.3,1X,5E10.3)
-      IF(ISS.EQ.0.OR.KKPER.EQ.1) WRITE(IOUT,9) LM,PRCPLK(LM),EVAPLK(LM),
-     1 RNF(LM),WTHDRW(LM),BOTTMS(LM),BGAREA(LM)
-      IF(IUNITGWT.LE.0) GO TO 300
-      DO 850 ISOL=1,NSOL
         IF(IFREFM.EQ.0) THEN
-          IF(WTHDRW(LM).LT.0.0) THEN
-            READ(IN,'(3F10.4)')CPPT(LM,ISOL),CRNF(LM,ISOL),CAUG(LM,ISOL)
-          ELSE
-            READ(IN,'(2F10.4)')CPPT(LM,ISOL),CRNF(LM,ISOL)
-          END IF
+          IF(ISS.NE.0.AND.KKPER.GT.1) READ(IN,'(6F10.4)') PRCPLK(LM),
+     1     EVAPLK(LM),RNF(LM),WTHDRW(LM),SSMN(LM),SSMX(LM)
+          IF(ISS.EQ.0.OR.KKPER.EQ.1) READ(IN,'(6F10.4)') PRCPLK(LM),
+     1     EVAPLK(LM),RNF(LM),WTHDRW(LM)
         ELSE
-          IF(WTHDRW(LM).LT.0.0) THEN
-            READ(IN,*) CPPT(LM,ISOL),CRNF(LM,ISOL),CAUG(LM,ISOL)
-          ELSE
-            READ(IN,*) CPPT(LM,ISOL),CRNF(LM,ISOL)
-          END IF
+          IF(ISS.NE.0.AND.KKPER.GT.1) READ(IN,*) PRCPLK(LM),EVAPLK(LM),
+     1     RNF(LM),WTHDRW(LM),SSMN(LM),SSMX(LM)
+          IF(ISS.EQ.0.OR.KKPER.EQ.1) READ(IN,*) PRCPLK(LM),EVAPLK(LM),
+     1     RNF(LM),WTHDRW(LM)
         END IF
-        IF(WTHDRW(LM).LT.0.0)WRITE(IOUTS,840) LM,ISOL,
-     +       CPPT(LM,ISOL),CRNF(LM,ISOL),CAUG(LM,ISOL)       
-        IF(WTHDRW(LM).GE.0.0)
-     1  WRITE(IOUTS,841) LM,ISOL,CPPT(LM,ISOL),CRNF(LM,ISOL)
-  840   FORMAT(1X,I3,6X,I3,4X,1P,3E10.2)
-  841 FORMAT(1X,I3,6X,I3,4X,1P,2E10.2)
-  850 CONTINUE
-C      WRITE (IOUTS,'(/)')
+C
+C--EDM: SET FOLLOWING VALUES FOR LMT
+        IF(IUNIT(49).NE.0) THEN
+          IF(PRCPLK(LM).NE.0.AND.LKFLOWTYPE(3).EQ.'NA') THEN
+            LKFLOWTYPE(3)='PRECIP'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(EVAPLK(LM).NE.0.AND.LKFLOWTYPE(4).EQ.'NA') THEN 
+            LKFLOWTYPE(4)='EVAP'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(RNF(LM).NE.0.AND.LKFLOWTYPE(5).EQ.'NA') THEN
+            LKFLOWTYPE(5)='RUNOFF'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+          IF(WTHDRW(LM).NE.0.AND.LKFLOWTYPE(6).EQ.'NA') THEN
+            LKFLOWTYPE(6)='WITHDRAW'
+            NLKFLWTYP = NLKFLWTYP + 1
+          ENDIF
+        ENDIF
+C
+        IF(ISS.NE.0.AND.KKPER.GT.1)WRITE(IOUT,9)LM,PRCPLK(LM),EVAPLK(LM)
+     1   ,RNF(LM),WTHDRW(LM),BOTTMS(LM),BGAREA(LM),SSMN(LM),SSMX(LM)
+9       FORMAT(1X,I3,4X,1P,3E10.3,1X,5E10.3)
+        IF(ISS.EQ.0.OR.KKPER.EQ.1)WRITE(IOUT,9)LM,PRCPLK(LM),EVAPLK(LM),
+     1   RNF(LM),WTHDRW(LM),BOTTMS(LM),BGAREA(LM)
+        IF(IUNITGWT.LE.0) GO TO 300
+        DO 850 ISOL=1,NSOL
+          IF(IFREFM.EQ.0) THEN
+            IF(WTHDRW(LM).LT.0.0) THEN
+              READ(IN,'(3F10.4)')CPPT(LM,ISOL),CRNF(LM,ISOL),
+     +                          CAUG(LM,ISOL)
+            ELSE
+              READ(IN,'(2F10.4)')CPPT(LM,ISOL),CRNF(LM,ISOL)
+            END IF
+          ELSE
+            IF(WTHDRW(LM).LT.0.0) THEN
+              READ(IN,*) CPPT(LM,ISOL),CRNF(LM,ISOL),CAUG(LM,ISOL)
+            ELSE
+              READ(IN,*) CPPT(LM,ISOL),CRNF(LM,ISOL)
+            END IF
+          END IF
+          IF(WTHDRW(LM).LT.0.0)WRITE(IOUTS,840) LM,ISOL,
+     +         CPPT(LM,ISOL),CRNF(LM,ISOL),CAUG(LM,ISOL)       
+          IF(WTHDRW(LM).GE.0.0)
+     1    WRITE(IOUTS,841) LM,ISOL,CPPT(LM,ISOL),CRNF(LM,ISOL)
+  840     FORMAT(1X,I3,6X,I3,4X,1P,3E10.2)
+  841   FORMAT(1X,I3,6X,I3,4X,1P,2E10.2)
+  850   CONTINUE
+C        WRITE (IOUTS,'(/)')
   300 CONTINUE
       WRITE (IOUT,'(/)')
 C
@@ -1826,7 +1870,7 @@ C
 C19------FORMAT STATEMENTS
 Cdep  101   FORMAT(4I5,3E20.10)    !format used for debugging
 Cdep  202  FORMAT(i5,8(1X,E20.10)) !format used for debugging
-  506           FORMAT(1X,'ERROR - NO AQUIFER UNDER LAKE CELL ',4I5)
+  506  FORMAT(1X,'ERROR - NO AQUIFER UNDER LAKE CELL ',4I5)
  1004  FORMAT(1X,'ITERATION ',I4,2X,'LAKE ',I4,2X,'NEW STAGE ',1PE15.8, !gsf
      1  '  DID NOT CONVERGE-- PREVIOUS INTERNAL ITERATION STAGE  ',
      2  1PE15.8,/) !gsf
@@ -1854,6 +1898,7 @@ C     ------------------------------------------------------------------
      +                        HNOFLO, VBVL, VBNM
       USE GWFSFRMODULE, ONLY: STRIN, DLKSTAGE, SLKOTFLW
       USE GWFUZFMODULE, ONLY: SURFDEP,IUZFBND,FINF,VKS
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       IMPLICIT NONE
       !rsr: argument IUNITSFR not used
       CHARACTER*16 TEXT
@@ -2735,8 +2780,17 @@ C-lfk
               ELSE
                 DELVOL(NN)=VOL(NN)-VOLOLD(NN)
               END IF
-C-EDM
+C
               DELVOLLAK(NN)=DELVOL(NN)/DELT
+C-EDM
+              IF(IUNIT(49).NE.0.AND.LKFLOWTYPE(1).EQ.'NA') THEN
+                LKFLOWTYPE(1)='VOLUME'
+                NLKFLWTYP = NLKFLWTYP + 1
+              ENDIF
+              IF(IUNIT(49).NE.0.AND.LKFLOWTYPE(2).EQ.'NA') THEN
+                LKFLOWTYPE(2)='DELVOL'
+                NLKFLWTYP = NLKFLWTYP + 1
+              ENDIF
 C
               IF(LWRT.GT.0.OR.ICBCFL.LE.0) GO TO 1100
               IF(IUNITUZF.EQ.0) THEN

@@ -35,7 +35,8 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: TABFLOW, TABTIME   !Reading Spedified inflow
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: FNETSEEP           !writing net seepage in UZF
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: ISFRLIST           !Reading Spedified inflow
-        INTEGER,SAVE,                 POINTER:: NINTOT             !for LMT, total # of possible inflows edm 7/30/13
+        INTEGER,SAVE,                 POINTER:: NINTOT,ITRFLG      !for LMT, total # of possible inflows edm 7/30/13
+C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         DOUBLE PRECISION,SAVE,DIMENSION(:),  POINTER:: THTS,THTR,EPS
         DOUBLE PRECISION,SAVE,DIMENSION(:),  POINTER:: FOLDFLBT, THTI
         DOUBLE PRECISION,SAVE,DIMENSION(:),  POINTER:: SUMLEAK,SUMRCH

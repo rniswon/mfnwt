@@ -84,7 +84,7 @@
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfsfrmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfuzfmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\hufutl7.f"/>
-		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\lmt7_NWT.f"/>
+		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\lmt8_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\mach_mod.f90"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\MF_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\mhc7.f"/>
@@ -102,6 +102,7 @@
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\obs2ghb7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\obs2riv7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\obs2str7.f"/>
+		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\openspec.inc"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\parutl7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\pcg7_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\sip7_NWT.f"/>
