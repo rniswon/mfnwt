@@ -48,7 +48,7 @@ C           THAN CELL-BASED REACHES (IGEOTYPE=5)
 C         - SUMMARY CONVERGENCE INFORMATION WRITTEN TO SCREEN (ONLY WHEN ISWRSCRN=1) ONLY
 C           INCLUDES INFORMATION FOR ACTIVE REACH GROUPS
 C
-C     VERSION 1.04 SWR1 for MODFLOW NWT
+C     VERSION 1.04 SWR1 for MODFLOW-2005 (1.12) AND MODFLOW NWT (1.1.0)
 C     CHANGES
 C     o ADDED STATE FUNCTION SUBROUTINES - RETRIEVE STAGE, FLOW, OR STRUCTURE FLOW
 C       AT THE END OF THE PREVIOUS MODFLOW TIME STEP
@@ -60,11 +60,17 @@ C       TO DEFINE THE INITIAL STAGE IN A SPECIFIED REACH - A NEGATIVE REACH NUMB
 C       SPECIFIED AND THE RSTAGE VALUE IS THE REACH USED TO DEFINE THE STAGE. ONLY APPLIES TO
 C       REACH STAGE DATA SPECIFIED USING LIST INPUT
 C     o ADDED KINEMATIC-WAVE OPTION (IROUTETYPE = 4)
+C       *** THIS NEEDS TO BE REFINED FOR TWO-DIMENSIONAL PROBLEMS ***
+C     o ADDED MATRIX LEVEL PSEUDO-TRANSIENT CONTINUATION APPROACH FOR STEADY-STATE STRESS 
+C       PERIODS (BASED ON KELLEY AND KEYES (1998). INITIAL PSEUDO-TRANSIENT CONTINUATION
+C       TIMESTEP (PTCDEL) IS CALCULATED USING THE COMPUTED WAVE CELERITY
+C       BASED ON SAVANT AND OTHERS (2011) - PTCDEL0 = DLEN / SQRT(g depth). 
+C       ORIGINAL PSEUDO-TRANSIENT CONTINUATION APPROACH DESCRIBED IN THE DOCUMENTATION 
+C       HAS BEEN DEPRECATED.      
+C     o ADDED BOTTOM AVERAGING TO DAMPEN OSCILLATING SOLUTIONS - ALGORITHM IS IDENTICAL TO
+C       THE ALGORITHM USED IN MODFLOW-USG (PANDAY AND OTHERS, 2013).
 C      
 C     o MINOR BUG FIXES IN:
-C         - FIX CONNECTION ISSUE FOR LEVEL POOL PROBLEMS WHERE POOLS ARE CONNECTED
-C           BY STRUCTURES. IN SOME CASES, THE CONNECTIONS BETWEEN LEVEL POOLS WERE
-C           NOT MADE. THIS PROBLEM WAS IDENTIFIED BY FRANS SCHAARS
 C         - CALCULATION OF QAQ EXCHANGE PERIMETER FOR EACH LAYER
 C           FIX IDENTIFIED BY JAN JEPPESEN
 C         - FIX TO WRITING GWET TO CBC FILE AS A LIST
@@ -93,11 +99,11 @@ C
 !        REAL, SAVE, POINTER, DIMENSION(:,:,:) :: HKUPW     
 !      END MODULE GWFUPWMODULE
 !C       END   - DUMMY MODULES FOR MODFLOW NWT - COMMENT OUT IF MODFLOW-NWT
-C-----------------------------------------------------------------------------
-C      
+!C-----------------------------------------------------------------------------
+!C      
       MODULE GWFSWRMODULE
         CHARACTER(LEN=64),PARAMETER :: VERSION_SWR =
-     +'$Id: gwf2swr7.f 1.04 2015-09-10 15:00:00Z jdhughes $'
+     +'$Id: gwf2swr7.f 1.04 2016-01-28 15:00:00Z jdhughes $'
 C
 C---------INVARIANT PARAMETERS
         INTEGER, PARAMETER          :: IUZFOFFS     = 100000
@@ -400,6 +406,11 @@ C           PROGRAM CALCULATED DATA
           INTEGER :: ICALCQAQ                = IZERO
           DOUBLEPRECISION  :: OFFSET         = DZERO
           DOUBLEPRECISION  :: GWETRATE       = DZERO
+C           AVERAGE QAQ RATE(BY LAYER), QEVT, AND IEVT - FOR MT3D LINK FILE
+          DOUBLEPRECISION,  DIMENSION(:), ALLOCATABLE ::  QAQRATE
+          DOUBLEPRECISION   ::  QEVT
+          INTEGER           ::  IEVT          
+C           CURRENT FLOW TERMS
           TYPE (TFLOWDATA) :: CURRENT
 C           CUMULATIVE SUBSIDENCE
           DOUBLEPRECISION :: GCUMSUB         = DZERO
@@ -567,6 +578,7 @@ C         SWR VARIABLES
         DOUBLEPRECISION,SAVE,POINTER  :: TOLS,TOLR,PTOLR
         DOUBLEPRECISION,SAVE,POINTER  :: TOLA
         DOUBLEPRECISION,SAVE,POINTER  :: DAMPSS, DAMPTR
+        DOUBLEPRECISION,SAVE,POINTER  :: PTCDEL
         INTEGER,SAVE,POINTER          :: IPRSWR
         INTEGER,SAVE,POINTER          :: MUTSWR
         INTEGER,SAVE,POINTER          :: NCORESM
@@ -724,6 +736,7 @@ C         SWR VARIABLES
           DOUBLEPRECISION,POINTER  :: TOLS,TOLR,PTOLR
           DOUBLEPRECISION,POINTER  :: TOLA
           DOUBLEPRECISION,POINTER  :: DAMPSS, DAMPTR
+          DOUBLEPRECISION,POINTER  :: PTCDEL
           INTEGER,POINTER          :: IPRSWR
           INTEGER,POINTER          :: MUTSWR
           INTEGER,POINTER          :: NCORESM
@@ -1118,6 +1131,7 @@ C       SWR1 VARIABLES
       ALLOCATE(RTIME,RTIME0,RTMIN,RTMAX,RTSTMAX,RTPRN,RSWRPRN,RSWRPRN0)
       ALLOCATE(IBT)
       ALLOCATE(TOLS,TOLR,PTOLR,TOLA,DAMPSS,DAMPTR,IPRSWR,MUTSWR)
+      ALLOCATE(PTCDEL)
       ALLOCATE(NCORESM)
       ALLOCATE(NCORESV)
       ALLOCATE(ISWRDRO)
@@ -1315,7 +1329,12 @@ C           USE_UPSTREAM_WEIGHTING
 C           USE_INEXACT_NEWTON
           IF ( swroptions(10)%ioptionused.NE.0 ) INEXCTNWT   =  1
 C           USE_STEADYSTATE_STORAGE
-          IF ( swroptions(11)%ioptionused.NE.0 ) ISSSTOR     =  1
+          IF ( swroptions(11)%ioptionused.NE.0 ) THEN
+            !ISSSTOR     =  1
+            WRITE (IOUT,'(1X,A)') 'ORIGINAL PSEUDO-TRANSIENT' //
+     &                            'CONTINUATION APPROACH DEPRECATED' //
+     &                            ' -- USING MATRIX APPROACH'
+          END IF
 C           USE_LAGGED_OPR_DATA
           IF ( swroptions(12)%ioptionused.NE.0 ) ILAGSTROPR  =  1
 C           USE_LINEAR_DEPTH_SCALING
@@ -2162,6 +2181,12 @@ C-------ALLOCATE SPACE FOR DIRECT RUNOFF VARIABLES
           DRORMULT(1,1) = 1.0
           DRORVAL(1,1)  = 0.0
       END IF
+C
+C-------ALLOCATE QAQRATE FOR EACH REACH TO STORE AVERAGE AQUIFER
+C-------EXCHANGE RATE FOR THE TIME STEP - FOR MT3D LINK FILE
+      DO i = 1, NREACHES
+          ALLOCATE(REACH(i)%QAQRATE(NLAY))
+      ENDDO
 C
 C-------FINISH SWR TIMER FOR GWF2SWR7AR
       CALL SSWRTIMER(1,tim1,tim2,SWREXETOT)
@@ -4865,7 +4890,7 @@ C
 C-----------SOLUTION USING APPROXIMATE NEWTON METHOD AND SPECIFIED SOLVER
           isoln = 0
           fmax0 = DZERO
-          CALL SSWR_GSOLWRP(iouter,isoln,JAC%PS,checkresult)
+          CALL SSWR_GSOLWRP(Kkiter,iouter,isoln,JAC%PS,checkresult)
           
           CALL SSWR_CALC_RGRESI(JAC%PS,JAC%R)
           SWRTIME(n)%ICNVG    = n
@@ -5529,7 +5554,7 @@ C     + + + LOCAL DEFINITIONS + + +
       DOUBLEPRECISION :: b
       DOUBLEPRECISION :: gwet, getextd, qq, hhcof, rrhs
       DOUBLEPRECISION :: ratin, ratout, rrate, tsrate
-      DOUBLEPRECISION, DIMENSION(NLAY) :: layrate
+      !DOUBLEPRECISION, DIMENSION(NLAY) :: layrate
       DOUBLEPRECISION :: swrtot, dt, t0
       REAL :: tim1, tim2
       CHARACTER (LEN=16) :: text(2)
@@ -5620,7 +5645,10 @@ C
 C-------LOOP THROUGH EACH RIVER REACH CALCULATING FLOW.
       REACHES: DO irch = 1, NREACHES
         tsrate  = DZERO
-        layrate = DZERO
+        !layrate = DZERO
+        DO k = 1, NLAY
+          REACH(irch)%QAQRATE(k) = DZERO
+        END DO
 C---------GET ROW & COLUMN OF CELL CONTAINING REACH.
         ir      = REACH(irch)%IRCH
         jc      = REACH(irch)%JRCH
@@ -5668,7 +5696,9 @@ C-------------CALCULATE AQUIFER-REACH EXCHANGE USING APPROPRIATE METHOD
             END IF
             rrate       = b * dtscale
             tsrate      = tsrate + rrate
-            layrate(kk) = layrate(kk) + rrate
+            !layrate(kk) = layrate(kk) + rrate
+            !--SEAWAT: layrate(kk) = layrate(kk) + rrate
+            REACH(irch)%QAQRATE(kk) = REACH(irch)%QAQRATE(kk) + rrate
           END DO LAYERS
         END DO TIMES
 C---------PROCESS ACCUMULATED QAQFLOW DATA FOR CBC AND LIST OUTPUT
@@ -5678,7 +5708,8 @@ C-----------SET UPPER MOST ACTIVE LAYER FOR REACH
         LAYCBC: IF ( kact.LE.NLAY ) THEN 
           kk = MAX( REACH(irch)%LAYEND, kact )
           LAYEROUTPUT: DO kl = REACH(irch)%LAYSTR, kk
-            rate = layrate(kl)
+            !--SEAWAT: rate = layrate(kl)
+            rate = REACH(irch)%QAQRATE(kl)
 C-------------ADD AVERAGE RATE FOR EACH SWR TIMESTEP TO BUFFER.
             BUFF(jc,ir,kl) = BUFF(jc,ir,kl) + rate
 C-------------PRINT THE INDIVIDUAL RATES IF REQUESTED(IRIVCB<0).
@@ -5710,7 +5741,8 @@ C---------IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.
               ival   = 1
             END IF
             DO kl = REACH(irch)%LAYSTR, REACH(irch)%LAYEND
-              rate = layrate(kl)
+              !rate = layrate(kl)
+              rate = REACH(irch)%QAQRATE(kl)
               CALL UBDSVB(ISWRCB,NCOL,NROW,jc,ir,kl,rate,
      1                    AUXROW,ival,iaux,1,IBOUND,NLAY)
             END DO
@@ -5781,6 +5813,9 @@ C---------CALCULATE GROUNDWATER EVAPOTRANSPIRATION
       DO irch = 1, NREACHES
         k = 0
         rate = RZERO
+C         INITIALIZE EVT DATA FOR MT3D LINK FILE    
+        REACH(irch)%IEVT = 1
+        REACH(irch)%QEVT = 0.0
         IF ( REACH(irch)%IGEOTYPE.NE.5 ) GO TO 299
 C         ONLY PROCESS FOR REACHES WITH REMAINING EVAPORATION
         ir = REACH(irch)%IRCH
@@ -5821,6 +5856,9 @@ C         GROUNDWATER LEVEL IS BELOW EXTINCTION DEPTH
         END IF
         rate   = qq
         ratout = ratout - qq
+C         SAVE EVT DATA FOR MT3D LINK FILE    
+        REACH(irch)%IEVT = k
+        REACH(irch)%QEVT = rate
 C---------ADD AVERAGE RATE FOR EACH SWR TIMESTEP TO BUFFER.
         BUFF(jc,ir,k) = BUFF(jc,ir,k) + rate
 C-----------PRINT THE INDIVIDUAL RATES IF REQUESTED(IRIVCB<0).
@@ -6106,6 +6144,7 @@ C         SWR1 VARIABLES
         DEALLOCATE(GWFSWRDAT(Igrid)%DAMPTR)
         DEALLOCATE(GWFSWRDAT(Igrid)%IPRSWR)
         DEALLOCATE(GWFSWRDAT(Igrid)%MUTSWR)
+        DEALLOCATE(GWFSWRDAT(Igrid)%PTCDEL)
         DEALLOCATE(GWFSWRDAT(Igrid)%NCORESM)
         DEALLOCATE(GWFSWRDAT(Igrid)%NCORESV)
         DEALLOCATE(GWFSWRDAT(Igrid)%ISWRDRO)
@@ -6281,6 +6320,7 @@ C         SWR1 VARIABLES
         DAMPTR=>GWFSWRDAT(Igrid)%DAMPTR
         IPRSWR=>GWFSWRDAT(Igrid)%IPRSWR
         MUTSWR=>GWFSWRDAT(Igrid)%MUTSWR
+        PTCDEL=>GWFSWRDAT(Igrid)%PTCDEL
         NCORESM=>GWFSWRDAT(Igrid)%NCORESM
         NCORESV=>GWFSWRDAT(Igrid)%NCORESV
         ISWRDRO=>GWFSWRDAT(Igrid)%ISWRDRO
@@ -6456,6 +6496,7 @@ C         SWR1 VARIABLES
         GWFSWRDAT(Igrid)%DAMPTR=>DAMPTR
         GWFSWRDAT(Igrid)%IPRSWR=>IPRSWR
         GWFSWRDAT(Igrid)%MUTSWR=>MUTSWR
+        GWFSWRDAT(Igrid)%PTCDEL=>PTCDEL
         GWFSWRDAT(Igrid)%NCORESM=>NCORESM
         GWFSWRDAT(Igrid)%NCORESV=>NCORESV
         GWFSWRDAT(Igrid)%ISWRDRO=>ISWRDRO
@@ -8595,11 +8636,12 @@ C
 C
 C-------WRAPPER FOR CONSOLIDATED OUTER ITERATIONS (NON-LINEAR NEWTON STEP)
 C       AND ALL LINEAR SOLVERS 
-      SUBROUTINE SSWR_GSOLWRP(Iouter,Isoln,X,Check)
+      SUBROUTINE SSWR_GSOLWRP(Kmf,Iouter,Isoln,X,Check)
         USE GLOBAL,       ONLY: IOUT
         USE GWFSWRMODULE
         IMPLICIT NONE
 C     + + + DUMMY ARGUMENTS + + +
+        INTEGER, INTENT(IN) :: Kmf
         INTEGER, INTENT(INOUT) :: Iouter
         INTEGER, INTENT(INOUT) :: Isoln
         DOUBLEPRECISION, DIMENSION(NRCHGRP), INTENT(INOUT) :: X
@@ -8609,12 +8651,21 @@ C     + + + LOCAL DEFINITIONS + + +
         INTEGER :: n
         INTEGER :: ots, its
         INTEGER :: ia
+        INTEGER :: icheck
+        INTEGER :: i, j
         DOUBLEPRECISION :: deltaf, deltafi, deltax
         DOUBLEPRECISION :: fn, fn0
         DOUBLEPRECISION :: fni
+        DOUBLEPRECISION :: ptcfn0
+        DOUBLEPRECISION :: diagmin
+        DOUBLEPRECISION :: ratio
         DOUBLEPRECISION :: eta
         DOUBLEPRECISION :: damp
         DOUBLEPRECISION :: e
+        DOUBLEPRECISION :: botm
+        DOUBLEPRECISION :: xu
+        DOUBLEPRECISION :: d, g, dt
+        logical :: l
 C     + + + FUNCTIONS + + +
         DOUBLEPRECISION :: SSWR_CALC_FTOLR
         DOUBLEPRECISION :: GSOL_L2NORM
@@ -8674,12 +8725,59 @@ C-----------CALCULATE EXPLICIT INVARIANT QM AND UPDATE THE RESIDUAL
           END IF
 C-----------CALCULATE COMPRESSED JACOBIAN
           CALL SSWR_FDJACC(X,JAC%R,JAC%XS,JAC%FJACC)
+C-----------CALCULATE PSEUDO-TRANSIENT CONTINUATION TERM
+          IF (ISWRSS.GT.0) THEN
+            diagmin = 1.0D20
+            DO n = 1, NSOLRG
+              ia = JAC%IA(n)
+              IF ( ABS(JAC%FJACC(ia)).EQ.DZERO ) CYCLE
+              IF (ABS(JAC%FJACC(ia)) < diagmin) THEN
+                diagmin = ABS(JAC%FJACC(ia))
+              END IF
+            END DO
+            fn = GSOL_L2NORM(NSOLRG, JAC%F)
+            IF (ots < 2) THEN
+              ptcfn0 = fn
+!              INQUIRE (unit=10691, OPENED=l)
+!              if (l .eqv. .false.) then
+!                open(unit=10691,file='ptc.dat',status='replace')
+!              end if
+!              write(10691,'(7(a10,1x))') 
+!     &          '   MFOUTER', ' OUTERITER', '    PTCDEL',
+!     &          '  PTCDEL-1', '   L2NORM0',
+!     &          '    L2NORM', ' L2NORMRAT'
+              PTCDEL = 1.0D+20 !RTMIN
+              g = GRAVITY * DLENCONV * TIMECONV * TIMECONV
+              DO n = 1, NSOLRG 
+                j = JAC%ISMAP(n)
+                IF (RCHGRP(j)%INACTIVE .EQV. .TRUE. .OR.
+     &              RCHGRP(j)%CONSTANT .EQV. .TRUE.) THEN
+                  CYCLE
+                END IF
+                d = JAC%XS(n) - RCHGRP(j)%RGELEV(1)
+                IF (d.GT.DZERO) THEN
+                  dt = RCHGRP(j)%DLEN / SQRT(g * d)
+                  IF (dt.LT.PTCDEL) PTCDEL = dt
+                END IF
+              END DO
+            END IF
+            PTCDEL = PTCDEL * ptcfn0 / fn
+!            write(10691,'(i10,1x,i10,5(1x,g10.2))') 
+!     &         Kmf, ots, ptcdel, done/ptcdel, 
+!     &         ptcfn0, fn, ptcfn0/fn
+            ptcfn0 = fn
+            DO n = 1, NSOLRG
+              ia = JAC%IA(n)
+              JAC%FJACC(ia) = JAC%FJACC(ia) - (DONE / PTCDEL)
+            END DO
+          END IF
 C-----------CHECK FOR ZERO ELEMENTS ALONG DIAGONAL
           DO n = 1, NSOLRG
             ia = JAC%IA(n)
             IF ( ABS(JAC%FJACC(ia)).EQ.DZERO ) THEN
               JAC%FJACC(ia) = DONE
-              JAC%F(n)      = JAC%F(n) + DONE
+              !JAC%F(n)      = JAC%F(n) + DONE
+              JAC%F(n) = DZERO
             END IF
           END DO
 C-----------CALCULATE THE MATRIX VECTOR PRODUCT J s(k-1)
@@ -8798,6 +8896,32 @@ C           ONLY APPLIED WHEN THERE HAS BEEN NO IMPROVEMENT IN THE L2NORM
               JAC%DX(n) = JAC%XS(n) - JAC%X0(n)
             END DO
           END IF
+C-----------NEWTON HEAD DAMPENING
+          icheck = 0
+          DO i = 1, NSOLRG
+            j = JAC%ISMAP(i)
+            botm = RCHGRP(j)%RGELEV(1)
+            IF (JAC%XS(i) < botm) THEN
+              icheck = icheck + 1
+              xu = JAC%XI(j)*(0.1D0) + botm*0.9D0
+              IF (xu > botm) THEN
+                JAC%XS(i) = xu
+              ELSE
+                JAC%XS(i) = botm
+              END IF
+              JAC%DX(i) = JAC%XS(i) - JAC%X0(i)
+            END IF
+          END DO
+C-----------MAP SOLUTION MODIFIED BY NEWTON HEAD DAMPENING
+C           TO ALL REACH GROUPS
+          IF (icheck > 0) THEN
+            CALL SSWRS2C(JAC%XS,X)
+            CALL SSWR_CALC_RGRESI(X,JAC%R)
+            CALL SSWRC2S(JAC%R,JAC%F)
+            fn = GSOL_L2NORM(NSOLRG, JAC%F)
+      END IF
+C-----------END OF NEWTON HEAD DAMPENING
+C      
 C-----------CHECK FOR ABSOLUTE MINIMIZATION OF f
           deltaf  = DZERO
           deltafi = DZERO
@@ -8807,19 +8931,28 @@ C-----------CHECK FOR ABSOLUTE MINIMIZATION OF f
             deltafi = MAX( deltafi, ABS(JAC%F(n) - JAC%F0(n)) )
             deltax  = MAX( deltax,  ABS(JAC%DX(n)) )
           END DO
-          IF ( IFTOLR.NE.0 ) THEN
-            deltaf = SSWR_CALC_FTOLR(JAC%R)
-            IF ( deltaf.LT.PTOLR ) THEN
-              IF ( ots.GT.1 ) RETURN
-            END IF
-          ELSE IF ( IL2NORMTOLR.NE.0 ) THEN
-            deltaf = GSOL_L2NORM(NRCHGRP, JAC%R)
-            IF ( deltaf.LT.PTOLR ) THEN
-              IF ( ots.GT.1 ) RETURN
-            END IF
-          ELSE
-            IF ( deltaf.LT.TOLR .AND. deltafi.LT.TOLR ) THEN
-              IF ( ots.GT.1 ) RETURN
+C-----------CHECK THAT THE PSEUDO-TRANSIENT CONTINUATION TERM HAS DECAYED
+C                     
+          icheck = 1
+          IF (ISWRSS.GT.0 .AND. ots.LT.NOUTER) THEN
+            ratio = (DONE / ptcdel) / diagmin
+            if (ratio > 1.0D-6) icheck = 0
+          END IF
+          IF (icheck > 0) THEN
+            IF ( IFTOLR.NE.0 ) THEN
+              deltaf = SSWR_CALC_FTOLR(JAC%R)
+              IF ( deltaf.LT.PTOLR ) THEN
+                IF ( ots.GT.1 ) RETURN
+              END IF
+            ELSE IF ( IL2NORMTOLR.NE.0 ) THEN
+              deltaf = GSOL_L2NORM(NRCHGRP, JAC%R)
+              IF ( deltaf.LT.PTOLR ) THEN
+                IF ( ots.GT.1 ) RETURN
+              END IF
+            ELSE
+              IF ( deltaf.LT.TOLR .AND. deltafi.LT.TOLR ) THEN
+                IF ( ots.GT.1 ) RETURN
+              END IF
             END IF
           END IF
 C-----------SAVE CURRENT OUTER ITERATES
@@ -9194,7 +9327,7 @@ C       SURFACE WATER ROUTING BUDGET FOR MODEL
         USE GLOBAL,       ONLY: IOUT, ISSFLG, NCOL, NROW, NLAY, IBOUND
         USE GWFBASMODULE, ONLY: DELT, TOTIM, IBUDFL
         USE GWFSWRMODULE, ONLY: IKND, IZERO, RZERO, DZERO, DONE, DTWO,
-     &                          ISWRONLY, NUMTIME, ISWRDT,
+     &                          ISWRONLY, NUMTIME, ISWRSS, ISWRDT,
      &                          REACH, 
      &                          NREACHES, NRCHGRP, RCHGRP,
      &                          ICALCQAQ, NBDITEMS, INCBD, CUMBD, 
@@ -9344,7 +9477,14 @@ C           SKIP CONNECTION IF CONNECTED REACH IS INACTIVE
             v       = SSWR_CALC_VOL(irch,rs)
             rs0 = RSTAGE(irch,n-1)
             v0  = SSWR_CALC_VOL(irch,rs0)
-            dv  = ( v0 - v ) / SWRTIME(n)%SWRDT
+C-------------NO STORAGE CHANGE FOR STEADY STATE SIMULATIONS
+C             v1.04 JDH 1/29/2016
+C             PRIOR VERSIONS INCLUDED STORAGE CHANGES IN BUDGETS            
+            IF ( ISWRSS.GT.0 ) THEN
+              dv = DZERO
+            ELSE
+              dv  = ( v0 - v ) / SWRTIME(n)%SWRDT
+            END IF
 C             CALCULATE CONSTANT STAGE REACH CONSTANT FLOW CHANGE
 C             DUE TO CHANGES IN CONSTANT STAGES
             cv  = DZERO
@@ -11331,7 +11471,15 @@ C---------SKIP IF STAGE (trs) AND GROUNDWATER HEAD (h) IS BELOW REACH BOTTOM (rb
 C-----------CALCULATE MAXIMUM INCREMENTAL WETTED PERIMETER FOR CURRENT HEAD
           wps = MAX(h,trs)
           !IF (k.EQ.1) zgtop = MAX(wps,zgtop)
-          IF (k.EQ.1) zgtop = MIN(wps,zgtop) !Jan Jeppesen bug fix
+          !IF (k.EQ.1) zgtop = MIN(wps,zgtop) !JAN JEPPESEN FIX
+C-----------JAN JEPPESEN FIX
+          IF (k.EQ.1) THEN
+            IF (dtop.GT.Rch%GBELEV) THEN
+              zgtop = MIN(wps,zgtop)
+            ELSE
+              zgtop = wps
+            END IF
+          END IF
           IF (zgtop.LT.zgbot) zgtop = zgbot
           wptop = SSWR_LININT(Rch%GEO%ELEV,
      2                        Rch%GEO%WETPER,zgtop)
@@ -11340,7 +11488,7 @@ C-----------CALCULATE MAXIMUM INCREMENTAL WETTED PERIMETER FOR CURRENT HEAD
      2                        Rch%GEO%WETPER,zgbot)
           twp = wptop
           !IF (Rch%IGEOTYPE.NE.5) twp = wptop - wpbot
-          IF (Rch%LAYSTR.NE.Rch%LAYEND) twp = wptop - wpbot !Jan Jeppesen bug fix
+          IF (Rch%LAYSTR.NE.Rch%LAYEND) twp = wptop - wpbot !JAN JEPPESEN FIX
           Rch%CURRENTQAQ(k)%WETTEDPERIMETER     = twp
 C-----------CALCULATE DYNAMIC CONDUCTANCE
           IF (Rch%IGCNDOP.GT.0) THEN
@@ -11510,7 +11658,15 @@ C---------SKIP IF STAGE (trs) AND GROUNDWATER HEAD (h) IS BELOW REACH BOTTOM (rb
 C-----------CALCULATE MAXIMUM INCREMENTAL WETTED PERIMETER FOR CURRENT HEAD
           wps = MAX(h,trs)
           !IF (k.EQ.1) zgtop = MAX(wps,zgtop)
-          IF (k.EQ.1) zgtop = MIN(wps,zgtop) !Jan Jeppesen bug fix
+          !IF (k.EQ.1) zgtop = MIN(wps,zgtop) !JAN JEPPESEN FIX
+C-----------JAN JEPPESEN FIX
+          IF (k.EQ.1) THEN
+            IF (dtop.GT.Rch%GBELEV) THEN
+              zgtop = MIN(wps,zgtop)
+            ELSE
+              zgtop = wps
+            END IF
+          END IF
           IF (zgtop.LT.zgbot) zgtop = zgbot
           wptop = SSWR_LININT(Rch%GEO%ELEV,
      2                        Rch%GEO%WETPER,zgtop)
@@ -11519,7 +11675,7 @@ C-----------CALCULATE MAXIMUM INCREMENTAL WETTED PERIMETER FOR CURRENT HEAD
      2                        Rch%GEO%WETPER,zgbot)
           twp = wptop
           !IF (Rch%IGEOTYPE.NE.5) twp = wptop - wpbot
-          IF (Rch%LAYSTR.NE.Rch%LAYEND) twp = wptop - wpbot !Jan Jeppesen bug fix
+          IF (Rch%LAYSTR.NE.Rch%LAYEND) twp = wptop - wpbot !JAN JEPPESEN FIX
           Rch%CURRENTQAQ(k)%WETTEDPERIMETER     = twp
 C-----------CALCULATE DYNAMIC CONDUCTANCE
           IF (Rch%IGCNDOP.GT.0) THEN
