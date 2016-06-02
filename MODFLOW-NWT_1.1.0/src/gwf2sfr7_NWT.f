@@ -104,7 +104,10 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
-      ALLOCATE (NINTOT,ITRFLG,NFLOWTYPE)                               !EDM - FOR LMT
+      ALLOCATE (ITRFLG)
+      IF(IUNIT(49).GT.0) THEN
+        ALLOCATE (NINTOT,NFLOWTYPE)                             !EDM - FOR LMT
+      ENDIF
       ALLOCATE (FACTOR)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
@@ -1299,12 +1302,14 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
-        FLOWTYPE(1) = 'NA'
-        FLOWTYPE(2) = 'NA'
-        FLOWTYPE(3) = 'NA'
-        FLOWTYPE(4) = 'NA'
-        FLOWTYPE(5) = 'NA'
-        NFLOWTYPE=0
+        IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+          FLOWTYPE(1) = 'NA'
+          FLOWTYPE(2) = 'NA'
+          FLOWTYPE(3) = 'NA'
+          FLOWTYPE(4) = 'NA'
+          FLOWTYPE(5) = 'NA'
+          NFLOWTYPE=0
+        ENDIF
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -3447,7 +3452,7 @@ C     *****************************************************************
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
 !!      USE GWFLAKMODULE, ONLY: VOL, LKARR1, STGNEW, STGOLD
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
-     +                        HNEW, BUFF, BOTM, LBOTM
+     +                        HNEW, BUFF, BOTM, LBOTM, IUNIT
 !!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
 !!     +                        HNEW, BUFF, BOTM, LBOTM, DELR, DELC
 !IFACE
@@ -3530,7 +3535,9 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       Transient_bd = 0.0
       lfold = 0
       maxwav = NSFRSETS*NSTRAIL
-      NINTOT = 0                  !EDM
+      IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+        NINTOT = 0              
+      ENDIF
       IF ( IUZT.EQ.1 ) THEN
         SFRUZBD(4) = zero
         SFRUZBD(5) = zero
@@ -3644,10 +3651,12 @@ C6------DETERMINE STREAM SEGMENT AND REACH NUMBER.
 C
 C7------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
+            flowin = SEG(2, istsg)
 !EDM - Count connection for LMT
-            IF ( ISEG(3, istsg).EQ.5 ) THEN  
-              flowin = SEG(2, istsg)
-              NINTOT = NINTOT + 1 
+            IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+              IF ( ISEG(3, istsg).EQ.5 ) THEN  
+                NINTOT = NINTOT + 1 
+              ENDIF
             ENDIF
             IF ( IDIVAR(1,istsg).EQ.0 ) 
      +          sfrbudg_in = sfrbudg_in + SEG(2, istsg)
@@ -3733,7 +3742,9 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
                 IF ( istsg.EQ.IOTSG(itrib) ) THEN
                   trbflw = SGOTFLW(itrib)
                   flowin = flowin + trbflw
-                  NINTOT = NINTOT + 1   !EDM
+                  IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+                    NINTOT = NINTOT + 1   !EDM
+                  ENDIF
                 END IF
                 itrib = itrib + 1
               END DO
@@ -3754,12 +3765,16 @@ C24-----SET INFLOW EQUAL TO OUTFLOW FROM UPSTREAM REACH, WHEN REACH
 C         GREATER THAN 1.
           ELSE IF ( nreach.GT.1 ) THEN
             flowin = STRM(9, ll)
-            NINTOT = NINTOT + 1    !EDM
+            IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+              NINTOT = NINTOT + 1    !EDM
+            ENDIF
           END IF
 C
 C- EDM -IF OUTSEG=0 THEN SEGMENT IS A NETWORK SINK AND SHOULD BE COUNTED FOR LMT
-          IF(IOTSG(ISTSG).EQ.0.AND.NREACH.EQ.ISEG(4,ISTSG)) THEN
-            NINTOT = NINTOT + 1
+          IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+            IF(IOTSG(ISTSG).EQ.0.AND.NREACH.EQ.ISEG(4,ISTSG)) THEN
+              NINTOT = NINTOT + 1
+            ENDIF
           ENDIF
 C
 C25-----SEARCH FOR UPPER MOST ACTIVE CELL IN STREAM REACH. Revised ERB
