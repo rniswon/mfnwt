@@ -1,3 +1,4 @@
+
 C
 C
 C     ******************************************************************
@@ -45,69 +46,7 @@ C     ******************************************************************
       END IF
       END FUNCTION SIMUZET
       END MODULE SIMET_MODULE
-!
-      MODULE ETLIN_MODULE
-      implicit none
-      type LIN_ET
-        DOUBLE PRECISION hh,s,x,c,trhs,thcof,dET
-      end type LIN_ET
-      public LIN_ET
-      CONTAINS
-      FUNCTION ETFUNC_LIN(flin)
-      type (LIN_ET), intent(inout) :: flin
-      double precision etgw, ETFUNC_LIN
-! Between ET surface and extintion depth
-      IF ( flin%hh.GT.(flin%s-flin%x) .AND. flin%hh.LT.flin%s ) THEN
-        etgw = (flin%c*(flin%hh-(flin%s-flin%x))/flin%x)
-        IF ( etgw.GT.flin%c ) THEN
-          etgw = flin%c
-          flin%trhs = etgw
-        ELSE
-          flin%trhs = flin%c - flin%c*flin%s/flin%x
-          flin%thcof = -flin%c/flin%x
-          etgw = flin%trhs-(flin%thcof*flin%hh)
-        END IF
-! Above land surface
-      ELSE IF ( flin%hh.GE.flin%s ) THEN           
-        flin%trhs = flin%c
-        etgw = flin%c
-! Below extintion depth
-      ELSE
-        etgw = 0.0
-      END IF
-      ETFUNC_LIN = etgw
-      END FUNCTION ETFUNC_LIN
-      END MODULE
-!
-      MODULE ETNLIN_MODULE
-      USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      implicit none
-      type NLIN_ET
-        DOUBLE PRECISION hh,s,x,c,trhs,thcof,dET
-      end type NLIN_ET
-      public NLIN_ET
-      CONTAINS
-      FUNCTION ETFUNC_NLIN(fnlin)
-      type (NLIN_ET), intent(inout) :: fnlin
-      EXTERNAL smoothuz
-      DOUBLE PRECISION smoothuz, smint
-      double precision etgw, ETFUNC_NLIN, depth, smoothick,
-     +                 detdh
-      depth = fnlin%hh - (fnlin%s - fnlin%x)
-      if ( depth.lt.0.0 ) depth = 0.0
-      etgw = fnlin%c
-      detdh = 0.0d0
-      smint = 0.15*fnlin%x
-      if ( depth>1.0e-7) then
-          etgw = etgw*smoothuz(depth,detdh,smint)
-      else
-          etgw = 0.0d0
-      end if
-      fnlin%trhs = etgw
-      fnlin%dET = detdh
-      ETFUNC_NLIN = etgw
-      END FUNCTION ETFUNC_NLIN
-      END MODULE
+
 !
       DOUBLE PRECISION FUNCTION smoothuz(h,dwdh,smint)
 ! h is the depth above extinction
@@ -2214,7 +2153,7 @@ C     -----------------------------------------------------------------
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
-      DATA textrej/'        HORT+DUNN'/
+      DATA textrej/'       HORT+DUNN'/
       DATA uzinftxt/'    INFILTRATION'/
       DATA uzsttext/'  STORAGE CHANGE'/
       DATA uzettext/'          UZF ET'/

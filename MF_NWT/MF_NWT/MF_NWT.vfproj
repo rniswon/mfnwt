@@ -74,13 +74,14 @@
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2sfr7_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2str7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2sub7_NWT.f"/>
-		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2swi27_NWT.f"/>
+		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2swi27.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2swr7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2swr7util.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2swt7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2upw1.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2uzf1_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwf2wel7_NWT.f"/>
+		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwflakmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfsfrmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\gwfuzfmodule_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.0\src\hufutl7.f"/>
