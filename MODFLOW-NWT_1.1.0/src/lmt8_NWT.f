@@ -3433,6 +3433,7 @@ C last modified: 03-31-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,HOLD,
      &                      BUFF,BOTM,DELR,DELC
+      USE GWFBASMODULE,ONLY:DELT
       USE LMTMODULE,   ONLY:IUZFFLOWS
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
      &                      NUZTOP,GWET,UZFLWT,IETFLG
@@ -3466,7 +3467,7 @@ C  TO 0 THAT ARE ABOVE THE CELL WITH THE WATER TABLE.
         I = IUZHOLD(1, ll)
         J = IUZHOLD(2, ll)
         IF(IUZFBND(J,I).NE.0) THEN
-          BUFF(J,I,1) = UZFLWT(J,I)
+          BUFF(J,I,1) = UZFLWT(J,I)/DELT
         END IF
       ENDDO
 C--Initialize IUZFRCH integer array
@@ -3572,7 +3573,7 @@ C--FOR EACH CELL CALCULATE GW ET & STORE IN BUFFER
             IF(K.NE.0) THEN
               IF(IBOUND(J,I,K).GT.0) THEN
                 IGWET(J,I)=K
-                BUFF(J,I,1)=-GWET(J,I)
+                BUFF(J,I,1)=-1*ABS(GWET(J,I))
               END IF
             END IF
           ENDDO
@@ -3802,10 +3803,10 @@ C--FOR EACH CELL CALCULATE UZ ET & STORE IN BUFFER
             IF( K.GE.IUZFBND(J,I) ) THEN
               IF( HNEW(J,I,K).LT.BOTM(J,I,K-1) )THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-GRIDET(J,I,K)*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
               ELSEIF ( ABS(SNGL(HNEW(J,I,K))-HNOFLO).LT.1.0 ) THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-GRIDET(J,I,K)*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
                 GRIDET(J,I,K) = 0.0
               END IF
             END IF
@@ -3847,7 +3848,7 @@ C--FOR EACH CELL CALCULATE GW ET & STORE IN BUFFER
           IF ( K.NE.0 ) THEN
             IF ( IBOUND(J,I,K).GT.0 ) THEN
               IGWET(J,I)=K
-              BUFF(J,I,K)=-GWET(J,I)
+              BUFF(J,I,K)=-1*ABS(GWET(J,I))
             END IF
           END IF
         ENDDO
