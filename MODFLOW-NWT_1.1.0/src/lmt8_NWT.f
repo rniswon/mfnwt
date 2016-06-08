@@ -86,7 +86,7 @@ C
 C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
       IUMT3D=0
       DO IU=1,NIUNIT
-        IF(CUNIT(IU).EQ.'LMT6') THEN
+        IF(CUNIT(IU).EQ.'LMT8') THEN
           INLMT=IUNIT(IU)     
         ELSEIF(CUNIT(IU).EQ.'BCF6') THEN
           MTBCF=IUNIT(IU)
@@ -259,13 +259,13 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
         IF(LINE(ISTART:ISTOP).EQ.' ') THEN
           IF(FIRSTVAL) THEN 
             WRITE(IOUT,15) 
-            GOTO 1000
+            GOTO 400
           ELSE
             CONTINUE
           ENDIF
         ELSEIF(LINE(ISTART:ISTOP).EQ.'ALL') THEN ! ALL = "all available"
           !Activate connections in SFR, LAK, and UZF, provided they are active
-          IF(MTUZF.NE.0.AND.IUZFOPT.NE.0) THEN
+400       IF(MTUZF.NE.0.AND.IUZFOPT.NE.0) THEN
             IUZFFLOWS=1
           ENDIF
           IF(MTSFR.NE.0) THEN
@@ -409,8 +409,8 @@ C
      & /1X,'INVALID OUTPUT_FILE_HEADER CODE: ',A)
    14 FORMAT(/1X,'ERROR READING LMT PACKAGE INPUT DATA:',
      & /1X,'INVALID OUTPUT_FILE_FORMAT SPECIFIER: ',A)
-   15 FORMAT(/1X,'SURFACE FLOW CONNECTIONS WILL NOT BE ',
-     & 'WRITTEN TO THE FLOW-TRANSPORT LINK FILE')
+   15 FORMAT(/1X,'NO VALUE GIVEN FOR PACKAGE_FLOWS VARIABLE: ',
+     & 'SETTING DEFAULT OPTION OF PACKAGE_FLOWS TO ALL')
    16 FORMAT(/1X,'THE FOLLOWING PACKAGE HAS NO SUPPORT ',
      & 'FOR SURFACE FLOW CONNECTIONS OR IS',
      & /1X,'AN UNRECOGNIZED KEYWORD IN THE LMT INPUT FILE: ',A)
@@ -3433,6 +3433,7 @@ C last modified: 03-31-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,HOLD,
      &                      BUFF,BOTM,DELR,DELC
+      USE GWFBASMODULE,ONLY:DELT
       USE LMTMODULE,   ONLY:IUZFFLOWS
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
      &                      NUZTOP,GWET,UZFLWT,IETFLG
@@ -3466,7 +3467,7 @@ C  TO 0 THAT ARE ABOVE THE CELL WITH THE WATER TABLE.
         I = IUZHOLD(1, ll)
         J = IUZHOLD(2, ll)
         IF(IUZFBND(J,I).NE.0) THEN
-          BUFF(J,I,1) = UZFLWT(J,I)
+          BUFF(J,I,1) = UZFLWT(J,I)/DELT
         END IF
       ENDDO
 C--Initialize IUZFRCH integer array
@@ -3572,7 +3573,7 @@ C--FOR EACH CELL CALCULATE GW ET & STORE IN BUFFER
             IF(K.NE.0) THEN
               IF(IBOUND(J,I,K).GT.0) THEN
                 IGWET(J,I)=K
-                BUFF(J,I,1)=-GWET(J,I)
+                BUFF(J,I,1)=-1*ABS(GWET(J,I))
               END IF
             END IF
           ENDDO
@@ -3802,10 +3803,10 @@ C--FOR EACH CELL CALCULATE UZ ET & STORE IN BUFFER
             IF( K.GE.IUZFBND(J,I) ) THEN
               IF( HNEW(J,I,K).LT.BOTM(J,I,K-1) )THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-GRIDET(J,I,K)*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
               ELSEIF ( ABS(SNGL(HNEW(J,I,K))-HNOFLO).LT.1.0 ) THEN
                 cellarea = DELR(J)*DELC(I)
-                BUFF(J,I,K)=-GRIDET(J,I,K)*cellarea/DELT
+                BUFF(J,I,K)=-1*ABS(GRIDET(J,I,K))*cellarea/DELT
                 GRIDET(J,I,K) = 0.0
               END IF
             END IF
@@ -3847,7 +3848,7 @@ C--FOR EACH CELL CALCULATE GW ET & STORE IN BUFFER
           IF ( K.NE.0 ) THEN
             IF ( IBOUND(J,I,K).GT.0 ) THEN
               IGWET(J,I)=K
-              BUFF(J,I,K)=-GWET(J,I)
+              BUFF(J,I,K)=-1*ABS(GWET(J,I))
             END IF
           END IF
         ENDDO
