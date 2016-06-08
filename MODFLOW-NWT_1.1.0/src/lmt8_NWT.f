@@ -104,11 +104,11 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
           MTEVT=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'RIV ') THEN
           MTRIV=IUNIT(IU)
+        ELSEIF(CUNIT(IU).EQ.'GHB ') THEN
+          MTGHB=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'STR ') THEN
           MTSTR=IUNIT(IU)
           IF(MTSTR.GT.0) NPCKGTXT = NPCKGTXT + 1
-        ELSEIF(CUNIT(IU).EQ.'GHB ') THEN
-          MTGHB=IUNIT(IU)
         ELSEIF(CUNIT(IU).EQ.'RES ') THEN
           MTRES=IUNIT(IU)
           IF(MTRES.GT.0) NPCKGTXT = NPCKGTXT + 1
@@ -129,9 +129,6 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
         ELSEIF(CUNIT(IU).EQ.'TLK ') THEN
           MTTLK=IUNIT(IU)
           IF(MTTLK.GT.0) NPCKGTXT = NPCKGTXT + 1
-        ELSEIF(CUNIT(IU).EQ.'LAK ') THEN
-          MTLAK=IUNIT(IU)
-          IF(MTLAK.GT.0) NPCKGTXT = NPCKGTXT + 1
         ELSEIF(CUNIT(IU).EQ.'MNW1') THEN
           MTMNW1=IUNIT(IU)
           IF(MTMNW1.GT.0) NPCKGTXT = NPCKGTXT + 1
@@ -139,6 +136,9 @@ C--CHECK for OPTIONS/PACKAGES USED IN CURRENT SIMULATION
 !swm: store separate to not get clobbered by MNW1
           MTMNW2=IUNIT(IU)   
           IF(MTMNW2.GT.0) NPCKGTXT = NPCKGTXT + 1
+        ELSEIF(CUNIT(IU).EQ.'LAK ') THEN
+          MTLAK=IUNIT(IU)
+          IF(MTLAK.GT.0) NPCKGTXT = NPCKGTXT + 1        
         ELSEIF(CUNIT(IU).EQ.'SWT ') THEN
           MTSWT=IUNIT(IU)
           IF(MTSWT.GT.0) NPCKGTXT = NPCKGTXT + 1
@@ -526,10 +526,10 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTFHB.NE.0) WRITE(IUMT3D)   '                 FHB'  ! Flow and Head Boundary package
           IF(MTDRT.NE.0) WRITE(IUMT3D)   '                 DRT'  ! Drain Return package
           IF(MTETS.NE.0) WRITE(IUMT3D)   '                 ETS'  ! Segmented ET package
-          IF(MTIBS.NE.0) WRITE(IUMT3D)   '                 IBS'  ! Interbed Storage
-          IF(MTTLK.NE.0) WRITE(IUMT3D)   '                 TLK'  ! Transient Leakage
+C          IF(MTIBS.NE.0) WRITE(IUMT3D)   '                 IBS'  ! Interbed Storage
+C          IF(MTTLK.NE.0) WRITE(IUMT3D)   '                 TLK'  ! Transient Leakage
           IF(MTMNW.NE.0) WRITE(IUMT3D)   '                 MNW'  ! Multi-node well package
-          IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
+C          IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
           IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0)
      &                   WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0)
@@ -559,10 +559,10 @@ C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
           IF(MTFHB.NE.0) WRITE(IUMT3D,*) '                 FHB'  ! Flow and Head Boundary package
           IF(MTDRT.NE.0) WRITE(IUMT3D,*) '                 DRT'  ! Drain Return package
           IF(MTETS.NE.0) WRITE(IUMT3D,*) '                 ETS'  ! Segmented ET package
-          IF(MTIBS.NE.0) WRITE(IUMT3D,*) '                 IBS'  ! Interbed Storage
-          IF(MTTLK.NE.0) WRITE(IUMT3D,*) '                 TLK'  ! Transient Leakage
+C          IF(MTIBS.NE.0) WRITE(IUMT3D,*) '                 IBS'  ! Interbed Storage
+C          IF(MTTLK.NE.0) WRITE(IUMT3D,*) '                 TLK'  ! Transient Leakage
           IF(MTMNW.NE.0) WRITE(IUMT3D,*) '                 MNW'  ! Multi-node well package
-          IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
+C          IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
           IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0) 
      &                   WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
           IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0) 
