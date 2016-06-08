@@ -41,12 +41,11 @@ C     ******************************************************************
         SIMUZET = ETFUNC_NLIN(fnlin)
         SELF%trhs = fnlin%trhs
         SELF%thcof = fnlin%thcof
-!        SELF%dET = fnlin%dET
+        SELF%dET = fnlin%dET
         SELF%dET = 0.0
       END IF
       END FUNCTION SIMUZET
       END MODULE SIMET_MODULE
-
 !
       DOUBLE PRECISION FUNCTION smoothuz(h,dwdh,smint)
 ! h is the depth above extinction
@@ -64,8 +63,7 @@ C     ******************************************************************
       cof2 = -(2.0D0*x)/(s**3.0D0)
       cof3 = 3.0D0/(s**2.0D0)
       y = cof1*(cof2+cof3)
- !     dwdh = (aa*x**2.0D0-bb*x)
-      dwdh = 0.0d0
+      dwdh = (aa*x**2.0D0-bb*x)
       IF ( x.LE.0.0 ) THEN
         y = 0.0D0
         dwdh = 0.0D0

@@ -1417,7 +1417,7 @@ C--Update heads.
 !     Return value of groundwater flow equation
       DOUBLE PRECISION FUNCTION GW_func(Ic, Ir, Il)
       USE GWFNWTMODULE
-!!      USE GLOBAL,      ONLY:iout
+      USE GLOBAL,      ONLY:iout, ibound
       USE GWFBASMODULE, ONLY:HNOFLO
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -1430,7 +1430,7 @@ C--Update heads.
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
-      DOUBLE PRECISION term1, term2, term3
+      DOUBLE PRECISION term1, term2, term3, sum
 !     -----------------------------------------------------------------   
       GW_func = 0.0D0
       IF ( H==HNOFLO ) RETURN    
@@ -1439,17 +1439,11 @@ C--Update heads.
       term3 = Crr*Hcp1 + Ccc*Hrp1 + Cvv*Hvp1 - Rhss
       GW_func = term1 + term2 + term3
 !      if(ic==166.and.ir==159.and.il==1)then
+!      if(ic+ir+il==3)write(iout,*)'begin'
 !      write(iout,222)ic,ir,il,cvm1*(Hvm1-h),ccm1*(hrm1-h),crm1*(hcm1-h),
-!     +cvv*(hvp1-h),ccc*(hrp1-h),crr*(hcp1-h),rhss,gw_func
+!     +cvv*(hvp1-h),ccc*(hrp1-h),crr*(hcp1-h),hcoff*h-rhss,gw_func
 !      end if
 !  222 format(3i5,8e20.10)
-      !if(ibound(ic,ir,il)==-1)then
-      !if(ibound(ic,ir-1,il)==1)sum=sum+ccm1*(hrm1-h)
-      !if(ibound(ic-1,ir,il)==1)sum=sum+crm1*(hcm1-h)
-      !if(ibound(ic+1,ir,il)==1)sum=sum+crr*(hcp1-h)
-      !if(ibound(ic,ir+1,il)==1)sum=sum+ccc*(hrp1-h)
-      !write(iout,*)'sum=',ic,ir,il,sum
-      !end if
       END FUNCTION GW_func
 !
 !

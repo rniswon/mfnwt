@@ -1083,8 +1083,8 @@ c     if partial penetration ne 0, set ZPD to 1d30.  this will act as a flag
 c     until ZDP (and ZPL) are set for the well)
                 MNWNOD(20,NODNUM)=1d30         
               ELSE
-                WRITE(iout,*) '***ERROR*** MNW2 screen in no-flow node'
-                STOP 'MNW2 - screen in no-flow node' 
+               WRITE(iout,*) '***WARNING*** MNW2 screen in no-flow node'   !RGN 6/6/16 (other cells can be active)
+!                STOP 'MNW2 - screen in no-flow node'                      !RGN 6/6/16
               END IF
 c     if a node has been created (nodecount>0), then check to see if this interval
 c     is still in that node (still NODNUM)
@@ -1123,8 +1123,8 @@ c     if partial penetration ne 0, set ZPD to 1d30.  this will act as a flag
 c     until ZDP (and ZPL) are set for the well)
                   MNWNOD(20,NODNUM)=1d30         
                 ELSE
-                 WRITE(iout,*) '***ERROR*** MNW2 screen in no-flow node'
-                 STOP 'MNW2 - screen in no-flow node' 
+              WRITE(iout,*) '***WARNING*** MNW2 screen in no-flow node'          !RGN 6/6/16 (other cells can be active)
+!                 STOP 'MNW2 - screen in no-flow node'                           !RGN 6/6/16
                 END IF
 	        END IF
             END IF

@@ -170,7 +170,7 @@
             etgw = 0.0d0
           end if
           fnlin%trhs = etgw
-          fnlin%dET = detdh
+          fnlin%dET = detdh*etgw
           ETFUNC_NLIN = etgw
         END FUNCTION ETFUNC_NLIN
       END MODULE ETNLIN_MODULE
