@@ -3706,7 +3706,7 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
 !EDM - For LMT
                 IF( IDIVAR(1,istsg).GT.0 ) THEN
                   flowin = DVRSFLW(istsg)
-                  NINTOT = NINTOT + 1
+                  IF(IUNIT(49).GT.0) NINTOT = NINTOT + 1
                 ENDIF
               END IF
             END IF
