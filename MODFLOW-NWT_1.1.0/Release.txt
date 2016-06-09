@@ -18,7 +18,7 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.0 05/01/2016:
+o Version 1.1.0 06/15/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
 means that MODFLOW-2005 source files used in MODFLOW-NWT were updated to
@@ -27,7 +27,7 @@ notes for MODFLOW-2005 version 1.11.0 for these changes.
 
 This release provides support for the new transport model called MT3D-USGS. 
 Changes to MODFLOW-NWT to support MT3D-USGS were made to the source file 
-lmt7_NWT.f. These changes include writing output for the UZF, SFR2, and 
+lmt8_NWT.f. These changes include writing output for the UZF, SFR2, and 
 LAK7 packages that is required for simulating transport in the unsaturated zone,
 streams, and lakes. Refer to the MT3D-USGS documentation report 
 (Bedekar and others, 2016) for details.
@@ -118,7 +118,7 @@ Complex:
 Streamflow Routing (SFR2) Package
 
 A new option was added to allow specfication of a multipication factor for reducing
-the streambed hydraulic conductivity for losing condition. 
+the streambed hydraulic conductivity for losing conditions. 
 
 New Data Set 1C: 
 [LOSSFACTOR Factor]
@@ -205,10 +205,10 @@ The names of the source files were changed from gwf2swr7_NWT.f to gwf2swr7.f
 and gsol7.f to gwf2swr7util.f.
 
 
-Source files that were modified include: gwf2uzf1_NWT.f,gwfuzfmodule_NWT.f,
+Source files that were modified for this release are: gwf2uzf1_NWT.f,gwfuzfmodule_NWT.f,
 gwf2sfr7_NWT.f,gwfsfrmodule_NWT.f,gwf2lak7_NWT.f, NWT1_gmres.f90, gwf2swr7.f,
 gwf2swr7util.f, gwf2mnw27_NWT.f, gmres.f90, NWT1_solver.f and NWT1_xmd.f, and
-lmt7_NWT.f.
+lmt8_NWT.f.
 
 o Version 1.0.9 07/01/2014:
 
