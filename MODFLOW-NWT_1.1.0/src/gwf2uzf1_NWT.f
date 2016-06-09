@@ -42,7 +42,6 @@ C     ******************************************************************
         SELF%trhs = fnlin%trhs
         SELF%thcof = fnlin%thcof
         SELF%dET = fnlin%dET
-        SELF%dET = 0.0
       END IF
       END FUNCTION SIMUZET
       END MODULE SIMET_MODULE
@@ -55,7 +54,7 @@ C     ******************************************************************
       DOUBLE PRECISION cof1, cof2, cof3
       smoothuz = 0.0D0
       s = smint
-      if ( s<1.0d-3 ) s = 1.0d-3
+!      if ( s<1.0d-3 ) s = 1.0d-3
       x = h
       aa = -6.0d0/(s**3.0d0)
       bb = -6.0d0/(s**2.0d0)

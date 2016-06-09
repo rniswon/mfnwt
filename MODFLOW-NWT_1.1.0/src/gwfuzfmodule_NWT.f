@@ -163,8 +163,8 @@
           if ( depth.lt.0.0 ) depth = 0.0
           etgw = fnlin%c
           detdh = 0.0d0
-          smint = 0.15*fnlin%x
-          if ( depth>1.0e-7) then
+          smint = 1.0e-2*fnlin%x
+          if ( depth>0.0d0) then
             etgw = etgw*smoothuz(depth,detdh,smint)
           else
             etgw = 0.0d0
