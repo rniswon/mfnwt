@@ -13,9 +13,10 @@ C     ******************************************************************
       end type SIM_ET
       public SIM_ET
       CONTAINS
-      FUNCTION SIMUZET(SELF,ETOPT)
+      FUNCTION SIMUZET(SELF,ETOPT,SMOOTHET)
       type (SIM_ET), intent(inout) :: SELF
       integer, intent(in) :: ETOPT
+      DOUBLE PRECISION, INTENT(IN) :: SMOOTHET
       type (LIN_ET) :: flin
       type (NLIN_ET) :: fnlin
       DOUBLE PRECISION SIMUZET
@@ -38,7 +39,7 @@ C     ******************************************************************
         fnlin%s = SELF%s
         fnlin%x = SELF%x
         fnlin%c = SELF%c
-        SIMUZET = ETFUNC_NLIN(fnlin)
+        SIMUZET = ETFUNC_NLIN(fnlin,SMOOTHET)
         SELF%trhs = fnlin%trhs
         SELF%thcof = fnlin%thcof
         SELF%dET = fnlin%dET
@@ -54,7 +55,6 @@ C     ******************************************************************
       DOUBLE PRECISION cof1, cof2, cof3
       smoothuz = 0.0D0
       s = smint
-!      if ( s<1.0d-3 ) s = 1.0d-3
       x = h
       aa = -6.0d0/(s**3.0d0)
       bb = -6.0d0/(s**2.0d0)
@@ -108,9 +108,12 @@ C     ------------------------------------------------------------------
      +        iuzcol, iuzflg, iuzlay, iuzopt, iuzrow, l, ncck, ncth, 
      +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL,
      +        llocsave, icheck2
-      REAL r, sy, fkmin, fkmax, range, finc, thick
+      REAL r, sy, fkmin, fkmax, range, finc, thick, smooth
       CHARACTER(LEN=200) line
       CHARACTER(LEN=24) aname(9)
+      character(len=16)  :: text        = 'UZF'
+      logical :: found
+      character(len=40) :: keyvalue
       DATA aname(1)/' AREAL EXTENT OF UZ FLOW'/
       DATA aname(2)/' ROUTING OVERLAND RUNOFF'/
       DATA aname(3)/' SATURATED WATER CONTENT'/
@@ -138,118 +141,134 @@ C     ------------------------------------------------------------------
       ALLOCATE (NUZGAG, NUZGAGAR, NUZCL, NUZRW, TOTRUNOFF)
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
-      ALLOCATE (INETFLUX,UNITRECH,UNITDIS)
+      ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
       IETBUD = 0
-      ETOPT = 2
+      ETOPT = 1
       MXVL = 0
       NPP = 0
       UNITRECH = 0
       UNITDIS = 0
       LAYNUM = 0
+      SMOOTHET = 0.0D0
+      smooth = 0.0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4', 
      +        ', 02/06/2012', /, 9X, 'INPUT READ FROM UNIT', I3)
+!
       CALL URDCOM(In, IOUT, line)
 ! Check for alternate input.
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
       lloc = 1
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'SPECIFYTHTR') THEN
-        ITHTRFLG = 1
-        WRITE(iout,*)
-        WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE READ ',
-     +                ' AND USED FOR THE FIRST TRANSIENT STRESS PERIOD'
-        WRITE(iout,*)
-        llocsave = lloc
-      ELSE
-        WRITE(iout,*)
-        WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
-     +              ' CALCULATED AS THE DIFFERENCE BETWEEN THTS AND SY'
-        WRITE(iout,*)
-        llocsave = 1
-      END IF
-      lloc = llocsave
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'SPECIFYTHTI') THEN
-         ITHTIFLG = 1
-         WRITE(iout,*)
-         WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE READ ',
-     +                ' FOR THE FIRST SS OR TR STRESS PERIOD'
-         WRITE(iout,*)
-         llocsave = lloc
-      ELSE
-         WRITE(iout,*)
-         WRITE(IOUT,'(A)') ' INITIAL WATER CONTENT (THTI) WILL BE ',
-     +                 ' CALCULATED BASED ON THE SS INFILTRATION RATE ',
-     +                 'IF STARTING WITH SS.'
-         WRITE(iout,*)
-      END IF
-      lloc = llocsave
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'NOSURFLEAK') THEN
-         Iseepsupress = 1
-         WRITE(iout,*)
-         WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
-         WRITE(iout,*)
-         llocsave = lloc
-      END IF
-      lloc = llocsave
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'SPECIFYSURFK') THEN
-         Ireadsurfk = 1
-         WRITE(iout,*)
-         WRITE(IOUT,'(A)')'HYDRAULIC CONDUCTIVITY OF LAND SURFACE WILL '
-     +                    ,'BE READ'
-         WRITE(iout,*)
-         llocsave = lloc
-      END IF
-      IF ( Ireadsurfk > 0 ) then
-        lloc = llocsave
+      keyvalue = LINE(ISTART:ISTOP)
+      call upcase(keyvalue)
+      IF(keyvalue.EQ.'OPTIONS') THEN
+              write(iout,'(/1x,a)') 'PROCESSING '//
+     +              trim(adjustl(text)) //' OPTIONS'
+        do
+        CALL URDCOM(In, IOUT, line)
+        lloc = 1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        IF(LINE(ISTART:ISTOP).EQ.'REJECTSURFK') THEN
-           Isurfkreject = 1
-           WRITE(iout,*)
-           WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
+        keyvalue = LINE(ISTART:ISTOP)
+        call upcase(keyvalue)
+        select case (keyvalue)
+          case('SPECIFYTHTR')
+            ITHTRFLG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
+     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
+     +                'PERIOD'
+            WRITE(iout,*)
+            found = .true.
+          case('SPECIFYTHTI')
+            ITHTIFLG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
+     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
+            WRITE(iout,*)
+            found = .true.
+          case('ETSQUARE')
+            i=1
+            CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
+     +                  IOUT, In)
+            SMOOTHET = smooth
+            IF( SMOOTHET<1.0E-7 ) SMOOTHET = 1.0D-7
+            IF( SMOOTHET>1.0 ) SMOOTHET = 1.0D0
+            ETOPT = 2
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')
+     +            ' A SQUARE ET FUNCTION WILL BE USED TO SIMULATE GW ET'
+            WRITE(iout,*)
+            found = .true.
+          case('NOSURFLEAK')
+            Iseepsupress = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+            WRITE(iout,*)
+            found = .true.
+          case('SPECIFYSURFK')
+            Ireadsurfk = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')'HYDRAULIC CONDUCTIVITY OF LAND SURFACE ',
+     +                       'WILL BE READ'
+            WRITE(iout,*)
+            found = .true.
+          case('REJECTSURFK')
+            if ( Ireadsurfk == 1 ) then
+              Isurfkreject = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
      +                    ,'LAND SURFACE K'
-           WRITE(iout,*)
-           llocsave = lloc
-        END IF
-!
-        lloc = llocsave
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        IF(LINE(ISTART:ISTOP).EQ.'SEEPSURFK') THEN
-           Iseepreject = 1
-           WRITE(iout,*)
-           WRITE(IOUT,'(A)')'SURFACE LEAKAGE WILL BE CALCULATED USING '
-     +                    ,'LAND SURFACE K'
-           WRITE(iout,*)
-           llocsave = lloc
-        END IF
-      END IF
-      icheck2 = ITHTRFLG + ITHTIFLG + Iseepsupress + Ireadsurfk + 
-     +         Isurfkreject
-      IF ( icheck2 > 0 ) CALL URDCOM(In, IOUT, line)
-! Check keyword for netflux files.
-      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'NETFLUX') THEN
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
-         IF(UNITRECH.LT.0) UNITRECH=0
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITDIS,R,IOUT,IN)
-         IF(UNITDIS.LT.0) UNITDIS=0
-         IF ( UNITRECH > 0 .AND. UNITDIS > 0 ) INETFLUX = 1
-         IF ( INETFLUX > 0 ) WRITE(IOUT,31) UNITRECH,UNITDIS
-   31    FORMAT(1X,I10,' Output will be written to Netrech and Netdis ',
-     +                 'files with unit numbers ',I10,I10, 
-     +                 ', respectively')
-         CALL URDCOM(In, IOUT, line)
-      END IF
+              WRITE(iout,*)
+            else
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'WARNING REJECTSURFK SPECIFIED BUT ',
+     +                     'NO SURFK SPECIFIED. OPTION IGNORED'
+              WRITE(iout,*) 
+            end if
+            found = .true.
+          case('SEEPSURFK')
+            if ( Ireadsurfk == 1 ) then
+              Iseepreject = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'SURFACE LEAKAGE WILL BE CALCULATED ',
+     +                         'USING LAND SURFACE K'
+              WRITE(iout,*)
+            else
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'WARNING SEEPSURFK SPECIFIED BUT ',
+     +                     'NO SURFK SPECIFIED. OPTION IGNORED'
+              WRITE(iout,*) 
+            end if
+            found = .true.
+        case ('NETFLUX')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
+            IF(UNITRECH.LT.0) UNITRECH=0
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITDIS,R,IOUT,IN)
+            IF(UNITDIS.LT.0) UNITDIS=0
+            IF ( UNITRECH > 0 .AND. UNITDIS > 0 ) INETFLUX = 1
+            IF ( INETFLUX > 0 ) WRITE(IOUT,31) UNITRECH,UNITDIS
+   31 FORMAT(1X,' OUTPUT WILL BE WRITTEN TO NETRECH AND NETDIS ',
+     +                 'FILES WITH UNIT NUMBERS ',I10,I10, 
+     +                 ', RESPECTIVELY')
+
+        case ('END')
+          CALL URDCOM(In, IOUT, line)
+          exit
+        case default
+    ! -- No options found
+        found = .false.
+        CALL URDCOM(In, IOUT, line)
+        exit
+        end select
+      end do
+      end if
+ !
       IF ( INETFLUX.GT.0 ) THEN
         ALLOCATE (FNETEXFIL2(NCOL,NROW))
         ALLOCATE(FNETEXFIL1(NCOL,NROW), TIMEPRINT)
@@ -257,16 +276,7 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
         ALLOCATE (FNETEXFIL2(1,1))
         ALLOCATE(FNETEXFIL1(1,1), TIMEPRINT)
       END IF
-      lloc = 1
-! lloc = llocsave
-! CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-! IF(LINE(ISTART:ISTOP).EQ.'ONLYET') THEN
-! IETBUD = 1
-! WRITE(iout,*)
-! WRITE(IOUT,'(A)')' ONLY ET WILL BE WRITTEN TO THE UNFORMATTED 
-!+                      BUDGET FILES '
-! WRITE(iout,*)
-! END IF
+!
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NUZTOP, r, IOUT, In)
       CALL URWORD(line, lloc, istart, istop, 2, IUZFOPT, r, IOUT, In)
@@ -1952,13 +1962,13 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
             uzfm_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
             uzfm_et%hh = H
             IF ( uzfm_et%c.LT.0.0d0 ) uzfm_et%c = 0.0d0
-            etgw = SIMUZET(uzfm_et,ETOPT)
+            etgw = SIMUZET(uzfm_et,ETOPT,SMOOTHET)
             RHS(ic, ir, il) = RHS(ic, ir, il) + uzfm_et%trhs
             HCOF(ic, ir, il) = HCOF(ic, ir, il) + uzfm_et%thcof
 ! Derivative for RHS
             IF ( Iunitnwt.GT.0 ) THEN
               ij = Icell(IC,IR,IL)
-              A(IA(ij)) = A(IA(ij)) + uzfm_et%dET
+              A(IA(ij)) = A(IA(ij)) - uzfm_et%dET*etgw
             END IF
 !            UZFETOUT(ic, ir) = etact*cellarea + etgw*DELT  !not used in Fm?
           END IF
@@ -2420,7 +2430,7 @@ C9------CALCULATE ET FROM GROUND WATER.
               uzbd_et%x = ROOTDPTH(ic, ir)
               uzbd_et%c = PETRATE(ic, ir)*CELLAREA
               uzbd_et%hh = H
-              etgw = SIMUZET(uzbd_et,ETOPT)
+              etgw = SIMUZET(uzbd_et,ETOPT,SMOOTHET)
               UZFETOUT(ic, ir) = 0.0
               GWET(ic, ir) = etgw
             END IF
@@ -2522,7 +2532,7 @@ C12-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
               uzbd_et%hh = H
               IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
-              etgw = SIMUZET(uzbd_et,ETOPT)
+              etgw = SIMUZET(uzbd_et,ETOPT,SMOOTHET)
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -2891,7 +2901,7 @@ C25-----CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
               uzbd_et%hh = H
               IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
-              etgw = SIMUZET(uzbd_et,ETOPT)           
+              etgw = SIMUZET(uzbd_et,ETOPT,SMOOTHET)           
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -3002,7 +3012,7 @@ C
               uzbd_et%c = ( PETRATE(ic, ir)- etact/DELT )*CELLAREA
               uzbd_et%hh = H
               IF ( uzbd_et%c.LT.0.0d0 ) uzbd_et%c = 0.0d0
-              etgw = SIMUZET(uzbd_et,ETOPT)           
+              etgw = SIMUZET(uzbd_et,ETOPT,SMOOTHET)           
               UZFETOUT(ic, ir) = etact*cellarea
               GWET(ic, ir) = etgw
             END IF
@@ -5395,6 +5405,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%UNITRECH)
       DEALLOCATE (GWFUZFDAT(Igrid)%UNITDIS)
       DEALLOCATE (GWFUZFDAT(Igrid)%ISEEPREJECT)
+      DEALLOCATE (GWFUZFDAT(Igrid)%SMOOTHET)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5491,6 +5502,7 @@ C     ------------------------------------------------------------------
       UNITRECH=>GWFUZFDAT(Igrid)%UNITRECH
       UNITDIS=>GWFUZFDAT(Igrid)%UNITDIS
       ISEEPREJECT=>GWFUZFDAT(Igrid)%ISEEPREJECT
+      SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -5587,5 +5599,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%UNITRECH=>UNITRECH
       GWFUZFDAT(Igrid)%UNITDIS=>UNITDIS
       GWFUZFDAT(Igrid)%ISEEPREJECT=>ISEEPREJECT
+      GWFUZFDAT(Igrid)%SMOOTHET=>SMOOTHET
 C
       END SUBROUTINE SGWF2UZF1PSV

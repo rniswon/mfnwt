@@ -39,6 +39,7 @@
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: FNETEXFIL1
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: FNETEXFIL2, CUMGWET
         REAL,   SAVE,  POINTER :: TIMEPRINT
+        DOUBLE PRECISION, SAVE, POINTER :: SMOOTHET
         DOUBLE PRECISION, SAVE, DIMENSION(:),  POINTER :: CUMUZVOL 
         DOUBLE PRECISION, SAVE, DIMENSION(:),  POINTER :: UZTSRAT
         DOUBLE PRECISION, SAVE, DIMENSION(:,:),POINTER :: UZFLWT, UZSTOR
@@ -88,6 +89,7 @@
         REAL,          DIMENSION(:,:),  POINTER :: FNETEXFIL1
         REAL,          DIMENSION(:,:),  POINTER :: FNETEXFIL2, CUMGWET
         REAL,                           POINTER :: TIMEPRINT
+        DOUBLE PRECISION,       POINTER :: SMOOTHET
         DOUBLE PRECISION,       DIMENSION(:),  POINTER :: CUMUZVOL
         DOUBLE PRECISION,       DIMENSION(:),  POINTER :: UZTSRAT
         DOUBLE PRECISION,       DIMENSION(:,:),POINTER :: UZFLWT, UZSTOR
@@ -153,8 +155,9 @@
         end type NLIN_ET
         public NLIN_ET
         CONTAINS
-          FUNCTION ETFUNC_NLIN(fnlin)
+          FUNCTION ETFUNC_NLIN(fnlin,SMOOTHET)
           type (NLIN_ET), intent(inout) :: fnlin
+          DOUBLE PRECISION, INTENT(IN) :: SMOOTHET
           EXTERNAL smoothuz
           DOUBLE PRECISION smoothuz, smint
           double precision etgw, ETFUNC_NLIN, depth, smoothick,
@@ -163,14 +166,14 @@
           if ( depth.lt.0.0 ) depth = 0.0
           etgw = fnlin%c
           detdh = 0.0d0
-          smint = 1.0e-2*fnlin%x
+          smint = SMOOTHET*fnlin%x
           if ( depth>0.0d0) then
             etgw = etgw*smoothuz(depth,detdh,smint)
           else
             etgw = 0.0d0
           end if
           fnlin%trhs = etgw
-          fnlin%dET = detdh*etgw
+          fnlin%dET = detdh
           ETFUNC_NLIN = etgw
         END FUNCTION ETFUNC_NLIN
       END MODULE ETNLIN_MODULE
