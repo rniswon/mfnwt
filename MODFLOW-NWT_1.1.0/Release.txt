@@ -219,7 +219,7 @@ Fixed output file control for parallel writing of output to files.
 Well (WEL) package
 
 Initialization of a variable was added as it was not previously getting initialized 
-correctly.
+correctly. Fixed minor error in smoothing function derivative.
 
 Unsaturated-Zone Flow (UZF) package
 
