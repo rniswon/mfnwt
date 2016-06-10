@@ -146,10 +146,36 @@ New Options were added to UZF1 to allow the hydraulic conducitvity used to
 calculate rejected infiltration and surface leakage to be different than
 the vertical hydraulic conductivity of the unsaturated zone (VKS). 
 
-Optional Key words for UZF1 in order of specification are:
+A new function was added for simulateing groundwater ET. This function simulates
+a constant ET rate over the extenction depth rather than linearly reducing 
+ET as groundwater head decreases. The ET is smoothly reduced to zero using the 
+same polynomial function used to reduce pumping in drying cells (Niswonger 
+and others, 2011). ET is smoothly reduced as groundwater head drops to the  
+extinction depth. The smoothing interval is specified as a factor of the extinction  
+depth.
 
-DATA SET 1A:
-[SPECIFYTHTR] [SPECIFYTHTI] [NOSURFLEAK] [SPECIFYSURFK] [REJECTSURFK] [SEEPSURFK]    
+The input format for specifying character variable options has changed. Rather than
+specifying these character variable options in a single line in a particular order, 
+each character variable option is specified on a separate line. If additional input 
+is required along with the character variable option then this value is specified on 
+the same line as the character variable option separated by spaces. Options must
+be proceeded with the "OPTIONS" specification and followed by the "END" specification. 
+Letters can be specified as upper or lower case.
+
+Optional character variables for UZF1 in any order:
+
+OPTIONS CHARACTER VARIABLES BLOCK:
+
+OPTIONS
+[SPECIFYTHTR] 
+[SPECIFYTHTI] 
+[NOSURFLEAK] 
+[SPECIFYSURFK] 
+[REJECTSURFK] 
+[SEEPSURFK] 
+[ETSQUARE smoothfact]
+[NETFLUX unitrech unitdis]  
+END 
 
 Definitions:
 
@@ -164,10 +190,21 @@ SEEPSURFK -- An optional character variable. When SEEPSURFK is specified, SURFK
              instead of VKS is used for calculating surface leakage. SEEPSURFK 
              only is included if SPECIFYSURFK is included.
 
-DATA SET 1b:             
-[NETFLUX Unitrech Unitdis]                                               
+ETSQUARE -- An optional character variable. When ETSQUARE is specified, 
+            groundwater ET is simulated using a constant potential ET
+            rate, and is smoothed over a specified smoothing interval.
 
-Definitions:
+smoothfact --  An optional real variable specified if ETSQAURE is specifed. For 
+               example, if the interval factor (smoothfact) is specified as 
+               smoothfact=0.1, then the smoothing  smoothing inerval will be 
+               calculated as: SMOOTHINT = 0.1*EXTDP and  is applied over the 
+               range for groundwater head (h): 
+
+               h < CELTOP-EXTDP, ET is zero;
+               CELTOP-EXTDP < h < CELTOP-EXTDP+SMOOTHINT, ET is smoothed;
+               CELTOP-EXTDP+SMOOTHINT < h, ET is equal to potential ET.
+               
+
 
 NETFLUX -- An optional character variable. When NETFLUX is specified, the sum 
            of recharge (L3/T) and the sum of discharge (L3/T) is written to separate 
