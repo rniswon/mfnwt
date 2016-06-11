@@ -64,7 +64,7 @@ C--USE FILE SPECIFICATION of MODFLOW-2005
       REAL          R
       INCLUDE       'openspec.inc'
       LOGICAL       LOP,FIRSTVAL
-      CHARACTER*4   CUNIT(NIUNIT)
+      CHARACTER*4   CUNIT(NIUNIT), SETDEFLT
       CHARACTER*200 LINE,FNAME,NME
       CHARACTER*8   OUTPUT_FILE_HEADER
       CHARACTER*11  OUTPUT_FILE_FORMAT,HDRTXT
@@ -77,6 +77,7 @@ C     -----------------------------------------------------------------
      +         ISFRLAKCONNECT,ISNKUZFCONNECT,NPCKGTXT,IUZFFLOWS,
      +         ISFRFLOWS,ILAKFLOWS,NLKFLWTYP,NLAKCON)
       NPCKGTXT=0
+      SETDEFLT='NA'
       ALLOCATE(FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
       ALLOCATE(LKFLOWTYPE(6)) ! POSITION 1: STORAGE; 2: DELVOL; 3: PRECIP; 4: EVAP; 5: RUNOFF; 6: WITHDRAWL
 C
@@ -258,14 +259,15 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,N,R,IOUT,INLMT)
         IF(LINE(ISTART:ISTOP).EQ.' ') THEN
           IF(FIRSTVAL) THEN 
-            WRITE(IOUT,15) 
-            GOTO 400
+            WRITE(IOUT,15)
+            SETDEFLT='ALL'
           ELSE
             CONTINUE
           ENDIF
-        ELSEIF(LINE(ISTART:ISTOP).EQ.'ALL') THEN ! ALL = "all available"
+        ENDIF
+        IF(LINE(ISTART:ISTOP).EQ.'ALL'.OR.SETDEFLT.EQ.'ALL') THEN ! ALL = "all available"
           !Activate connections in SFR, LAK, and UZF, provided they are active
-400       IF(MTUZF.NE.0.AND.IUZFOPT.NE.0) THEN
+          IF(MTUZF.NE.0.AND.IUZFOPT.NE.0) THEN
             IUZFFLOWS=1
           ENDIF
           IF(MTSFR.NE.0) THEN
