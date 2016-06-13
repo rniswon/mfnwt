@@ -155,7 +155,7 @@ extinction depth. The smoothing interval is specified as a factor of the extinct
 depth.
 
 The input format for specifying character variable options has changed. Rather than
-specifying these character variable options in a single line in a particular order, 
+specifying character variable options in a single line in a particular order, 
 each character variable option is specified on a separate line. If additional input 
 is required along with the character variable option then this value is specified on 
 the same line as the character variable option separated by spaces. Options must
@@ -192,11 +192,12 @@ SEEPSURFK -- An optional character variable. When SEEPSURFK is specified, SURFK
 
 ETSQUARE -- An optional character variable. When ETSQUARE is specified, 
             groundwater ET is simulated using a constant potential ET
-            rate, and is smoothed over a specified smoothing interval.
+            rate, and is smoothed over a specified smoothing interval. This
+            option is recommended only when using the NWT solver.
 
 smoothfact --  An optional real variable specified if ETSQAURE is specifed. For 
                example, if the interval factor (smoothfact) is specified as 
-               smoothfact=0.1, then the smoothing  smoothing inerval will be 
+               smoothfact=0.1 (recommended), then the smoothing inerval will be
                calculated as: SMOOTHINT = 0.1*EXTDP and  is applied over the 
                range for groundwater head (h): 
 
@@ -204,8 +205,6 @@ smoothfact --  An optional real variable specified if ETSQAURE is specifed. For
                CELTOP-EXTDP < h < CELTOP-EXTDP+SMOOTHINT, ET is smoothed;
                CELTOP-EXTDP+SMOOTHINT < h, ET is equal to potential ET.
                
-
-
 NETFLUX -- An optional character variable. When NETFLUX is specified, the sum 
            of recharge (L3/T) and the sum of discharge (L3/T) is written to separate 
            unformatted files using module UBDSV3. Unitrech and Unitdis are the unit   

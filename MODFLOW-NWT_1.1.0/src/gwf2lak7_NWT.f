@@ -2636,13 +2636,17 @@ C-lfk
 C
               DELVOLLAK(NN)=DELVOL(NN)/DELT
 C-EDM
-              IF(IUNIT(49).NE.0.AND.LKFLOWTYPE(1).EQ.'NA') THEN
-                LKFLOWTYPE(1)='VOLUME'
-                NLKFLWTYP = NLKFLWTYP + 1
+              IF(IUNIT(49).NE.0 ) THEN
+                IF ( LKFLOWTYPE(1).EQ.'NA' ) THEN
+                  LKFLOWTYPE(1)='VOLUME'
+                  NLKFLWTYP = NLKFLWTYP + 1
+                END IF
               ENDIF
-              IF(IUNIT(49).NE.0.AND.LKFLOWTYPE(2).EQ.'NA') THEN
-                LKFLOWTYPE(2)='DELVOL'
-                NLKFLWTYP = NLKFLWTYP + 1
+              IF(IUNIT(49).NE.0 ) THEN
+                IF ( LKFLOWTYPE(2).EQ.'NA' ) THEN
+                  LKFLOWTYPE(2)='DELVOL'
+                  NLKFLWTYP = NLKFLWTYP + 1
+                END IF
               ENDIF
 C
               IF(LWRT.GT.0.OR.ICBCFL.LE.0) GO TO 1100

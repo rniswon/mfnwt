@@ -2184,7 +2184,7 @@ C     -----------------------------------------------------------------
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
-      DATA textrej/'       HORT+DUNN'/
+      DATA textrej/'        HORT+DUNN'/
       DATA uzinftxt/'    INFILTRATION'/
       DATA uzsttext/'  STORAGE CHANGE'/
       DATA uzettext/'          UZF ET'/
@@ -2258,6 +2258,15 @@ CDEP 05/05/2006
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
+! EDM
+        IF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
+          EXCESPP(ic, ir) =  (FINF(ic, ir) - 
+     +                 VKS(ic, ir))*DELC(ir)*DELR(ic)
+          FINF(ic, ir) = VKS(ic, ir)
+        ELSE
+          EXCESPP(ic, ir) = 0.0
+        ENDIF
+! EDM
         finfhold = FINF(ic, ir)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
 C set excess precipitation to zero for integrated (GSFLOW) simulation
@@ -3191,9 +3200,9 @@ C
 C-----SAVE NET DISCHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.                
           IF ( ibd.GT.0 ) THEN
             CALL UBDSV3(Kkstp, Kkper, txthold,  
-     +                               UNITDIS, BUFF, LAYNUM, 1,
-     +                               NCOL, NROW, NLAY, IOUT, DELT,  
-     +                               PERTIM, TOTIM, IBOUND)
+     +                  UNITDIS, BUFF, LAYNUM, 1,
+     +                  NCOL, NROW, NLAY, IOUT, DELT,  
+     +                  PERTIM, TOTIM, IBOUND)
             DO ir = 1, NROW
               DO ic = 1, NCOL
                 FNETEXFIL1(ic, ir) = 0.0
@@ -3312,35 +3321,79 @@ C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
      +                                   PERTIM, TOTIM, IBOUND)
         END IF
       END IF
-C
+
+C--not sure if this is used for MODSIM-MODFLOW. Uncomment if yes.
 C35-----UPDATE RATES AND BUFFERS FOR SFR-DIVERTED INFILTRATION.
-     !! IF ( Iunitsfr.GT.0 ) THEN
-     !!   IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
-     !!     IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
-     !!       CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
-     !!       DO ir = 1, NROW
-     !!         DO ic = 1, NCOL
-     !!           ill = LAYNUM(ic, ir)
-     !!           IF ( ill.GT.0 ) THEN
-     !!             BUFF(ic, ir, ill)= (UZOLSFLX(ic, ir)-
-     !!+                               RECHSAVE(ic,ir))*DELC(ir)*DELR(ic)
-     !!             IF ( BUFF(ic, ir, ill).LT.0.0 ) 
-     !!+            BUFF(ic, ir, ill) = 0.0
-     !!           END IF
-     !!         END DO
-     !!       END DO
-     !!     END IF
+!      IF ( Iunitsfr.GT.0 ) THEN
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN                                              
+!            CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))                                         
+!            DO ir = 1, NROW                                                                  
+!              DO ic = 1, NCOL                                                                
+!                DO il = 1, NLAY                                                              
+!                  BUFF(ic, ir, il) = 0.0                                                     
+!                END DO                                                                       
+!                ill = LAYNUM(ic, ir)                                                         
+!                IF ( ill.GT.0 ) THEN                                                         
+!                  BUFF(ic, ir, ill)= FINF(ic, ir)*DELC(ir)*DELR(ic)+
+!     +                               EXCESPP(ic,ir)-RECHSAVE(ic,ir)*
+!     +                               DELC(ir)*DELR(ic)
+!                  IF ( BUFF(ic, ir, ill).LT.0.0 ) 
+!     +            BUFF(ic, ir, ill) = 0.0
+!                END IF
+!              END DO
+!            END DO
+!          END IF
 C   
 C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
-     !!     IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf2, IUZFCB1,
-     !!+                                BUFF, NCOL, NROW, NLAY, IOUT)
-     !!     IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf2,  
-     !!+                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
-     !!+                                   NCOL, NROW, NLAY, IOUT, DELT,  
-     !!+                                   PERTIM, TOTIM, IBOUND)
-     !!   END IF
-     !! END IF
+!          IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf2, IUZFCB1,
+!     +                                BUFF, NCOL, NROW, NLAY, IOUT)
+!          IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf2,  
+!     +                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
+!     +                                   NCOL, NROW, NLAY, IOUT, DELT,  
+!     +                                   PERTIM, TOTIM, IBOUND)
+!        END IF
+!      END IF
+C--possible end here for MODSIM-MODFLOW
 C
+C--Uncomment for MODSIM-MODFLOW required output. 
+C35-----UPDATE RATES AND BUFFERS FOR INFILTRATION.
+!      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
+!          DO ir = 1, NROW
+!            DO ic = 1, NCOL
+!             DO il = 1, NLAY
+!               BUFF(ic, ir, il) = 0.0
+!             END DO
+!              IF ( IUZFBND(ic,ir).NE.0 ) THEN
+!                ill = LAYNUM(ic, ir)
+!                IF ( ill.GT.0 ) THEN
+!                  IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!                    BUFF(ic, ir, ill)= RECHSAVE(ic, ir)* !EDM 4/3/15 [print just precip (specified in UZF1 input file) for MS/MF]
+!     +                                 DELC(ir)*DELR(ic)
+!                  END IF
+!                ELSE
+!                  LAYNUM(ic, ir) = NLAY
+!                END IF
+!              ELSE
+!                LAYNUM(ic, ir) = NLAY
+!              END IF
+!            END DO
+!          END DO
+!        END IF
+C   
+C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf, IUZFCB1,
+!     +                                BUFF, NCOL, NROW, NLAY, IOUT)
+!          IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf,  
+!     +                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
+!     +                                   NCOL, NROW, NLAY, IOUT, DELT,  
+!     +                                   PERTIM, TOTIM, IBOUND)
+!        END IF
+!      END IF
+C--Uncomment to here for MODSIM-MODFLOW
 C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
         CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
@@ -3370,7 +3423,7 @@ C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
         END DO
       END IF
 C
-C39-----SAVE RECHARGE RATES TO UNFORMATTED FILE.
+C39-----SAVE ACTUAL INFILTRATION RATES TO UNFORMATTED FILE.
       IF ( IETBUD.EQ.0 ) THEN
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textrch, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)
