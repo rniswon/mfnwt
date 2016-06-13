@@ -8397,6 +8397,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%ISFRLIST)
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
+      DEALLOCATE (GWFSFRDAT(IGRID)%factor)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8508,6 +8509,7 @@ C     ------------------------------------------------------------------
       ISFRLIST=>GWFSFRDAT(IGRID)%ISFRLIST
       FNETSEEP=>GWFSFRDAT(IGRID)%FNETSEEP
       NSEGDIM=>GWFSFRDAT(IGRID)%NSEGDIM
+      factor=>GWFSFRDAT(IGRID)%factor
 C
       END SUBROUTINE SGWF2SFR7PNT
 C
@@ -8619,5 +8621,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%ISFRLIST=>ISFRLIST
       GWFSFRDAT(IGRID)%FNETSEEP=>FNETSEEP
       GWFSFRDAT(IGRID)%NSEGDIM=>NSEGDIM
+      GWFSFRDAT(IGRID)%factor=>factor
 C
       END SUBROUTINE SGWF2SFR7PSV
