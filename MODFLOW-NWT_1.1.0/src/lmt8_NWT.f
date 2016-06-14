@@ -390,6 +390,8 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
               FIRSTVAL=.FALSE.
           END SELECT
           GOTO 20
+        ELSEIF(LINE(ISTART:ISTOP).EQ.' ') THEN
+          CONTINUE
         ELSE
           WRITE(IOUT,16) LINE(ISTART:ISTOP)
           CALL USTOP(' ')
