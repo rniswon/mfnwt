@@ -312,9 +312,9 @@ Cdep  changed DSTROT to FXLKOT
       ALLOCATE (HSTRM(nstrmar,NUMTIM), HWDTH(nstrmar,NUMTIM))
       ALLOCATE (QSTRM(nstrmar,NUMTIM))
       ALLOCATE (HWTPRM(nstrmar,NUMTIM))
-!      ALLOCATE (DVRCH(nstrmar),DVEFF(nstrmar))        !cjm
-!      ALLOCATE (DVRCELL(NCOL*NROW,2,nss))  !cjm
-!      ALLOCATE (DVRPERC(NCOL,NROW))   !cjm
+      ALLOCATE (DVRCH(nstrmar),DVEFF(nstrmar))        !cjm
+      ALLOCATE (DVRCELL(NCOL*NROW,2,nss))  !cjm
+      ALLOCATE (DVRPERC(NCOL,NROW))   !cjm
       ALLOCATE (RECHSAVE(NCOL,NROW))
       ALLOCATE (FNETSEEP(NCOL,NROW)) !rgn printing net recharge in UZF
       STRM = 0.0  
@@ -323,11 +323,11 @@ Cdep  changed DSTROT to FXLKOT
       HWDTH = 0.0
       HWTPRM = 0.0
       ISTRM = 0
-!      DVRCH = 0       !cjm
-!      DVEFF = 0.0     !cjm
-!      DVRCELL = 0     !cjm
+      DVRCH = 0       !cjm
+      DVEFF = 0.0     !cjm
+      DVRCELL = 0     !cjm
        RECHSAVE = 0.0
-!      DVRPERC = 0.0   !cjm
+      DVRPERC = 0.0   !cjm
       FNETSEEP = 0.0  !rgn
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
@@ -1919,13 +1919,13 @@ C     ADD STREAM TERMS TO RHS AND HCOF IF FLOW OCCURS IN MODEL CELL
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
 !rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
 C     *****************************************************************
-!      USE GWFRCHMODULE,ONLY:RECH  !cjm
-!!      USE GWFUZFMODULE,ONLY:FINF  !cjm
+      USE GWFRCHMODULE,ONLY:RECH  !cjm
+      USE GWFUZFMODULE,ONLY:FINF  !cjm
       USE GWFSFRMODULE
+!      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
+!     +                        RHS, BOTM, LBOTM
       USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
-     +                        RHS, BOTM, LBOTM
-!!      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
-!!     +                        RHS, BOTM, LBOTM, DELR, DELC
+     +                        RHS, BOTM, LBOTM, DELR, DELC
       USE GWFBASMODULE, ONLY: DELT, TOTIM, HDRY
       USE GWFNWTMODULE, ONLY: Heps
 !!      USE GWFNWTMODULE, ONLY: Heps, A, IA, Icell
@@ -1972,15 +1972,15 @@ C     -----------------------------------------------------------------
 !      DOUBLE PRECISION rhsh1, rhsh2, hcofh1, hcofh2
       REAL areamax, avhc, errold, fks, ha, qcnst, seep, 
      +     stgon, strlen, roughch, roughbnk, widthch, deltinc, qlat, 
-     +     fltest, Transient_bd
-!!     +     fltest, Transient_bd, dvt, dum, totdum  !CJM
+!     +     fltest, Transient_bd
+     +     fltest, Transient_bd, dvt, dum, totdum  !CJM
 !      real fin, fout
       INTEGER i, ibflg, ic, icalc, idivseg, iflg, iic, iic2, iic3, iic4,
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, !  ii, 
      +        idr, lfold, ij, illake, lakid
-!!      INTEGER irr, icc, icount  !cjm
+      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
 C     -----------------------------------------------------------------
@@ -2181,28 +2181,28 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
               END IF
             END IF
 C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
-!            IF ( istsg.GT.1 ) THEN
-!              IF (Iunitrch.GT.0 .OR. Iunituzf.GT.0) THEN
-!                iprvsg = ISTRM(4, ll)
-!                IF ( DVRCH(iprvsg) .GT. 0) THEN
+            IF ( istsg.GT.1 ) THEN
+              IF (Iunitrch.GT.0 .OR. Iunituzf.GT.0) THEN
+                iprvsg = ISTRM(4, ll)
+                IF ( DVRCH(iprvsg) .GT. 0) THEN
 !                  IDVFLG = 1
-!                  DO icount = 1, DVRCH(iprvsg)
-!                    irr = DVRCELL(icount, 1, iprvsg)
-!                    icc = DVRCELL(icount, 2, iprvsg)
-!                    IF ( Iunituzf.GT.0 ) THEN
-!                      dvt = SGOTFLW(iprvsg)*DVRPERC(icc,irr)
-!                      dvt = dvt/(DELR(IC)*DELC(IR))
-!                      FINF(icc, irr) = RECHSAVE(icc, irr) + 
-!     +                              dvt*(1.0-DVEFF(iprvsg))
-!                    ELSE
-!                      dvt = (SGOTFLW(iprvsg) / float(DVRCH(iprvsg)))
-!                      RECH(icc, irr) = RECHSAVE(icc, irr) + 
-!     +                              dvt*(1.0-DVEFF(iprvsg))
-!                    END IF
-!                  END DO
-!                END IF
-!              END IF
-!            END IF
+                  DO icount = 1, DVRCH(iprvsg)
+                    irr = DVRCELL(icount, 1, iprvsg)
+                    icc = DVRCELL(icount, 2, iprvsg)
+                    IF ( Iunituzf.GT.0 ) THEN
+                      dvt = SGOTFLW(iprvsg)*DVRPERC(icc,irr)
+                      dvt = dvt/(DELR(IC)*DELC(IR))
+                      FINF(icc, irr) = RECHSAVE(icc, irr) + 
+     +                              dvt*(1.0-DVEFF(iprvsg))
+                    ELSE
+                      dvt = (SGOTFLW(iprvsg) / float(DVRCH(iprvsg)))
+                      RECH(icc, irr) = RECHSAVE(icc, irr) + 
+     +                              dvt*(1.0-DVEFF(iprvsg))
+                    END IF
+                  END DO
+                END IF
+              END IF
+            END IF
 C
 C21-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
             IF ( istsg.GE.1 .AND. ISEG(3, istsg).EQ.7 ) THEN
@@ -3464,15 +3464,15 @@ C     *****************************************************************
       USE GWFSFRMODULE
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
 !!      USE GWFLAKMODULE, ONLY: VOL, LKARR1, STGNEW, STGOLD
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
+!     +                        HNEW, BUFF, BOTM, LBOTM, IUNIT
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
-     +                        HNEW, BUFF, BOTM, LBOTM, IUNIT
-!!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND,
-!!     +                        HNEW, BUFF, BOTM, LBOTM, DELR, DELC
+     +                        HNEW, BUFF, BOTM, LBOTM, DELR, DELC, IUNIT
 !IFACE
       USE GWFBASMODULE, ONLY: MSUM, ICBCFL, IBUDFL, DELT, PERTIM, TOTIM,
      +                        VBVL, VBNM, HDRY, IAUXSV
-!      USE GWFRCHMODULE,ONLY:RECH  !cjm
-!!      USE GWFUZFMODULE,ONLY:FINF  !cjm
+      USE GWFRCHMODULE,ONLY:RECH  !cjm
+      USE GWFUZFMODULE,ONLY:FINF  !cjm
       IMPLICIT NONE
       INTRINSIC FLOAT, ABS, IABS, DSQRT, DLOG10, SQRT, SNGL
 C     ------------------------------------------------------------------
@@ -3495,7 +3495,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       REAL areamax, avhc, fks, ha, rin, rout, strlen,
      +     zero, sfrbudg_in, sfrbudg_out, qlat, deltinc, qcnst, rtime,
-     +     fltest, Transient_bd, Transient_bd_tot !!, dvt  !cjm (added dvt)
+     +     fltest, Transient_bd, Transient_bd_tot, dvt  !cjm (added dvt)
 !IFACE
       REAL xface(1)
       INTEGER naux
@@ -3504,7 +3504,7 @@ C     ------------------------------------------------------------------
      +        iwidthcheck, kss, l, lk, ll, nreach, numdelt, maxwav,
      +        icalccheck, iss, lsub, irt, itstr, imassroute, lfold
       INTEGER illake, LAKID
-!!      INTEGER irr, icc, icount  !cjm
+      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION h, hstr, sbot, cstr, ratin, ratout, flowin,
      +                 flobot, flow, flowot, sbdthk, upflw, trbflw,
      +                 width, wetperm, runof, runoff, precip, etstr,
@@ -3727,27 +3727,27 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
             END IF
 C
 C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm
-!           IF ( istsg.GT.1 ) THEN
-!             IF (Iunitrch .GT. 0) THEN
-!               iprvsg = ISTRM(4, ll)
-!               IF ( DVRCH(iprvsg) .GT. 0) THEN
-!                 DO icount = 1, DVRCH(iprvsg)
-!                   irr = DVRCELL(icount, 1, iprvsg)
-!                   icc = DVRCELL(icount, 2, iprvsg)
-!                   IF ( Iunituzf.GT.0 ) THEN
-!                     dvt = SGOTFLW(iprvsg)*DVRPERC(icc,irr)
-!                     dvt = dvt/(DELR(IC)*DELC(IR))
-!                     FINF(icc, irr) = RECHSAVE(icc, irr) + 
-!     +                              dvt*(1.0-DVEFF(iprvsg))
-!                   ELSE
-!                     dvt = (SGOTFLW(iprvsg) / float(DVRCH(iprvsg)))
-!                     RECH(icc, irr) = RECHSAVE(icc, irr) + 
-!     +                              dvt*(1.0-DVEFF(iprvsg))
-!                   END IF
-!                 END DO
-!               END IF
-!             END IF
-!           END IF
+           IF ( istsg.GT.1 ) THEN
+             IF (Iunitrch .GT. 0) THEN
+               iprvsg = ISTRM(4, ll)
+               IF ( DVRCH(iprvsg) .GT. 0) THEN
+                 DO icount = 1, DVRCH(iprvsg)
+                   irr = DVRCELL(icount, 1, iprvsg)
+                   icc = DVRCELL(icount, 2, iprvsg)
+                   IF ( Iunituzf.GT.0 ) THEN
+                     dvt = SGOTFLW(iprvsg)*DVRPERC(icc,irr)
+                     dvt = dvt/(DELR(IC)*DELC(IR))
+                     FINF(icc, irr) = RECHSAVE(icc, irr) + 
+     +                              dvt*(1.0-DVEFF(iprvsg))
+                   ELSE
+                     dvt = (SGOTFLW(iprvsg) / float(DVRCH(iprvsg)))
+                     RECH(icc, irr) = RECHSAVE(icc, irr) + 
+     +                              dvt*(1.0-DVEFF(iprvsg))
+                   END IF
+                 END DO
+               END IF
+             END IF
+           END IF
 C           
 C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
             IF ( istsg.GE.1 .AND. ISEG(3, istsg).EQ.7 ) THEN
@@ -5209,14 +5209,14 @@ C     ******************************************************************
 C     READ STREAM SEGMENT DATA -- parameters or non parameters
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 C     ******************************************************************
+!      USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
+!     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
       USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
-     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
-!!      USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
-!!     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
-!!     +                        DVRCH, DVRCELL, RECHSAVE, DVEFF, DVRPERC  !cjm (added DVRCH, DVRCELL and RECHSAVE)
+     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
+     +                        DVRCH, DVRCELL, RECHSAVE, DVEFF, DVRPERC  !cjm (added DVRCH, DVRCELL and RECHSAVE)
       USE GLOBAL,       ONLY: IOUT
-!      USE GWFUZFMODULE, ONLY: FINF
-!      USE GWFRCHMODULE,ONLY: RECH  !cjm
+      USE GWFUZFMODULE, ONLY: FINF
+      USE GWFRCHMODULE,ONLY: RECH  !cjm
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -5230,8 +5230,8 @@ C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER icalc, idum, ii, iqseg, isol, iupseg, jj, jk, lstend, n, 
-     +        noutseg, nseg, nstrpts !!, numcell, i  !cjm (added numcell and i)
-!!      REAL dum, totdum
+     +        noutseg, nseg, nstrpts, numcell, i  !cjm (added numcell and i)
+      REAL dum, totdum
 C     ------------------------------------------------------------------
 C
 C1------READ STREAM SEGMENT DATA.
@@ -5260,9 +5260,9 @@ C
 C2a-----DETERMINE IF SEGMENT OUTFLOW WILL BE DIVERTED TO RECHARGE MF CELLS  !cjm
         IF ( N.LT.0 ) THEN
           N = ABS(N)
-   !       DVRCH(N) = 1
-	  !ELSE              !cjm 20090708
-	  !  DVRCH(N) = 0       !cjm 20090708
+          DVRCH(N) = 1
+	  ELSE              !cjm 20090708
+	    DVRCH(N) = 0       !cjm 20090708
         END IF
 C
 C3------DETERMINE WHERE DATA ARE STORED.
@@ -5506,22 +5506,22 @@ C10-----READ DATA SET 4G FOR SEGMENT IF SOLUTES SPECIFIED.
         END IF
 C
 C10b----READ CELL INDECES THAT RECEIVE RECHARGE: i,1 = ROW, i,2 = COL  !cjm
-!        IF ( DVRCH(N).GT.0 ) THEN
-!! Set old values to zero
-!          READ(In, *)DVRCH(N),DVEFF(N)
-!          totdum = 0.0
-!          DO i = 1, DVRCH(N)
-!            READ(In, *) DVRCELL(i,1,N),DVRCELL(i,2,N),dum
-!            DVRPERC(DVRCELL(i,2,N),DVRCELL(i,1,N)) = dum
-!            totdum = totdum + dum
-!          END DO
-!          IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
-!        END IF
+        IF ( DVRCH(N).GT.0 ) THEN
+! Set old values to zero
+          READ(In, *)DVRCH(N),DVEFF(N)
+          totdum = 0.0
+          DO i = 1, DVRCH(N)
+            READ(In, *) DVRCELL(i,1,N),DVRCELL(i,2,N),dum
+            DVRPERC(DVRCELL(i,2,N),DVRCELL(i,1,N)) = dum
+            totdum = totdum + dum
+          END DO
+          IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
+        END IF
 !C
       END DO
-! 9006 FORMAT(' ***Warning in SFR2*** ',/
-!     1       'Fraction of diversion for each cell in group sums '/,
-!     1       'to a value greater than one. Sum = ',E10.5)
+ 9006 FORMAT(' ***Warning in SFR2*** ',/
+     1       'Fraction of diversion for each cell in group sums '/,
+     1       'to a value greater than one. Sum = ',E10.5)
 C
 C11-----RETURN.
       RETURN
@@ -8340,12 +8340,12 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%CONST)
       DEALLOCATE (GWFSFRDAT(IGRID)%DLEAK)
       DEALLOCATE (GWFSFRDAT(IGRID)%IOTSG)
-      !DEALLOCATE (GWFSFRDAT(IGRID)%DVRCH)     !cjm
-      !DEALLOCATE (GWFSFRDAT(IGRID)%DVEFF)     !cjm
-      !DEALLOCATE (GWFSFRDAT(IGRID)%DVRCELL)   !cjm
+      DEALLOCATE (GWFSFRDAT(IGRID)%DVRCH)     !cjm
+      DEALLOCATE (GWFSFRDAT(IGRID)%DVEFF)     !cjm
+      DEALLOCATE (GWFSFRDAT(IGRID)%DVRCELL)   !cjm
        DEALLOCATE (GWFSFRDAT(IGRID)%RECHSAVE)  !cjm
-      !DEALLOCATE (GWFSFRDAT(IGRID)%DVRPERC)  !cjm
-      !DEALLOCATE (GWFSFRDAT(IGRID)%IDVFLG)  !cjm
+      DEALLOCATE (GWFSFRDAT(IGRID)%DVRPERC)  !cjm
+      DEALLOCATE (GWFSFRDAT(IGRID)%IDVFLG)  !cjm
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGCK)
       DEALLOCATE (GWFSFRDAT(IGRID)%ITRLSTH)
       DEALLOCATE (GWFSFRDAT(IGRID)%ISEG)
@@ -8452,12 +8452,12 @@ C     ------------------------------------------------------------------
       FLWTOL=>GWFSFRDAT(IGRID)%FLWTOL
       IRTFLG=>GWFSFRDAT(IGRID)%IRTFLG
       IOTSG=>GWFSFRDAT(IGRID)%IOTSG
-      !IDVFLG=>GWFSFRDAT(IGRID)%IDVFLG        !cjm
-      !DVRCH=>GWFSFRDAT(IGRID)%DVRCH        !cjm
-      !DVEFF=>GWFSFRDAT(IGRID)%DVEFF        !cjm
-      !DVRCELL=>GWFSFRDAT(IGRID)%DVRCELL    !cjm
+      IDVFLG=>GWFSFRDAT(IGRID)%IDVFLG        !cjm
+      DVRCH=>GWFSFRDAT(IGRID)%DVRCH        !cjm
+      DVEFF=>GWFSFRDAT(IGRID)%DVEFF        !cjm
+      DVRCELL=>GWFSFRDAT(IGRID)%DVRCELL    !cjm
        RECHSAVE=>GWFSFRDAT(IGRID)%RECHSAVE  !cjm
-      !DVRPERC=>GWFSFRDAT(IGRID)%DVRPERC  !cjm
+      DVRPERC=>GWFSFRDAT(IGRID)%DVRPERC  !cjm
       NSEGCK=>GWFSFRDAT(IGRID)%NSEGCK
       ITRLSTH=>GWFSFRDAT(IGRID)%ITRLSTH
       ISEG=>GWFSFRDAT(IGRID)%ISEG
@@ -8564,11 +8564,11 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%FLWTOL=>FLWTOL
       GWFSFRDAT(IGRID)%IRTFLG=>IRTFLG
       GWFSFRDAT(IGRID)%IOTSG=>IOTSG
-      !GWFSFRDAT(IGRID)%IDVFLG=>IDVFLG        !cjm
-      !GWFSFRDAT(IGRID)%DVRCH=>DVRCH        !cjm
-      !GWFSFRDAT(IGRID)%DVEFF=>DVEFF        !cjm
-      !GWFSFRDAT(IGRID)%DVRCELL=>DVRCELL    !cjm
-      !GWFSFRDAT(IGRID)%DVRPERC=>DVRPERC  !cjm
+      GWFSFRDAT(IGRID)%IDVFLG=>IDVFLG        !cjm
+      GWFSFRDAT(IGRID)%DVRCH=>DVRCH        !cjm
+      GWFSFRDAT(IGRID)%DVEFF=>DVEFF        !cjm
+      GWFSFRDAT(IGRID)%DVRCELL=>DVRCELL    !cjm
+      GWFSFRDAT(IGRID)%DVRPERC=>DVRPERC  !cjm
       GWFSFRDAT(IGRID)%RECHSAVE=>RECHSAVE  !cjm
       GWFSFRDAT(IGRID)%NSEGCK=>NSEGCK
       GWFSFRDAT(IGRID)%ITRLSTH=>ITRLSTH
