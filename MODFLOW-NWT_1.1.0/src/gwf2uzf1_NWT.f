@@ -148,11 +148,11 @@ C     ------------------------------------------------------------------
       DATA aname(1)/' AREAL EXTENT OF UZ FLOW'/
       DATA aname(2)/' ROUTING OVERLAND RUNOFF'/
       DATA aname(3)/' SATURATED WATER CONTENT'/
-      DATA aname(4)/'   INITIAL WATER CONTENT'/
+      DATA aname(4)/'  RESIDUAL WATER CONTENT'/
       DATA aname(5)/'    BROOKS-COREY EPSILON'/
       DATA aname(6)/'    SATURATED VERTICAL K'/
       DATA aname(7)/'    UZ CELL BOTTOM ELEV.'/
-      DATA aname(8)/'  RESIDUAL WATER CONTENT'/
+      DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
       Version_uzf =
@@ -674,7 +674,7 @@ C       IS CONSTANT THROUGHOUT VERTICAL COLUMN.
         CALL U2DREL(THTS, aname(3), NUZRW, NUZCL, 0, In, IOUT)
 C
         IF ( ITHTRFLG.GT.0 )THEN
-          CALL U2DREL(THTR, aname(8), NUZRW, NUZCL, 0, In, IOUT)
+          CALL U2DREL(THTR, aname(4), NUZRW, NUZCL, 0, In, IOUT)
         END IF
 C
 C15-----READ AIR ENTRY PRESSURE FOR UNSATURATED ZONE ASSUMING IT
@@ -690,7 +690,7 @@ C16-----READ INITIAL WATER CONTENT FOR UNSATURATED ZONE ASSUMING IT
 C         IS CONSTANT THROUGHOUT VERTICAL COLUMN. DO NOT READ
 C         INITIAL WATER CONTENT IF PERIOD IS STEADY STATE.
         IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 )  
-     +       CALL U2DREL(THTI, aname(4), NUZRW, NUZCL, 0, In, IOUT)
+     +       CALL U2DREL(THTI, aname(8), NUZRW, NUZCL, 0, In, IOUT)
 C
 C17-----CHECK FOR ERRORS IN EPS, THTS, AND THTI ARRAYS.
         DO nrck = 1, NUZRW
