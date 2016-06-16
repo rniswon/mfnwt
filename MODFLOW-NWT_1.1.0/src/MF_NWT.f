@@ -198,9 +198,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
         IF(IUNIT(20).GT.0) CALL GWF2CHD7RP(IUNIT(20),IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2SFR7RP(IUNIT(44),IUNIT(15),
      1                                     IUNIT(22),KKPER,KKSTP,
-     2                                     NSOL,IOUTS,IUNIT(1),
-     3                                     IUNIT(23),IUNIT(37),
-     4                                     IUNIT(62), IUNIT(55), IGRID)
+     2                                     NSOL,IOUTS,IUNIT(55),IGRID)
       IF(IUNIT(43).GT.0 .AND. IUNIT(44).GT.0)
      1                     CALL GWF2HYD7SFR7RP(IUNIT(43),KKPER,IGRID)
         IF(IUNIT(55).GT.0) CALL GWF2UZF1RP(IUNIT(55),KKPER,IUNIT(44),

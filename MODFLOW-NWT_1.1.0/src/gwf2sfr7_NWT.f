@@ -990,7 +990,7 @@ C     ------------------------------------------------------------------
 C
       IF ( Iunitlpf.GT.0 .OR. Iunithuf.GT.0 .OR. Iunitupw.GT.0 ) THEN 
         IF ( ISFROPT.EQ.2.OR.ISFROPT.EQ.4 )
-     +    CALL SGWF2SFR7UHC(Iunitlpf, Iunithuf, Iunitupw)
+     +    CALL SGWF2SFR7UHC(Iunitlpf, Iunitupw)
       END IF
 C
 C23-----SAVE POINTERS FOR GRID AND RETURN.
@@ -999,7 +999,7 @@ C23-----SAVE POINTERS FOR GRID AND RETURN.
       END SUBROUTINE GWF2SFR7AR
 C
 C-------SUBROUTINE SGWF2SFR7UHC
-      SUBROUTINE SGWF2SFR7UHC(Iunitlpf, Iunithuf, Iunitupw)
+      SUBROUTINE SGWF2SFR7UHC(Iunitlpf, Iunitupw)
 C     ******************************************************************
 C     SETS UNSATURATED VERTICAL HYDRAULIC CONDUCTIVITY TO VERTICAL
 C     HYDRAULIC CONDUCTIVITY IN THE LAYER-PROPERTY FLOW PACKAGE.
@@ -1014,7 +1014,7 @@ C     ******************************************************************
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
-      INTEGER Iunitlpf, Iunithuf, Iunitupw
+      INTEGER Iunitlpf, Iunitupw
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
@@ -1067,8 +1067,7 @@ C2------RETURN.
 C
 C-------SUBROUTINE GWF2SFR7RP
       SUBROUTINE GWF2SFR7RP(In, Iunitgwt, Iunitlak, Kkper, Kkstp, Nsol,
-     +                      Iouts, Iunitbcf, Iunitlpf, Iunithuf, 
-     +                      Iunitupw, Iunituzf, Igrid)
+     +                      Iouts, Iunituzf, Igrid)
 C     ******************************************************************
 C     READ STREAM DATA FOR STRESS PERIOD
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
@@ -1102,7 +1101,7 @@ C     ------------------------------------------------------------------
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
      +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
-     +        Ltyp,ierr,IFLG
+     +        ierr,IFLG
 C     ------------------------------------------------------------------
 C
 C-------SET POINTERS FOR CURRENT GRID.
@@ -1979,7 +1978,7 @@ C     -----------------------------------------------------------------
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, !  ii, 
-     +        idr, lfold, ij, illake, lakid
+     +        lfold, illake, lakid
 !!      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -8132,7 +8131,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      INTEGER i, maxiter, iprndpth
+      INTEGER maxiter, iprndpth
       DOUBLE PRECISION aa, wetperm, depth, CALC_XSA
 C     ------------------------------------------------------------------
       iprndpth = 0
@@ -8224,8 +8223,9 @@ C     OF TIME TO CACULATE SPECIFIED INFLOW TO SEGMENTS.
 !!      USE GWFSFRMODULE, ONLY: TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        CLOSEZERO
       USE GWFBASMODULE, ONLY: DELT
-      REAL TIME, FLOW, TIMEBEG
-      INTEGER INUM
+      IMPLICIT NONE
+      REAL TIME, FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
+      INTEGER INUM, IEND, ISTM1, ISTART, iflg, ISEG, NVAL, I
       TOLF2=1.0E-4
       FLOW = 0.0
       NVAL = ISFRLIST(2,INUM)
