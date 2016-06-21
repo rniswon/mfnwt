@@ -2184,7 +2184,7 @@ C     -----------------------------------------------------------------
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
-      DATA textrej/'        HORT+DUNN'/
+      DATA textrej/'       HORT+DUNN'/
       DATA uzinftxt/'    INFILTRATION'/
       DATA uzsttext/'  STORAGE CHANGE'/
       DATA uzettext/'          UZF ET'/
