@@ -329,7 +329,7 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
               IF(.NOT.ISFRLAKCONNECT.EQ.1) THEN
                 IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
                   DO I=1,NSS
-                    IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+                    IF(IOTSG(I).LT.0.OR.IDIVAR(1,I).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
                       ISFRLAKCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
                       EXIT
@@ -349,7 +349,7 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
               IF(.NOT.ISFRLAKCONNECT.EQ.1) THEN
                 IF(ISFRFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1) THEN
                   DO I=1,NSS
-                    IF(IOTSG(I).LT.0.OR.IDIVAR(I,1).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
+                    IF(IOTSG(I).LT.0.OR.IDIVAR(1,I).LT.0) THEN ! check for a stream dumping to a lake, or lake dumping to a stream
                       ISFRLAKCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
                       EXIT
@@ -4630,6 +4630,20 @@ C                    NINFLOW = NINFLOW+1
                 END DO
                 !FLOWIN = FLOWIN + SEG(2,ISTSG)
 C                NINFLOW = NINFLOW + 1
+C--A STREAM SEGMENT THAT RECEIVES TRIBUTARY FLOW MAY ALSO HAVE SPCIFIED INFLOW AS WELL
+                IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN
+                  FLOWIN = SEG(2,ISTSG)      !Set flowin equal to specified inflow
+                  NINFLOW = 1
+                  IDISP = 0
+                  III = -ISTSG
+                  JJJ = -NREACH
+                  XSA = STRM(31,L)
+                  IF(ILMTFMT.EQ.0) THEN
+                    WRITE(IUMT3D) -999,L,IDISP,FLOWIN,XSA
+                  ELSEIF(ILMTFMT.EQ.1) THEN
+                    WRITE(IUMT3D,*) -999,L,IDISP,FLOWIN,XSA
+                  ENDIF       
+                ENDIF
               END IF
             ENDIF
 C
