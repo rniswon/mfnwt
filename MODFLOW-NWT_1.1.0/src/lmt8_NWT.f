@@ -1,7 +1,7 @@
 C
 C ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-C LINK-MT3DMS (LMT) PACKAGE V7 FOR MODFLOW-2005
-C Modified from LMT V6 for MODFLOW-2000 as documented in:
+C LINK-MT3DMS (LMT) PACKAGE V8 FOR MODFLOW-NWT
+C Modified from LMT V7 for MODFLOW-2000 and MF2005 as documented in:
 C     Zheng, C., M.C. Hill, and P.A. Hsieh, 2001,
 C         MODFLOW-2000, the U.S. Geological Survey modular ground-water
 C         model--User guide to the LMT6 Package, the linkage with
@@ -9,9 +9,11 @@ C         MT3DMS for multispecies mass transport modeling:
 C         U.S. Geological Survey Open-File Report 01-82
 C
 C Revision History: 
-C     Version 7.0: 08-08-2008 cz
+C     Version 7.0: 06-23-2016 cz
 C     Version 7.0: 08-15-2009 swm: added LMTMODULE to support LGR
 C     Version 7.0: 02-12-2010 swm: rolled in include file
+C     Version 8.0: 07-05-2016: added support for pending release of 
+C     MT3D-USGS
 C ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 C
 C
@@ -39,14 +41,18 @@ C **********************************************************************
 C OPEN AND READ THE INPUT FILE FOR THE LINK-MT3DMS PACKAGE VERSION 7.
 C CHECK KEY FLOW MODEL INFORMATION AND SAVE IT IN THE HEADER OF
 C THE MODFLOW-MT3DMS LINK FILE FOR USE IN MT3DMS TRANSPORT SIMULATION.
+C WILL NOW WORK WITH MF-NWT AND MT3D-USGS TRANSPORT SIMULATIONS THAT 
+C MAKE USE OF THE SFR2, LAK, AND/OR UZF1 PACKAGES.
 C NOTE THE 'STANDARD' HEADER OPTION IS NO LONGER SUPPORTED. INSTEAD,
 C THE 'EXTENDED' HEADER OPTION IS THE DEFAULT. THE RESULTING LINK FILE 
-C IS ONLY COMPATIBLE WITH MT3DMS VERSION [4.00] OR LATER.
+C IS COMPATIBLE WITH MT3DMS VERSION [4.00] OR LATER OR MT3D-USGS VERSION
+C [1.00] OR LATER.
 !rgn------REVISION NUMBER CHANGED TO INDICATE MODIFICATIONS FOR NWT 
 !rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C **********************************************************************
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
+C last modified: 06-23-2016
 C      
       USE GLOBAL,   ONLY:NCOL,NROW,NLAY,NPER,NODES,NIUNIT,IUNIT,
      &                   ISSFLG,IBOUND,IOUT
@@ -619,7 +625,7 @@ C  TRANSPORT SIMULATIONS.  THE CODE BELOW IS COPIED FROM THE LMT8.inc
 C  FILE.  INSTEAD OF USING THE INCLUDE FILE, THE CODE IS PUT INTO THIS
 C  SUBROUTINE AND CALLED FROM MAIN.
 C **********************************************************************
-C last modified: 02-12-2010
+C last modified: 06-23-2016
 C     
       USE GLOBAL,ONLY:IOUT,IUNIT
       USE LMTMODULE,ONLY:ISSMT3D,IUMT3D,ILMTFMT,ILAKUZFCONNECT,
@@ -706,7 +712,7 @@ C CONSTANT-HEAD CELLS FOR USE BY MT3D.  THIS SUBROUTINE IS CALLED
 C ONLY IF THE 'BCF' PACKAGE IS USED IN MODFLOW.
 C *********************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,ISSFLG,IBOUND,HNEW,HOLD,
      &                      BUFF,CR,CC,CV,BOTM,LBOTM
@@ -1074,7 +1080,7 @@ C OF CONSTANT-HEAD CELLS FOR USE BY MT3D.  THIS SUBROUTINE IS CALLED
 C ONLY IF THE 'LPF' PACKAGE IS USED IN MODFLOW.
 C *********************************************************************
 C Modified from Harbaugh(2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,ISSFLG,IBOUND,HNEW,HOLD,
      &                      BUFF,CR,CC,CV,BOTM,LBOTM
@@ -1440,7 +1446,7 @@ C OF CONSTANT-HEAD CELLS FOR USE BY MT3D.  THIS SUBROUTINE IS CALLED
 C ONLY IF THE 'UPW' PACKAGE IS USED IN MODFLOW.
 C *********************************************************************
 C Modified from Harbaugh(2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,ISSFLG,IBOUND,HNEW,HOLD,
      &                      BUFF,CR,CC,CV,BOTM,LBOTM
@@ -1962,7 +1968,7 @@ C OF CONSTANT-HEAD CELLS FOR USE BY MT3D.  THIS SUBROUTINE IS CALLED
 C ONLY IF THE 'HUF' PACKAGE IS USED IN MODFLOW.
 C **********************************************************************
 C Modified from Anderman and Hill (2000), Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,ISSFLG,IBOUND,HNEW,HOLD,BOTM,
      &                      LBOTM,DELR,DELC,BUFF,IOUT,CR,CC,CV
@@ -2373,7 +2379,7 @@ C *********************************************************************
 C SAVE WELL CELL LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C *********************************************************************
 C Modified from  Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,BOTM,LBOTM,HNEW
       USE GWFWELMODULE,ONLY:NWELLS,WELL,PSIRAMP
@@ -2451,7 +2457,7 @@ C ********************************************************************
 C SAVE DRAIN CELL LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C ********************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF
       USE GWFDRNMODULE,ONLY:NDRAIN,DRAI
@@ -2520,7 +2526,7 @@ C *********************************************************************
 C SAVE RIVER CELL LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C *********************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW
       USE GWFRIVMODULE,ONLY:NRIVER,RIVR
@@ -2596,7 +2602,7 @@ C SAVE RECHARGE LAYER LOCATION AND VOLUMETRIC FLOW RATES
 C FOR USE BY MT3D.
 C *******************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,BUFF
       USE GWFRCHMODULE,ONLY:NRCHOP,RECH,IRCH
@@ -2679,7 +2685,7 @@ C SAVE EVAPOTRANSPIRATION LAYER LOCATION AND VOLUMETRIC FLOW RATES
 C FOR USE BY MT3D.
 C ******************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF      
       USE GWFEVTMODULE,ONLY:NEVTOP,EVTR,EXDP,SURF,IEVT
@@ -2782,7 +2788,7 @@ C SAVE HEAD-DEPENDENT BOUNDARY CELL LOCATIONS AND VOLUMETRIC FLOW
 C RATES FOR USE BY MT3D.
 C *****************************************************************
 C Modified from Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF
       USE GWFGHBMODULE,ONLY:NBOUND,BNDS
@@ -2847,7 +2853,7 @@ C SAVE SPECIFIED-FLOW CELL LOCATIONS AND VOLUMETRIC FLOW RATES
 C FOR USE BY MT3D.
 C **********************************************************************
 C Modified from Leake and Lilly (1997), and Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND     
       USE GWFFHBMODULE,ONLY:NFLW,IFLLOC,BDFV
@@ -2902,7 +2908,7 @@ C SAVE RESERVOIR CELL LOCATIONS AND VOLUMETRIC FLOW RATES
 C FOR USE BY MT3D.
 C **********************************************************************
 C Modified from Fenske et al., (1996), Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY 
       USE GWFRESMODULE, ONLY: NRES,NRESOP,IRES,IRESL,BRES,CRES,
@@ -3026,7 +3032,7 @@ C **********************************************************************
 C SAVE STREAM CELL LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C **********************************************************************
 C Modified from Prudic (1989), Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND      
       USE GWFSTRMODULE,ONLY:NSTREM,STRM,ISTRM
@@ -3081,7 +3087,7 @@ C *********************************************************************
 C SAVE MNW LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C *********************************************************************
 C Modified from MNW by Halford and Hanson (2002)
-C last modification: 08-08-2008
+C last modification: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND
       USE GWFMNW1MODULE,ONLY:NWELL2,WELL2
@@ -3138,7 +3144,7 @@ C *********************************************************************
 C SAVE MNW LOCATIONS AND VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C *********************************************************************
 C Modified from MNW by Halford and Hanson (2002)
-C last modification: 08-08-2008
+C last modification: 06-23-2016
 C Modified from MNW2 by Konikow and Hornberger (2009)
 C modification: 10-21-2010:  swm  
 C last modification: 2-16-2012:  awh
@@ -3211,7 +3217,7 @@ C SAVE SEGMENTED EVAPOTRANSPIRATION LAYER INDICES (IF NLAY>1) AND
 C VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C ********************************************************************
 C Modified from Banta (2000), Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY      
       USE GWFETSMODULE, ONLY: NETSOP,NETSEG,IETS,ETSR,ETSX,ETSS,
@@ -3351,7 +3357,7 @@ C SAVE DRT (Drain with Return Flow) CELL LOCATIONS AND
 C VOLUMETRIC FLOW RATES FOR USE BY MT3D.
 C ******************************************************************
 C Modified from Banta (2000), Harbaugh (2005)
-C last modified: 08-08-2008
+C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,NCOL,NROW,NLAY
       USE GWFDRTMODULE, ONLY: DRTF,NDRTCL,IDRTFL,NRFLOW
