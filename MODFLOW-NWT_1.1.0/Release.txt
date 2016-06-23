@@ -28,8 +28,8 @@ notes for MODFLOW-2005 version 1.11.0 for these changes.
 This release provides support for the new transport model called MT3D-USGS. 
 Changes to MODFLOW-NWT to support MT3D-USGS were made to the source file 
 lmt8_NWT.f. These changes include writing output for the UZF, SFR2, and 
-LAK7 packages that is required for simulating transport in the unsaturated zone,
-streams, and lakes. Refer to the MT3D-USGS documentation report 
+LAK7 packages that is required for simulating transport in the unsaturated 
+zone, streams, and lakes. Refer to the MT3D-USGS documentation report 
 (Bedekar and others, 2016) for details.
 
 Upstream Weigthing (UPW) Package
@@ -117,13 +117,26 @@ Complex:
 
 Streamflow Routing (SFR2) Package
 
-A new option was added to allow specfication of a multipication factor for reducing
-the streambed hydraulic conductivity for losing conditions. 
+The input format for specifying character variable options has changed. Rather than
+specifying character variable options in a single line in a particular order, 
+each character variable option is specified on a separate line. If additional input 
+is required along with the character variable option then this value is specified on 
+the same line as the character variable option separated by one or more spaces. Options 
+must be proceeded with the "OPTIONS" specification and followed by the "END"  
+specification. Characters can be specified as upper or lower case.
 
-New Data Set 1C: 
+Optional character variables for SFR2 in any order:
+
+OPTIONS CHARACTER VARIABLES BLOCK:
+
+OPTIONS
+[REACHINPUT]
+[TRANSROUTE]
+[TABFILES Numtab Maxval]
 [LOSSFACTOR Factor]
+END
 
-Definitions:
+Definitions of new charaction variable option:
 
 LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
               real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
