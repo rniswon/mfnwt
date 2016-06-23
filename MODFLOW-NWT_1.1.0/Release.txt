@@ -18,7 +18,7 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.0 06/15/2016:
+o Version 1.1.0 06/21/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
 means that MODFLOW-2005 source files used in MODFLOW-NWT were updated to
@@ -127,8 +127,6 @@ specification. Characters can be specified as upper or lower case.
 
 Optional character variables for SFR2 in any order:
 
-OPTIONS CHARACTER VARIABLES BLOCK:
-
 OPTIONS
 [REACHINPUT]
 [TRANSROUTE]
@@ -136,15 +134,12 @@ OPTIONS
 [LOSSFACTOR Factor]
 END
 
-Definitions of new charaction variable option:
+Definitions for new charaction variable option:
 
 LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
               real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
               to calculate seepage loss from streams. Calculation of groundwater 
               seepage to streams is unchanged.
-
-Note: The original Data Set 1C is now called Data Set 1D.
-
 
 Some variables in the SFR2 Package were initialized. Some variables were changed
 to arrays for use in MT3D-USGS.
@@ -171,13 +166,11 @@ The input format for specifying character variable options has changed. Rather t
 specifying character variable options in a single line in a particular order, 
 each character variable option is specified on a separate line. If additional input 
 is required along with the character variable option then this value is specified on 
-the same line as the character variable option separated by spaces. Options must
-be proceeded with the "OPTIONS" specification and followed by the "END" specification. 
-Letters can be specified as upper or lower case.
+the same line as the character variable option separated by one or more spaces. 
+Options must be proceeded with the "OPTIONS" specification and followed by the "END"  
+specification. Letters can be specified as upper or lower case.
 
 Optional character variables for UZF1 in any order:
-
-OPTIONS CHARACTER VARIABLES BLOCK:
 
 OPTIONS
 [SPECIFYTHTR] 
@@ -190,13 +183,13 @@ OPTIONS
 [NETFLUX unitrech unitdis]  
 END 
 
-Definitions:
+Definitions of new variables:
 
 SPECIFYSURFK -- An optional character variable. When SPECIFYSURFK is specified, the 
                 variable SURFK is specfied in Data Set 4b.
 
 REJECTSURFK -- An optional character variable. When REJECTSURFK is specified, SURFK 
-               instead of VKS is used for for calculating rejected infiltration. 
+               instead of VKS is used for calculating rejected infiltration. 
                REJECTSURFK only is included if SPECIFYSURFK is included.
               
 SEEPSURFK -- An optional character variable. When SEEPSURFK is specified, SURFK 
@@ -243,10 +236,20 @@ Some variables were changed to arrays in order to save data for MT3D-USGS.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
 beneath lakes.
 
+WELL (WEL) Package
+
+A bug was fixed that sets pumping applied to inactive cells to zero. This bug
+only affects results printed to the cell by cell budget file. A small error was
+fixed in the calculation of the derivative used for smoothing the pumping rate
+to zero for drying cells.
+
 Multi-Node Well (MNW2) Package
 
 A bug was fixed to correct budget calculations when the UPW Package was
-used with MNW2.
+used with MNW2. The model stopped and an error was reported when a well 
+was screened in mulitple cells and one of the cells was inactive. This error
+was changed to be a warning if one of the sceened cells is active and
+execution continues.
 
 Surface Water Routing (SWR) Process
 

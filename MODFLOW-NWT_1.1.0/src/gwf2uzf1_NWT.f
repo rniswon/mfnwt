@@ -113,7 +113,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -647,14 +647,14 @@ C13b-----CHECK FOR ERRORS IN SURFACE K
      +                 'UNSAT. K')
                 iflgbnd = 0
               END IF
-              IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
-                WRITE (IOUT, 9031) nrck, ncck
- 9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
-     +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
-     +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
-     +                 'UNSAT. K')
-                iflgbnd = 0
-              END IF
+ !             IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
+ !               WRITE (IOUT, 9031) nrck, ncck
+ !9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
+ !    +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
+ !    +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
+ !    +                 'UNSAT. K')
+ !               iflgbnd = 0
+ !             END IF
             END IF
             IF ( iflgbnd.EQ.0 ) THEN
                 SURFK(ncck, nrck) = VKS(ncck, nrck)

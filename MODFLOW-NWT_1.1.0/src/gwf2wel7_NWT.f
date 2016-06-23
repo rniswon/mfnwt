@@ -38,8 +38,8 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
-    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE, VERSION 1.0.6, 12/05/2012',
-     1' INPUT READ FROM UNIT ',I4)
+    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.1.0, ',
+     1' 6/21/2016 INPUT READ FROM UNIT ',I4)
       NWELLS=0
       NNPWEL=0
       IUNITRAMP=IOUT
@@ -336,6 +336,7 @@ C     ------------------------------------------------------------------
       CHARACTER*16 TEXT
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE
       double precision Qp,Hh,Ttop,Bbot,dQp
+      real Q
       INTEGER Iunitnwt, iw1
       DATA TEXT /'           WELLS'/
 C     ------------------------------------------------------------------
@@ -379,20 +380,22 @@ C5A-----GET LAYER, ROW & COLUMN OF CELL CONTAINING WELL.
       IC=WELL(3,L)
       IL=WELL(1,L)
       Q=ZERO
+      QQ=ZERO
 C
 C5C-----GET FLOW RATE FROM WELL LIST.
-      Q=WELL(4,L)
-      QSAVE = Q
+      QSAVE=WELL(4,L)
       bbot = Botm(IC, IR, Lbotm(IL))
       ttop = Botm(IC, IR, Lbotm(IL)-1)
       Hh = HNEW(ic,ir,il)
 C
 C5B-----IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
       IF(IBOUND(IC,IR,IL).LE.0)GO TO 99
-      IF ( Q.LT.zero  .AND. Iunitnwt.NE.0) THEN
+      IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
         IF ( LAYTYPUPW(il).GT.0 ) THEN
           Qp = smooth3(Hh,Ttop,Bbot,dQp)
-          Q = Q*Qp
+          Q = Qsave*Qp
+        ELSE
+          Q = Qsave
         END IF
       END IF
       QQ=Q
@@ -408,10 +411,10 @@ C5D-----PRINT FLOW RATE IF REQUESTED.
       END IF
 C
 C5E-----ADD FLOW RATE TO BUFFER.
-      BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+Q
+      BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
 C
 C5F-----SEE IF FLOW IS POSITIVE OR NEGATIVE.
-      IF(Q.GE.ZERO) THEN
+      IF(QQ.GE.ZERO) THEN
 C
 C5G-----FLOW RATE IS POSITIVE (RECHARGE). ADD IT TO RATIN.
         RATIN=RATIN+QQ
@@ -425,10 +428,10 @@ C5I-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
 C5I-----COPY FLOW TO WELL LIST.
    99 IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-      WELL(NWELVL,L)=Q
+      WELL(NWELVL,L)=QQ
 ! write wells with reduced pumping
       IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
-     +     IPRWEL.NE.0 ) THEN
+     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
         IF ( iw1.EQ.1 ) THEN
           WRITE(IUNITRAMP,*)
           WRITE(IUNITRAMP,300)KPER,KSTP
