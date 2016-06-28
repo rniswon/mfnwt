@@ -1020,7 +1020,7 @@ C
         krck = ISTRM(1, ichk)
         irck = ISTRM(2, ichk)
         jrck = ISTRM(3, ichk)
-        IF ( IBOUND(jrck, irck, krck).EQ.0 ) THEN
+        IF ( IBOUND(jrck, irck, krck).GT.0 ) THEN
             IF ( STRHC1KHFLAG.EQ.1 ) THEN
                 STRM(6,ichk) = FACTORKH*HKUPW(jrck,irck,krck)
             ELSE IF ( STRHC1KVFLAG.EQ.1 ) THEN   
