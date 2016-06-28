@@ -4,6 +4,7 @@
         DOUBLE PRECISION,SAVE :: THETAB, FLUXB, FLUXHLD2
         REAL,PARAMETER :: CLOSEZERO=1.0E-15
         INTEGER, SAVE :: Nfoldflbt, NUMTAB, MAXVAL
+        INTEGER, SAVE :: STRHC1KHFLAG, STRHC1KVFLAG
         INTEGER,SAVE,                 POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(diverted recharge flag; then reharge cell count)
         INTEGER,SAVE,  DIMENSION(:,:,:),POINTER:: DVRCELL !(store cells to apply diverted recharge)
@@ -17,7 +18,7 @@
         INTEGER,SAVE,POINTER:: ITMP, IRDFLG, IPTFLG, NP
         REAL,   SAVE,POINTER:: CONST, DLEAK, WEIGHT, SFRRATIN, SFRRATOUT
         REAL   ,SAVE,POINTER:: FLWTOL, STRMDELSTOR_CUM, STRMDELSTOR_RATE
-        REAL   ,SAVE,POINTER:: FACTOR
+        REAL   ,SAVE,POINTER:: FACTOR,FACTORKH,FACTORKV
         DOUBLE PRECISION,SAVE,POINTER:: TOTSPFLOW
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: IOTSG, NSEGCK
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: ITRLSTH
@@ -65,7 +66,7 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         INTEGER,     POINTER:: ITMP, IRDFLG, IPTFLG, NP
         REAL,        POINTER:: CONST, DLEAK, WEIGHT, SFRRATIN, SFRRATOUT
         REAL,        POINTER:: FLWTOL, STRMDELSTOR_CUM, STRMDELSTOR_RATE
-        REAL,        POINTER:: FACTOR
+        REAL,        POINTER:: FACTOR,FACTORKH,FACTORKV
         DOUBLE PRECISION, POINTER:: TOTSPFLOW
         INTEGER,       DIMENSION(:),  POINTER:: IOTSG, NSEGCK
         INTEGER,       DIMENSION(:),  POINTER:: ITRLSTH
@@ -83,7 +84,7 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         REAL,          DIMENSION(:,:),POINTER:: TABFLOW, TABTIME  ! Reading SPecified inflow
         REAL,          DIMENSION(:,:),POINTER:: FNETSEEP          !writing net seepage in UZF
         INTEGER,       DIMENSION(:,:),POINTER:: ISFRLIST
-        INTEGER,                      POINTER:: NINTOT            !for LMT, total # of possible inflows edm 7/30/13
+        INTEGER,                      POINTER:: NINTOT,ITRFLG          !for LMT, total # of possible inflows edm 7/30/13
         DOUBLE PRECISION,     DIMENSION(:),  POINTER:: THTS,THTR,EPS
         DOUBLE PRECISION,     DIMENSION(:),  POINTER:: FOLDFLBT, THTI
         DOUBLE PRECISION,     DIMENSION(:),  POINTER:: SUMLEAK, SUMRCH

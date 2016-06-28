@@ -64,7 +64,7 @@ C     ------------------------------------------------------------------
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
       USE GWFBCFMODULE, ONLY: SC1, SC2, LAYCON
       USE GWFHUFMODULE, ONLY: SC2HUF
-      USE GWFUPWMODULE, ONLY: SC2UPW
+      USE GWFUPWMODULE, ONLY: SC2UPW,HKUPW,VKAUPW
       USE ICHKSTRBOT_MODULE
       IMPLICIT NONE
       INTRINSIC ABS, DBLE
@@ -111,7 +111,7 @@ C     ------------------------------------------------------------------
       IF(IUNIT(49).GT.0) THEN
         ALLOCATE (NINTOT,NFLOWTYPE)                             !EDM - FOR LMT
       ENDIF
-      ALLOCATE (FACTOR)
+      ALLOCATE (factor,FACTORKH,FACTORKV)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /, ' SFR7 -- STREAMFLOW ROUTING PACKAGE, '
@@ -142,6 +142,10 @@ C         DLEAK, ISTCB1, ISTCB2.
       IFLG = 0
       found = .false.
       factor = 1.0
+      STRHC1KHFLAG = 0
+      STRHC1KVFLAG = 0
+      FACTORKH=1.0
+      FACTORKV=1.0
       CALL URDCOM(In, IOUT, line)
 ! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
@@ -188,6 +192,24 @@ C         DLEAK, ISTCB1, ISTCB2.
   322    FORMAT('Stream loss will be calculated as a factor ',
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
+           found = .true.
+          case('STRHC1KH')
+            STRHC1KHFLAG = 1
+            WRITE(IOUT,*)
+            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
+     +                  IOUT,In)
+            WRITE(IOUT,323) FACTORKH
+  323       FORMAT('Streambed K will be set equal to KH of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
+            found = .true.
+          case('STRHC1KV')
+            STRHC1KVFLAG = 1
+            WRITE(IOUT,*)
+            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
+     +                  IOUT,In)
+            WRITE(IOUT,324) FACTORKV
+  324       FORMAT('Streambed K will be set equal to KV of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
            found = .true.
         case ('END')
           CALL URDCOM(In, IOUT, line)
@@ -326,13 +348,13 @@ Cdep  changed DSTROT to FXLKOT
       DVRCH = 0       !cjm
       DVEFF = 0.0     !cjm
       DVRCELL = 0     !cjm
-       RECHSAVE = 0.0
+      RECHSAVE = 0.0
       DVRPERC = 0.0   !cjm
       FNETSEEP = 0.0  !rgn
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-!      ALLOCATE (IDVFLG)
-!      IDVFLG = 0
+      ALLOCATE (IDVFLG)
+      IDVFLG = 0
 Cdep  allocate space for stream outflow derivatives for lake package
       ALLOCATE (DLKOTFLW(200,nssar), SLKOTFLW(200,nssar))
       ALLOCATE (DLKSTAGE(200,nssar))
@@ -992,6 +1014,22 @@ C
         IF ( ISFROPT.EQ.2.OR.ISFROPT.EQ.4 )
      +    CALL SGWF2SFR7UHC(Iunitlpf, Iunithuf, Iunitupw)
       END IF
+! set streambed K when option to use KV or KH are defined
+      if ( Iunitupw > 0 ) then
+      DO ichk = 1, NSTRM
+        krck = ISTRM(1, ichk)
+        irck = ISTRM(2, ichk)
+        jrck = ISTRM(3, ichk)
+        IF ( IBOUND(jrck, irck, krck).EQ.0 ) THEN
+            IF ( STRHC1KHFLAG.EQ.1 ) THEN
+                STRM(6,ichk) = FACTORKH*HKUPW(jrck,irck,krck)
+            ELSE IF ( STRHC1KVFLAG.EQ.1 ) THEN   
+                STRM(6,ichk) = FACTORKV*VKAUPW(jrck,irck,krck)
+            END IF
+        END IF
+      END DO
+      end if
+!          
 C
 C23-----SAVE POINTERS FOR GRID AND RETURN.
       CALL SGWF2SFR7PSV(Igrid)
