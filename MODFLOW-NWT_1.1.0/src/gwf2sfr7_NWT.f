@@ -5274,10 +5274,11 @@ C     ------------------------------------------------------------------
 C
 C1------READ STREAM SEGMENT DATA.
       lstend = Lstbeg + Nlst - 1
+      ! Set old values to zero
+      DVRCELL = 0.0
+      DVRPERC = 0.0
+      DVRCH = 0.0
       DO iqseg = Lstbeg, lstend
-!          DVRCELL = 0.0
-!          DVRPERC = 0.0
-!          DVRCH = 0.0
 C
 C2------ONLY READ FIRST 4 VARIABLES TO DETERMINE VALUE OF IUPSEG.
         READ (In, *) n, icalc, noutseg, iupseg
@@ -8451,6 +8452,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
       DEALLOCATE (GWFSFRDAT(IGRID)%factor)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FACTORKH)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FACTORKV)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8563,6 +8566,8 @@ C     ------------------------------------------------------------------
       FNETSEEP=>GWFSFRDAT(IGRID)%FNETSEEP
       NSEGDIM=>GWFSFRDAT(IGRID)%NSEGDIM
       factor=>GWFSFRDAT(IGRID)%factor
+      FACTORKH=>GWFSFRDAT(IGRID)%FACTORKH
+      FACTORKV=>GWFSFRDAT(IGRID)%FACTORKV
 C
       END SUBROUTINE SGWF2SFR7PNT
 C
@@ -8675,5 +8680,7 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%FNETSEEP=>FNETSEEP
       GWFSFRDAT(IGRID)%NSEGDIM=>NSEGDIM
       GWFSFRDAT(IGRID)%factor=>factor
+      GWFSFRDAT(IGRID)%FACTORKH=>FACTORKH
+      GWFSFRDAT(IGRID)%FACTORKV=>FACTORKV
 C
       END SUBROUTINE SGWF2SFR7PSV
