@@ -113,7 +113,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -148,11 +148,11 @@ C     ------------------------------------------------------------------
       DATA aname(1)/' AREAL EXTENT OF UZ FLOW'/
       DATA aname(2)/' ROUTING OVERLAND RUNOFF'/
       DATA aname(3)/' SATURATED WATER CONTENT'/
-      DATA aname(4)/'   INITIAL WATER CONTENT'/
+      DATA aname(4)/'  RESIDUAL WATER CONTENT'/
       DATA aname(5)/'    BROOKS-COREY EPSILON'/
       DATA aname(6)/'    SATURATED VERTICAL K'/
       DATA aname(7)/'    UZ CELL BOTTOM ELEV.'/
-      DATA aname(8)/'  RESIDUAL WATER CONTENT'/
+      DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
       Version_uzf =
@@ -647,14 +647,14 @@ C13b-----CHECK FOR ERRORS IN SURFACE K
      +                 'UNSAT. K')
                 iflgbnd = 0
               END IF
-              IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
-                WRITE (IOUT, 9031) nrck, ncck
- 9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
-     +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
-     +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
-     +                 'UNSAT. K')
-                iflgbnd = 0
-              END IF
+ !             IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
+ !               WRITE (IOUT, 9031) nrck, ncck
+ !9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
+ !    +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
+ !    +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
+ !    +                 'UNSAT. K')
+ !               iflgbnd = 0
+ !             END IF
             END IF
             IF ( iflgbnd.EQ.0 ) THEN
                 SURFK(ncck, nrck) = VKS(ncck, nrck)
@@ -674,7 +674,7 @@ C       IS CONSTANT THROUGHOUT VERTICAL COLUMN.
         CALL U2DREL(THTS, aname(3), NUZRW, NUZCL, 0, In, IOUT)
 C
         IF ( ITHTRFLG.GT.0 )THEN
-          CALL U2DREL(THTR, aname(8), NUZRW, NUZCL, 0, In, IOUT)
+          CALL U2DREL(THTR, aname(4), NUZRW, NUZCL, 0, In, IOUT)
         END IF
 C
 C15-----READ AIR ENTRY PRESSURE FOR UNSATURATED ZONE ASSUMING IT
@@ -690,7 +690,7 @@ C16-----READ INITIAL WATER CONTENT FOR UNSATURATED ZONE ASSUMING IT
 C         IS CONSTANT THROUGHOUT VERTICAL COLUMN. DO NOT READ
 C         INITIAL WATER CONTENT IF PERIOD IS STEADY STATE.
         IF ( ISSFLG(1).EQ.0 .OR. ITHTIFLG.GT.0 )  
-     +       CALL U2DREL(THTI, aname(4), NUZRW, NUZCL, 0, In, IOUT)
+     +       CALL U2DREL(THTI, aname(8), NUZRW, NUZCL, 0, In, IOUT)
 C
 C17-----CHECK FOR ERRORS IN EPS, THTS, AND THTI ARRAYS.
         DO nrck = 1, NUZRW
@@ -2258,6 +2258,15 @@ CDEP 05/05/2006
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
+! EDM
+        IF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
+          EXCESPP(ic, ir) =  (FINF(ic, ir) - 
+     +                 VKS(ic, ir))*DELC(ir)*DELR(ic)
+          FINF(ic, ir) = VKS(ic, ir)
+        ELSE
+          EXCESPP(ic, ir) = 0.0
+        ENDIF
+! EDM
         finfhold = FINF(ic, ir)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
 C set excess precipitation to zero for integrated (GSFLOW) simulation
@@ -3191,9 +3200,9 @@ C
 C-----SAVE NET DISCHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.                
           IF ( ibd.GT.0 ) THEN
             CALL UBDSV3(Kkstp, Kkper, txthold,  
-     +                               UNITDIS, BUFF, LAYNUM, 1,
-     +                               NCOL, NROW, NLAY, IOUT, DELT,  
-     +                               PERTIM, TOTIM, IBOUND)
+     +                  UNITDIS, BUFF, LAYNUM, 1,
+     +                  NCOL, NROW, NLAY, IOUT, DELT,  
+     +                  PERTIM, TOTIM, IBOUND)
             DO ir = 1, NROW
               DO ic = 1, NCOL
                 FNETEXFIL1(ic, ir) = 0.0
@@ -3312,35 +3321,79 @@ C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
      +                                   PERTIM, TOTIM, IBOUND)
         END IF
       END IF
-C
+
+C--not sure if this is used for MODSIM-MODFLOW. Uncomment if yes.
 C35-----UPDATE RATES AND BUFFERS FOR SFR-DIVERTED INFILTRATION.
-     !! IF ( Iunitsfr.GT.0 ) THEN
-     !!   IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
-     !!     IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
-     !!       CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
-     !!       DO ir = 1, NROW
-     !!         DO ic = 1, NCOL
-     !!           ill = LAYNUM(ic, ir)
-     !!           IF ( ill.GT.0 ) THEN
-     !!             BUFF(ic, ir, ill)= (UZOLSFLX(ic, ir)-
-     !!+                               RECHSAVE(ic,ir))*DELC(ir)*DELR(ic)
-     !!             IF ( BUFF(ic, ir, ill).LT.0.0 ) 
-     !!+            BUFF(ic, ir, ill) = 0.0
-     !!           END IF
-     !!         END DO
-     !!       END DO
-     !!     END IF
+!      IF ( Iunitsfr.GT.0 ) THEN
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN                                              
+!            CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))                                         
+!            DO ir = 1, NROW                                                                  
+!              DO ic = 1, NCOL                                                                
+!                DO il = 1, NLAY                                                              
+!                  BUFF(ic, ir, il) = 0.0                                                     
+!                END DO                                                                       
+!                ill = LAYNUM(ic, ir)                                                         
+!                IF ( ill.GT.0 ) THEN                                                         
+!                  BUFF(ic, ir, ill)= FINF(ic, ir)*DELC(ir)*DELR(ic)+
+!     +                               EXCESPP(ic,ir)-RECHSAVE(ic,ir)*
+!     +                               DELC(ir)*DELR(ic)
+!                  IF ( BUFF(ic, ir, ill).LT.0.0 ) 
+!     +            BUFF(ic, ir, ill) = 0.0
+!                END IF
+!              END DO
+!            END DO
+!          END IF
 C   
 C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
-     !!     IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf2, IUZFCB1,
-     !!+                                BUFF, NCOL, NROW, NLAY, IOUT)
-     !!     IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf2,  
-     !!+                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
-     !!+                                   NCOL, NROW, NLAY, IOUT, DELT,  
-     !!+                                   PERTIM, TOTIM, IBOUND)
-     !!   END IF
-     !! END IF
+!          IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf2, IUZFCB1,
+!     +                                BUFF, NCOL, NROW, NLAY, IOUT)
+!          IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf2,  
+!     +                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
+!     +                                   NCOL, NROW, NLAY, IOUT, DELT,  
+!     +                                   PERTIM, TOTIM, IBOUND)
+!        END IF
+!      END IF
+C--possible end here for MODSIM-MODFLOW
 C
+C--Uncomment for MODSIM-MODFLOW required output. 
+C35-----UPDATE RATES AND BUFFERS FOR INFILTRATION.
+!      IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
+!          DO ir = 1, NROW
+!            DO ic = 1, NCOL
+!             DO il = 1, NLAY
+!               BUFF(ic, ir, il) = 0.0
+!             END DO
+!              IF ( IUZFBND(ic,ir).NE.0 ) THEN
+!                ill = LAYNUM(ic, ir)
+!                IF ( ill.GT.0 ) THEN
+!                  IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!                    BUFF(ic, ir, ill)= RECHSAVE(ic, ir)* !EDM 4/3/15 [print just precip (specified in UZF1 input file) for MS/MF]
+!     +                                 DELC(ir)*DELR(ic)
+!                  END IF
+!                ELSE
+!                  LAYNUM(ic, ir) = NLAY
+!                END IF
+!              ELSE
+!                LAYNUM(ic, ir) = NLAY
+!              END IF
+!            END DO
+!          END DO
+!        END IF
+C   
+C37-----SAVE INFILTRATION RATES TO UNFORMATTED FILE.
+!        IF ( IUZFB22.LT.0 .OR. IUZFB11.LT.0 ) THEN
+!          IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textinf, IUZFCB1,
+!     +                                BUFF, NCOL, NROW, NLAY, IOUT)
+!          IF ( ibduzf.GT.0 ) CALL UBDSV3(Kkstp, Kkper, textinf,  
+!     +                                   IUZFCB2, BUFF, LAYNUM, NUZTOP,
+!     +                                   NCOL, NROW, NLAY, IOUT, DELT,  
+!     +                                   PERTIM, TOTIM, IBOUND)
+!        END IF
+!      END IF
+C--Uncomment to here for MODSIM-MODFLOW
 C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 .AND. IETBUD.EQ.0 ) THEN
         CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
@@ -3370,7 +3423,7 @@ C38-----UPDATE RATES AND BUFFERS FOR RECHARGE.
         END DO
       END IF
 C
-C39-----SAVE RECHARGE RATES TO UNFORMATTED FILE.
+C39-----SAVE ACTUAL INFILTRATION RATES TO UNFORMATTED FILE.
       IF ( IETBUD.EQ.0 ) THEN
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, textrch, IUZFCB1, 
      +                            BUFF, NCOL, NROW, NLAY, IOUT)

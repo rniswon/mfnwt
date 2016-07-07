@@ -37,7 +37,7 @@ C     ******************************************************************
       END IF
       IF ( self%IFLAG.GT.0 .AND. self%IRCHNUM.EQ.NSTRM ) THEN
         WRITE(self%IUNIT,*)' MODEL STOPPING DUE TO REACH ALTITUDE ERROR'
-!        CALL USTOP(' ')
+        CALL USTOP(' ')
       END IF
   100 FORMAT(5I7,2F15.7)
       END FUNCTION ICHKSTRBOT
@@ -53,7 +53,7 @@ C     READ STREAM DATA THAT IS CONSTANT FOR ENTIRE SIMULATION:
 C     REACH DATA AND PARAMETER DEFINITIONS
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -90,6 +90,9 @@ C     ------------------------------------------------------------------
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
       REAL epsslpe
+      character(len=40) :: keyvalue
+      character(len=16)  :: text        = 'SFR2'
+      logical :: found
 C     ------------------------------------------------------------------
       Version_sfr =
      +'$Id: gwf2sfr7_NWT.f 7541 2015-07-30 21:46:59Z rniswon $'
@@ -137,56 +140,66 @@ C         DLEAK, ISTCB1, ISTCB2.
       lloc = 1
       IERR = 0
       IFLG = 0
-      FACTOR = 1.0
+      found = .false.
+      factor = 1.0
       CALL URDCOM(In, IOUT, line)
 ! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
+      
       lloc = 1
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'REACHINPUT') THEN
-         IRFG = 1
-         WRITE(IOUT,32)
-   32  FORMAT(1X,I10,' Some stream information will be read by reach. ',
+      keyvalue = LINE(ISTART:ISTOP)
+      call upcase(keyvalue)
+      IF(keyvalue.EQ.'OPTIONS') THEN
+              write(iout,'(/1x,a)') 'PROCESSING '//
+     +              trim(adjustl(text)) //' OPTIONS'
+        do
+        CALL URDCOM(In, IOUT, line)
+        lloc = 1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        keyvalue = LINE(ISTART:ISTOP)
+        call upcase(keyvalue)
+        select case (keyvalue)
+          case('REACHINPUT')
+            IRFG = 1
+            WRITE(IOUT,32)
+   32 FORMAT(1X,I10,' Some stream information will be read by reach. ',
      +                'This option replaces NSTRM<0')
-      ELSE
-         WRITE(IOUT,'(A)') ' Segment information will not be ',
-     +                     ' read by reach'
-      END IF
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'TRANSROUTE') THEN
-        ITRFLG = 1
-      END IF
-      IF ( ITRFLG.EQ.1 .OR. IRFG.EQ.1 ) READ(IN,'(A)') LINE
-! Check keyword for tabular inflow rates.
-      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'TABFILES') THEN
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-         IF(NUMTAB.LT.0) NUMTAB=0
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
-         IF(MAXVAL.LT.0) MAXVAL=0
-         WRITE(IOUT,31) NUMTAB,MAXVAL
-   31    FORMAT(1X,I10,' Specified inflow files will be read ',
+            found = .true.
+          case('TRANSROUTE')
+            ITRFLG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS IS ACTIVE'
+            WRITE(iout,*)
+            found = .true.
+          case('TABFILES')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
+            IF(NUMTAB.LT.0) NUMTAB=0
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
+            IF(MAXVAL.LT.0) MAXVAL=0
+            WRITE(IOUT,31) NUMTAB,MAXVAL
+   31    FORMAT(1X,I10,' Specifed inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
-         READ(IN,'(A)') LINE
-      ELSE
-         WRITE(IOUT,'(A)') ' No specified inflow files'
-      END IF
-!
-! Check keyword for reading losing stream factor.
-      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'LOSSFACTOR') THEN
-         WRITE(IOUT,*)
-         CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR, IOUT, In)
-         WRITE(IOUT,322) FACTOR
+            found = .true.
+          case('LOSSFACTOR')
+            WRITE(IOUT,*)
+            CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,IOUT,In)
+            WRITE(IOUT,322) FACTOR
   322    FORMAT('Stream loss will be calculated as a factor ',
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
-         READ(IN,'(A)') LINE
-      END IF
+           found = .true.
+        case ('END')
+          CALL URDCOM(In, IOUT, line)
+          exit
+        case default
+    ! -- No options found
+        found = .false.
+        CALL URDCOM(In, IOUT, line)
+        exit
+        end select
+      end do
+      end if
 !
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
@@ -977,7 +990,7 @@ C     ------------------------------------------------------------------
 C
       IF ( Iunitlpf.GT.0 .OR. Iunithuf.GT.0 .OR. Iunitupw.GT.0 ) THEN 
         IF ( ISFROPT.EQ.2.OR.ISFROPT.EQ.4 )
-     +    CALL SGWF2SFR7UHC(Iunitlpf, Iunithuf, Iunitupw)
+     +    CALL SGWF2SFR7UHC(Iunitlpf, Iunitupw)
       END IF
 C
 C23-----SAVE POINTERS FOR GRID AND RETURN.
@@ -986,7 +999,7 @@ C23-----SAVE POINTERS FOR GRID AND RETURN.
       END SUBROUTINE GWF2SFR7AR
 C
 C-------SUBROUTINE SGWF2SFR7UHC
-      SUBROUTINE SGWF2SFR7UHC(Iunitlpf, Iunithuf, Iunitupw)
+      SUBROUTINE SGWF2SFR7UHC(Iunitlpf, Iunitupw)
 C     ******************************************************************
 C     SETS UNSATURATED VERTICAL HYDRAULIC CONDUCTIVITY TO VERTICAL
 C     HYDRAULIC CONDUCTIVITY IN THE LAYER-PROPERTY FLOW PACKAGE.
@@ -1001,7 +1014,7 @@ C     ******************************************************************
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
-      INTEGER Iunitlpf, Iunithuf, Iunitupw
+      INTEGER Iunitlpf, Iunitupw
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
@@ -1054,8 +1067,7 @@ C2------RETURN.
 C
 C-------SUBROUTINE GWF2SFR7RP
       SUBROUTINE GWF2SFR7RP(In, Iunitgwt, Iunitlak, Kkper, Kkstp, Nsol,
-     +                      Iouts, Iunitbcf, Iunitlpf, Iunithuf, 
-     +                      Iunitupw, Iunituzf, Igrid)
+     +                      Iouts, Iunituzf, Igrid)
 C     ******************************************************************
 C     READ STREAM DATA FOR STRESS PERIOD
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
@@ -1089,7 +1101,7 @@ C     ------------------------------------------------------------------
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
      +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
-     +        Ltyp,ierr,IFLG
+     +        ierr,IFLG
 C     ------------------------------------------------------------------
 C
 C-------SET POINTERS FOR CURRENT GRID.
@@ -1904,7 +1916,7 @@ C     *****************************************************************
 C     ADD STREAM TERMS TO RHS AND HCOF IF FLOW OCCURS IN MODEL CELL
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C     *****************************************************************
 !      USE GWFRCHMODULE,ONLY:RECH  !cjm
 !!      USE GWFUZFMODULE,ONLY:FINF  !cjm
@@ -1966,7 +1978,7 @@ C     -----------------------------------------------------------------
      +        il, ilay, iprior, iprndpth, iprvsg, ir, istsg, itot,itrib,
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt, !  ii, 
-     +        idr, lfold, ij, illake, lakid
+     +        lfold, illake, lakid
 !!      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
@@ -3498,7 +3510,8 @@ C     ------------------------------------------------------------------
      +                 slope, cdpth, fdpth, hdiff, grad, depth,
      +                 hld, fbcheck, totflwt, totdelstor, totuzstor,
      +                 thetas, epsilon, thr, qa, qb, qc, qd, awdth,
-     +                 bwdth, gwflow, dvrsn, fbot, depthtr, strtop,dwdh
+     +                 bwdth, gwflow, dvrsn, fbot, depthtr, strtop,
+     +                 dwdh, fact
       EXTERNAL CALC_XSA
       DOUBLE PRECISION CALC_XSA
 C     ------------------------------------------------------------------
@@ -3534,6 +3547,7 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       Transient_bd_tot = 0.0
       Transient_bd = 0.0
       lfold = 0
+      fact = FACTOR
       maxwav = NSFRSETS*NSTRAIL
       IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
         NINTOT = 0              
@@ -3749,7 +3763,9 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
                 itrib = itrib + 1
               END DO
               flowin = flowin + SEG(2, istsg)  !SEG(2,istsg) stores specified inflow, and should have a spot in "Headwaters" flows
-c              NINTOT = NINTOT + 1   !EDM
+              IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow. if the latter exist, count it next
+                NINTOT = NINTOT + 1   !EDM
+              ENDIF
 C
 C23-----CHECK IF SPECIFIED "FLOW" IS WITHDRAWAL (i.e., negative), THAT WATER IS AVAILABLE.
               IF ( flowin.LT.0.0D0 ) THEN
@@ -8117,7 +8133,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      INTEGER i, maxiter, iprndpth
+      INTEGER maxiter, iprndpth
       DOUBLE PRECISION aa, wetperm, depth, CALC_XSA
 C     ------------------------------------------------------------------
       iprndpth = 0
@@ -8209,8 +8225,9 @@ C     OF TIME TO CACULATE SPECIFIED INFLOW TO SEGMENTS.
 !!      USE GWFSFRMODULE, ONLY: TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        CLOSEZERO
       USE GWFBASMODULE, ONLY: DELT
-      REAL TIME, FLOW, TIMEBEG
-      INTEGER INUM
+      IMPLICIT NONE
+      REAL TIME, FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
+      INTEGER INUM, IEND, ISTM1, ISTART, iflg, ISEG, NVAL, I
       TOLF2=1.0E-4
       FLOW = 0.0
       NVAL = ISFRLIST(2,INUM)
