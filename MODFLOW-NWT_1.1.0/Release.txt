@@ -30,13 +30,14 @@ Changes to MODFLOW-NWT to support MT3D-USGS were made to the source file
 lmt8_NWT.f. These changes include writing output for the UZF, SFR2, and 
 LAK7 packages that is required for simulating transport in the unsaturated 
 zone, streams, and lakes. Refer to the MT3D-USGS documentation report 
-(Bedekar and others, 2016) for details.
+(Bedekar and others, 2016) for details. Refer to the LMT release notes file
+"LMT8.pdf" located in ..\MODFLOW-NWT_1.1.0\doc
 
 Upstream Weigthing (UPW) Package
 
 An error was fixed in the calculation of the derivative for smoothing conductunce  
 during complete wetting of a cell. Testing using several problems indicated that 
-this change has minimal affects on the solution.
+this change has minimal effects on the solution.
 
 NWT solver (NWT) Package
 
@@ -48,7 +49,7 @@ and the model will stop if TOP-BOT<100*Thickfact.
 
 An error was fixed in the calculation of the derivative for smoothing conductunce  
 during complete wetting of a cell. Testing using several problems indicated that 
-this change has minimal affects on the solution.
+this change has minimal effects on the solution.
 
 A minor memory allocation error was fixed in GMRES that affected compilations using 
 the gfortran compiler
@@ -134,7 +135,7 @@ OPTIONS
 [LOSSFACTOR Factor]
 END
 
-Definitions for new charaction variable option:
+Definitions for new character variable option:
 
 LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
               real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
@@ -154,8 +155,8 @@ New Options were added to UZF1 to allow the hydraulic conducitvity used to
 calculate rejected infiltration and surface leakage to be different than
 the vertical hydraulic conductivity of the unsaturated zone (VKS). 
 
-A new function was added for simulateing groundwater ET. This function simulates
-a constant ET rate over the extenction depth rather than linearly reducing 
+A new function was added for simulating groundwater ET. This function simulates
+a constant ET rate over the extinction depth rather than linearly reducing 
 ET as groundwater head decreases. The ET is smoothly reduced to zero using the 
 same polynomial function used to reduce pumping in drying cells (Niswonger 
 and others, 2011). ET is smoothly reduced as groundwater head drops to the  
@@ -1012,7 +1013,7 @@ Bakker, Mark, Schaars, Frans, Hughes, J.D., Langevin, C.D., and Dausman, A.M., 2
 Documentation of the seawater intrusion (SWI2) package for MODFLOW: U.S. Geological Survey 
 Techniques and Methods, book 6, chap. A46, 47 p. Available online at http://pubs.er.usgs.gov/publication/tm6A46
 
-Bedekar, V., Morway, E.D., Langevin, C.D., Tonkin, M.T., 2015, MT3D-USGS Version 1: A U.S. Geological Survey 
+Bedekar, V., Morway, E.D., Langevin, C.D., Tonkin, M.T., 2016, MT3D-USGS Version 1: A U.S. Geological Survey 
 Release of MT3DMS Updated with New and Expanded Transport Capabilities for MODFLOW, U.S. Geological Survey, 
 Techniques and Methods 6-A53 variously p. 
 
