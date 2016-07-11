@@ -389,6 +389,8 @@ C5C-----GET FLOW RATE FROM WELL LIST.
       Hh = HNEW(ic,ir,il)
 C
 C5B-----IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
+C-------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
+C
       IF(IBOUND(IC,IR,IL).LE.0)GO TO 99
       IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
         IF ( LAYTYPUPW(il).GT.0 ) THEN
@@ -397,6 +399,8 @@ C5B-----IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
         ELSE
           Q = Qsave
         END IF
+      ELSE
+        Q = Qsave
       END IF
       QQ=Q
 C
