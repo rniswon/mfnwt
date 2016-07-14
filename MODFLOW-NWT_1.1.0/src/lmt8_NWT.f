@@ -61,7 +61,7 @@ C
      &                   NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
      &                   FLOWTYPE,LKFLOWTYPE,NLKFLWTYP,NLAKCON
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND,IUZFBND
-      USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
+      USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS,ITRFLG
 C
 C--USE FILE SPECIFICATION of MODFLOW-2005
       INTEGER       I,INUNIT,IGRID,IU,ILMTHEAD,INLMT,IFLEN,NC,LLOC,
@@ -563,9 +563,13 @@ C          IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence a
                          WRITE(IUMT3D)   '           LAK FLOWS'
           ENDIF
           IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
-                         WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
+                         WRITE(IUMT3D)   '                 SFR'  ! Streamflow Routing package
           ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
-                         WRITE(IUMT3D,*) '           SFR FLOWS'
+            IF(ITRFLG.EQ.0) THEN
+              WRITE(IUMT3D)              '        SFR FLOWS SS'
+            ELSEIF(ITRFLG.EQ.1) THEN
+              WRITE(IUMT3D)              '        SFR FLOWS TR'
+            ENDIF
           ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D)   '                 SWR'  ! Surface-water Routing package
           IF(ISFRLAKCONNECT.NE.0) 
@@ -598,7 +602,11 @@ C          IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence a
           IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
                          WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
           ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
-                         WRITE(IUMT3D,*) '           SFR FLOWS'
+            IF(ITRFLG.EQ.0) THEN
+              WRITE(IUMT3D,*)            '        SFR FLOWS SS'
+            ELSEIF(ITRFLG.EQ.1) THEN
+              WRITE(IUMT3D,*)            '        SFR FLOWS TR'
+            ENDIF
           ENDIF
           IF(MTSWR.NE.0) WRITE(IUMT3D,*) '                 SWR'  ! Surface-water Routing package
           IF(ISFRLAKCONNECT.NE.0) 
@@ -4252,7 +4260,7 @@ C DATE CREATED: 4-01-2016
       USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT,IBOUND,IUNIT
       USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,STRM,ISEG,NSEGDIM,SEG,
      &                       IOTSG,IDIVAR,FXLKOT,NSS,DVRSFLW,SGOTFLW,
-     &                       STROUT,NINTOT,ITRFLG
+     &                       STROUT,NINTOT,ITRFLG,ITRFLG
       USE GWFLAKMODULE, ONLY:VOL,NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK
       USE LMTMODULE,    ONLY:ISFRFLOWS,NFLOWTYPE,FLOWTYPE
 C
@@ -4276,7 +4284,11 @@ C
       IF(ISFRFLOWS.EQ.0) THEN
         TEXT='SFR'
       ELSEIF(ISFRFLOWS.NE.0) THEN
-        TEXT='SFR FLOWS'
+        IF(ITRFLG.EQ.0) THEN
+          TEXT='SFR FLOWS SS'
+        ELSEIF(ITRFLG.EQ.1) THEN
+          TEXT='SFR FLOWS TR'
+        ENDIF
       ENDIF
       CLOSEZERO = 1.0e-15
 C
@@ -4342,7 +4354,11 @@ C       Strm(11, L): FLOW TO/FROM AQUIFER
 C
 C--LOOP THROUGH EACH STREAM CELL AND WRITE EXCHANGE WITH OTHER STREAM REACHES
       IF(ISFRFLOWS.NE.0) THEN
-        TEXT='SFR FLOWS'
+        IF(ITRFLG.EQ.0) THEN
+          TEXT='SFR FLOWS SS'
+        ELSEIF(ITRFLG.EQ.1) THEN
+          TEXT='SFR FLOWS TR'
+        ENDIF
 C
 C--WRITE AN IDENTIFYING HEADER
         IF(ILMTFMT.EQ.0) THEN
