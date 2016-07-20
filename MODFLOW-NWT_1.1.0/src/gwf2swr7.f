@@ -8290,7 +8290,8 @@ C     + + + CODE + + +
         jc = REACH(irch)%JRCH
         rtop = REACH(irch)%GTELEV
         rbot = REACH(irch)%GBELEV
-        DO k = 1, NLAY
+        ktop = ABS(REACH(irch)%KRCH)
+        DO k = ABS(REACH(irch)%KRCH), NLAY
           kk = LBOTM(k)
           zgtop = REAL(BOTM(jc,ir,kk-1),8)
           zgbot = REAL(BOTM(jc,ir,kk),8)
