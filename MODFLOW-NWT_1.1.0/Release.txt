@@ -33,9 +33,9 @@ zone, streams, and lakes. Refer to the MT3D-USGS documentation report
 (Bedekar and others, 2016) for details. Refer to the LMT release notes file
 "LMT8.pdf" located in ..\MODFLOW-NWT_1.1.0\doc
 
-Upstream Weigthing (UPW) Package
+Upstream Weighting (UPW) Package
 
-An error was fixed in the calculation of the derivative for smoothing conductunce  
+An error was fixed in the calculation of the derivative for smoothing conductance  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal effects on the solution.
 
@@ -47,7 +47,7 @@ is an input variable specified within the NWT solver input file. These cells wer
 set to inactive by setting IBOUND=0. This conditions is now treated as an error
 and the model will stop if TOP-BOT<100*Thickfact.
 
-An error was fixed in the calculation of the derivative for smoothing conductunce  
+An error was fixed in the calculation of the derivative for smoothing conductance  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal effects on the solution.
 
@@ -138,7 +138,7 @@ END
 Definitions for new character variable option:
 
 LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
-              real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
+              real variable Factor is multiplied by STRHC1 or Hc1fact and Hc2fact 
               to calculate seepage loss from streams. Calculation of groundwater 
               seepage to streams is unchanged.
 
@@ -151,7 +151,7 @@ Some variables in the UZF Package for calculating runoff were initialized.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
 beneath lakes.
 
-New Options were added to UZF1 to allow the hydraulic conducitvity used to
+New Options were added to UZF1 to allow the hydraulic conductivity used to
 calculate rejected infiltration and surface leakage to be different than
 the vertical hydraulic conductivity of the unsaturated zone (VKS). 
 
@@ -187,7 +187,7 @@ END
 Definitions of new variables:
 
 SPECIFYSURFK -- An optional character variable. When SPECIFYSURFK is specified, the 
-                variable SURFK is specfied in Data Set 4b.
+                variable SURFK is specified in Data Set 4b.
 
 REJECTSURFK -- An optional character variable. When REJECTSURFK is specified, SURFK 
                instead of VKS is used for calculating rejected infiltration. 
@@ -202,10 +202,10 @@ ETSQUARE -- An optional character variable. When ETSQUARE is specified,
             rate, and is smoothed over a specified smoothing interval. This
             option is recommended only when using the NWT solver.
 
-smoothfact --  An optional real variable specified if ETSQAURE is specifed. For 
+smoothfact --  An optional real variable specified if ETSQAURE is specified. For 
                example, if the interval factor (smoothfact) is specified as 
-               smoothfact=0.1 (recommended), then the smoothing inerval will be
-               calculated as: SMOOTHINT = 0.1*EXTDP and  is applied over the 
+               smoothfact=0.1 (recommended), then the smoothing interval will be
+               calculated as: SMOOTHINT = 0.1*EXTDP and is applied over the 
                range for groundwater head (h): 
 
                h < CELTOP-EXTDP, ET is zero;
@@ -262,7 +262,7 @@ END
 Definitions for new character variable option:
 
 TABFILES -- An optional character variable. When TABFILES is specified, all pumping
-rates for all wells in the model will be input using separage time series tabular
+rates for all wells in the model will be input using separate time series tabular
 input files. 
 
 NUMTAB -- An integer variable that is the number of tabular input files that
@@ -312,8 +312,8 @@ Multi-Node Well (MNW2) Package
 
 A bug was fixed to correct budget calculations when the UPW Package was
 used with MNW2. The model stopped and an error was reported when a well 
-was screened in mulitple cells and one of the cells was inactive. This error
-was changed to be a warning if one of the sceened cells is active and
+was screened in multiple cells and one of the cells was inactive. This error
+was changed to be a warning if one of the screened cells is active and
 execution continues.
 
 Surface Water Routing (SWR) Process
@@ -327,6 +327,7 @@ Source files that were modified for this release are: gwf2uzf1_NWT.f,gwfuzfmodul
 gwf2sfr7_NWT.f,gwfsfrmodule_NWT.f,gwf2lak7_NWT.f, NWT1_gmres.f90, gwf2swr7.f,
 gwf2swr7util.f, gwf2mnw27_NWT.f, gmres.f90, NWT1_solver.f and NWT1_xmd.f, and
 lmt8_NWT.f.
+
 
 o Version 1.0.9 07/01/2014:
 
