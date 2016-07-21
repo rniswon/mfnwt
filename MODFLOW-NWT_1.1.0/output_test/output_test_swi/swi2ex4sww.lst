@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.0, 6/21/2016
+                            VERSION 1.1.0, 7/21/2016
                     BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
 
  LIST FILE: swi2ex4sww.lst
@@ -193,9 +193,6 @@
  No named parameters
  MAXIMUM OF   1683 ACTIVE WELLS AT ONE TIME
  LISTS OF WELL CELLS WILL NOT BE PRINTED
- No named parameters
-  PHIRAMP WILL BE SET TO A DEFAULT VALUE OF 0.1
-  WELLS WITH REDUCED PUMPING WILL BE REPORTED TO THE MAIN LISTING FILE
 
 
      0 Well parameters
@@ -47717,6 +47714,6 @@
          TOTAL TIME 7.25328E+09 1.20888E+08 2.01480E+06  83950.      229.84    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/06/28 14:49:18
- Elapsed run time:  1 Minutes,  3.262 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 13:00:36
+ Elapsed run time:  1 Minutes,  3.219 Seconds
 
