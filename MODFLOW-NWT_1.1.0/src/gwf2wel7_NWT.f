@@ -46,6 +46,7 @@ C     ------------------------------------------------------------------
       integer,intent(inout) :: IN
 C
       CHARACTER*200 LINE,TEXT
+      LOGICAL :: found
       character(len=40) :: keyvalue
       INTEGER NUMTABHOLD
 C     ------------------------------------------------------------------
