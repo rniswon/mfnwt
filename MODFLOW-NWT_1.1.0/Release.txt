@@ -239,6 +239,66 @@ beneath lakes.
 
 WELL (WEL) Package
 
+Note that the following changes to the Well Package input no longer supports
+previous input files that read the key word option SPECIFY in Data Set 2B.
+ 
+The input format for specifying keyword (character) variable SPECIFY has changed.
+This character variable is now specified within the OPTIONS block that is now 
+specified between Data Set 0 and Data Set 1. A new character variable option was added
+that allows users to specify pumping rates using separate tabular input input 
+files for each well. Each tabular input file consists of a series of simulation
+times and pumping rates. The applied pumping rate will be interpolated from
+the tabular input file using the times at the end and beginning of the time step.
+Options must be proceeded with the "OPTIONS" specification and followed by the "END"  
+specification. Characters can be specified as upper or lower case.
+
+Optional character variables for WELL in any order:
+
+OPTIONS
+[SPECIFY PHIRAMP IUNITRAMP]
+[TABFILES NUMTAB MAXVAL]
+END
+
+Definitions for new character variable option:
+
+TABFILES -- An optional character variable. When TABFILES is specified, all pumping
+rates for all wells in the model will be input using separage time series tabular
+input files. 
+
+NUMTAB -- An integer variable that is the number of tabular input files that
+will be read for interpolating pumping rates for each well in the model. A 
+separate tabular input file is required for each well in the model. Wells
+can be made inactive by specifying pumping rates of zero for times when a well
+is inactive.
+
+MAXVAL -- An integer value equal to the maximum number of time series
+values specified in the tabular input file, not including header lines. 
+Tabular input files each can have a different number of values and MAXVAL
+is the number of lines in the tabular input file that has the most lines
+as compared to all other tabular input files.
+
+IF TABFILES is specified then DATA SET 6 is replaced with the following NUMTAB
+lines for stress period 1 only. DATA SET 6 is not required for stress periods
+following the first stress period when the TABFILES option is used.
+
+[TABUNIT TABVAL TABLAY TABROW TABCOL]   #repeat this line NUMTAB times for stress period 1. 
+
+TABUNIT -- An integer value equal to the unit number for the tabular input file.
+This unit number must match the unit number specified in the MODFLOW Name file
+as type data.
+
+TABVAL -- An integer value equal to the number of lines in this tabular input file 
+not including header lines.
+
+TABLAY -- An integer value equal to the MODFLOW layer for the cell to which the 
+pumping rates will be applied.
+
+TABROW -- An integer value equal to the MODFLOW row for the cell to which the 
+pumping rates will be applied.
+
+TABCOL -- An integer value equal to the MODFLOW column for the cell to which the 
+pumping rates will be applied.
+
 A bug was fixed that sets pumping applied to inactive cells to zero. This bug
 only affects results printed to the cell by cell budget file. A small error was
 fixed in the calculation of the derivative used for smoothing the pumping rate
