@@ -5,6 +5,7 @@
 *.obj
 *.mod
 *_genmod.f90
+*.htm
 
 # Executables
 *.exe
