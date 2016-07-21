@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.0, 6/21/2016
+                            VERSION 1.1.0, 7/21/2016
                     BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
 
  LIST FILE: .\Ex_prob3\Pr3_MFNWT_lower.lst
@@ -4004,6 +4004,6 @@
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/06/28 11:07:06
- Elapsed run time:  1.185 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 12:58:38
+ Elapsed run time:  1.232 Seconds
 
