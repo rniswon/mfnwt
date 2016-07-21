@@ -18,7 +18,7 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.0 06/21/2016:
+o Version 1.1.0 07/21/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
 means that MODFLOW-2005 source files used in MODFLOW-NWT were updated to
@@ -315,7 +315,8 @@ execution continues.
 Surface Water Routing (SWR) Process
 
 The names of the source files were changed from gwf2swr7_NWT.f to gwf2swr7.f
-and gsol7.f to gwf2swr7util.f.
+and gsol7.f to gwf2swr7util.f. See SWRProcess_release.txt for a summary of
+the changes made to SWR Process v 1.04.
 
 
 Source files that were modified for this release are: gwf2uzf1_NWT.f,gwfuzfmodule_NWT.f,
