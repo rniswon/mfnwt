@@ -242,15 +242,15 @@ WELL (WEL) Package
 Note that the following changes to the Well Package input no longer supports
 previous input files that read the key word option SPECIFY in Data Set 2B.
  
-The input format for specifying keyword (character) variable SPECIFY has changed.
-This character variable is now specified within the OPTIONS block that is now 
-specified between Data Set 0 and Data Set 1. A new character variable option was added
-that allows users to specify pumping rates using separate tabular input input 
-files for each well. Each tabular input file consists of a series of simulation
-times and pumping rates. The applied pumping rate will be interpolated from
-the tabular input file using the times at the end and beginning of the time step.
-Options must be proceeded with the "OPTIONS" specification and followed by the "END"  
-specification. Characters can be specified as upper or lower case.
+The input format for specifying the keyword (character) variable SPECIFY has changed.
+This character variable is now specified within the OPTIONS block that is specified 
+between Data Set 0 and Data Set 1. A new character variable option was added
+that allows users to specify pumping rates using separate tabular input files 
+for each well. Each tabular input file consists of a series of simulation
+times and pumping rates that should begin with time equal to zero. The applied pumping 
+rate will be interpolated from the tabular input file using the times at the end and 
+beginning of the time step. Options must be proceeded with the "OPTIONS" specification   
+and followed by the "END" specification. Characters can be specified as upper or lower case.
 
 Optional character variables for WELL in any order:
 
@@ -298,6 +298,10 @@ pumping rates will be applied.
 
 TABCOL -- An integer value equal to the MODFLOW column for the cell to which the 
 pumping rates will be applied.
+
+A new test problem was added to the directory .\MODFLOW-NWT_1.1.0\data
+that includes example input files for using the tabular input file option
+for specifying pumping. 
 
 A bug was fixed that sets pumping applied to inactive cells to zero. This bug
 only affects results printed to the cell by cell budget file. A small error was
