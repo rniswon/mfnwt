@@ -143,10 +143,12 @@ the test problems (Pr1a, Pr1b, Pr2, Pr3_lower, and Pr3_higher) are documented
 in Niswonger and others (2011), one test problems (l1b2k) is documented in 
 Merritt and Konikow (2000) as Test Simulation 1, one test problem (SwrSample05)
 is documented in Hughes and others (2012), and one test problem (swi2ex4sww) is
-documented in Bakker and others (2013). Another test problem was added that 
-was modified from the hypothetical test simulation described by Niswonger and 
+documented in Bakker and others (2013). A test problem (Sfr2weltab) was added
+that was modified from the hypothetical test simulation described by Niswonger and 
 Prudic (2005) to provide an example of specifying tabular time series input
-files for specifying pumping rates. These test problems can be run using 
+files for specifying pumping rates. Another test problem (Uzf_testoptions) was added
+that was modified from test simulation 2 of Niswonger and others (2006) to provide
+as example of the new input options for UZF. These test problems can be run using 
 either the 32-bit or 64-bit version of the MODFLOW-NWT executable. Saved 
 results for these simulations are included in the Output_test and Output_test_64
 directories for comparison.
@@ -179,3 +181,7 @@ formulation for MODFLOW-2005: U.S. Geological Survey Techniques and Methods 6-A3
 
 Niswonger, R.G., and Prudic, D.E., 2005, Documentation of the Streamflow-Routing (SFR2) Package to include unsaturated flow beneath streams—
 A modification to SFR1: U.S. Geological Survey Techniques and Methods 6-A13, 50 p.
+
+Niswonger, R.G., Prudic, D.E., and Regan, R.S., 2006, Documentation of the Unsaturated-Zone Flow (UZF1) Package
+for modeling unsaturated flow between the land surface and the water table with MODFLOW-2005: U.S. Geological
+Survey Techniques and Methods 6-A19, 62 p

@@ -3195,7 +3195,7 @@ C Print net recharge as ascii to a separate output file
            txthold = netrchtext
 C 
 C-----SAVE NET RECHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.
-          IF ( ibd.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
+          IF ( ICBCFL.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                               UNITRECH, BUFF, LAYNUM, 1,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
@@ -3209,7 +3209,7 @@ C-----SAVE NET RECHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEM
           END DO
 C 
 C-----SAVE NET DISCHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.                
-          IF ( ibd.GT.0 ) THEN
+          IF ( ICBCFL.GT.0 ) THEN
             CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                  UNITDIS, BUFF, LAYNUM, 1,
      +                  NCOL, NROW, NLAY, IOUT, DELT,  

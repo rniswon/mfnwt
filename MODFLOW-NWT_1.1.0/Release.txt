@@ -231,6 +231,9 @@ SURFK -- An optional array of positive real values used to define the hydraulic
          and/or surface leakage. IF SURFK is set greater than VKS then it is
          set equal to VKS.
 
+A new test problem is included in \MODFLOW-NWT_1.1.0\data called UZFtestoptions
+that provides example input for these new options.
+
 Lake (LAK) Package
 
 Some variables were changed to arrays in order to save data for MT3D-USGS.
