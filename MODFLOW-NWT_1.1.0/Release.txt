@@ -147,6 +147,11 @@ to arrays for use in MT3D-USGS.
 
 Unsaturated-Zone Flow (UZF) Package
 
+Note that the following changes to the UZF options will no longer support previous
+versions of UZF input files that used key word options. Previous UZF1 input 
+files must be modified to be consistent with the new character variable input
+options described below.
+
 Some variables in the UZF Package for calculating runoff were initialized.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
 beneath lakes.
