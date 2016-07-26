@@ -18,7 +18,7 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.0 06/21/2016:
+o Version 1.1.0 07/21/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
 means that MODFLOW-2005 source files used in MODFLOW-NWT were updated to
@@ -33,9 +33,9 @@ zone, streams, and lakes. Refer to the MT3D-USGS documentation report
 (Bedekar and others, 2016) for details. Refer to the LMT release notes file
 "LMT8.pdf" located in ..\MODFLOW-NWT_1.1.0\doc
 
-Upstream Weigthing (UPW) Package
+Upstream Weighting (UPW) Package
 
-An error was fixed in the calculation of the derivative for smoothing conductunce  
+An error was fixed in the calculation of the derivative for smoothing conductance  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal effects on the solution.
 
@@ -47,7 +47,7 @@ is an input variable specified within the NWT solver input file. These cells wer
 set to inactive by setting IBOUND=0. This conditions is now treated as an error
 and the model will stop if TOP-BOT<100*Thickfact.
 
-An error was fixed in the calculation of the derivative for smoothing conductunce  
+An error was fixed in the calculation of the derivative for smoothing conductance  
 during complete wetting of a cell. Testing using several problems indicated that 
 this change has minimal effects on the solution.
 
@@ -138,7 +138,7 @@ END
 Definitions for new character variable option:
 
 LOSSFACTOR -- An optional character variable. When LOSSFACTOR is specified, the 
-              real variable Factor is mulitplied by STRHC1 or Hc1fact and Hc2fact 
+              real variable Factor is multiplied by STRHC1 or Hc1fact and Hc2fact 
               to calculate seepage loss from streams. Calculation of groundwater 
               seepage to streams is unchanged.
 
@@ -147,11 +147,16 @@ to arrays for use in MT3D-USGS.
 
 Unsaturated-Zone Flow (UZF) Package
 
+Note that the following changes to the UZF options will no longer support previous
+versions of UZF input files that used key word options. Previous UZF1 input 
+files must be modified to be consistent with the new character variable input
+options described below.
+
 Some variables in the UZF Package for calculating runoff were initialized.
 A minor bug was fixed that relates to simulating unsaturated-zone flow 
 beneath lakes.
 
-New Options were added to UZF1 to allow the hydraulic conducitvity used to
+New Options were added to UZF1 to allow the hydraulic conductivity used to
 calculate rejected infiltration and surface leakage to be different than
 the vertical hydraulic conductivity of the unsaturated zone (VKS). 
 
@@ -187,7 +192,7 @@ END
 Definitions of new variables:
 
 SPECIFYSURFK -- An optional character variable. When SPECIFYSURFK is specified, the 
-                variable SURFK is specfied in Data Set 4b.
+                variable SURFK is specified in Data Set 4b.
 
 REJECTSURFK -- An optional character variable. When REJECTSURFK is specified, SURFK 
                instead of VKS is used for calculating rejected infiltration. 
@@ -202,10 +207,10 @@ ETSQUARE -- An optional character variable. When ETSQUARE is specified,
             rate, and is smoothed over a specified smoothing interval. This
             option is recommended only when using the NWT solver.
 
-smoothfact --  An optional real variable specified if ETSQAURE is specifed. For 
+smoothfact --  An optional real variable specified if ETSQAURE is specified. For 
                example, if the interval factor (smoothfact) is specified as 
-               smoothfact=0.1 (recommended), then the smoothing inerval will be
-               calculated as: SMOOTHINT = 0.1*EXTDP and  is applied over the 
+               smoothfact=0.1 (recommended), then the smoothing interval will be
+               calculated as: SMOOTHINT = 0.1*EXTDP and is applied over the 
                range for groundwater head (h): 
 
                h < CELTOP-EXTDP, ET is zero;
@@ -231,6 +236,9 @@ SURFK -- An optional array of positive real values used to define the hydraulic
          and/or surface leakage. IF SURFK is set greater than VKS then it is
          set equal to VKS.
 
+A new test problem is included in \MODFLOW-NWT_1.1.0\data called UZFtestoptions
+that provides example input for these new options.
+
 Lake (LAK) Package
 
 Some variables were changed to arrays in order to save data for MT3D-USGS.
@@ -238,6 +246,70 @@ A minor bug was fixed that relates to simulating unsaturated-zone flow
 beneath lakes.
 
 WELL (WEL) Package
+
+Note that the following changes to the Well Package input no longer supports
+previous input files that read the key word option SPECIFY in Data Set 2B.
+ 
+The input format for specifying the keyword (character) variable SPECIFY has changed.
+This character variable is now specified within the OPTIONS block that is specified 
+between Data Set 0 and Data Set 1. A new character variable option was added
+that allows users to specify pumping rates using separate tabular input files 
+for each well. Each tabular input file consists of a series of simulation
+times and pumping rates that should begin with time equal to zero. The applied pumping 
+rate will be interpolated from the tabular input file using the times at the end and 
+beginning of the time step. Options must be proceeded with the "OPTIONS" specification   
+and followed by the "END" specification. Characters can be specified as upper or lower case.
+
+Optional character variables for WELL in any order:
+
+OPTIONS
+[SPECIFY PHIRAMP IUNITRAMP]
+[TABFILES NUMTAB MAXVAL]
+END
+
+Definitions for new character variable option:
+
+TABFILES -- An optional character variable. When TABFILES is specified, all pumping
+rates for all wells in the model will be input using separate time series tabular
+input files. 
+
+NUMTAB -- An integer variable that is the number of tabular input files that
+will be read for interpolating pumping rates for each well in the model. A 
+separate tabular input file is required for each well in the model. Wells
+can be made inactive by specifying pumping rates of zero for times when a well
+is inactive.
+
+MAXVAL -- An integer value equal to the maximum number of time series
+values specified in the tabular input file, not including header lines. 
+Tabular input files each can have a different number of values and MAXVAL
+is the number of lines in the tabular input file that has the most lines
+as compared to all other tabular input files.
+
+IF TABFILES is specified then DATA SET 6 is replaced with the following NUMTAB
+lines for stress period 1 only. DATA SET 6 is not required for stress periods
+following the first stress period when the TABFILES option is used.
+
+[TABUNIT TABVAL TABLAY TABROW TABCOL]   #repeat this line NUMTAB times for stress period 1. 
+
+TABUNIT -- An integer value equal to the unit number for the tabular input file.
+This unit number must match the unit number specified in the MODFLOW Name file
+as type data.
+
+TABVAL -- An integer value equal to the number of lines in this tabular input file 
+not including header lines.
+
+TABLAY -- An integer value equal to the MODFLOW layer for the cell to which the 
+pumping rates will be applied.
+
+TABROW -- An integer value equal to the MODFLOW row for the cell to which the 
+pumping rates will be applied.
+
+TABCOL -- An integer value equal to the MODFLOW column for the cell to which the 
+pumping rates will be applied.
+
+A new test problem was added to the directory .\MODFLOW-NWT_1.1.0\data
+that includes example input files for using the tabular input file option
+for specifying pumping. 
 
 A bug was fixed that sets pumping applied to inactive cells to zero. This bug
 only affects results printed to the cell by cell budget file. A small error was
@@ -248,20 +320,22 @@ Multi-Node Well (MNW2) Package
 
 A bug was fixed to correct budget calculations when the UPW Package was
 used with MNW2. The model stopped and an error was reported when a well 
-was screened in mulitple cells and one of the cells was inactive. This error
-was changed to be a warning if one of the sceened cells is active and
+was screened in multiple cells and one of the cells was inactive. This error
+was changed to be a warning if one of the screened cells is active and
 execution continues.
 
 Surface Water Routing (SWR) Process
 
 The names of the source files were changed from gwf2swr7_NWT.f to gwf2swr7.f
-and gsol7.f to gwf2swr7util.f.
+and gsol7.f to gwf2swr7util.f. See SWRProcess_release.txt for a summary of
+the changes made to SWR Process v 1.04.
 
 
 Source files that were modified for this release are: gwf2uzf1_NWT.f,gwfuzfmodule_NWT.f,
 gwf2sfr7_NWT.f,gwfsfrmodule_NWT.f,gwf2lak7_NWT.f, NWT1_gmres.f90, gwf2swr7.f,
 gwf2swr7util.f, gwf2mnw27_NWT.f, gmres.f90, NWT1_solver.f and NWT1_xmd.f, and
 lmt8_NWT.f.
+
 
 o Version 1.0.9 07/01/2014:
 

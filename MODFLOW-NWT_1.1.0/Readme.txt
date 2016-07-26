@@ -81,52 +81,11 @@ B. INSTALLING
 
 To make the executable versions of MODFLOW-NWT accessible from any
 directory, the directory containing the executables (MODFLOW-NWT_1.1.0\bin)
-should be included in the PATH environment variable (see explanation below).  
+should be included in the PATH environment variable.  
 
 As an alternative, the executable files, MODFLOW-NWT.exe and MODFLOW-NWT_64.exe, 
 in the MODFLOW-NWT_1.1.0\bin directory can be copied into a directory already
 included in the PATH environment variable.
-
-       HOW TO ADD TO THE PATH ENVIRONMENT VARIABLE
-          WINDOWS 9 X AND WINDOWS ME SYSTEMS
-          
-Add the following line to the AUTOEXEC.BAT file:
-
-  PATH=%PATH%;C:\WRDAPP\MODFLOW-NWT_1.1.0\bin
-
-Note, reboot your system after modifying AUTOEXEC.BAT.
-
-
-       HOW TO ADD TO THE PATH ENVIRONMENT VARIABLE
-               WINDOWS NT SYSTEMS
-
-From the Start menu, select Settings and then Control Panel.  Double click
-System and select the Environment tab. To add a new user variable, enter
-"PATH" in the Variable field and enter
-
-   %PATH%;C:\WRDAPP\MODFLOW-NWT_1.1.0\bin
-
-in the Value field.  Click Set and then click OK.  If a PATH user variable
-already is defined, click on it in the User Variables pane, add
-";C:\WRDAPP\MODFLOW-NWT_1.1.0\bin" to its definition in the Value field, and click
-OK.  Initiate and use a new Windows Command Prompt window after making this
-change.
-
-
-       HOW TO ADD TO THE PATH ENVIRONMENT VARIABLE
-             WINDOWS 2000 OR XP SYSTEMS
-             
-From the Start menu, select Settings and then Control Panel.  Double click
-System and select the Advanced tab.  Click on Environment Variables.  If
-a PATH user variable already is defined, click on it in the User Variables
-pane, then click Edit.  In the Edit User Variable window, add
-";C:\WRDAPP\MODFLOW-NWT_1.1.0\bin" to the end of the Variable Value (ensure that
-the current contents of the User Value are not deleted) and click OK.  If
-a PATH user variable is not already defined, in the User variables pane of
-the Environment Variables window, click New.  In the New User Variable
-window, define a new variable PATH as shown above.  Click OK.  Click OK
-in the Environment Variables window and again in the System Properties
-window.  Initiate and use a new Windows Command Prompt window.
 
 
 C. EXECUTING THE SOFTWARE
@@ -184,7 +143,12 @@ the test problems (Pr1a, Pr1b, Pr2, Pr3_lower, and Pr3_higher) are documented
 in Niswonger and others (2011), one test problems (l1b2k) is documented in 
 Merritt and Konikow (2000) as Test Simulation 1, one test problem (SwrSample05)
 is documented in Hughes and others (2012), and one test problem (swi2ex4sww) is
-documented in Bakker and others (2013). These test problems can be run using 
+documented in Bakker and others (2013). A test problem (Sfr2weltab) was added
+that was modified from the hypothetical test simulation described by Niswonger and 
+Prudic (2005) to provide an example of specifying tabular time series input
+files for specifying pumping rates. Another test problem (Uzf_testoptions) was added
+that was modified from test simulation 2 of Niswonger and others (2006) to provide
+as example of the new input options for UZF. These test problems can be run using 
 either the 32-bit or 64-bit version of the MODFLOW-NWT executable. Saved 
 results for these simulations are included in the Output_test and Output_test_64
 directories for comparison.
@@ -214,3 +178,10 @@ solute-transport model: Water-Resources Investigations Report 00-4167, 146 p. Av
 
 Niswonger, R.G., Panday, Sorab, and Ibaraki, Motomu, 2011, MODFLOW-NWT, A Newton
 formulation for MODFLOW-2005: U.S. Geological Survey Techniques and Methods 6-A37, 44 p. Available online at http://pubs.usgs.gov/tm/tm6a37/
+
+Niswonger, R.G., and Prudic, D.E., 2005, Documentation of the Streamflow-Routing (SFR2) Package to include unsaturated flow beneath streams—
+A modification to SFR1: U.S. Geological Survey Techniques and Methods 6-A13, 50 p.
+
+Niswonger, R.G., Prudic, D.E., and Regan, R.S., 2006, Documentation of the Unsaturated-Zone Flow (UZF1) Package
+for modeling unsaturated flow between the land surface and the water table with MODFLOW-2005: U.S. Geological
+Survey Techniques and Methods 6-A19, 62 p

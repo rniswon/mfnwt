@@ -61,7 +61,7 @@ C
      &                   NPCKGTXT,IUZFFLOWS,ISFRFLOWS,ILAKFLOWS,
      &                   FLOWTYPE,LKFLOWTYPE,NLKFLWTYP,NLAKCON
       USE GWFUZFMODULE, ONLY:IUZFOPT,IRUNFLG,IETFLG,IRUNBND,IUZFBND
-      USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS
+      USE GWFSFRMODULE, ONLY:IOTSG,IDIVAR,NSS,ITRFLG
 C
 C--USE FILE SPECIFICATION of MODFLOW-2005
       INTEGER       I,INUNIT,IGRID,IU,ILMTHEAD,INLMT,IFLEN,NC,LLOC,
@@ -535,80 +535,90 @@ C--WRITE A HEADER TO MODFLOW-MT3DMS LINK FILE
       ENDIF
 C
 C--WRITE THE NUMBER OF FLOW PACKAGE TEXT ENTRIES THAT ARE TO BE READ NEXT
-      IF(NPCKGTXT.GT.0) THEN
-        IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) NPCKGTXT
-        ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) NPCKGTXT
-        ENDIF
+      IF(HDRTXT.EQ.'MTGS1.00.00') THEN
+        IF(NPCKGTXT.GT.0) THEN
+          IF(ILMTFMT.EQ.0) THEN
+            WRITE(IUMT3D) NPCKGTXT
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            WRITE(IUMT3D,*) NPCKGTXT
+          ENDIF
 C
 C--WRITE NPCKGTXT RECORDS TO THE FLOW-TRANSPORT LINK FILE (CHARACTER*20)
-        IF(ILMTFMT.EQ.0) THEN
-          IF(MTSTR.NE.0) WRITE(IUMT3D)   '                 STR'  ! Stream package
-          IF(MTRES.NE.0) WRITE(IUMT3D)   '                 RES'  ! Reservoir package
-          IF(MTFHB.NE.0) WRITE(IUMT3D)   '                 FHB'  ! Flow and Head Boundary package
-          IF(MTDRT.NE.0) WRITE(IUMT3D)   '                 DRT'  ! Drain Return package
-          IF(MTETS.NE.0) WRITE(IUMT3D)   '                 ETS'  ! Segmented ET package
-C          IF(MTIBS.NE.0) WRITE(IUMT3D)   '                 IBS'  ! Interbed Storage
-C          IF(MTTLK.NE.0) WRITE(IUMT3D)   '                 TLK'  ! Transient Leakage
-          IF(MTMNW.NE.0) WRITE(IUMT3D)   '                 MNW'  ! Multi-node well package
-C          IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
-          IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0)
-     &                   WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
-          IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0)
-     &                   WRITE(IUMT3D)   '           UZF FLOWS'
-          IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN 
-                         WRITE(IUMT3D)   '                 LAK'  ! Lake package
-          ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
-                         WRITE(IUMT3D)   '           LAK FLOWS'
+          IF(ILMTFMT.EQ.0) THEN
+            IF(MTSTR.NE.0) WRITE(IUMT3D)   '                 STR'  ! Stream package
+            IF(MTRES.NE.0) WRITE(IUMT3D)   '                 RES'  ! Reservoir package
+            IF(MTFHB.NE.0) WRITE(IUMT3D)   '                 FHB'  ! Flow and Head Boundary package
+            IF(MTDRT.NE.0) WRITE(IUMT3D)   '                 DRT'  ! Drain Return package
+            IF(MTETS.NE.0) WRITE(IUMT3D)   '                 ETS'  ! Segmented ET package
+C            IF(MTIBS.NE.0) WRITE(IUMT3D)   '                 IBS'  ! Interbed Storage
+C            IF(MTTLK.NE.0) WRITE(IUMT3D)   '                 TLK'  ! Transient Leakage
+            IF(MTMNW.NE.0) WRITE(IUMT3D)   '                 MNW'  ! Multi-node well package
+C            IF(MTSWT.NE.0) WRITE(IUMT3D)   '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
+            IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0)
+     &                     WRITE(IUMT3D)   '                 UZF'  ! Unsaturated-zone Flow package
+            IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0)
+     &                     WRITE(IUMT3D)   '           UZF FLOWS'
+            IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN 
+                           WRITE(IUMT3D)   '                 LAK'  ! Lake package
+            ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
+                           WRITE(IUMT3D)   '           LAK FLOWS'
+            ENDIF
+            IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
+                           WRITE(IUMT3D)   '                 SFR'  ! Streamflow Routing package
+            ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
+              IF(ITRFLG.EQ.0) THEN
+                WRITE(IUMT3D)              '        SFR FLOWS SS'
+              ELSEIF(ITRFLG.EQ.1) THEN
+                WRITE(IUMT3D)              '        SFR FLOWS TR'
+              ENDIF
+            ENDIF
+            IF(MTSWR.NE.0) WRITE(IUMT3D)   '                 SWR'  ! Surface-water Routing package
+            IF(ISFRLAKCONNECT.NE.0) 
+     &                     WRITE(IUMT3D)   '     CONNECT SFR LAK'
+            IF(ISFRUZFCONNECT.NE.0) 
+     &                     WRITE(IUMT3D)   '     CONNECT SFR UZF'
+            IF(ILAKUZFCONNECT.NE.0) 
+     &                     WRITE(IUMT3D)   '     CONNECT LAK UZF'
+            IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
+     &                     WRITE(IUMT3D)   '     CONNECT SNK UZF'
+          ELSEIF(ILMTFMT.EQ.1) THEN
+            IF(MTSTR.NE.0) WRITE(IUMT3D,*) '                 STR'  ! Stream package
+            IF(MTRES.NE.0) WRITE(IUMT3D,*) '                 RES'  ! Reservoir package
+            IF(MTFHB.NE.0) WRITE(IUMT3D,*) '                 FHB'  ! Flow and Head Boundary package
+            IF(MTDRT.NE.0) WRITE(IUMT3D,*) '                 DRT'  ! Drain Return package
+            IF(MTETS.NE.0) WRITE(IUMT3D,*) '                 ETS'  ! Segmented ET package
+C            IF(MTIBS.NE.0) WRITE(IUMT3D,*) '                 IBS'  ! Interbed Storage
+C            IF(MTTLK.NE.0) WRITE(IUMT3D,*) '                 TLK'  ! Transient Leakage
+            IF(MTMNW.NE.0) WRITE(IUMT3D,*) '                 MNW'  ! Multi-node well package
+C            IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
+            IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0) 
+     &                     WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
+            IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0) 
+     &                     WRITE(IUMT3D,*) '           UZF FLOWS'
+            IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN
+                           WRITE(IUMT3D,*) '                 LAK'  ! Lake package
+            ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
+                           WRITE(IUMT3D,*) '           LAK FLOWS'
+            ENDIF
+            IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
+                           WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
+            ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
+              IF(ITRFLG.EQ.0) THEN
+                WRITE(IUMT3D,*)            '        SFR FLOWS SS'
+              ELSEIF(ITRFLG.EQ.1) THEN
+                WRITE(IUMT3D,*)            '        SFR FLOWS TR'
+              ENDIF
+            ENDIF
+            IF(MTSWR.NE.0) WRITE(IUMT3D,*) '                 SWR'  ! Surface-water Routing package
+            IF(ISFRLAKCONNECT.NE.0) 
+     &                     WRITE(IUMT3D,*) '     CONNECT SFR LAK'
+            IF(ISFRUZFCONNECT.NE.0) 
+     &                     WRITE(IUMT3D,*) '     CONNECT SFR UZF'
+            IF(ILAKUZFCONNECT.NE.0) 
+     &                     WRITE(IUMT3D,*) '     CONNECT LAK UZF'
+            IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
+     &                     WRITE(IUMT3D,*) '     CONNECT SNK UZF'
           ENDIF
-          IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
-                         WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
-          ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
-                         WRITE(IUMT3D,*) '           SFR FLOWS'
-          ENDIF
-          IF(MTSWR.NE.0) WRITE(IUMT3D)   '                 SWR'  ! Surface-water Routing package
-          IF(ISFRLAKCONNECT.NE.0) 
-     &                   WRITE(IUMT3D)   '     CONNECT SFR LAK'
-          IF(ISFRUZFCONNECT.NE.0) 
-     &                   WRITE(IUMT3D)   '     CONNECT SFR UZF'
-          IF(ILAKUZFCONNECT.NE.0) 
-     &                   WRITE(IUMT3D)   '     CONNECT LAK UZF'
-          IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
-     &                   WRITE(IUMT3D)   '     CONNECT SNK UZF'
-        ELSEIF(ILMTFMT.EQ.1) THEN
-          IF(MTSTR.NE.0) WRITE(IUMT3D,*) '                 STR'  ! Stream package
-          IF(MTRES.NE.0) WRITE(IUMT3D,*) '                 RES'  ! Reservoir package
-          IF(MTFHB.NE.0) WRITE(IUMT3D,*) '                 FHB'  ! Flow and Head Boundary package
-          IF(MTDRT.NE.0) WRITE(IUMT3D,*) '                 DRT'  ! Drain Return package
-          IF(MTETS.NE.0) WRITE(IUMT3D,*) '                 ETS'  ! Segmented ET package
-C          IF(MTIBS.NE.0) WRITE(IUMT3D,*) '                 IBS'  ! Interbed Storage
-C          IF(MTTLK.NE.0) WRITE(IUMT3D,*) '                 TLK'  ! Transient Leakage
-          IF(MTMNW.NE.0) WRITE(IUMT3D,*) '                 MNW'  ! Multi-node well package
-C          IF(MTSWT.NE.0) WRITE(IUMT3D,*) '                 SWT'  ! Subsidence and Aquifer-System Compaction Package for Water-Table Aquifers
-          IF(MTUZF.NE.0.AND.IUZFFLOWS.EQ.0) 
-     &                   WRITE(IUMT3D,*) '                 UZF'  ! Unsaturated-zone Flow package
-          IF(MTUZF.NE.0.AND.IUZFFLOWS.NE.0) 
-     &                   WRITE(IUMT3D,*) '           UZF FLOWS'
-          IF(MTLAK.NE.0.AND.ILAKFLOWS.EQ.0) THEN
-                         WRITE(IUMT3D,*) '                 LAK'  ! Lake package
-          ELSEIF(MTLAK.NE.0.AND.ILAKFLOWS.NE.0) THEN
-                         WRITE(IUMT3D,*) '           LAK FLOWS'
-          ENDIF
-          IF(MTSFR.NE.0.AND.ISFRFLOWS.EQ.0) THEN
-                         WRITE(IUMT3D,*) '                 SFR'  ! Streamflow Routing package
-          ELSEIF(MTSFR.NE.0.AND.ISFRFLOWS.NE.0) THEN
-                         WRITE(IUMT3D,*) '           SFR FLOWS'
-          ENDIF
-          IF(MTSWR.NE.0) WRITE(IUMT3D,*) '                 SWR'  ! Surface-water Routing package
-          IF(ISFRLAKCONNECT.NE.0) 
-     &                   WRITE(IUMT3D,*) '     CONNECT SFR LAK'
-          IF(ISFRUZFCONNECT.NE.0) 
-     &                   WRITE(IUMT3D,*) '     CONNECT SFR UZF'
-          IF(ILAKUZFCONNECT.NE.0) 
-     &                   WRITE(IUMT3D,*) '     CONNECT LAK UZF'
-          IF(ISNKUZFCONNECT.NE.0.OR.MTUZF.NE.0)
-     &                   WRITE(IUMT3D,*) '     CONNECT SNK UZF'
         ENDIF
       ENDIF
 C------SAVE POINTER DATA TO ARRARYS
@@ -4252,7 +4262,7 @@ C DATE CREATED: 4-01-2016
       USE GLOBAL,       ONLY:NCOL,NROW,NLAY,IOUT,IBOUND,IUNIT
       USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,STRM,ISEG,NSEGDIM,SEG,
      &                       IOTSG,IDIVAR,FXLKOT,NSS,DVRSFLW,SGOTFLW,
-     &                       STROUT,NINTOT,ITRFLG
+     &                       STROUT,NINTOT,ITRFLG,ITRFLG
       USE GWFLAKMODULE, ONLY:VOL,NSFRLAK,LAKSFR,ILKSEG,ILKRCH,SWLAK
       USE LMTMODULE,    ONLY:ISFRFLOWS,NFLOWTYPE,FLOWTYPE
 C
@@ -4276,7 +4286,11 @@ C
       IF(ISFRFLOWS.EQ.0) THEN
         TEXT='SFR'
       ELSEIF(ISFRFLOWS.NE.0) THEN
-        TEXT='SFR FLOWS'
+        IF(ITRFLG.EQ.0) THEN
+          TEXT='SFR FLOWS SS'
+        ELSEIF(ITRFLG.EQ.1) THEN
+          TEXT='SFR FLOWS TR'
+        ENDIF
       ENDIF
       CLOSEZERO = 1.0e-15
 C
@@ -4342,7 +4356,11 @@ C       Strm(11, L): FLOW TO/FROM AQUIFER
 C
 C--LOOP THROUGH EACH STREAM CELL AND WRITE EXCHANGE WITH OTHER STREAM REACHES
       IF(ISFRFLOWS.NE.0) THEN
-        TEXT='SFR FLOWS'
+        IF(ITRFLG.EQ.0) THEN
+          TEXT='SFR FLOWS SS'
+        ELSEIF(ITRFLG.EQ.1) THEN
+          TEXT='SFR FLOWS TR'
+        ENDIF
 C
 C--WRITE AN IDENTIFYING HEADER
         IF(ILMTFMT.EQ.0) THEN
@@ -4406,28 +4424,6 @@ C--THE FOLLOWING PRINT STATEMENTS ONLY WORK BECAUSE VALUES HAVE BEEN CONSOLIDATE
      &                     PRNTSFRQTYP(4),PRNTSFRQTYP(5)
           ENDIF
         ENDIF
-        !DO I=1,4  ! 4 TYPES OF FLOW TO BE RECORED: STORAGE, PRECIP, EVAP, RUNOFF
-        !  WRITEVAL=.FALSE.
-        !  SELECT CASE (FLOWTYPE(I))
-        !    CASE ('STORAGE')
-        !      TEXT=FLOWTYPE(I)
-        !      WRITEVAL=.TRUE.
-        !    CASE ('EVAP')
-        !      TEXT=FLOWTYPE(I)
-        !      WRITEVAL=.TRUE.
-        !    CASE ('PRECIP')
-        !      TEXT=FLOWTYPE(I)
-        !      WRITEVAL=.TRUE.
-        !    CASE ('RUNOFF')
-        !      TEXT=FLOWTYPE(I)
-        !      WRITEVAL=.TRUE.
-        !  END SELECT
-        !  IF(ILMTFMT.EQ.0.AND.WRITEVAL) THEN
-        !    WRITE(IUMT3D) TEXT
-        !  ELSEIF(ILMTFMT.EQ.1.AND.WRITEVAL) THEN
-        !    WRITE(IUMT3D,*) TEXT
-        !  ENDIF  
-        !ENDDO 
 C
 C--FILL A 2D ARRAY OF SFRFLOWS(NFLOWTYPE,NRCH) THAT CONTAINS THE VOLUMETRIC 
 C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)

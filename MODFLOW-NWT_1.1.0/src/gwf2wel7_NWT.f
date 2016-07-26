@@ -3,15 +3,31 @@
         INTEGER,SAVE,POINTER  ::NPWEL,IWELPB,NNPWEL,IRDPSI
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABTIME
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABRATE
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABLAY
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABROW
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABCOL
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABVAL
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
+        INTEGER,          SAVE,                 POINTER     ::NUMTAB
+        INTEGER,          SAVE,                 POINTER     ::MAXVAL
       TYPE GWFWELTYPE
         INTEGER,POINTER  ::NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL
         INTEGER,POINTER  ::NPWEL,IWELPB,NNPWEL,IRDPSI
         CHARACTER(LEN=16), DIMENSION(:),   POINTER     ::WELAUX
         REAL,              DIMENSION(:,:), POINTER     ::WELL
+        REAL,              DIMENSION(:,:),   POINTER     ::TABTIME
+        REAL,              DIMENSION(:,:),   POINTER     ::TABRATE
+        INTEGER,           DIMENSION(:),   POINTER     ::TABLAY
+        INTEGER,           DIMENSION(:),   POINTER     ::TABROW
+        INTEGER,           DIMENSION(:),   POINTER     ::TABCOL
+        INTEGER,           DIMENSION(:),   POINTER     ::TABVAL
         REAL,                              POINTER     ::PSIRAMP
         INTEGER,                           POINTER     ::IUNITRAMP
+        INTEGER,                           POINTER     ::NUMTAB
+        INTEGER,                           POINTER     ::MAXVAL
       END TYPE
       TYPE(GWFWELTYPE), SAVE:: GWFWELDAT(10)
       END MODULE GWFWELMODULE
@@ -25,16 +41,21 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
-      USE GWFWELMODULE, ONLY:NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL,NPWEL,
-     1                       IWELPB,NNPWEL,WELAUX,WELL,PSIRAMP,IUNITRAMP
+      USE GWFWELMODULE
       integer,intent(in) :: IUNITNWT,IGRID
       integer,intent(inout) :: IN
 C
-      CHARACTER*200 LINE
+      CHARACTER*200 LINE,TEXT
+      LOGICAL :: found
+      character(len=40) :: keyvalue
+      INTEGER NUMTABHOLD
 C     ------------------------------------------------------------------
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL)
       ALLOCATE(NPWEL,IWELPB,NNPWEL,PSIRAMP,IUNITRAMP)
+      ALLOCATE(NUMTAB,MAXVAL)
       PSIRAMP = 0.10
+      NUMTAB = 0
+      MAXVAL = 1
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
@@ -46,9 +67,69 @@ C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
 C
 C2------READ MAXIMUM NUMBER OF WELLS AND UNIT OR FLAG FOR
 C2------CELL-BY-CELL FLOW TERMS.
-      LLOC=1
+!      LLOC=1
       CALL URDCOM(IN,IOUT,LINE)
       CALL UPARLSTAL(IN,IOUT,LINE,NPWEL,MXPW)
+! options for reducing pumpage and using time series input files
+      lloc = 1
+      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+      keyvalue = LINE(ISTART:ISTOP)
+      call upcase(keyvalue)
+      IF(keyvalue.EQ.'OPTIONS') THEN
+              write(iout,'(/1x,a)') 'PROCESSING '//
+     +              trim(adjustl(text)) //' OPTIONS'
+        do
+        CALL URDCOM(In, IOUT, line)
+        lloc = 1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        keyvalue = LINE(ISTART:ISTOP)
+        call upcase(keyvalue)
+        select case (keyvalue)
+! REDUCING PUMPING FOR DRY CELLS
+        case('SPECIFY')
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
+          IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
+          IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
+          WRITE(IOUT,*)
+          WRITE(IOUT,9) PSIRAMP,IUNITRAMP
+          IF ( Iunitnwt.EQ.0 ) write(IOUT,32)
+! SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
+        case('TABFILES')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
+            IF(NUMTAB.LT.0) NUMTAB=0
+            WRITE(IOUT,30) NUMTAB
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
+            IF(MAXVAL.LT.0) THEN
+                MAXVAL=1
+                NUMTAB=0
+            END IF
+            WRITE(IOUT,31) MAXVAL
+            found = .true.
+        case ('END')
+          CALL URDCOM(In, IOUT, line)
+          exit
+        case default
+    ! -- No options found
+        found = .false.
+        CALL URDCOM(In, IOUT, line)
+        exit
+        end select
+      end do
+        end if
+! ALLOCATE VARS FOR TIME SERIES WELL RATES
+      NUMTABHOLD = NUMTAB
+      IF ( NUMTABHOLD.EQ.0 ) NUMTABHOLD = 1
+      ALLOCATE(TABTIME(MAXVAL,NUMTABHOLD),TABRATE(MAXVAL,NUMTABHOLD))
+      ALLOCATE(TABLAY(NUMTABHOLD),TABROW(NUMTABHOLD),TABCOL(NUMTABHOLD))
+      ALLOCATE(TABVAL(NUMTABHOLD))
+      TABTIME = 0.0
+      TABRATE = 0.0
+      TABLAY = 0
+      TABROW = 0
+      TABCOL = 0
+      TABVAL = 0
+!        
       IF(IFREFM.EQ.0) THEN
          READ(LINE,'(2I10)') MXACTW,IWELCB
          LLOC=21
@@ -69,6 +150,14 @@ C2------CELL-BY-CELL FLOW TERMS.
      +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
      +       ' WELLS WITH REDUCED PUMPING WILL BE '
      +       'REPORTED TO FILE UNIT NUMBER',I5)
+   30 FORMAT(1X,' Pumping rates will be read from time ',
+     +                 'series input files. ',I10,' files will be read')
+   31 FORMAT(1X,' Pumping rates will be read from time ',
+     +                 'series input files. A maximum of ',I10,
+     +                 ' row entries will be read per file')
+   32       FORMAT(1X,' Option to reduce pumping during cell ',
+     +                 'dewatering is activated and NWT solver ',I10,
+     +                 ' is not being used. Option deactivated')
 C
 C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
       ALLOCATE(WELAUX(20))
@@ -91,27 +180,9 @@ C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
          IPRWEL = 0
          GO TO 10
       END IF
-! Check keyword for specifying PSI (NWT).
-      CALL URDCOM(IN,IOUT,LINE)
-      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      LLOC=1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'SPECIFY') THEN
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
-         IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
-         IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
-         WRITE(IOUT,*)
-         WRITE(IOUT,9) PSIRAMP,IUNITRAMP
-      ELSE
-         BACKSPACE IN
-         IF ( IUNITNWT.GT.0 )THEN
-           IUNITRAMP = IOUT
-      WRITE(IOUT,*)' PHIRAMP WILL BE SET TO A DEFAULT VALUE OF 0.1'
-      WRITE(IOUT,*) ' WELLS WITH REDUCED PUMPING WILL BE '
-     +                      ,'REPORTED TO THE MAIN LISTING FILE'
-         END IF
-      END IF
+! Check keyword for specifying PSI (NWT). !Moved above
+!      CALL URDCOM(IN,IOUT,LINE)
+!      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
 !
 C3A-----THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
 C3A-----CELL-BY-CELL FLOW.
@@ -161,7 +232,7 @@ C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
       RETURN
       END
-      SUBROUTINE GWF2WEL7RP(IN,IGRID)
+      SUBROUTINE GWF2WEL7RP(IN,KPER,IGRID)
 C     ******************************************************************
 C     READ WELL DATA FOR A STRESS PERIOD
 C     ******************************************************************
@@ -169,28 +240,40 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
-      USE GWFWELMODULE, ONLY:NWELLS,MXWELL,NWELVL,IPRWEL,NPWEL,
-     1                       IWELPB,NNPWEL,WELAUX,WELL
+      USE GWFWELMODULE, ONLY:NWELLS,MXWELL,NWELVL,IPRWEL,NPWEL,IWELPB,
+     1                       NNPWEL,WELAUX,WELL,NUMTAB,MAXVAL,TABTIME,
+     2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL
 C
       CHARACTER*6 CWELL
+      CHARACTER(LEN=200)::LINE
+      INTEGER TABUNIT,I
+      REAL TTIME,TRATE
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
+      TABUNIT = 0
+      TTIME = 0.0
+      TRATE = 0.0
 C
 C1----READ NUMBER OF WELLS (OR FLAG SAYING REUSE WELL DATA).
 C1----AND NUMBER OF PARAMETERS
-      IF(NPWEL.GT.0) THEN
-        IF(IFREFM.EQ.0) THEN
-           READ(IN,'(2I10)') ITMP,NP
+      IF ( KPER.EQ.1 .OR. NUMTAB.EQ.0 ) THEN
+        IF(NPWEL.GT.0) THEN
+          IF(IFREFM.EQ.0) THEN
+             READ(IN,'(2I10)') ITMP,NP
+          ELSE
+            READ(IN,*) ITMP,NP
+          END IF
         ELSE
-           READ(IN,*) ITMP,NP
+           NP=0
+           IF(IFREFM.EQ.0) THEN
+              READ(IN,'(I10)') ITMP
+           ELSE
+              READ(IN,*) ITMP
+           END IF
         END IF
       ELSE
-         NP=0
-         IF(IFREFM.EQ.0) THEN
-            READ(IN,'(I10)') ITMP
-         ELSE
-            READ(IN,*) ITMP
-         END IF
+        ITMP = -1
+        NP = 0
       END IF
 C
 C------Calculate some constants.
@@ -217,9 +300,27 @@ C1B-----IF THERE ARE NEW NON-PARAMETER WELLS, READ THEM.
      1                     ') IS GREATER THAN MXACTW(',I6,')')
             CALL USTOP(' ')
          END IF
-         CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
+         IF ( NUMTAB.EQ.0 ) THEN
+           CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
      1            'WELL NO.  LAYER   ROW   COL   STRESS RATE',
      2             WELAUX,20,NAUX,IFREFM,NCOL,NROW,NLAY,4,4,IPRWEL)
+         ELSEIF ( KPER.EQ.1 ) THEN
+           DO J = 1, NUMTAB
+             READ(IN,*)TABUNIT,TABVAL(J),TABLAY(J),TABROW(J),TABCOL(J)
+             IF ( TABUNIT.LE.0 ) THEN
+                 WRITE(IOUT,100)
+                 CALL USTOP('')
+             END IF
+             DO I = 1, TABVAL(J)
+              LLOC = 1
+              CALL URDCOM(TABUNIT,IOUT,LINE)
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,TABUNIT)
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,TABUNIT)
+              TABTIME(I,J) = TTIME
+              TABRATE(I,J) = TRATE
+             END DO
+           END DO
+         END IF
       END IF
       NWELLS=NNPWEL
 C
@@ -240,6 +341,8 @@ C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
       IF(NWELLS.EQ.1) CWELL=' WELL '
       WRITE(IOUT,101) NWELLS,CWELL
   101 FORMAT(1X,/1X,I6,A)
+  100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
+     +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
 C
 C6------RETURN
       RETURN
@@ -252,9 +355,11 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT
-      USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP
+      USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
+     1                       NUMTAB
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
+      USE GWFBASMODULE, ONLY: TOTIM
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -267,21 +372,30 @@ C     ------------------------------------------------------------------
       END INTERFACE
 !
       DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp
-      INTEGER Iunitnwt
+      INTEGER Iunitnwt, NWELLSTEMP
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
       ZERO=0.0D0
       Qp = 0.0
+      NWELLSTEMP = NWELLS
+      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C1------IF NUMBER OF WELLS <= 0 THEN RETURN.
       IF(NWELLS.LE.0) RETURN
 C
 C2------PROCESS EACH WELL IN THE WELL LIST.
-      DO 100 L=1,NWELLS
-      IR=WELL(2,L)
-      IC=WELL(3,L)
-      IL=WELL(1,L)
-      Q=WELL(4,L)
+      DO 100 L=1,NWELLSTEMP
+      IF ( NUMTAB.LE.0 ) THEN
+        IR=WELL(2,L)
+        IC=WELL(3,L)
+        IL=WELL(1,L)
+        Q=WELL(4,L)
+      ELSE
+        IR = TABROW(L)
+        IC = TABCOL(L)
+        IL = TABLAY(L)
+        Q = RATETERP(TOTIM,L)
+      END IF
 C
 C2A-----IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
       IF(IBOUND(IC,IR,IL).LE.0) GO TO 100
@@ -321,7 +435,8 @@ C     ------------------------------------------------------------------
       USE GWFBASMODULE,ONLY:MSUM,ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBVL,VBNM
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
-     1                      IUNITRAMP,IPRWEL
+     1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
+     2                      NUMTAB
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
 !External function interface
       INTERFACE 
@@ -337,7 +452,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
-      INTEGER Iunitnwt, iw1
+      INTEGER Iunitnwt, iw1, NWELLSTEMP
       DATA TEXT /'           WELLS'/
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
@@ -349,6 +464,9 @@ C1------BUDGET FLAG.
       RATOUT=ZERO
       IBD=0
       Qp = 1.0
+      NWELLSTEMP = NWELLS
+      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
+      
       IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
       IF(IWELCB.GT.0) IBD=ICBCFL
       IBDLBL=0
@@ -373,17 +491,25 @@ C4------IF THERE ARE NO WELLS, DO NOT ACCUMULATE FLOW.
       IF(NWELLS.EQ.0) GO TO 200
 C
 C5------LOOP THROUGH EACH WELL CALCULATING FLOW.
-      DO 100 L=1,NWELLS
+      DO 100 L=1,NWELLSTEMP
+        Q=ZERO
+        QQ=ZERO
+        IF ( NUMTAB.LE.0 ) THEN
 C
 C5A-----GET LAYER, ROW & COLUMN OF CELL CONTAINING WELL.
-      IR=WELL(2,L)
-      IC=WELL(3,L)
-      IL=WELL(1,L)
-      Q=ZERO
-      QQ=ZERO
+          IR=WELL(2,L)
+          IC=WELL(3,L)
+          IL=WELL(1,L)
 C
 C5C-----GET FLOW RATE FROM WELL LIST.
-      QSAVE=WELL(4,L)
+          QSAVE=WELL(4,L)
+        ELSE
+          IR = TABROW(L)
+          IC = TABCOL(L)
+          IL = TABLAY(L)
+          QSAVE = RATETERP(TOTIM,L)
+        END IF
+C
       bbot = Botm(IC, IR, Lbotm(IL))
       ttop = Botm(IC, IR, Lbotm(IL)-1)
       Hh = HNEW(ic,ir,il)
@@ -473,6 +599,70 @@ C
 C9------RETURN
       RETURN
       END
+C
+C     ------------------------------------------------------------------
+C
+      REAL FUNCTION RATETERP (TIME,INUM)
+C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
+C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
+      USE GWFWELMODULE, ONLY: TABRATE, TABTIME, TABVAL
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+!ARGUMENTS
+      INTEGER, INTENT(IN):: INUM
+      REAL, INTENT(IN):: TIME
+!
+      REAL CLOSEZERO
+      REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
+      INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
+      TOLF2=1.0E-4
+      CLOSEZERO=1.0E-15
+      FLOW = 0.0
+      NVAL = TABVAL(INUM)
+      IFLG = 0
+      SUMFLOW = 0.0
+      I = 1
+      TIMEBEG = TIME - DELT
+      IF ( TIMEBEG-TABTIME(1,INUM).LT.0.0 ) THEN
+        RATETERP = TABRATE(1,INUM)
+      ELSEIF ( TIMEBEG-TABTIME(NVAL,INUM).GT.0.0 ) THEN
+        RATETERP = TABRATE(NVAL,INUM)
+      ELSE
+! Find table value before beginning of time step.
+        DO WHILE ( I.LE.NVAL-1 )
+          IF ( TIMEBEG-TABTIME(I,INUM).LE.CLOSEZERO ) THEN
+            EXIT
+          ELSEIF ( TIMEBEG-TABTIME(I+1,INUM).LE.CLOSEZERO ) THEN
+            EXIT
+          ELSE
+            I = I + 1
+          END IF
+        END DO
+        ISTART = I
+        ISTM1 = I
+        IF ( I.GT.1 ) ISTM1 = ISTM1 - 1
+! Find table value after end of time step
+        DO WHILE ( I.LE.NVAL ) 
+          IF ( TIME-TABTIME(I,INUM).LE.0.0 ) THEN
+            EXIT
+          ELSE
+            I = I + 1
+          END IF
+        END DO
+        IEND = I
+        IF ( IEND.GT.NVAL ) IEND = NVAL
+        DO I = ISTART, IEND - 1
+          TIMESTART = TABTIME(I,INUM)
+          TIMEND = TABTIME(I+1,INUM)
+          IF ( TIMEBEG-TIMESTART.GT.0.0 ) TIMESTART = TIMEBEG
+          IF ( TIME-TIMEND.LT.0.0 ) TIMEND = TIME
+          SUMFLOW = SUMFLOW + (TIMEND-TIMESTART)*TABRATE(I,INUM)
+        END DO
+        RATETERP = SUMFLOW/DELT
+      END IF
+      RETURN
+      END FUNCTION RATETERP
+C
       DOUBLE PRECISION FUNCTION smooth3(H,T,B,dQ)
 C     ******************************************************************
 C     SMOOTHLY REDUCES PUMPING TO ZERO FOR DEWATERED CONDITIONS
@@ -524,6 +714,11 @@ C
         DEALLOCATE(NNPWEL)
         DEALLOCATE(WELAUX)
         DEALLOCATE(WELL)
+        DEALLOCATE(NUMTAB)
+        DEALLOCATE(MAXVAL)
+        DEALLOCATE(TABTIME)
+        DEALLOCATE(TABRATE)
+        DEALLOCATE(TABVAL)
 C
       RETURN
       END
@@ -543,6 +738,11 @@ C
         NNPWEL=>GWFWELDAT(IGRID)%NNPWEL
         WELAUX=>GWFWELDAT(IGRID)%WELAUX
         WELL=>GWFWELDAT(IGRID)%WELL
+        NUMTAB=>GWFWELDAT(IGRID)%NUMTAB
+        MAXVAL=>GWFWELDAT(IGRID)%MAXVAL
+        TABTIME=>GWFWELDAT(IGRID)%TABTIME
+        TABRATE=>GWFWELDAT(IGRID)%TABRATE
+        TABVAL=>GWFWELDAT(IGRID)%TABVAL
 C
       RETURN
       END
@@ -562,6 +762,11 @@ C
         GWFWELDAT(IGRID)%NNPWEL=>NNPWEL
         GWFWELDAT(IGRID)%WELAUX=>WELAUX
         GWFWELDAT(IGRID)%WELL=>WELL
+        GWFWELDAT(IGRID)%NUMTAB=>NUMTAB
+        GWFWELDAT(IGRID)%MAXVAL=>MAXVAL
+        GWFWELDAT(IGRID)%TABTIME=>TABTIME
+        GWFWELDAT(IGRID)%TABRATE=>TABRATE
+        GWFWELDAT(IGRID)%TABVAL=>TABVAL
 C
       RETURN
       END
