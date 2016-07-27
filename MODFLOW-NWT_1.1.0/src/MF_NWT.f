@@ -1,7 +1,7 @@
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 7/21/2016
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
@@ -25,9 +25,9 @@ C
 C-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3
       CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.1.0, 9/11/2015')
+      PARAMETER (VERSION='1.1.0, 7/26/2016')
       PARAMETER (VERSION2='1.11.0 08/08/2013')
-      PARAMETER (VERSION3='1.03.0 08/30/2013')
+      PARAMETER (VERSION3='1.04.0 07/26/2016')
       PARAMETER (MFVNAM='-NWT-SWR1')
 C
       CHARACTER*80 HEADNG(2)
@@ -41,7 +41,7 @@ C
      &           'LAK ', 'LPF ', 'DIS ', '    ', 'PVAL', '    ', 'HOB ',  ! 28
      &           '    ', '    ', 'ZONE', 'MULT', 'DROB', 'RVOB', 'GBOB',  ! 35
      &           'STOB', 'HUF2', 'CHOB', 'ETS ', 'DRT ', '    ', 'GMG ',  ! 42
-     &           'HYD ', 'SFR ', '    ', 'GAGE', 'LVDA', '    ', 'LMT8',  ! 49
+     &           'HYD ', 'SFR ', '    ', 'GAGE', 'LVDA', '    ', 'LMT6',  ! 49
      &           'MNW2', 'MNWI', 'MNW1', 'KDEP', 'SUB ', 'UZF ', 'gwm ',  ! 56
      &           'SWT ', 'cfp ', 'pcgn', '    ', 'FMP ', 'UPW ', 'NWT ',  ! 63
      &           'SWR ', 'SWI2', '    ', '    ', '    ', '    ', '    ',  ! 70     - SWR - JDH 
@@ -184,7 +184,7 @@ C7------SIMULATE EACH STRESS PERIOD.
 C
 C7B-----READ AND PREPARE INFORMATION FOR STRESS PERIOD.
 C----------READ USING PACKAGE READ AND PREPARE MODULES.
-        IF(IUNIT(2).GT.0) CALL GWF2WEL7RP(IUNIT(2),IGRID)
+        IF(IUNIT(2).GT.0) CALL GWF2WEL7RP(IUNIT(2),KPER,IGRID)
         IF(IUNIT(3).GT.0) CALL GWF2DRN7RP(IUNIT(3),IGRID)
         IF(IUNIT(4).GT.0) CALL GWF2RIV7RP(IUNIT(4),IGRID)
         IF(IUNIT(5).GT.0) CALL GWF2EVT7RP(IUNIT(5),IGRID)
@@ -198,9 +198,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
         IF(IUNIT(20).GT.0) CALL GWF2CHD7RP(IUNIT(20),IGRID)
         IF(IUNIT(44).GT.0) CALL GWF2SFR7RP(IUNIT(44),IUNIT(15),
      1                                     IUNIT(22),KKPER,KKSTP,
-     2                                     NSOL,IOUTS,IUNIT(1),
-     3                                     IUNIT(23),IUNIT(37),
-     4                                     IUNIT(62), IUNIT(55), IGRID)
+     2                                     NSOL,IOUTS,IUNIT(55),IGRID)
       IF(IUNIT(43).GT.0 .AND. IUNIT(44).GT.0)
      1                     CALL GWF2HYD7SFR7RP(IUNIT(43),KKPER,IGRID)
         IF(IUNIT(55).GT.0) CALL GWF2UZF1RP(IUNIT(55),KKPER,IUNIT(44),

@@ -113,7 +113,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 9/11/2015
+!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -250,33 +250,19 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
             WRITE(iout,*)
             found = .true.
           case('REJECTSURFK')
-            if ( Ireadsurfk == 1 ) then
               Isurfkreject = 1
               WRITE(iout,*)
               WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
      +                    ,'LAND SURFACE K'
               WRITE(iout,*)
-            else
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'WARNING REJECTSURFK SPECIFIED BUT ',
-     +                     'NO SURFK SPECIFIED. OPTION IGNORED'
-              WRITE(iout,*) 
-            end if
             found = .true.
           case('SEEPSURFK')
-            if ( Ireadsurfk == 1 ) then
               Iseepreject = 1
               WRITE(iout,*)
               WRITE(IOUT,'(A)')'SURFACE LEAKAGE WILL BE CALCULATED ',
      +                         'USING LAND SURFACE K'
               WRITE(iout,*)
-            else
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'WARNING SEEPSURFK SPECIFIED BUT ',
-     +                     'NO SURFK SPECIFIED. OPTION IGNORED'
-              WRITE(iout,*) 
-            end if
-            found = .true.
+              found = .true.
         case ('NETFLUX')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
             IF(UNITRECH.LT.0) UNITRECH=0
@@ -298,6 +284,31 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
         exit
         end select
       end do
+      end if
+ !
+      if ( Ireadsurfk == 0 .and. Isurfkreject == 1) then
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')'WARNING REJECTSURFK SPECIFIED BUT ',
+     +                    'NO SURFK SPECIFIED. OPTION IGNORED'
+          WRITE(iout,*) 
+          Isurfkreject = 0
+      end if
+!            
+      if ( Ireadsurfk == 0 .and. Iseepreject == 1 ) then
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')'WARNING SEEPSURFK SPECIFIED BUT ',
+     +                     'NO SURFK SPECIFIED. OPTION IGNORED'
+          WRITE(iout,*) 
+          Iseepreject = 0
+      end if
+!
+      if ( Iseepsupress > 0 .and. Iseepreject == 1 ) then
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')'WARNING NOSURFLEAK SPECIFIED BUT ',
+     +                     'SEEPSURFK WAS SPECIFIED. SEEPSURFK ',
+     +                     'OPTION IGNORED'
+          WRITE(iout,*) 
+          Iseepreject = 0
       end if
  !
       IF ( INETFLUX.GT.0 ) THEN
@@ -647,14 +658,14 @@ C13b-----CHECK FOR ERRORS IN SURFACE K
      +                 'UNSAT. K')
                 iflgbnd = 0
               END IF
-              IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
-                WRITE (IOUT, 9031) nrck, ncck
- 9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
-     +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
-     +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
-     +                 'UNSAT. K')
-                iflgbnd = 0
-              END IF
+ !             IF ( SURFK(ncck, nrck).GT.VKS(ncck, nrck) ) THEN
+ !               WRITE (IOUT, 9031) nrck, ncck
+ !9031           FORMAT (1X/, 'LAND SURFACE K FOR CELL AT ROW ', 
+ !    +                  I5, ', COL. ', I5, ' IS GREATER THAN ',
+ !    +                 'VKS-- SETTING LAND SURFACE K EQUAL TO ', 
+ !    +                 'UNSAT. K')
+ !               iflgbnd = 0
+ !             END IF
             END IF
             IF ( iflgbnd.EQ.0 ) THEN
                 SURFK(ncck, nrck) = VKS(ncck, nrck)
@@ -2184,7 +2195,7 @@ C     -----------------------------------------------------------------
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
-      DATA textrej/'        HORT+DUNN'/
+      DATA textrej/'       HORT+DUNN'/
       DATA uzinftxt/'    INFILTRATION'/
       DATA uzsttext/'  STORAGE CHANGE'/
       DATA uzettext/'          UZF ET'/
@@ -3184,7 +3195,7 @@ C Print net recharge as ascii to a separate output file
            txthold = netrchtext
 C 
 C-----SAVE NET RECHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.
-          IF ( ibd.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
+          IF ( ICBCFL.GT.0 ) CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                               UNITRECH, BUFF, LAYNUM, 1,
      +                               NCOL, NROW, NLAY, IOUT, DELT,  
      +                               PERTIM, TOTIM, IBOUND)
@@ -3198,7 +3209,7 @@ C-----SAVE NET RECHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEM
           END DO
 C 
 C-----SAVE NET DISCHARGE RATES TO UNFORMATTED FILE FOR UZF OR MODFLOW BUDGET ITEMS.                
-          IF ( ibd.GT.0 ) THEN
+          IF ( ICBCFL.GT.0 ) THEN
             CALL UBDSV3(Kkstp, Kkper, txthold,  
      +                  UNITDIS, BUFF, LAYNUM, 1,
      +                  NCOL, NROW, NLAY, IOUT, DELT,  

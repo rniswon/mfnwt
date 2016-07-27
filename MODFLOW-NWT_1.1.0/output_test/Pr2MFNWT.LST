@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.0, 9/11/2015
+                            VERSION 1.1.0, 7/21/2016
                     BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
 
  LIST FILE: .\Ex_prob2\Pr2MFNWT.LST
@@ -34,7 +34,7 @@
  FILE TYPE:UPW   UNIT   35   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.0.7, 1/15/2013 INPUT READ FROM UNIT    2
+ BAS -- BASIC PACKAGE, VERSION 1.1.0, 6/21/2016 INPUT READ FROM UNIT    2
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -393,7 +393,7 @@
  HEADS WILL BE SAVED ON UNIT   30    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT data for Prob 2 from McDonald and others (1991)
 
- NWT1 -- Newton Solver, VERSION 1.1.0, 9/11/2015
+ NWT1 -- Newton Solver, VERSION 1.1.0, 6/21/2016
          INPUT READ FROM UNIT 34
 
  SPECIFIED OPTION:
@@ -431,7 +431,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.0.6, 12/05/2012
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.0, 6/21/2016
          INPUT READ FROM UNIT 35
 
  # UPW data for Prob 2 from McDonald and others (1991)
@@ -15610,6 +15610,6 @@
          TOTAL TIME 2.27232E+08 3.78720E+06  63120.      2630.0      7.2005    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2015/09/11 16:25:02
- Elapsed run time:  9.673 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 12:58:11
+ Elapsed run time:  9.986 Seconds
 

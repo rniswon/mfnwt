@@ -5,6 +5,16 @@
 *.obj
 *.mod
 *_genmod.f90
+*.htm
+*.manifest
+*.rc
+*.res
+*.ilk
+*.pdb
+*.lib
+*.res
+*.tlog
+*.idb
 
 # Executables
 *.exe
@@ -15,3 +25,6 @@
 *.hobs
 *.cbc
 *.hed
+
+MF_NWT/MF_NWT/Release/
+MF_NWT/MF_NWT/Debug/

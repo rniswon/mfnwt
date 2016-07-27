@@ -69,6 +69,10 @@ C       ORIGINAL PSEUDO-TRANSIENT CONTINUATION APPROACH DESCRIBED IN THE DOCUMEN
 C       HAS BEEN DEPRECATED.      
 C     o ADDED BOTTOM AVERAGING TO DAMPEN OSCILLATING SOLUTIONS - ALGORITHM IS IDENTICAL TO
 C       THE ALGORITHM USED IN MODFLOW-USG (PANDAY AND OTHERS, 2013).
+C     o ADDED ABILITY TO CONNECT A SWR REACH WITH MULTIPLE LAYERS STARTING FROM A SPECIFIC
+C       LAYER. LIKE THE PREVIOUS OPTION WHERE A NEGATIVE KRCH FOR A REACH INDICATED THE
+C       REACH SHOULD BE CONNECTED TO LAYERS 1 TO NLAY. SPECIFICATION OF A KRCH OF -2 FOR
+C       A REACH WILL CONNECT THE REACH TO LAYERS 2 TO NLAY.
 C      
 C     o MINOR BUG FIXES IN:
 C         - CALCULATION OF QAQ EXCHANGE PERIMETER FOR EACH LAYER
@@ -103,7 +107,7 @@ C
 !C      
       MODULE GWFSWRMODULE
         CHARACTER(LEN=64),PARAMETER :: VERSION_SWR =
-     +'$Id: gwf2swr7.f 1.04 2016-01-28 15:00:00Z jdhughes $'
+     +'$Id: gwf2swr7.f 1.04 2016-07-26 15:00:00Z jdhughes $'
 C
 C---------INVARIANT PARAMETERS
         INTEGER, PARAMETER          :: IUZFOFFS     = 100000
@@ -882,7 +886,7 @@ C     + + + LOCAL DEFINITIONS + + +
       CHARACTER (LEN= 20) :: ctab(0:5)
       CHARACTER (LEN= 10) :: cobs
       CHARACTER (LEN= 20) :: cintp(3)
-      CHARACTER (LEN=200) :: line
+      CHARACTER (LEN=300) :: line
       CHARACTER (LEN= 20) :: ctabtype, ctabintp
       INTEGER :: iut, iclose
       INTEGER :: i, j, k, n
@@ -2217,7 +2221,7 @@ C     + + + DUMMY ARGUMENTS + + +
       INTEGER, INTENT(IN) :: Igrid
 C     + + + LOCAL DEFINITIONS + + +
       LOGICAL :: writece
-      CHARACTER (LEN=200) :: line
+      CHARACTER (LEN=300) :: line
       CHARACTER (LEN=200) :: errmsg
       CHARACTER (LEN=15)  :: cbnd
       CHARACTER (LEN=10), DIMENSION( 8) :: creach
@@ -6569,7 +6573,7 @@ C       + + + DUMMY ARGUMENTS + + +
         INTEGER, INTENT(IN) :: Iu
 C       + + + LOCAL DEFINITIONS + + +
         CHARACTER (LEN=2), PARAMETER :: comment = '//'
-        CHARACTER (LEN=200) :: line
+        CHARACTER (LEN=300) :: line
         LOGICAL :: iscomment
         INTEGER :: ios
         line = comment
@@ -8252,7 +8256,7 @@ C---------RETURN
 C     + + + DUMMY ARGUMENTS + + +
         INTEGER, INTENT(IN) :: irch
 C     + + + LOCAL DEFINITIONS + + +
-        INTEGER :: k, kk
+        INTEGER :: k, kk, k0
         INTEGER :: ir, jc
         INTEGER :: ktop, kbot
         DOUBLEPRECISION :: e
@@ -8290,7 +8294,9 @@ C     + + + CODE + + +
         jc = REACH(irch)%JRCH
         rtop = REACH(irch)%GTELEV
         rbot = REACH(irch)%GBELEV
-        DO k = 1, NLAY
+        ktop = MAX(1, ABS(REACH(irch)%KRCH))
+        k0 = ktop
+        DO k = k0, NLAY
           kk = LBOTM(k)
           zgtop = REAL(BOTM(jc,ir,kk-1),8)
           zgbot = REAL(BOTM(jc,ir,kk),8)
@@ -8538,7 +8544,7 @@ C-------SUBROUTINE FOR READING DIRECT RUNOFF DATA
 C     + + + DUMMY ARGUMENTS + + +
 C     + + + LOCAL DEFINITIONS + + +
         CHARACTER (LEN=24) :: aname(3)
-        CHARACTER (LEN=200) :: line
+        CHARACTER (LEN=300) :: line
         INTEGER :: lloc, istart, istop, ival
         INTEGER :: iu
         INTEGER :: itmp, irdimap, irdrmult, irdrval
@@ -13628,7 +13634,7 @@ C     + + + LOCAL DEFINITIONS + + +
         INTEGER :: istart, istop
         INTEGER :: lloc
         REAL    :: r
-        CHARACTER (LEN=200) :: line, fname
+        CHARACTER (LEN=300) :: line, fname
 C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/9999/
@@ -13697,7 +13703,7 @@ C     + + + LOCAL DEFINITIONS + + +
         INTEGER :: ii, jj
         REAL :: r
         REAL :: gfac
-        CHARACTER (LEN=200) :: line, fname
+        CHARACTER (LEN=300) :: line, fname
 C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/99/
@@ -14329,6 +14335,8 @@ C     + + + CODE + + +
         dlj   = DZERO
         bj    = DZERO
         aj    = DZERO
+        p     = DZERO
+        r     = DZERO
         IF (REACH(I)%IGEOTYPE.EQ.5) THEN
           IF (Irowi.NE.Irowj) dli = DELC(Irowi) * DONEHALF
           IF (Jcoli.NE.Jcolj) dli = DELR(Jcoli) * DONEHALF
@@ -14374,7 +14382,7 @@ C     + + + DUMMY ARGUMENTS + + +
         REAL, INTENT(IN)    :: Totim
         TYPE(TTABS), INTENT(INOUT) :: TABDATA
 C     + + + LOCAL DEFINITIONS + + +
-        CHARACTER (LEN=200) :: line
+        CHARACTER (LEN=300) :: line
         INTEGER :: iut
         INTEGER :: itmp
         INTEGER :: i, n
@@ -14484,7 +14492,7 @@ C     + + + DUMMY ARGUMENTS + + +
         REAL, INTENT(IN)    :: Totim
         TYPE(TTSDATA), INTENT(INOUT) :: TSDATA
 C     + + + LOCAL DEFINITIONS + + +
-        CHARACTER (LEN=200) :: line
+        CHARACTER (LEN=300) :: line
         INTEGER :: iut
         INTEGER :: lloc, istart, istop
         INTEGER :: iv

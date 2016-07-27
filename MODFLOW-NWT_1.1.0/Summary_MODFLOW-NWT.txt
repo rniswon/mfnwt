@@ -65,7 +65,7 @@ HISTORY
        MODFLOW-NWT Version 1.0.9 07/01/2014 - Also see the file
        ‘release.txt’ for additional release notes.
        
-       MODFLOW-NWT Version 1.1.0 07/01/2014 - Also see the file
+       MODFLOW-NWT Version 1.1.0 07/21/2016 - Also see the file
        ‘release.txt’ for additional release notes.
         
 SYSTEM REQUIREMENTS
@@ -141,6 +141,6 @@ CONTACT
 
     Richard Niswonger
     U.S. Geological Survey
-    2730 N. Deer Run Road
-    Carson City, Nevada 89701
-    (775) 887-7727
+    345 Middlefield Rd. MS470
+    Menlo Park, CA 94025
+    (650) 329-4534
