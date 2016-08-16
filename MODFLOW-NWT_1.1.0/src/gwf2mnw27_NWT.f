@@ -29,7 +29,7 @@
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR MNW2 PACKAGE.
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C     ******************************************************************
 C
 C     SPECIFICATIONS:

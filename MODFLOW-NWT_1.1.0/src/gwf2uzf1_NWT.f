@@ -16,6 +16,7 @@ C     ******************************************************************
       gwet = 0.0d0
       trhs = 0.0d0
       thcof = 0.0d0
+      dET = 0.0d0
       IF ( ETOPT.EQ.1 ) THEN
         gwet = etlinear(smoothet,hh,s,x,c,trhs,thcof,dET)
       ELSE IF ( ETOPT.EQ.2 ) THEN
@@ -113,7 +114,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -5063,20 +5064,26 @@ C9------ALL WAVES SHALLOWER THAN ET EXTINCTION DEPTH.
                   fhold = ((Theta(kj)-Thetar)*thsrinv)**Eps
                   IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                   Speed(kj) = epsfksths * (fhold**eps_m1)
-                  Flux(kj) = Fksat*(((Theta(kj)-Thetar)*thsrinv)**Eps)
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  Flux(kj) = Fksat*((fhold*thsrinv)**Eps)
                   Ltrail(kj) = 1
                   Itrwave(kj) = 0
                 ELSE
-                  fhold = ((Theta(kj-1)-Thetar)*thsrinv)**Eps
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
+                  fhold = Theta(kj-1)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  fhold = (fhold*thsrinv)**Eps
                   ftheta1 = Fksat*fhold
-                  fhold = ((Theta(kj)-Thetar)*thsrinv)**Eps
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  fhold = (fhold*thsrinv)**Eps
                   ftheta2 = Fksat*fhold
                   bottom  = Theta(kj-1)-Theta(kj)
                   IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
                   Speed(kj) = (ftheta1-ftheta2)/bottom
-                  Flux(kj) = Fksat*(((Theta(kj)-Thetar)*thsrinv)**Eps)
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  Flux(kj) = Fksat*((fhold*thsrinv)**Eps)
                   Ltrail(kj) = 1
                   Itrwave(kj) = 0
                 END IF
