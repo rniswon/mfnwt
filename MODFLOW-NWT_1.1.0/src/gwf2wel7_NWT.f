@@ -45,7 +45,8 @@ C     ------------------------------------------------------------------
       integer,intent(in) :: IUNITNWT,IGRID
       integer,intent(inout) :: IN
 C
-      CHARACTER*200 LINE,TEXT
+      CHARACTER(len=200) :: LINE
+      CHARACTER(len=16) :: text        = ' WELL PACKAGE '
       LOGICAL :: found
       character(len=40) :: keyvalue
       INTEGER NUMTABHOLD
