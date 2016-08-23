@@ -4003,7 +4003,7 @@ C
      +                    Surflux, Jpnt )
           itrailflg = 1
         END IF
-        CALL LEADWAVE2(Numwaves, time, Totalflux, itester, Flux, 
+        CALL LEADWAVE2(I, Numwaves, time, Totalflux, itester, Flux, 
      +                 Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
      +                 Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
      +                 feps2, itrailflg, Delt, ffcheck)
@@ -4054,7 +4054,7 @@ C5-----RETURN.
 
 C
 C--------SUBROUTINE LEADWAVE2
-      SUBROUTINE LEADWAVE2(Numwaves, Time, Totalflux, Itester, Flux, 
+      SUBROUTINE LEADWAVE2(I, Numwaves, Time, Totalflux, Itester, Flux, 
      +                     Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
      +                     Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
      +                     Feps2, Itrailflg, Delt, ffcheck)
@@ -4065,6 +4065,7 @@ C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
       USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, NEARZERO, THETAB, FLUXB,
      +    FLUXHLD2, ZEROD15, ZEROD9, ZEROD6, CHECKTIME, MORE
+      USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -4072,7 +4073,7 @@ C     ------------------------------------------------------------------
 C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER Itester, Jpnt, Numwaves, Itrailflg
-      INTEGER Itrwave(NWAV), Ltrail(NWAV)
+      INTEGER Itrwave(NWAV), Ltrail(NWAV),I
       REAL Eps, Fksat, Thetas
       DOUBLE PRECISION Depth(NWAV), Theta(NWAV), Flux(NWAV), Speed(NWAV)
       DOUBLE PRECISION Feps2, Totalflux, Surflux, Oldsflx, Thetar, Time,
@@ -4080,7 +4081,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION bottomtime, shortest, fcheck, fhold
+      DOUBLE PRECISION bottomtime, shortest, fcheck, fhold, fhold2
       DOUBLE PRECISION eps_m1, timenew, feps3, bottom
       DOUBLE PRECISION thsrinv, epsfksths, timedt, big, f7, f8
       DOUBLE PRECISION ttt, diff, comp1, comp2, ftheta1, ftheta2
@@ -4147,7 +4148,7 @@ C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE A WAVE AHEAD.
                 kk = j + Itrwave(Jpnt+j)
                 IF ( j.GT.2 ) THEN
                   IF ( ABS(Speed(jpntm2+j)-
-     +                 Speed(jpntm1+j)).GT.CLOSEZERO ) THEN
+     +                 Speed(jpntm1+j)).GT.ZEROD15 ) THEN
                     CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
      +                             /(Speed(jpntm2+j)-Speed(jpntm1+j))
                   ELSE
@@ -4162,27 +4163,28 @@ C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE A WAVE AHEAD.
 C
 C4------LEAD WAVE INTERSECTS A TRAIL WAVE.
                   fhold = 0.0D0
-                  IF ( ABS(Theta(jpntm1+jj)-Thetar).GT.CLOSEZERO )
+                  IF ( ABS(Theta(jpntm1+jj)-Thetar).GT.ZEROD15 )
      +                fhold = (f7*Theta(jpntm2+j)+f8*Theta(jpntm3+j)-
      +                        Thetar)/(Theta(jpntm1+jj)-Thetar)
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm1+jj)
-     +                             *(fhold**eps_m1))/(Speed(jpntm1+jj)
+                  fhold2 = (Speed(jpntm1+jj)
      +                             *(fhold**eps_m1)-Speed(jpntm1+j))
+                  IF ( fhold2.LT.ZEROD15 ) fhold2 = ZEROD15
+                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm1+jj)
+     +                             *(fhold**eps_m1))/fhold2
                 ELSE
                   j = j + 1
                   lcheck = (Ltrail(jpntm1+j).NE.0 .AND.
      +                     Itrwave(Jpnt+j).GT.0)
                 END IF
               END DO
-            ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.CLOSEZERO 
+            ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
      +                .AND. j.NE.1 ) THEN
               CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
      +                       /(Speed(jpntm2+j)-Speed(jpntm1+j))
             ELSE
               CHECKTIME(j) = big
             END IF
-          ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.CLOSEZERO 
+          ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
      +                .AND. j.NE.1 ) THEN
             CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
      +                     /(Speed(jpntm2+j)-Speed(jpntm1+j))
@@ -4192,7 +4194,7 @@ C4------LEAD WAVE INTERSECTS A TRAIL WAVE.
           j = j + 1
         END DO
         DO j = 2, Numwaves
-          IF ( CHECKTIME(j).LT.NEARZERO ) CHECKTIME(j) = big
+          IF ( CHECKTIME(j).LT.ZEROD15 ) CHECKTIME(j) = big
         END DO
 C
 C5------CALCULATE HOW LONG IT WILL TAKE BEFORE DEEPEST WAVE REACHES
@@ -4204,7 +4206,7 @@ Cdep
             bottom = Speed(jpntp1)
             IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
             bottomtime = (Depth(Jpnt)-Depth(jpntp1))/bottom
-            IF ( bottomtime.LT.0.0 ) bottomtime = 1.0D-12
+            IF ( bottomtime.LT.ZEROD15 ) bottomtime = ZEROD15
           END IF
         END IF
 C
@@ -4413,7 +4415,8 @@ C         WHEN LEAD TRAIL WAVE INTERSECTS A LEAD WAVE.
      +                   = Theta(jpntm3+j) - ZEROD9
                     IF ( comp2.LT.CLOSEZERO ) Flux(jpntm1+j)
      +                   = Flux(jpntm3+j) - ZEROD15
-                    IF ( Flux(jpntm1+j)-Flux(jpntm3+j).LT.0.0D0 ) THEN
+                    IF ( Flux(jpntm1+j)-Flux(jpntm3+j).LT.
+     +                                                CLOSEZERO ) THEN
                       fhold = (Theta(jpntm1+j)-Thetar)*thsrinv
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                       Speed(jpntm1+j) = epsfksths * (fhold**eps_m1)
