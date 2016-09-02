@@ -5755,7 +5755,7 @@ C
 C
       DO 1 I=1,NS
        if ( abs(TD)>verysmall ) PP=XLN2*I/TD
-       IF ( pp.LT.1.0e-14 ) THEN
+       IF ( pp.LT.verysmall ) THEN   !RGN 9/2/2016 changed 1e-14 to verysmall
          Q0=DSQRT(PP)
        ELSE
          Q0=0.0
@@ -5766,7 +5766,7 @@ C
        RE0=BESSK0(Q0)
        RE1=BESSK1(Q0)
        RE0X=BESSK0(Q0RD)
-       IF ( abs(Q0*RE1).GT.1.0e-14 ) THEN
+       IF ( abs(Q0*RE1).GT.verysmall ) THEN
          A0=RE0*(XLD-XDD)/(Q0*RE1)
          E0=RE0X*(XLD-XDD)/(Q0*RE1)
        ELSE
@@ -5896,12 +5896,15 @@ C    OF THE SECOND KIND. SOURCE: PRESS AND OTHERS (1992).
       DOUBLE PRECISION FUNCTION BESSK0(X)
 C---SPECIFICATIONS
       DOUBLE PRECISION X,Y,P1,P2,P3,P4,P5,P6,P7,
-     *    Q1,Q2,Q3,Q4,Q5,Q6,Q7,BESSI0
+     *    Q1,Q2,Q3,Q4,Q5,Q6,Q7,BESSI0,verysmall
       DATA P1,P2,P3,P4,P5,P6,P7/-0.57721566D0,0.42278420D0,0.23069756D0,
      *    0.3488590D-1,0.262698D-2,0.10750D-3,0.74D-5/
       DATA Q1,Q2,Q3,Q4,Q5,Q6,Q7/1.25331414D0,-0.7832358D-1,0.2189568D-1,
      *    -0.1062446D-1,0.587872D-2,-0.251540D-2,0.53208D-3/
 C
+      verysmall = 1.0d-25
+      BESSK0 = 0.0d0
+      if ( abs(x) < verysmall ) return
       IF (X.LE.2.D0) THEN
         Y=X*X/4.D0
         BESSK0=(-DLOG(X/2.D0)*BESSI0(X))+(P1+Y*(P2+Y*(P3+
