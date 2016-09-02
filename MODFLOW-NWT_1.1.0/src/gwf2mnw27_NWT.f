@@ -3598,7 +3598,8 @@ c
 c  correct partially penetrating node-defined cells by ratio of screenlength/satthck
               if(NNODES.GT.0) then
                   ratio = 0.0
-                if ( thck > verysmall) ratio=(topscreen-bottomscreen)/thck
+                if ( thck > verysmall) ratio=(topscreen-bottomscreen)/
+     &                                       thck
                 cond=cond*ratio
               end if
 c             
