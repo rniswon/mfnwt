@@ -45,7 +45,8 @@ C     ------------------------------------------------------------------
       integer,intent(in) :: IUNITNWT,IGRID
       integer,intent(inout) :: IN
 C
-      CHARACTER*200 LINE,TEXT
+      CHARACTER(len=200) :: LINE
+      CHARACTER(len=16) :: text        = ' WELL PACKAGE '
       LOGICAL :: found
       character(len=40) :: keyvalue
       INTEGER NUMTABHOLD
@@ -59,8 +60,8 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
-    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.1.0, ',
-     1' 6/21/2016 INPUT READ FROM UNIT ',I4)
+    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.1.1, ',
+     1' 7/28/2016 INPUT READ FROM UNIT ',I4)
       NWELLS=0
       NNPWEL=0
       IUNITRAMP=IOUT
@@ -625,7 +626,7 @@ C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
       TIMEBEG = TIME - DELT
       IF ( TIMEBEG-TABTIME(1,INUM).LT.0.0 ) THEN
         RATETERP = TABRATE(1,INUM)
-      ELSEIF ( TIMEBEG-TABTIME(NVAL,INUM).GT.0.0 ) THEN
+      ELSEIF ( TIMEBEG-TABTIME(NVAL,INUM).GE.0.0 ) THEN
         RATETERP = TABRATE(NVAL,INUM)
       ELSE
 ! Find table value before beginning of time step.

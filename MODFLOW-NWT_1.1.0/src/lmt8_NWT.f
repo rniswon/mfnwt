@@ -48,7 +48,7 @@ C THE 'EXTENDED' HEADER OPTION IS THE DEFAULT. THE RESULTING LINK FILE
 C IS COMPATIBLE WITH MT3DMS VERSION [4.00] OR LATER OR MT3D-USGS VERSION
 C [1.00] OR LATER.
 !rgn------REVISION NUMBER CHANGED TO INDICATE MODIFICATIONS FOR NWT 
-!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C **********************************************************************
 C last modified: 06-23-2016
 C last modified: 10-21-2010 swm: added MTMNW1 & MTMNW2
@@ -291,11 +291,11 @@ C--CHECK FOR "PACKAGE_FLOWS" KEYWORD AND GET INPUT
                 IF(IRUNBND(J,I).GT.0.AND.ISFRUZFCONNECT.NE.1) THEN ! check IRUNBND for at least 1 positive connection
                   ISFRUZFCONNECT=1
                   NPCKGTXT = NPCKGTXT + 1
-                  EXIT
+                  GOTO 86  ! Using a goto statement b/c need to exit from nested DO loop
                 ENDIF
               ENDDO
             ENDDO
-          ENDIF
+86        ENDIF
           IF(IUZFFLOWS.EQ.1.AND.ILAKFLOWS.EQ.1.AND.   ! (UZF -> LAK)
      &                        IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
             DO I=1,NROW
@@ -376,11 +376,11 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
                     IF(IRUNBND(J,I).GT.0) THEN ! check IRUNBND for at least 1 positive connection
                       ISFRUZFCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
-                      EXIT
+                      GOTO 87
                     ENDIF
                   ENDDO
                 ENDDO
-              ENDIF
+87            ENDIF
               IF(IUZFFLOWS.EQ.1.AND.MTLAK.NE.0.AND.
      &                            IUZFOPT.NE.0.AND.IRUNFLG.NE.0) THEN
                 DO I=1,NROW
@@ -388,11 +388,11 @@ C  indicating that there is at least one SFR->LAK or LAK->SFR connection.
                     IF(IRUNBND(J,I).LT.0) THEN ! check IRUNBND for at least 1 negative (lake) connection
                       ILAKUZFCONNECT=1
                       NPCKGTXT = NPCKGTXT + 1
-                      EXIT
+                      GOTO 88
                     ENDIF
                   ENDDO
                 ENDDO
-              ENDIF
+88            ENDIF
               FIRSTVAL=.FALSE.
           END SELECT
           GOTO 20

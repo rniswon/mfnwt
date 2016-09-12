@@ -48,7 +48,7 @@ C           THAN CELL-BASED REACHES (IGEOTYPE=5)
 C         - SUMMARY CONVERGENCE INFORMATION WRITTEN TO SCREEN (ONLY WHEN ISWRSCRN=1) ONLY
 C           INCLUDES INFORMATION FOR ACTIVE REACH GROUPS
 C
-C     VERSION 1.04 SWR1 for MODFLOW-2005 (1.12) AND MODFLOW NWT (1.1.0)
+C     VERSION 1.04 SWR1 for MODFLOW-2005 (1.12) AND MODFLOW NWT (1.1.1)
 C     CHANGES
 C     o ADDED STATE FUNCTION SUBROUTINES - RETRIEVE STAGE, FLOW, OR STRUCTURE FLOW
 C       AT THE END OF THE PREVIOUS MODFLOW TIME STEP
@@ -107,7 +107,7 @@ C
 !C      
       MODULE GWFSWRMODULE
         CHARACTER(LEN=64),PARAMETER :: VERSION_SWR =
-     +'$Id: gwf2swr7.f 1.04 2016-07-26 15:00:00Z jdhughes $'
+     +'$Id: gwf2swr7.f 1.04 2016-07-21 15:00:00Z jdhughes $'
 C
 C---------INVARIANT PARAMETERS
         INTEGER, PARAMETER          :: IUZFOFFS     = 100000
@@ -886,7 +886,7 @@ C     + + + LOCAL DEFINITIONS + + +
       CHARACTER (LEN= 20) :: ctab(0:5)
       CHARACTER (LEN= 10) :: cobs
       CHARACTER (LEN= 20) :: cintp(3)
-      CHARACTER (LEN=300) :: line
+      CHARACTER (LEN=200) :: line
       CHARACTER (LEN= 20) :: ctabtype, ctabintp
       INTEGER :: iut, iclose
       INTEGER :: i, j, k, n
@@ -2221,7 +2221,7 @@ C     + + + DUMMY ARGUMENTS + + +
       INTEGER, INTENT(IN) :: Igrid
 C     + + + LOCAL DEFINITIONS + + +
       LOGICAL :: writece
-      CHARACTER (LEN=300) :: line
+      CHARACTER (LEN=200) :: line
       CHARACTER (LEN=200) :: errmsg
       CHARACTER (LEN=15)  :: cbnd
       CHARACTER (LEN=10), DIMENSION( 8) :: creach
@@ -6573,7 +6573,7 @@ C       + + + DUMMY ARGUMENTS + + +
         INTEGER, INTENT(IN) :: Iu
 C       + + + LOCAL DEFINITIONS + + +
         CHARACTER (LEN=2), PARAMETER :: comment = '//'
-        CHARACTER (LEN=300) :: line
+        CHARACTER (LEN=200) :: line
         LOGICAL :: iscomment
         INTEGER :: ios
         line = comment
@@ -8544,7 +8544,7 @@ C-------SUBROUTINE FOR READING DIRECT RUNOFF DATA
 C     + + + DUMMY ARGUMENTS + + +
 C     + + + LOCAL DEFINITIONS + + +
         CHARACTER (LEN=24) :: aname(3)
-        CHARACTER (LEN=300) :: line
+        CHARACTER (LEN=200) :: line
         INTEGER :: lloc, istart, istop, ival
         INTEGER :: iu
         INTEGER :: itmp, irdimap, irdrmult, irdrval
@@ -13634,7 +13634,7 @@ C     + + + LOCAL DEFINITIONS + + +
         INTEGER :: istart, istop
         INTEGER :: lloc
         REAL    :: r
-        CHARACTER (LEN=300) :: line, fname
+        CHARACTER (LEN=200) :: line, fname
 C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/9999/
@@ -13703,7 +13703,7 @@ C     + + + LOCAL DEFINITIONS + + +
         INTEGER :: ii, jj
         REAL :: r
         REAL :: gfac
-        CHARACTER (LEN=300) :: line, fname
+        CHARACTER (LEN=200) :: line, fname
 C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/99/
@@ -14382,7 +14382,7 @@ C     + + + DUMMY ARGUMENTS + + +
         REAL, INTENT(IN)    :: Totim
         TYPE(TTABS), INTENT(INOUT) :: TABDATA
 C     + + + LOCAL DEFINITIONS + + +
-        CHARACTER (LEN=300) :: line
+        CHARACTER (LEN=200) :: line
         INTEGER :: iut
         INTEGER :: itmp
         INTEGER :: i, n
@@ -14492,7 +14492,7 @@ C     + + + DUMMY ARGUMENTS + + +
         REAL, INTENT(IN)    :: Totim
         TYPE(TTSDATA), INTENT(INOUT) :: TSDATA
 C     + + + LOCAL DEFINITIONS + + +
-        CHARACTER (LEN=300) :: line
+        CHARACTER (LEN=200) :: line
         INTEGER :: iut
         INTEGER :: lloc, istart, istop
         INTEGER :: iv

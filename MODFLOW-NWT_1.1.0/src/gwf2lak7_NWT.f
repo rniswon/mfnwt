@@ -23,7 +23,7 @@ C
 C------OLD USGS VERSION 7.1; JUNE 2006 GWF2LAK7AR; 
 C------UPDATED FOR MF-2005, FEBRUARY 6, 2012  
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER FOR NWT 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER FOR NWT 1.1.1, 7/28/2016
 C     ******************************************************************
 C     INITIALIZE POINTER VARIABLES USED BY SFR1 TO SUPPORT LAKE3 AND
 C     GAGE PACKAGES AND THE GWT PROCESS
@@ -389,7 +389,7 @@ C
 C------OLD USGS VERSION 7.1;  JUNE 2006 GWF2LAK7RP
 C        REVISED FEBRUARY 6, 2012
 C------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-C------NEW VERSION NUMBER 1.1.0, 6/21/2016  
+C------NEW VERSION NUMBER 1.1.1, 7/28/2016  
 C     ******************************************************************
 C       READ INPUT DATA FOR THE LAKE PACKAGE.
 C     ------------------------------------------------------------------
@@ -1094,7 +1094,7 @@ C
 C
 C------OLD VERSION 7.1 JUNE 2006 GWF2LAK7AD; REVISED FEBRUARY 6, 2012
 C------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-C------NEW VERSION NUMBER 1.1.0, 6/21/2016  
+C------NEW VERSION NUMBER 1.1.1, 7/28/2016  
 C
 C     ******************************************************************
 C     ADVANCE TO NEXT TIME STEP FOR TRANSIENT LAKE SIMULATION, AND COPY
@@ -1238,7 +1238,7 @@ C
 C
 C------OLD USGS VERSION 7.1; JUNE 2006 GWF2LAK7FM; 
 C------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-C------NEW VERSION NUMBER 1.1.0, 6/21/2016  
+C------NEW VERSION NUMBER 1.1.1, 7/28/2016  
 C     ******************************************************************
 C     ADD LAKE TERMS TO RHS AND HCOF IF SEEPAGE OCCURS IN MODEL CELLS
 C     ******************************************************************
@@ -1734,7 +1734,7 @@ C
 C
 C------OLD USGS VERSION 7.1; JUNE 2006 GWF2LAK7BD; 
 C------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-C------NEW VERSION NUMBER 1.1.0, 6/21/2016
+C------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C     ******************************************************************
 C     CALCULATE VOLUMETRIC BUDGET FOR LAKES
 C     ******************************************************************
@@ -3888,7 +3888,11 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
                 END IF
                 FLOTOUZF = FLOBOT 
                 FLOBOT = 0.0D0
-                CONDUC = FLOTOUZF/(STGNEW(LAKE)-BOTLK)
+                IF ( abs((STGNEW(LAKE)-BOTLK)) > closezero ) THEN
+                  CONDUC = FLOTOUZF/(STGNEW(LAKE)-BOTLK)
+                ELSE
+                  CONDUC = 0.0
+                END IF
                 FINF(IC,IR)=FLOTOUZF/AREA
               END IF
             END IF

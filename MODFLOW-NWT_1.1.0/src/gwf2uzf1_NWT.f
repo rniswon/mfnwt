@@ -16,6 +16,7 @@ C     ******************************************************************
       gwet = 0.0d0
       trhs = 0.0d0
       thcof = 0.0d0
+      dET = 0.0d0
       IF ( ETOPT.EQ.1 ) THEN
         gwet = etlinear(smoothet,hh,s,x,c,trhs,thcof,dET)
       ELSE IF ( ETOPT.EQ.2 ) THEN
@@ -113,7 +114,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -4079,7 +4080,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION bottomtime, shortest, fcheck, fhold
+      DOUBLE PRECISION bottomtime, shortest, fcheck, fhold, fhold2
       DOUBLE PRECISION eps_m1, timenew, feps3, bottom
       DOUBLE PRECISION thsrinv, epsfksths, timedt, big, f7, f8
       DOUBLE PRECISION ttt, diff, comp1, comp2, ftheta1, ftheta2
@@ -4146,9 +4147,9 @@ C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE A WAVE AHEAD.
                 kk = j + Itrwave(Jpnt+j)
                 IF ( j.GT.2 ) THEN
                   IF ( ABS(Speed(jpntm2+j)-
-     +                 Speed(jpntm1+j)).GT.CLOSEZERO ) THEN
+     +                 Speed(jpntm1+j)).GT.ZEROD15 ) THEN
                     CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
-     +                             /(Speed(jpntm2+j)-Speed(jpntm1+j))
+     +                            /(Speed(jpntm2+j)-Speed(jpntm1+j))
                   ELSE
                     CHECKTIME(j) = big
                   END IF
@@ -4161,27 +4162,28 @@ C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE A WAVE AHEAD.
 C
 C4------LEAD WAVE INTERSECTS A TRAIL WAVE.
                   fhold = 0.0D0
-                  IF ( ABS(Theta(jpntm1+jj)-Thetar).GT.CLOSEZERO )
+                  IF ( ABS(Theta(jpntm1+jj)-Thetar).GT.ZEROD15 )
      +                fhold = (f7*Theta(jpntm2+j)+f8*Theta(jpntm3+j)-
      +                        Thetar)/(Theta(jpntm1+jj)-Thetar)
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm1+jj)
-     +                             *(fhold**eps_m1))/(Speed(jpntm1+jj)
+                  fhold2 = (Speed(jpntm1+jj)
      +                             *(fhold**eps_m1)-Speed(jpntm1+j))
+                  IF ( abs(fhold2).LT.ZEROD15 ) fhold2 = ZEROD15
+                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm1+jj)
+     +                             *(fhold**eps_m1))/fhold2
                 ELSE
                   j = j + 1
                   lcheck = (Ltrail(jpntm1+j).NE.0 .AND.
      +                     Itrwave(Jpnt+j).GT.0)
                 END IF
               END DO
-            ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.CLOSEZERO 
+            ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
      +                .AND. j.NE.1 ) THEN
               CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
      +                       /(Speed(jpntm2+j)-Speed(jpntm1+j))
             ELSE
               CHECKTIME(j) = big
             END IF
-          ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.CLOSEZERO 
+          ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
      +                .AND. j.NE.1 ) THEN
             CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
      +                     /(Speed(jpntm2+j)-Speed(jpntm1+j))
@@ -4191,7 +4193,7 @@ C4------LEAD WAVE INTERSECTS A TRAIL WAVE.
           j = j + 1
         END DO
         DO j = 2, Numwaves
-          IF ( CHECKTIME(j).LT.NEARZERO ) CHECKTIME(j) = big
+          IF ( CHECKTIME(j).LT.ZEROD15 ) CHECKTIME(j) = big
         END DO
 C
 C5------CALCULATE HOW LONG IT WILL TAKE BEFORE DEEPEST WAVE REACHES
@@ -4203,7 +4205,7 @@ Cdep
             bottom = Speed(jpntp1)
             IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
             bottomtime = (Depth(Jpnt)-Depth(jpntp1))/bottom
-            IF ( bottomtime.LT.0.0 ) bottomtime = 1.0D-12
+            IF ( bottomtime.LT.ZEROD15 ) bottomtime = ZEROD15
           END IF
         END IF
 C
@@ -4412,7 +4414,8 @@ C         WHEN LEAD TRAIL WAVE INTERSECTS A LEAD WAVE.
      +                   = Theta(jpntm3+j) - ZEROD9
                     IF ( comp2.LT.CLOSEZERO ) Flux(jpntm1+j)
      +                   = Flux(jpntm3+j) - ZEROD15
-                    IF ( Flux(jpntm1+j)-Flux(jpntm3+j).LT.0.0D0 ) THEN
+                    IF ( Flux(jpntm1+j)-Flux(jpntm3+j).LT.
+     +                                                CLOSEZERO ) THEN
                       fhold = (Theta(jpntm1+j)-Thetar)*thsrinv
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                       Speed(jpntm1+j) = epsfksths * (fhold**eps_m1)
@@ -5063,20 +5066,26 @@ C9------ALL WAVES SHALLOWER THAN ET EXTINCTION DEPTH.
                   fhold = ((Theta(kj)-Thetar)*thsrinv)**Eps
                   IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                   Speed(kj) = epsfksths * (fhold**eps_m1)
-                  Flux(kj) = Fksat*(((Theta(kj)-Thetar)*thsrinv)**Eps)
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  Flux(kj) = Fksat*((fhold*thsrinv)**Eps)
                   Ltrail(kj) = 1
                   Itrwave(kj) = 0
                 ELSE
-                  fhold = ((Theta(kj-1)-Thetar)*thsrinv)**Eps
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
+                  fhold = Theta(kj-1)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  fhold = (fhold*thsrinv)**Eps
                   ftheta1 = Fksat*fhold
-                  fhold = ((Theta(kj)-Thetar)*thsrinv)**Eps
-                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  fhold = (fhold*thsrinv)**Eps
                   ftheta2 = Fksat*fhold
                   bottom  = Theta(kj-1)-Theta(kj)
                   IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
                   Speed(kj) = (ftheta1-ftheta2)/bottom
-                  Flux(kj) = Fksat*(((Theta(kj)-Thetar)*thsrinv)**Eps)
+                  fhold = Theta(kj)-Thetar
+                  IF ( fhold < ZEROD15 ) fhold = ZEROD15
+                  Flux(kj) = Fksat*((fhold*thsrinv)**Eps)
                   Ltrail(kj) = 1
                   Itrwave(kj) = 0
                 END IF

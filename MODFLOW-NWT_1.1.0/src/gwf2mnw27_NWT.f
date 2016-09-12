@@ -15,7 +15,7 @@
         DOUBLE PRECISION, POINTER :: SMALL
         CHARACTER(LEN=20), DIMENSION(:),   POINTER     ::WELLID
         CHARACTER(LEN=16), DIMENSION(:),   POINTER     ::MNWAUX
-        INTEGER,    DIMENSION(:,:),     POINTER ::LIMQ
+        INTEGER,    DIMENSION(:,:),     POINTER :: LIMQ
         DOUBLE PRECISION,  DIMENSION(:,:), POINTER     ::MNW2
         DOUBLE PRECISION,  DIMENSION(:,:), POINTER     ::MNWNOD
         DOUBLE PRECISION,  DIMENSION(:,:), POINTER     ::MNWINT
@@ -29,7 +29,7 @@
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR MNW2 PACKAGE.
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.0, 6/21/2016
+!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
 C     ******************************************************************
 C
 C     SPECIFICATIONS:
@@ -2141,7 +2141,7 @@ c             Q has been constrained
 c             only perform % checks after second iteration (lets soln get going)
               if(kiter.gt.2) then
 c              % check divides by lastQ, so avoid this if it is zero
-               if(lastQ.ne.0.0) then
+               if(abs(lastQ)>small) then
 c               this is the percentage change, below which the Q will be locked in
 c               for the time step
                 temppct=0.01d0
@@ -2872,10 +2872,10 @@ c   Assuming expansion of grid is slight, if present, & that Txx and Tyy of the 
 c   cells are about the same value.
           Txx = 0.00000000D0
           div  = Txp + Txm
-          if( div.gt.small ) Txx  = 2*Txp*Txm / div
+          if( abs(div).gt.small ) Txx  = 2*Txp*Txm / div
           Tyy = 0.00000000D0
           div  = Typ + Tym
-          if( div.gt.small ) Tyy  = 2*Typ*Tym / div
+          if( abs(div).gt.small ) Tyy  = 2*Typ*Tym / div
           if( Txx.gt.small .and. Tyy.lt.small ) Tyy = Txx
           if( Tyy.gt.small .and. Txx.lt.small ) Txx = Tyy
          else
@@ -2901,13 +2901,13 @@ C  FOR BCF, must assume Kh=Kz as only input is VCONT
          upper = hnew(ix,iy,iz)
          if( upper.gt.top ) upper = top
          thick = upper - bot
-         if(thick.gt.0.d0) then
+         if(thick.gt.verysmall) then
            Kz=((Txx*Tyy)**0.5D0)/thick
          else
            Kz=0.d0
          end if
 c-lfk         IF(ISS.NE.0) THEN
-         IF(ISS.EQ.0.and.thick.gt.0.D0) THEN
+         IF(ISS.EQ.0.and.thick.gt.verysmall) THEN
            SS=SC1(IX,IY,IZ)/(thick*dx*dy)
          ELSE
            SS=1e-5
@@ -3005,7 +3005,7 @@ c   set thickness / conductance to 0 if cell is dry
              Kz=VKA(ix,iy,iz)
            ELSE
 c--LFK 10/4/12 modifications below to prevent zero-divide error if VKA.eq.0
-            if (VKA(ix,iy,iz).gt.0.0) then
+            if (VKA(ix,iy,iz).gt.verysmall) then
              Kz=HK(ix,iy,iz)/VKA(ix,iy,iz)
             else
              Kz=0.0
@@ -3029,7 +3029,7 @@ c            end if
 c          end if
 c         continue
 c lfk  4/21/11 modifications below to prevent zero-divide error if thick.eq.0       
-         IF(thick.gt.0) THEN
+         IF(thick.gt.verysmall) THEN
           IF(ITRSS.NE.0) THEN
            SS=SC1(IX,IY,IZ)/(thick*dx*dy)
           ELSE
@@ -3096,7 +3096,7 @@ C
 C     FIND HORIZONTAL ANISOTROPY, THE RATIO Ky/Kx
          TempKX = HK(ix,iy,iz)
          KY = HKCC(IX,IY,IZ)
-         AH = KY/TempKX
+         if ( TempKX > verysmall ) AH = KY/TempKX
 C
          if (LAYHDT(IZ).EQ.0) then
 C       THICKNESS IS NOT HEAD-DEPENDENT
@@ -3126,7 +3126,7 @@ c   set thickness / conductance to 0 if cell is dry
            Kz=VKAH(ix,iy,iz)
          end if
 C-LFK         IF(ISS.NE.0) THEN
-         IF(ISS.EQ.0.and.thick.gt.0.0) THEN
+         IF(ISS.EQ.0.and.thick.gt.verysmall) THEN
            SS=SC1(IX,IY,IZ)/(thick*dx*dy)
          ELSE
            SS=1e-5
@@ -3227,7 +3227,7 @@ c   set thickness / conductance to 0 if cell is dry
            END IF
          end if
           IF(ITRSS.NE.0) THEN
-           IF (thick.GT.0.0) THEN
+           IF (thick.GT.verysmall) THEN
              SS=SC1(IX,IY,IZ)/(thick*dx*dy)
            ELSE
              SS=0.0
@@ -3428,13 +3428,14 @@ c   check boundaries/saturated thickness
 c   calculate total length of borehole within cell
                 totlength=totlength+lengthint
                 if(LOSSTYPE.EQ.4) then
-                  if(totlength.gt.0D0) then
+                  if(totlength.gt.verysmall) then
                     lengthratio=lengthint/totlength
                     CWC = CWC + lengthratio*(MNWINT(11,iint))
                   endif
                 else
 c   calculate weighting ratio based on full thickness of node
-                  ratio=lengthint/thck
+                  ratio = 0.0
+                  if(thck.gt.verysmall)ratio=lengthint/thck
 c   maximum ratio is 1.0
                   if(ratio.gt.1.d0) ratio=1.d0 
 c   use length-weighted ratios for each interval to determine CWC of that interval
@@ -3464,7 +3465,8 @@ c
 c   calculate alpha for partial penetration effect if PPFLAG is on
               PPFLAG=INT(MNW2(19,iw))
               if(PPFLAG.GT.0) then
-                alpha=totlength/(thck)
+                  alpha = 0.0
+                if ( thck>verysmall ) alpha=totlength/(thck)
                 if(alpha.gt.0.99.and.alpha.lt.1.0) then
                   if (MNWPRNT.gt.1.and.kiter.eq.1) then
                   nd=INODE-firstnode+1
@@ -3493,11 +3495,13 @@ c  use saved partial penetration effect if steady state and past 1st iter
               else
 c      if transient, update dhp
                 T = (Txx*Tyy)**0.5D0
-                Kh = T/thck
+                Kh = 0.0
+                if ( thck > verysmall ) Kh = T/thck
                 QQ=Qact*(-1.D0)
                 Kz=MNWNOD(33,INODE)
 c
-                SS=MNWNOD(34,INODE)/(thck*dx*dy)
+                SS = 1.0e-6
+                if ( thck > verysmall ) SS=MNWNOD(34,INODE)/(thck*dx*dy)
 c
 c    determine location of well screen in cell
 c
@@ -3593,7 +3597,9 @@ c             end if recalc dhp
 c
 c  correct partially penetrating node-defined cells by ratio of screenlength/satthck
               if(NNODES.GT.0) then
-                ratio=(topscreen-bottomscreen)/thck
+                  ratio = 0.0
+                if ( thck > verysmall) ratio=(topscreen-bottomscreen)/
+     &                                       thck
                 cond=cond*ratio
               end if
 c             
@@ -3607,8 +3613,8 @@ c     &          .OR.(Qact.gt.0.D0.AND.dhp.lt.0.D0)) then
 c  LFK 6/2012  change check on dhp to include 0.0 to avoid unneeded warnings
      &          .AND.(Qact.lt.0.D0.AND.dhp.ge.0.D0)
      &          .OR.(Qact.gt.0.D0.AND.dhp.le.0.D0)) then
-                  dpp=dhp/(Qact*(-1.D0))
-                if(cond.gt.0.0) then
+                  if (abs(Qact)>verysmall) dpp=dhp/(Qact*(-1.D0))
+                if(cond.gt.verysmall) then
                   ABC=1/cond
                   ABCD=ABC+dpp
                   cond=1/ABCD
@@ -3723,7 +3729,7 @@ C--LFK
       INTEGER ISEGFLG
 C
       DOUBLE PRECISION pi,verysmall,rw,Txx,Tyy,yx4,xy4,ro,dx,dy,Tpi2,A,
-     & Ploss,B,Rskin,Kskin,C,Cf,Q,thck,T,Tskin,Skin,h,dc
+     & Ploss,B,Rskin,Kskin,C,Cf,Q,thck,T,Tskin,Skin,h,dc,check
 C     ------------------------------------------------------------------
 C
 ! RGN added next 3 lines.
@@ -3732,6 +3738,7 @@ C
       IF( h.LT.0.0 ) h = 0.0
       pi = 3.1415926535897932D0
       verysmall = 1.D-25
+      check = 0.0
 C-LFK
       ISEGFLG=0
 C      
@@ -3745,14 +3752,16 @@ C
 c
         Tpi2 = 2.D0*pi * (Txx*Tyy)**0.5D0
 c       if ro/rw is <1, 'A' term will be negative.  Warn user and cut off flow from this node
-        if (ro/rw.lt.1.D0) then
+        if (rw > verysmall) check  =  ro/rw
+        if (check.lt.1.D0) then
           write(iout,*) 
      &      '     Ro/Rw =  ',Ro/Rw, 
      &      '***WARNING*** Ro/Rw < 1, CWC set = 0.0 for well ',WELLNAME
           cel2wel2 = 0.D0
           GOTO 888
         end if
-        A = log(ro/rw) / Tpi2
+        A = 0.0
+        if ( rw>verysmall ) A = log(ro/rw) / Tpi2
 c--LFK--Dec 2012   IF Vert.Segment, Length & Cond. = 1/2 of calc. value.
           IF (SKIN.EQ.-999.0) THEN
             A=A*2.0
@@ -3762,7 +3771,8 @@ c--LFK--Dec 2012   IF Vert.Segment, Length & Cond. = 1/2 of calc. value.
 c
 c       For the "NONE" option, multiply the Kh by 1000 to equivalate Hnew and hwell
         if(LOSSTYPE.EQ.0) then
-          cel2wel2=1.0D4*((Txx*Tyy)**0.5D0)/thck    
+          cel2wel2 = 0.0
+          if ( thck>verysmall ) cel2wel2=1.0D4*((Txx*Tyy)**0.5D0)/thck
 c
 c       THEIM option (LOSSTYPE.EQ.1) only needs A, so no need to calculate  B or C
 c
@@ -3776,7 +3786,8 @@ c--LFK--Dec 2012    Check for segment calculation
             Tskin=Tskin*0.5
           END IF
 C
-          if(Tskin.gt.0.D0.and.rw.gt.0.D0) then
+          if(Tskin.gt.verysmall.and.rw.gt.verysmall.and.
+     +       Tpi2>verysmall) then
 c         this is from eqs 3 and 5 in orig MNW report
             Skin = ((T/Tskin)-1)*(DLOG(Rskin/rw))
             B = Skin / Tpi2
@@ -3801,7 +3812,7 @@ C
           C = 0.D0
        end if
         cel2wel2 = A + B + C 
-        cel2wel2 = 1.000000D0 / cel2wel2
+        if ( cel2wel2>verysmall )cel2wel2 = 1.000000D0 / cel2wel2
       endif
       IF ( LAYHDT(L1).GT.0 .AND. Iuupw.GT.0 ) 
      +     cel2wel2 = cel2wel2*smooth2(h,dc)
@@ -3879,7 +3890,7 @@ c   Retrieve Qfrcmn, Qfrcmx, Qdes
            qon  = mnw2(10,iw)
            if(QCUT.GT.0) then
 c     convert rate into fraction of Qdes (ratio is used to compare)
-            if(Qdes.NE.0) then
+            if(abs(Qdes)>verysmall) then
               qoff=abs(qoff/Qdes)
               qon=abs(qon/Qdes)
 c            else
@@ -4119,7 +4130,7 @@ c      Hlim constraints that stop production are not tested until after the 2nd 
               if( abs(qdes) .gt. small ) ratio =  qact / qdes
               if( ratio .lt. 0.00001D0 ) then
                 qact  = 0.000D0
-                if (csum .gt. 0.0D0) then
+                if (csum .gt. verysmall) then
                   hwell = ( qact - Qseep + chsum ) / csum
                 else
                   hwell = hnew(ic,ir,il)
@@ -4361,12 +4372,13 @@ c-LFK
      & cel2wel2,alpha,T,Kh,Kz,Txx1,Tyy1
       DOUBLE PRECISION 
      & Txx,Tyy,rw,Rskin,Kskin,B,Cf,PLoss,Qact,cond1,cond2,cond,Skin
-      DOUBLE PRECISION dgr_to_rad,pi
+      DOUBLE PRECISION dgr_to_rad,pi,verysmall
       ALLOCATE(ivert1(NODTOT),ivert2(NODTOT),zseg1(NODTOT),
      & zseg2(NODTOT))
 c convert degree trig func modified from http://techpubs.sgi.com
       pi = 3.1415926535897932D0
       dgr_to_rad = (pi/180.D0)
+      verysmall = 1.0d-25
 c     compute borehole length and screen orientation
 c
 c     compute length associated with each section 
@@ -4596,10 +4608,10 @@ C-LFK          if(z1.gt.HNEW(C1,R1,L1)) then
             zwt=HNEW(C1,R1,L1)                
 c   at wt face, determine intersection with line segment
 c-lfk
-            if ((z2-z1).eq.0.0) then
-              m=0.0
-            else
+            if (abs(z2-z1)>verysmall) then
               m=(zwt-z1)/(z2-z1)
+            else
+              m=0.0
             end if
             xwt=x1+m*(x2-x1)             
             ywt=y1+m*(y2-y1)
@@ -5151,8 +5163,14 @@ c-lfk
       dgr_to_rad = (pi/180.D0)
       verysmall = 1.D-25
 c
-      Kx=Txx/thck
-      Ky=Tyy/thck
+
+      if ( thck>verysmall ) then
+        Kx=Txx/thck
+        Ky=Tyy/thck
+      else
+        Kx = verysmall
+        Ky = verysmall
+      end if
 c    this makes conductance very small
       if( rw.lt.verysmall .or. Txx.lt.verysmall .or. Tyy.lt.verysmall ) 
      &  then
@@ -5189,32 +5207,39 @@ c       if ro/rw is <1, 'A' term will be negative.  Warn user and cut off flow f
           cel2wel2SEG = 0.D0
           GOTO 888
         end if
-        Az = log(roz/rw) / Tpi2z
-        Ay = log(roy/rw) / Tpi2y
-        Ax = log(rox/rw) / Tpi2x
+        Az = verysmall
+        Ay = verysmall
+        Ax = verysmall
+        if ( rw > verysmall ) then
+          if ( abs(Tpi2z)>verysmall ) Az = log(roz/rw) / Tpi2z
+          if ( abs(Tpi2y)>verysmall ) Ay = log(roy/rw) / Tpi2y
+          if ( abs(Tpi2x)>verysmall ) Ax = log(rox/rw) / Tpi2x
+        end if
 c
 c       THEIM option (LOSSTYPE.EQ.1) only needs A, so no need to calculate  B or C
 c
 c       SKIN (LINEAR) option, calculate B, C=0
         if(LOSSTYPE.EQ.2) then
 c         average T in aquifer assumed to be sqrt of Txx*Tyy
-          if(Kskin.gt.0.D0.and.rw.gt.0.D0) then
+          Bx = 0.D0
+          By = 0.D0
+          Bz = 0.D0
+          if(Kskin.gt.verysmall.and.rw.gt.verysmall) then
 c         this is from eqs 3 and 5 in orig MNW report
             lwz=thck
-            Bz=(thck*(Kx*Ky)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2z
+            if ( abs(Tpi2z)>verysmall ) 
+     +      Bz=(thck*(Kx*Ky)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2z
             lwy=dy
-            By = (dy*(Kx*Kz)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2y
+            if ( abs(Tpi2y)>verysmall ) 
+     +      By = (dy*(Kx*Kz)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2y
             lwx=dx
-            Bx = (dx*(Ky*Kz)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2x
-          else
-            Bx = 0.D0
-            By = 0.D0
-            Bz = 0.D0
+            if ( abs(Tpi2x)>verysmall )
+     +      Bx = (dx*(Ky*Kz)**0.5D0/(Kskin*lw)-1)*(DLOG(Rskin/rw))/Tpi2x
           end if
           C = 0.D0
 c       NONLINEAR option, calculate B and C
        else if (LOSSTYPE.EQ.3) then
-          B = B / Tpi2z 
+          if ( abs(Tpi2z)>verysmall ) B = B / Tpi2z 
           if(Cf.NE.0.0) then
             C = Cf * abs(Q)**(PLoss-1)
           else
@@ -5228,11 +5253,12 @@ c       NONLINEAR option, calculate B and C
        end if
 c       these are per length
        CLz = Az + Bz + C 
-       CLz = 1.000000D0 / CLz / thck
+       if ( thck>verysmall .and. abs(CLz)>verysmall) 
+     +      CLz = 1.000000D0 / CLz / thck
        CLy = Ay + By + C 
-       CLy = 1.000000D0 / CLy / dy
+       if ( abs(CLy)>verysmall) CLy = 1.000000D0 / CLy / dy
        CLx = Ax + Bx + C 
-       CLx = 1.000000D0 / CLx / dx
+       if ( abs(CLx)>verysmall) CLx = 1.000000D0 / CLx / dx
 c calculate CWC for slanted well (from 2.45b in SUTRA doc)
        numerator=(CLz*CLy*CLx)
 c      dsind = sin(dgr_to_rad * dgr_argument)
@@ -5246,7 +5272,7 @@ c-lfk       x4=dsin(dgr_to_rad * omega)
      &              *sin(dgr_to_rad * omega)**2
        denom2=CLx*Cly*(cos(dgr_to_rad * omega)**2)
 c 
-       if((denom1+denom2).eq.0) then
+       if(abs(denom1+denom2)<verysmall) then
          write(iout,*) '***ERROR*** MNW2 slanted well error'
          STOP 'MNW2 -- slanted well'
        end if
@@ -5277,8 +5303,9 @@ C     ******************************************************************
       INTEGER PUMPCAP
       DOUBLE PRECISION qactCap,LIFTact,Hlift,hwell,m,b,
      & L1,L2,Q1,Q2
-      DOUBLE PRECISION CapMult
+      DOUBLE PRECISION CapMult,verysmall
 C 
+      verysmall = 1.0d-25
 C
 C     Compute lift
       PUMPCAP=MNW2(22,iw)
@@ -5338,7 +5365,8 @@ c     define points
         Q1=CapTable(iw,ifirstL,2)
         Q2=CapTable(iw,isecondL,2)
 c     calculate slope and intercept of line between the two points
-        m=(Q2-Q1)/(L2-L1)
+        m = 0.0d0
+        if ( abs(L2-L2)>verysmall ) m=(Q2-Q1)/(L2-L1)
         b=Q1-(m*L1)
 c     interpolate by finding Q on the line segment for actual lift
         qactCap=m*LIFTact+b
@@ -5608,17 +5636,21 @@ C---SPECIFICATIONS
        IMPLICIT DOUBLE PRECISION (A-H,O-Z)
        DIMENSION G(20),V(20),HS(20)
 C
+       verysmall = 1.0d-25
        G(1)=1.D0
        NH=NS/2
         DO 1 IS=2,NS
-1      G(IS)=G(IS-1)*IS
-       HS(1)=2.D0/G(NH-1)
+1       G(IS)=G(IS-1)*IS
+       HS(1) = 0.0d0
+       if (abs(G(NH-1))>verysmall) HS(1)=2.D0/G(NH-1)
         DO 3 IS=2,NH
        FI=IS
        IF(IS.EQ.NH) GO TO 2
-       HS(IS)=FI**(NH)*G(2*IS)/(G(NH-IS)*G(IS)*G(IS-1))
+       if ( abs((G(NH-IS)*G(IS)*G(IS-1)))>verysmall )
+     +   HS(IS)=FI**(NH)*G(2*IS)/(G(NH-IS)*G(IS)*G(IS-1))
        GO TO 3
-2      HS(IS)=FI**(NH)*G(2*IS)/(G(IS)*G(IS-1))
+2      if (abs(G(IS)*G(IS-1))>verysmall )
+     +   HS(IS)=FI**(NH)*G(2*IS)/(G(IS)*G(IS-1))
 3       CONTINUE
        SN=2*(NH-NH/2*2)-1
         DO 4 IS=1,NS
@@ -5629,11 +5661,12 @@ C
         DO 5 KS=K1,K2
        IF(2*KS-IS.EQ.0) GO TO 6
        IF(IS.EQ.KS)GO TO 7
-       V(IS)=V(IS)+HS(KS)/(G(IS-KS)*G(2*KS-IS))
+       if ( abs(G(IS-KS)*G(2*KS-IS))>verysmall ) 
+     +      V(IS)=V(IS)+HS(KS)/(G(IS-KS)*G(2*KS-IS))
        GO TO 5
-6      V(IS)=V(IS)+HS(KS)/(G(IS-KS))
+6      if ( abs(G(IS-KS))>verysmall ) V(IS)=V(IS)+HS(KS)/(G(IS-KS))
        GO TO 5
-7      V(IS)=V(IS)+HS(KS)/G(2*KS-IS)
+7      if ( abs(G(2*KS-IS))>verysmall) V(IS)=V(IS)+HS(KS)/G(2*KS-IS)
 5       CONTINUE
        V(IS)=SN*V(IS)
        SN=-SN
@@ -5662,16 +5695,17 @@ C---COMMON STATEMENTS
       COMMON /PAR9/ V(20),XLN2,EXPMAX
       COMMON /PAR10/ RD,ZD,ZD1,ZD2
 C
+      verysmall = 1.0d-25
        XP=0.D0
       DO 1 I=1,NS
-       PP=XLN2*I/TD
+       if ( abs(TD)>verysmall ) PP=XLN2*I/TD
 C
        CA=RD*DSQRT(PP)
        IF(CA.GT.EXPMAX) CA=EXPMAX
        RE0=BESSK0(CA)
-       PDL=RE0/PP
+       if ( abs(PP)>verysmall ) PDL=RE0/PP
 1     XP=XP+V(I)*PDL
-       HDT=2.D0*XP*XLN2/TD
+       if ( abs(TD)>verysmall ) HDT=2.D0*XP*XLN2/TD
 C
 C---RETURN TO MAIN PROGRAM
        RETURN
@@ -5707,6 +5741,7 @@ C---COMMON STATEMENTS
       COMMON /PAR11/ XLD,XDD,WD,SW
 C
        HD=0.D0
+       verysmall = 1.0d-25
        IF(IRUN.EQ.0.AND.KK.EQ.1) RETURN
 C
        PI=3.141592653589793D0
@@ -5719,8 +5754,8 @@ C
        XP=0.0D0
 C
       DO 1 I=1,NS
-       PP=XLN2*I/TD
-       IF ( pp.LT.1.0e-14 ) THEN
+       if ( abs(TD)>verysmall ) PP=XLN2*I/TD
+       IF ( pp.LT.verysmall ) THEN   !RGN 9/2/2016 changed 1e-14 to verysmall
          Q0=DSQRT(PP)
        ELSE
          Q0=0.0
@@ -5731,7 +5766,7 @@ C
        RE0=BESSK0(Q0)
        RE1=BESSK1(Q0)
        RE0X=BESSK0(Q0RD)
-       IF ( abs(Q0*RE1).GT.1.0e-14 ) THEN
+       IF ( abs(Q0*RE1).GT.verysmall ) THEN
          A0=RE0*(XLD-XDD)/(Q0*RE1)
          E0=RE0X*(XLD-XDD)/(Q0*RE1)
        ELSE
@@ -5861,12 +5896,15 @@ C    OF THE SECOND KIND. SOURCE: PRESS AND OTHERS (1992).
       DOUBLE PRECISION FUNCTION BESSK0(X)
 C---SPECIFICATIONS
       DOUBLE PRECISION X,Y,P1,P2,P3,P4,P5,P6,P7,
-     *    Q1,Q2,Q3,Q4,Q5,Q6,Q7,BESSI0
+     *    Q1,Q2,Q3,Q4,Q5,Q6,Q7,BESSI0,verysmall
       DATA P1,P2,P3,P4,P5,P6,P7/-0.57721566D0,0.42278420D0,0.23069756D0,
      *    0.3488590D-1,0.262698D-2,0.10750D-3,0.74D-5/
       DATA Q1,Q2,Q3,Q4,Q5,Q6,Q7/1.25331414D0,-0.7832358D-1,0.2189568D-1,
      *    -0.1062446D-1,0.587872D-2,-0.251540D-2,0.53208D-3/
 C
+      verysmall = 1.0d-25
+      BESSK0 = 0.0d0
+      if ( abs(x) < verysmall ) return
       IF (X.LE.2.D0) THEN
         Y=X*X/4.D0
         BESSK0=(-DLOG(X/2.D0)*BESSI0(X))+(P1+Y*(P2+Y*(P3+
@@ -5935,6 +5973,7 @@ C---SPECIFICATIONS
       DATA Q1,Q2,Q3,Q4,Q5,Q6,Q7/1.25331414D0,0.23498619D0,-0.3655620D-1,
      *    0.1504268D-1,-0.780353D-2,0.325614D-2,-0.68245D-3/
 C
+      if ( abs(X)<1.0d-25 ) return
       IF (X.LE.2.0) THEN
         Y=X*X/4.0
         BESSK1=(LOG(X/2.0)*BESSI1(X))+(1.0/X)*(P1+Y*(P2+
