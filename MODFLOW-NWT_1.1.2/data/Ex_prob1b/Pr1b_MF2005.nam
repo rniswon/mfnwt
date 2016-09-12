@@ -1,0 +1,8 @@
+LIST                  2 .\Ex_prob1b\Pr1bMF2005.LST
+DIS                   3 .\Ex_prob1b\Pr1b.DIS
+BAS6                  4 .\Ex_prob1b\Pr1b.BA6
+PCG                  23 .\Ex_prob1b\Pr1b.PCG
+LPF                  33 .\Ex_prob1b\Pr1b.LPF
+RCH                  34 .\Ex_prob1b\Pr1b.RCH
+OC                   35 .\Ex_prob1b\Pr1b.OC
+DATA(BINARY)         50 .\Ex_prob1b\Pr1bMF2005.BUD

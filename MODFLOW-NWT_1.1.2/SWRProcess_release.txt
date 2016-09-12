@@ -1,0 +1,251 @@
+release.txt
+
+
+                           SWR Process Release Notes
+
+
+This file describes changes introduced into the SWR Process with each 
+official release; these changes may substantially affect users.
+
+
+NOTE: Any use of trade, product or firm names is for descriptive purposes
+only and does not imply endorsement by the U.S. Government.
+
+
+o Version 1.0 09/10/2012:
+
+This version is the initial release.
+
+o Version 1.01.0 10/17/2012:
+
+The SWR Process was modified to allow incorporation of SWR derivative terms 
+into the groundwater flow equation solved by MODFLOW-NWT. The SWR Process 
+was also modified to allow downstream discharge from a SFR2 reach to be routed 
+to a SWR reach using an additional SWR surface-water control structure. The 
+SWR Process was also modified to allow surface-water control structures 
+discharging from the SWR1 network to discharge to SFR2 reaches.
+
+Modified input instructions for the SWR1 input file
+
+Items 0-1a: As in previous versions of the code.
+
+1b.  CSWROPT [IOPTUNIT]
+
+USE_IMPLICIT_NEWTON_CORRECTION keyword for implicitly calculating the
+  Newton correction term for the groundwater flow equation. This option
+  requires solving SWR1 equations using the current and perturbed heads.
+  As a result, SWR1 Process runtimes will be approximately a factor of 2
+  greater.
+
+USE_EXPLICIT_NEWTON_CORRECTION keyword for explicitly calculating the
+  Newton correction term for the groundwater flow equation. This option
+  calculated the Newton correction terms using the current SWR1 stage
+  solution and current and perturbed heads within the aquifer-reach 
+  exchange calculation routine (SSWR_CALC_QAQ). This option does not have 
+  a significant effect on SWR1 Process runtimes and is sufficient for the 
+  test problems evaluated.
+
+By default, Newton corrections are not calculated. Only one of the keywords
+  specified above should be used if Newton correction terms for the SWR1
+  Process are desired.
+
+Items 2-4c: As in previous versions of the code.
+
+4d.  ITAB CTABTYPE CINTP [CTABRCH] [ITABRCH(1)...ITABRCH(NTABRCH)]
+     
+ITAB     - Number of tabular data item. ITAB value is the tabular data item
+           that will be referred to by CSTRCRIT and CSTRVAL in Item 13b. 
+           Tabular data items specified in Item 4d do not need to be specified 
+           in numerical order.
+CTABTYPE - No changes
+CINTP    - No changes
+CTABRCH  - No changes
+ITABRCH  - No changes
+
+Items 5-12: As in previous versions of the code.
+
+13a. ISTRRCH ISTRNUM ISTRCONN ISTRTYPE [NSTRPTS] [STRCD] [STRCD2] [STRCD3] 
+     [STRINV] [STRINV2] [STRWID] [STRWID2] [STRLEN] [STRMAN] [STRVAL] [ISTRDIR]
+     [ISFRSEG] [ISFRRCH]
+     
+ISTRRCH  - No changes
+ISTRNUM  - Must be 0 if: (1) ISTRTYPE=11; or (2) SFR is specified in the MODFLOW-NWT name
+           file and ISFRSEG and ISFRRCH > 0. No changes otherwise.
+ISTRTYPE - ISTRTYPE=11 for a inflow structure from SFR2 segment ISFRSEG and reach ISFRRCH. 
+           ISTRCONN must be 0 if ISTRTYPE=11. All other surface-water control structures
+           detailed in the documentation report are available.
+NSTRPTS  - No changes
+STRCD    - No changes
+STRCD2   - No changes
+STRCD3   - No changes
+STRINV   - No changes
+STRINV2  - No changes
+STRWID   - No changes
+STRWID2  - No changes
+STRLEN   - No changes
+STRMAN   - No changes
+STRVAL   - No changes
+ISTRDIR  - No changes
+ISFRSEG  - SFR2 segment that (1) supplies downstream segment discharge to SWR1 reach 
+           ISTRRCH or (2) SFR2 segment that receives SWR2 surface-water control 
+           structure discharge. ISFRSEG is not read if SFR is not specified in the 
+           MODFLOW-NWT name file.
+ISFRRCH  - SFR2 reach in SFR2 segment ISFRSEG that receives SWR2 surface-water control  
+           structure discharge. Any SFR2 reach number can be specified if ISTRTYPE=11.
+           ISFRRCH is not read if SFR is not specified in the MODFLOW-NWT name file.
+
+Items 13b-15: As in previous versions of the code.
+
+o Version 1.02.0 01/17/2013:
+
+The SWR Process was modified to allow RTMIN and RTMAX to set equal to the MODFLOW
+DELT calculated for each time step in a stress period. Minor bug fix in the
+SSWR_P_QMFLOW subroutine to output calculated reach connection flow and discharge
+data to the correct location in the ascii and binary output file.
+
+Modified input instructions for the SWR1 input file
+
+Items 0-1b: As in previous versions of the code.
+
+Item 2: DLENCONV TIMECONV RTINI RTMIN RTMAX RTPRN RTMULT NTMULT DMINGRAD DMNDEPTH 
+        [DMAXRAI] [DMAXSTG] [DMAXINF]
+
+DLENCONV - No changes
+TIMECONV - No changes
+RTINI    - No changes
+RTMIN    - a real value that defines the minimum SWR1 time-step length to use. 
+           RTMIN should be >= 0.0. If RTMIN = 0.0, RTMIN is set to the minimum 
+           DELT for the current MODFLOW stress period. When RTMIN > 0.0, typical 
+           values of RTMIN are between 1 and 30 seconds but is dependent on the 
+           magnitude of streamflow. Value is in units of time and must be 
+           consistent with the defined MODFLOW time unit.
+RTMAX    - a real value that defines the maximum SWR1 time-step length to use. 
+           RTMAX should be >= RTMIN and <= the minimum MODFLOW time-step length. 
+           Adaptive time stepping is disabled if RTMAX = RTMIN. If RTMAX is specified
+           to be 0.0 RTMAX is set equal to DELT for the current MODFLOW timestep.
+           When RTMAX > 0.0, typical values of RTMAX are between 1 and 24 hours 
+           but are dependent on the magnitude of streamflow. Value is in units of
+           time and must be consistent with the defined MODFLOW time unit.
+RTPRN    - No changes
+RTMULT   - No changes
+NTMULT   - No changes
+DMINGRAD - No changes
+DMNDEPTH - No changes
+DMAXRAI  - No changes
+DMAXSTG  - No changes
+DMAXINF  - No changes
+
+Items 3-15: As in previous versions of the code.
+
+o Version 1.03.0 09/09/2013:
+
+  The SWR Process was modified to include the following functionality:
+      - UPSTREAM-WEIGHTING OPTION FOR DIFFUSIVE-WAVE FLOW BETWEEN
+        CONNECTED REACH GROUPS
+      - SWR OBSERVATIONS
+      - STAGE DEPENDENT EXTERNAL BOUNDARY STRUCTURE
+      - ADDED DIRECT RUNOFF OPTION 
+      - GLOBAL AND ABSOLUTE TOLA OPTIONS
+      - L2 NORM AND FRACTIONAL TOLR OPTIONS
+      - REVISED MODFLOW-SWR QAQ COMPARISON TO KEEP TRACK OF POSITIVE
+        AND NEGATIVE TERMS SEPARATELY FOR EACH REACH AND TO DIFFERENCE
+        THE DIFFERENCE IN POSITIVE AND THE DIFFERENCE IN NEGATIVE
+        TERMS AND DIVIDE BY THE AVERAGE OF POSITIVE AND NEGATIVE
+        MODFLOW TERMS.
+          value = ( swrpos - mfpos ) - ( swrneg - mfneg ) / mfaverage      
+      - ADDED OPTION FOR USING CURRENT STAGE (FROM THE LAST ITERATION) IN  
+        A SPECIFIED REACH TO DEFINE THE INITIAL STAGE IN A SPECIFIED REACH. 
+        A NEGATIVE REACH NUMBER IS SPECIFIED AND THE RSTAGE VALUE IS THE 
+        REACH USED TO DEFINE THE STAGE. ONLY APPLIES TO REACH STAGE DATA 
+        SPECIFIED USING LIST INPUT      
+
+  The following minor modifications were made to existing SWR Process 
+  functionality:
+      - LATERAL FLOW FROM ACTIVE REACH GROUPS TO CONSTANT STAGE REACH 
+        GROUPS ARE REPORTED TO THE GLOBAL BUDGET AS EXTERNAL FLOW. THE 
+        REMAINDER OF CONSTANT STAGE REACH GROUP FLOW TERMS ARE STILL 
+        REPORTED AS CONSTANT FLOW IN THE GLOBAL BUDGET. THIS MODIFICATION 
+        WAS MADE TO MAKE IT EASIER TO DETERMINE LATERAL FLOW TO OR FROM
+        EXTERNAL BOUNDARIES. OTHER SWR OUTPUT HAVE NOT BEEN MODIFIED.
+      - SEPARATED QAQ FLOW TO ACTIVE AND CONSTANT HEAD MODFLOW CELLS IN QAQ 
+        DISCREPANCY BETWEEN MODFLOW AND SWR SUMMARY WRITTEN TO THE LISTING FILE.
+
+  The SWR Process was modified to correct the following minor bugs:
+      - AUX VARIABLES
+      - STRUCTURE EXTERNAL TIME SERIES WHEN ONE EXTERNAL TIME SERIES
+        IS USED FOR MORE THAN ONE STRUCTURE
+      - WRITING COMPACT BUDGET DATA FOR SWR GWET FROM ALL REACHES OTHER
+        THAN CELL-BASED REACHES (IGEOTYPE=5)
+
+  Complete SWR input instructions for version 1.03 are provided in
+  the included document named 'SWRProcessInputInstructions_v1.03.pdf' in the
+  doc subdirectory of this distribution.
+
+o Version 1.04.0 07/21/2016:
+
+      - ADDED STATE FUNCTION SUBROUTINES - RETRIEVE STAGE, FLOW, OR STRUCTURE 
+        FLOW AT THE END OF THE PREVIOUS MODFLOW TIME STEP
+      - ADDED OVERBANK STRUCTURE (ISTRTYPE=13) TO SIMPLIFY SPECIFICATION OF WEIR 
+        STRUCTURED FOR CONNECTIONS BETWEEN 1D AND 2D REACHES. INCLUDES OPTION TO 
+        SMOOTHLY TRANSITION WEIR WIDTH OVER A DEFINED DEPTH
+      - REMOVED OPTION FOR USING CURRENT STAGE (FROM THE LAST ITERATION) IN A 
+        SPECIFIED REACH TO DEFINE THE INITIAL STAGE IN A SPECIFIED REACH - A 
+        NEGATIVE REACH NUMBER IS SPECIFIED AND THE RSTAGE VALUE IS THE REACH 
+        USED TO DEFINE THE STAGE. ONLY APPLIES TO REACH STAGE DATA SPECIFIED 
+        USING LIST INPUT
+      - ADDED KINEMATIC-WAVE OPTION (IROUTETYPE = 4). THIS SHOULD ONLY BE USED
+        FOR ONE-DIMENSIONAL REACHES BUT SWR WILL RUN IF KINEMATIC REACHES ARE
+        USED FOR TWO-DIMENSIONAL REACHES
+      - ADDED MATRIX LEVEL PSEUDO-TRANSIENT CONTINUATION APPROACH FOR STEADY-
+        STATE STRESS PERIODS (BASED ON KELLEY AND KEYES, 1998). INITIAL PSEUDO-
+        TRANSIENT CONTINUATION TIMESTEP (PTCDEL) IS CALCULATED USING THE 
+        COMPUTED WAVE CELERITY BASED ON SAVANT AND OTHERS (2011) - 
+        PTCDEL0 = DLEN / SQRT(g depth). ORIGINAL PSEUDO-TRANSIENT CONTINUATION 
+        APPROACH DESCRIBED IN THE DOCUMENTATION HAS BEEN DEPRECATED.      
+      - ADDED BOTTOM AVERAGING TO DAMPEN OSCILLATING SOLUTIONS - ALGORITHM IS 
+        IDENTICAL TO THE ALGORITHM USED IN MODFLOW-USG (PANDAY AND OTHERS, 
+        2013).
+      - ADDED ABILITY TO CONNECT A SWR REACH WITH MULTIPLE LAYERS STARTING FROM 
+        A SPECIFIC LAYER. LIKE THE PREVIOUS OPTION WHERE A NEGATIVE KRCH FOR A 
+        REACH INDICATED THE REACH SHOULD BE CONNECTED TO LAYERS 1 TO NLAY. 
+        SPECIFICATION OF A KRCH OF -2 FOR A REACH WILL CONNECT THE REACH TO 
+        LAYERS 2 TO NLAY.
+       
+  The SWR Process was modified to correct the following minor bugs:
+      - CALCULATION OF QAQ EXCHANGE PERIMETER FOR EACH LAYER FIX IDENTIFIED BY 
+        JAN JEPPESEN
+      - FIX TO WRITING GWET TO CBC FILE AS A LIST
+      - MOVED SSWR_EXINIT() SUBROUTINE THAT RESETS QUZFLOW AND QEXTFLOW FROM 
+        SSWRBUDGET SUBROUTINE TO THE END OF GWF2SWR7BD SUBROUTINE. THIS ENSURES 
+        QUZFLOW AND QEXTFLOW TERMS ARE CORRECTLY WRITTEN IF SSWR_P_RGFLOW 
+        SUBROUTINE IS BEING USED   
+      - MODIFIED SSWR_SET_RCHOFF SO THAT LEVEL-POOL AND DIFFUSIVE-WAVE REACHES
+        STAGES ARE SET TO GBELV WHEN STAGES SPECIFIED IN DATA SET 14 ARE LESS 
+        THAN GBELV.
+
+  Complete SWR input instructions for version 1.04 are provided in
+  the included document named 'SWRProcessInputInstructions_v1.04.pdf' in the
+  doc subdirectory of this distribution.
+
+
+Reference:
+
+Hughes, J.D., Langevin, C.D., Chartier, K.L., and White, J.T., 2012, 
+Documentation of the Surface-Water Routing (SWR1) Process for modeling 
+surface-water flow with the U.S. Geological Survey Modular Ground-Water
+Model (MODFLOW–2005): U.S. Geological Survey Techniques and Methods, 
+book 6, chap. A40 (Version 1.0), 113 p.
+
+
+Contact:
+
+    Joseph D. Hughes
+    Florida Water Science Center
+    4446 Pet Lane
+    Suite 108
+    Lutz, FL 33559
+    jdhughes@usgs.gov 
+
+
+
+
