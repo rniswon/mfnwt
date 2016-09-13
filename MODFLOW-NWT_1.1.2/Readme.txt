@@ -14,7 +14,7 @@ computers are provided as well as the source code at the following URL:
 http://water.usgs.gov/ogw/modflow-nwt/
 
 The executable files were compiled on a personal computer with the Intel(R) 
-Core(TM)2Duo CPU T9500 chipset, running the Microsoft Windows XP Professional 
+Core(TM)2Duo CPU T9500 chipset, running the Microsoft Windows 7 Professional 
 operating system, using the Microsoft Visual Studio 2012 Version 12.0.21005.1 
 development environment and the Intel(R) Visual Fortran Version 16.0.0046.12 
 compiler. The source code is provided to aid users in compilation on other 
@@ -49,7 +49,7 @@ The distribution file contains:
 
           Executables and source code for MODFLOW-NWT.
           MODFLOW-NWT documentation.
-          Four MODFLOW-NWT sample problems.
+          Ten MODFLOW-NWT sample problems.
 
 The MODFLOW-NWT program and related files can be extracted from the 
 distribution file.  Extracting these files is all that is required 
@@ -136,31 +136,30 @@ the same unformatted file structure.
 
 D. TESTING
 
-Eight sample problems with MODFLOW-NWT data sets are provided to verify that 
+Ten sample problems with MODFLOW-NWT data sets are provided to verify that 
 MODFLOW-NWT is correctly installed and running on the system.  The sample 
 problems also may be looked at as examples of how to use the program. Five of 
-the test problems (Pr1a, Pr1b, Pr2, Pr3_lower, and Pr3_higher) are documented 
-in Niswonger and others (2011), one test problems (l1b2k) is documented in 
-Merritt and Konikow (2000) as Test Simulation 1, one test problem (SwrSample05)
-is documented in Hughes and others (2012), and one test problem (swi2ex4sww) is
-documented in Bakker and others (2013). A test problem (Sfr2weltab) was added
-that was modified from the hypothetical test simulation described by Niswonger and 
-Prudic (2005) to provide an example of specifying tabular time series input
-files for specifying pumping rates. Another test problem (Uzf_testoptions) was added
-that was modified from test simulation 2 of Niswonger and others (2006) to provide
-as example of the new input options for UZF. Another test problem (SFR_LAK_floodplain) 
-was created that combines the SFR2, LAK7, and UZF1 packages was added to demonstrate  
-how the lake package can be used to simulate floodplains adjacent to streams simulated.
-by SFR2. These test problems can be run using  either the 32-bit or 64-bit version of 
-the MODFLOW-NWT executable. Saved results for these simulations are included in the 
-Output_test and Output_test_64 directories for comparison.
+the test problems (Pr1a, Pr1b, Pr2, Pr3_lower (32 bit and 64 bit), and  
+Pr3_higher (32 bit and 64 bit) are documented in Niswonger and others (2011),  
+one test problems (l1b2k) is documented in Merritt and Konikow (2000) as Test 
+Simulation 1, one test problem (SwrSample05) is documented in Hughes and others 
+(2012), and one test problem (swi2ex4sww) is documented in Bakker and others (2013). 
+A test problem (Sfr2weltab) was added that was modified from the hypothetical test 
+simulation described by Niswonger and Prudic (2005) to provide an example of specifying 
+tabular time series input files for specifying pumping rates. Another test problem 
+(Uzf_testoptions) was added that was modified from test simulation 2 of Niswonger and 
+others (2006) to provide as example of the new input options for UZF. Another test 
+problem (SFR_LAK_floodplain) was created that combines the SFR2, LAK7, and UZF1 packages   
+was added to demonstrate how the lake package can be used to simulate floodplains 
+adjacent to streams. These test problems can be run using either the 32-bit or 64-bit 
+version of the MODFLOW-NWT executable. Saved results for these simulations are included 
+in the Output_test and Output_test_64 directories for comparison.
 
 E. COMPILING
 
-The executable files provided in MODFLOW-NWT_1.1.2\bin were created using the Intel  
-Visual Fortran 12.1 compiler. Although executable versions of the program are  
-provided, the source code also is provided in the MODFLOW-NWT_1.1.2\src directory so 
-that MODFLOW-NWT can be recompiled if necessary. However, the USGS cannot provide  
+The executable files are provided in MODFLOW-NWT_1.1.2\bin Although executable versions   
+of the program are provided, the source code also is provided in the MODFLOW-NWT_1.1.2\src 
+directory so that MODFLOW-NWT can be recompiled if necessary. However, the USGS cannot provide  
 assistance to those compiling MODFLOW-NWT.
 
 F. REFERENCES

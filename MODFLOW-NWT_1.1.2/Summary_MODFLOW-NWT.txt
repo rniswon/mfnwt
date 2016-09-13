@@ -114,6 +114,9 @@ FUNTIONALITY
          SWR -- Surface-Water Routing Package
          UZF -- Unsaturated-Zone Package
          WEL -- Well Package
+         SWT -- Subsidence-Water Table Package
+         SWI -- Sea Water Intrusion Package
+         LMT -- Link-MT3DMS Package
          
      Other packages that are included with the MODFLOW-NWT release but have not been
      tested include:
