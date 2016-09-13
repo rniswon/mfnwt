@@ -63,7 +63,7 @@ lmt8_NWT.f. These changes include writing output for the UZF, SFR2, and
 LAK7 packages that is required for simulating transport in the unsaturated 
 zone, streams, and lakes. Refer to the MT3D-USGS documentation report 
 (Bedekar and others, 2016) for details. Refer to the LMT release notes file
-"README FILE FOR LMT8 for MODFLOW.docx" located in ..\MODFLOW-NWT_1.1.0\doc
+"LMT8.pdf" located in ..\MODFLOW-NWT_1.1.0\doc
 
 Upstream Weighting (UPW) Package
 
