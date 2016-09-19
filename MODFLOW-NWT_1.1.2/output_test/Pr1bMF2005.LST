@@ -1,0 +1,289 @@
+                                  MODFLOW-NWT-SWR1 
+      U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
+                            VERSION 1.1.0, 7/21/2016
+                    BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
+
+ LIST FILE: .\Ex_prob1b\Pr1bMF2005.LST
+                         UNIT    2
+
+ OPENING .\Ex_prob1b\Pr1b.DIS
+ FILE TYPE:DIS   UNIT    3   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1b.BA6
+ FILE TYPE:BAS6   UNIT    4   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1b.PCG
+ FILE TYPE:PCG   UNIT   23   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1b.LPF
+ FILE TYPE:LPF   UNIT   33   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1b.RCH
+ FILE TYPE:RCH   UNIT   34   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1b.OC
+ FILE TYPE:OC   UNIT   35   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING .\Ex_prob1b\Pr1bMF2005.BUD
+ FILE TYPE:DATA(BINARY)   UNIT   50   STATUS:UNKNOWN
+ FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+
+ BAS -- BASIC PACKAGE, VERSION 1.1.0, 6/21/2016 INPUT READ FROM UNIT    4
+ 
+ MODFLOW was compiled using mixed precision
+ Precision of REAL variables:           6
+ Precision of DOUBLE PRECISION variables:          15
+
+ DISCRETIZATION INPUT DATA READ FROM UNIT    3
+    1 LAYERS         1 ROWS       100 COLUMNS
+    1 STRESS PERIOD(S) IN SIMULATION
+ MODEL TIME UNIT IS DAYS
+ MODEL LENGTH UNIT IS METERS
+  Confining bed flag for each layer:
+   0
+
+
+
+                               DELR
+ READING ON UNIT    3 WITH FORMAT: (FREE)              
+  0.10000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+   50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000       50.000    
+
+                     DELC =   1.00000    
+
+ TOP ELEVATION OF LAYER 1 =   50.0000    
+
+   MODEL LAYER BOTTOM EL. =   0.00000     FOR LAYER   1
+
+
+ STRESS PERIOD     LENGTH       TIME STEPS     MULTIPLIER FOR DELT    SS FLAG
+ ----------------------------------------------------------------------------
+        1         1.000000          1                    1.000         SS
+
+ STEADY-STATE SIMULATION
+
+
+
+ 
+ THE FREE FORMAT OPTION HAS BEEN SELECTED
+
+
+
+                     BOUNDARY ARRAY FOR LAYER   1
+ READING ON UNIT    4 WITH FORMAT: (FREE)              
+
+                1           2           3           4           5           6           7           8           9          10
+               11          12          13          14          15          16          17          18          19          20
+               21          22          23          24          25          26          27          28          29          30
+               31          32          33          34          35          36          37          38          39          40
+               41          42          43          44          45          46          47          48          49          50
+               51          52          53          54          55          56          57          58          59          60
+               61          62          63          64          65          66          67          68          69          70
+               71          72          73          74          75          76          77          78          79          80
+               81          82          83          84          85          86          87          88          89          90
+               91          92          93          94          95          96          97          98          99         100
+ ............................................................................................................................
+   1           -1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+                1           1           1           1           1           1           1           1           1           1
+
+ AQUIFER HEAD WILL BE SET TO   999.99     AT ALL NO-FLOW NODES (IBOUND=0).
+
+             INITIAL HEAD =   10.0000     FOR LAYER   1
+
+ OUTPUT CONTROL IS SPECIFIED ONLY AT TIME STEPS FOR WHICH OUTPUT IS DESIRED
+ COMPACT CELL-BY-CELL BUDGET FILES WILL BE WRITTEN
+ AUXILIARY DATA WILL BE SAVED IN CELL-BY-CELL BUDGET FILES
+ HEAD PRINT FORMAT CODE IS   6    DRAWDOWN PRINT FORMAT CODE IS   0
+ HEADS WILL BE SAVED ON UNIT    0    DRAWDOWNS WILL BE SAVED ON UNIT    0
+
+ LPF -- LAYER-PROPERTY FLOW PACKAGE, VERSION 7, 5/2/2005
+         INPUT READ FROM UNIT   33
+ CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT   50
+ HEAD AT CELLS THAT CONVERT TO DRY=  1.00000E+30
+ No named parameters
+
+   LAYER FLAGS:
+ LAYER       LAYTYP        LAYAVG         CHANI        LAYVKA        LAYWET
+ ---------------------------------------------------------------------------
+    1             1             0     1.000E+00             0             0
+
+   INTERPRETATION OF LAYER FLAGS:
+                        INTERBLOCK     HORIZONTAL    DATA IN
+         LAYER TYPE   TRANSMISSIVITY   ANISOTROPY   ARRAY VKA   WETTABILITY
+ LAYER      (LAYTYP)      (LAYAVG)       (CHANI)      (LAYVKA)      (LAYWET)
+ ---------------------------------------------------------------------------
+    1   CONVERTIBLE      HARMONIC     1.000E+00    VERTICAL K  NON-WETTABLE
+
+ WETTING CAPABILITY IS NOT ACTIVE IN ANY LAYER
+
+    HYD. COND. ALONG ROWS =   50.0000     FOR LAYER   1
+
+      VERTICAL HYD. COND. =   1.00000     FOR LAYER   1
+
+ RCH -- RECHARGE PACKAGE, VERSION 7, 5/2/2005 INPUT READ FROM UNIT   34
+ No named parameters
+ OPTION 3 -- RECHARGE TO HIGHEST ACTIVE NODE IN EACH VERTICAL COLUMN
+ CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT   50
+
+
+     0 Recharge parameters
+
+ PCG -- CONJUGATE-GRADIENT SOLUTION PACKAGE, VERSION 7, 5/2/2005
+ MAXIMUM OF    100 CALLS OF SOLUTION ROUTINE
+ MAXIMUM OF     20 INTERNAL ITERATIONS PER CALL TO SOLUTION ROUTINE
+ MATRIX PRECONDITIONING TYPE :    1
+
+
+
+                                    SOLUTION BY THE CONJUGATE-GRADIENT METHOD
+                                   -------------------------------------------
+                    MAXIMUM NUMBER OF CALLS TO PCG ROUTINE =      100
+                        MAXIMUM ITERATIONS PER CALL TO PCG =       20
+                               MATRIX PRECONDITIONING TYPE =        1
+        RELAXATION FACTOR (ONLY USED WITH PRECOND. TYPE 1) =    0.10000E+01
+ PARAMETER OF POLYNOMIAL PRECOND. = 2 (2) OR IS CALCULATED :        2
+                         HEAD CHANGE CRITERION FOR CLOSURE =    0.10000E-03
+                     RESIDUAL CHANGE CRITERION FOR CLOSURE =    0.10000E+04
+            PCG HEAD AND RESIDUAL CHANGE PRINTOUT INTERVAL =        1
+     PRINTING FROM SOLVER IS LIMITED(1) OR SUPPRESSED (>1) =        0
+                            STEADY-STATE DAMPING PARAMETER =    0.10000E+01
+                               TRANSIENT DAMPING PARAMETER =    0.10000E+01
+1
+                            STRESS PERIOD NO.    1, LENGTH =   1.000000    
+                            -----------------------------------------------
+
+                              NUMBER OF TIME STEPS =     1
+
+                               MULTIPLIER FOR DELT =     1.000
+
+                            INITIAL TIME STEP SIZE =   1.000000    
+
+                 RECHARGE =  1.000000E-03
+ 
+ SOLVING FOR HEAD 
+
+
+     9 CALLS TO PCG ROUTINE FOR TIME STEP   1 IN STRESS PERIOD    1
+    17 TOTAL ITERATIONS
+
+ MAXIMUM HEAD CHANGE FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE 
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1   24.50      0  0.4363E-04  1  -12.12      0 -0.4035E-04  1   2.321    
+   (  1,  1,100)  (  1,  1, 99)  (  1,  1,100)  (  1,  1, 53)  (  1,  1,100)
+  0  0.8162E-05  1 -0.4814      0  0.1270E-05  1  0.7738E-01  0 -0.7526E-06
+   (  1,  1, 99)  (  1,  1,100)  (  1,  1, 48)  (  1,  1,100)  (  1,  1, 40)
+  1 -0.1078E-01  0  0.4860E-07  1  0.1306E-02  0  0.7683E-09  1 -0.1405E-03
+   (  1,  1,100)  (  1,  1, 63)  (  1,  1,100)  (  1,  1, 99)  (  1,  1,100)
+  0 -0.6470E-09  1  0.1362E-04
+   (  1,  1, 45)  (  1,  1,100)
+
+ MAXIMUM RESIDUAL FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL    
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.1118E-04  0 -0.1726E-10  1 -0.2400E-04  0  0.5917E-10  1 -0.1848E-05
+   (  1,  1, 80)  (  1,  1, 51)  (  1,  1, 91)  (  1,  1, 91)  (  1,  1, 99)
+  0  0.5414E-11  1 -0.3889E-06  0  0.1752E-11  1 -0.7661E-07  0  0.5424E-12
+   (  1,  1, 63)  (  1,  1, 77)  (  1,  1, 93)  (  1,  1, 97)  (  1,  1, 28)
+  1  0.8674E-08  0 -0.2524E-13  1  0.1187E-08  0  0.5079E-15  1 -0.1308E-09
+   (  1,  1, 88)  (  1,  1, 95)  (  1,  1, 86)  (  1,  1, 95)  (  1,  1, 88)
+  0  0.5323E-15  1  0.1261E-10
+   (  1,  1, 49)  (  1,  1, 88)
+
+
+
+ OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+    PRINT BUDGET
+    SAVE BUDGET
+    PRINT HEAD FOR ALL LAYERS
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  50 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  50 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  50 AT TIME STEP  1, STRESS PERIOD   1
+1
+              HEAD IN LAYER   1 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
+
+           1       2       3       4       5       6       7       8       9      10      11      12      13      14      15
+          16      17      18      19      20      21      22      23      24      25      26      27      28      29      30
+          31      32      33      34      35      36      37      38      39      40      41      42      43      44      45
+          46      47      48      49      50      51      52      53      54      55      56      57      58      59      60
+          61      62      63      64      65      66      67      68      69      70      71      72      73      74      75
+          76      77      78      79      80      81      82      83      84      85      86      87      88      89      90
+          91      92      93      94      95      96      97      98      99     100
+ ...........................................................................................................................
+   1  10.0000 10.2421 10.7101 11.1539 11.5764 11.9798 12.3660 12.7366 13.0928 13.4359 13.7668 14.0864 14.3954 14.6945 14.9843
+      15.2653 15.5380 15.8029 16.0603 16.3105 16.5539 16.7909 17.0216 17.2463 17.4652 17.6786 17.8867 18.0896 18.2876 18.4807
+      18.6691 18.8530 19.0325 19.2077 19.3788 19.5457 19.7088 19.8680 20.0234 20.1752 20.3233 20.4679 20.6091 20.7470 20.8815
+      21.0128 21.1409 21.2659 21.3878 21.5067 21.6226 21.7356 21.8458 21.9531 22.0576 22.1594 22.2584 22.3548 22.4486 22.5397
+      22.6282 22.7143 22.7978 22.8788 22.9573 23.0334 23.1071 23.1784 23.2473 23.3139 23.3781 23.4401 23.4997 23.5571 23.6122
+      23.6651 23.7158 23.7642 23.8105 23.8545 23.8964 23.9361 23.9737 24.0091 24.0424 24.0736 24.1027 24.1296 24.1545 24.1772
+      24.1979 24.2165 24.2330 24.2474 24.2598 24.2701 24.2783 24.2845 24.2886 24.2907
+1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  ------------------------------------------------------------------------------
+
+     CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
+     ------------------                 ------------------------
+
+           IN:                                      IN:
+           ---                                      ---
+             STORAGE =           0.0000               STORAGE =           0.0000
+       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
+            RECHARGE =           4.9500              RECHARGE =           4.9500
+
+            TOTAL IN =           4.9500              TOTAL IN =           4.9500
+
+          OUT:                                     OUT:
+          ----                                     ----
+             STORAGE =           0.0000               STORAGE =           0.0000
+       CONSTANT HEAD =           4.9500         CONSTANT HEAD =           4.9500
+            RECHARGE =           0.0000              RECHARGE =           0.0000
+
+           TOTAL OUT =           4.9500             TOTAL OUT =           4.9500
+
+            IN - OUT =           0.0000              IN - OUT =           0.0000
+
+ PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+
+
+
+
+
+
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+                    SECONDS     MINUTES      HOURS       DAYS        YEARS
+                    -----------------------------------------------------------
+   TIME STEP LENGTH  86400.      1440.0      24.000      1.0000     2.73785E-03
+ STRESS PERIOD TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
+         TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
+1
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 12:56:46
+ Elapsed run time:  0.016 Seconds
+
