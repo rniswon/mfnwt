@@ -3340,12 +3340,14 @@ c   skip if zero vk
         IF(VK.LE.0.0) GO TO 350
         BBOT=BOTM(I,J,LBOTM(K))
         TTOP=BOTM(I,J,LBOTM(K)-1)
+        IF(TTOP-BBOT.LT.1.0e-20) GO TO 350
         CAQ=VK*DELR(I)*DELC(J)/((TTOP-BBOT)*0.5)
         IF(LAYCBD(K-1).GT.0) THEN
 c   skip if zero vkcb
           IF(VKCB(I,J,LAYCBD(K)).LE.0.0) GO TO 350
           BBOT=BOTM(I,J,LBOTM(K)-1)
           TTOP=BOTM(I,J,LBOTM(K-1))
+          IF(TTOP-BBOT.LT.1.0e-20) GO TO 350
           CCB=VKCB(I,J,LAYCBD(K-1))*DELR(I)*DELC(J)/(TTOP-BBOT)
           !include VKCB
           CAQ = 1.0/(1.0/CAQ + 1.0/CCB)
