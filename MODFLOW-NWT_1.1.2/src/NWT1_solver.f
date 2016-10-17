@@ -1323,6 +1323,7 @@ C--Update heads.
         ir = Diag(jj, 2)
         ic = Diag(jj, 3)
         Hchange(jj) = Hchange(jj) - Hnew(ic,ir,il)
+!      if(kkiter.eq.2000)write(333,*)ic,ir,il,Hchange(jj)
         IF ( kkiter.EQ.1 )THEN
           Wsave(jj) = 1.0D0
           Hchold(jj) = Hchange(jj)
