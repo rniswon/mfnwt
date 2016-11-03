@@ -396,7 +396,7 @@ C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE
-      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
+      !USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       USE GLOBAL,       ONLY: IOUT, NCOL, NROW, NLAY, IFREFM, IBOUND,
      +                        LBOTM, BOTM, DELR, DELC, ISSFLG,IUNIT
 C
@@ -960,15 +960,15 @@ C
  8    FORMAT (//1X,'LAKE',4X,'SOLUTE',6X,'CPPT',6X,'CRNF',6X,'CAUG'/)
 C
 C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
-      IF(IUNIT(49).NE.0) THEN
-        LKFLOWTYPE(1)='NA'
-        LKFLOWTYPE(2)='NA'
-        LKFLOWTYPE(3)='NA'
-        LKFLOWTYPE(4)='NA'
-        LKFLOWTYPE(5)='NA'
-        LKFLOWTYPE(6)='NA'
-        NLKFLWTYP=0
-      ENDIF
+      !IF(IUNIT(49).NE.0) THEN
+      !  LKFLOWTYPE(1)='NA'
+      !  LKFLOWTYPE(2)='NA'
+      !  LKFLOWTYPE(3)='NA'
+      !  LKFLOWTYPE(4)='NA'
+      !  LKFLOWTYPE(5)='NA'
+      !  LKFLOWTYPE(6)='NA'
+      !  NLKFLWTYP=0
+      !ENDIF
 C
       DO 300 LM=1,NLAKES
         IF(IFREFM.EQ.0) THEN
@@ -984,24 +984,24 @@ C
         END IF
 C
 C--EDM: SET FOLLOWING VALUES FOR LMT
-        IF(IUNIT(49).NE.0) THEN
-          IF(PRCPLK(LM).NE.0.AND.LKFLOWTYPE(3).EQ.'NA') THEN
-            LKFLOWTYPE(3)='PRECIP'
-            NLKFLWTYP = NLKFLWTYP + 1
-          ENDIF
-          IF(EVAPLK(LM).NE.0.AND.LKFLOWTYPE(4).EQ.'NA') THEN 
-            LKFLOWTYPE(4)='EVAP'
-            NLKFLWTYP = NLKFLWTYP + 1
-          ENDIF
-          IF(RNF(LM).NE.0.AND.LKFLOWTYPE(5).EQ.'NA') THEN
-            LKFLOWTYPE(5)='RUNOFF'
-            NLKFLWTYP = NLKFLWTYP + 1
-          ENDIF
-          IF(WTHDRW(LM).NE.0.AND.LKFLOWTYPE(6).EQ.'NA') THEN
-            LKFLOWTYPE(6)='WITHDRAW'
-            NLKFLWTYP = NLKFLWTYP + 1
-          ENDIF
-        ENDIF
+        !IF(IUNIT(49).NE.0) THEN
+        !  IF(PRCPLK(LM).NE.0.AND.LKFLOWTYPE(3).EQ.'NA') THEN
+        !    LKFLOWTYPE(3)='PRECIP'
+        !    NLKFLWTYP = NLKFLWTYP + 1
+        !  ENDIF
+        !  IF(EVAPLK(LM).NE.0.AND.LKFLOWTYPE(4).EQ.'NA') THEN 
+        !    LKFLOWTYPE(4)='EVAP'
+        !    NLKFLWTYP = NLKFLWTYP + 1
+        !  ENDIF
+        !  IF(RNF(LM).NE.0.AND.LKFLOWTYPE(5).EQ.'NA') THEN
+        !    LKFLOWTYPE(5)='RUNOFF'
+        !    NLKFLWTYP = NLKFLWTYP + 1
+        !  ENDIF
+        !  IF(WTHDRW(LM).NE.0.AND.LKFLOWTYPE(6).EQ.'NA') THEN
+        !    LKFLOWTYPE(6)='WITHDRAW'
+        !    NLKFLWTYP = NLKFLWTYP + 1
+        !  ENDIF
+        !ENDIF
 C
         IF(ISS.NE.0.AND.KKPER.GT.1)WRITE(IOUT,9)LM,PRCPLK(LM),EVAPLK(LM)
      1   ,RNF(LM),WTHDRW(LM),BOTTMS(LM),BGAREA(LM),SSMN(LM),SSMX(LM)
@@ -1751,7 +1751,7 @@ C     ------------------------------------------------------------------
      +                        HNOFLO, VBVL, VBNM
       USE GWFSFRMODULE, ONLY: STRIN, DLKSTAGE, SLKOTFLW
       USE GWFUZFMODULE, ONLY: SURFDEP,IUZFBND,FINF,VKS
-      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
+      !USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       IMPLICIT NONE
       !rsr: argument IUNITSFR not used
       CHARACTER*16 TEXT
@@ -2636,18 +2636,18 @@ C-lfk
 C
               DELVOLLAK(NN)=DELVOL(NN)/DELT
 C-EDM
-              IF(IUNIT(49).NE.0 ) THEN
-                IF ( LKFLOWTYPE(1).EQ.'NA' ) THEN
-                  LKFLOWTYPE(1)='VOLUME'
-                  NLKFLWTYP = NLKFLWTYP + 1
-                END IF
-              ENDIF
-              IF(IUNIT(49).NE.0 ) THEN
-                IF ( LKFLOWTYPE(2).EQ.'NA' ) THEN
-                  LKFLOWTYPE(2)='DELVOL'
-                  NLKFLWTYP = NLKFLWTYP + 1
-                END IF
-              ENDIF
+              !IF(IUNIT(49).NE.0 ) THEN
+              !  IF ( LKFLOWTYPE(1).EQ.'NA' ) THEN
+              !    LKFLOWTYPE(1)='VOLUME'
+              !    NLKFLWTYP = NLKFLWTYP + 1
+              !  END IF
+              !ENDIF
+              !IF(IUNIT(49).NE.0 ) THEN
+              !  IF ( LKFLOWTYPE(2).EQ.'NA' ) THEN
+              !    LKFLOWTYPE(2)='DELVOL'
+              !    NLKFLWTYP = NLKFLWTYP + 1
+              !  END IF
+              !ENDIF
 C
               IF(LWRT.GT.0.OR.ICBCFL.LE.0) GO TO 1100
               IF(IUNITUZF.EQ.0) THEN
