@@ -94,8 +94,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr =
-     +'$Id: gwf2sfr7_NWT.f 7541 2015-07-30 21:46:59Z rniswon $'
+      Version_sfr = 'gwf2sfr7_NWT.f 2015-07-30 21:46:59Z'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
