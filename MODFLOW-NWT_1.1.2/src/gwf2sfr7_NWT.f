@@ -58,7 +58,6 @@ C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFSFRMODULE
-!      USE LMTMODULE,    ONLY: NFLOWTYPE
       USE GLOBAL,       ONLY: IOUT, IBOUND, BOTM, STRT, DELR, DELC, 
      +                        ITRSS, NCOL, NROW, LAYHDT, IUNIT  !CJM added ncol and nrow
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
@@ -94,7 +93,8 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr = 'gwf2sfr7_NWT.f 2015-07-30 21:46:59Z'
+      Version_sfr =
+     +'$Id: gwf2sfr7_NWT.f 7541 2015-07-30 21:46:59Z rniswon $'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
@@ -107,9 +107,11 @@ C     ------------------------------------------------------------------
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (ITRFLG)
-      !IF(IUNIT(49).GT.0) THEN
-      !  ALLOCATE (NINTOT,NFLOWTYPE)                             !EDM - FOR LMT
-      !ENDIF
+      ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
+      ALLOCATE (NFLOWTYPE)
+      IF(IUNIT(49).GT.0) THEN
+        ALLOCATE (NINTOT)                             !EDM - FOR LMT
+      ENDIF
       ALLOCATE (FACTOR)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
@@ -141,6 +143,14 @@ C         DLEAK, ISTCB1, ISTCB2.
       IFLG = 0
       found = .false.
       factor = 1.0
+      NFLOWTYPE=0
+      IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+        FLOWTYPE(1) = 'NA'
+        FLOWTYPE(2) = 'NA'
+        FLOWTYPE(3) = 'NA'
+        FLOWTYPE(4) = 'NA'
+        FLOWTYPE(5) = 'NA'
+      ENDIF
       CALL URDCOM(In, IOUT, line)
 ! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
@@ -1073,7 +1083,6 @@ C     READ STREAM DATA FOR STRESS PERIOD
 C     Compute three new tables for lake outflow
 C     ******************************************************************
       USE GWFSFRMODULE
-!      USE LMTMODULE,    ONLY: NFLOWTYPE,FLOWTYPE
       USE GLOBAL,       ONLY: IOUT, ISSFLG, IBOUND, BOTM, HNEW, NLAY, 
      +                        LAYHDT, IUNIT
       USE PARAMMODULE,  ONLY: MXPAR, PARTYP, IACTIVE, IPLOC
@@ -1313,14 +1322,6 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
-        !IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-        !  FLOWTYPE(1) = 'NA'
-        !  FLOWTYPE(2) = 'NA'
-        !  FLOWTYPE(3) = 'NA'
-        !  FLOWTYPE(4) = 'NA'
-        !  FLOWTYPE(5) = 'NA'
-        !  NFLOWTYPE=0
-        !ENDIF
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -1334,28 +1335,28 @@ C--SET SOME VALUES NEEDED BY THE LMT PACKAGE
 C--AS EACH SEGMENT IS READ, DETERMINE IF ANY OF THE FOLLOWING ARE ACTIVE
 C  (1) STORAGE (TRANSIENT ROUTING); (2) PRECIP; (3) EVAP; (4) USER-SPECIFIED RUNOFF; 
 C  (5) RUNOFF FROM UZF1 PACKAGE; (6) UNSATURATED FLOW BENEATH REACH (NOT AVAILABLE YET)
-          !IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-          !  IF(FLOWTYPE(1).EQ.'NA') THEN !Originally: (ITRFLG.EQ.1.AND.FLOWTYPE(1).EQ.'NA')
-          !    NFLOWTYPE = NFLOWTYPE + 1
-          !    FLOWTYPE(1)='VOLUME'
-          !  ENDIF
-          !  IF(FLOWTYPE(2).EQ.'NA') THEN
-          !    NFLOWTYPE = NFLOWTYPE + 1
-          !    FLOWTYPE(2)='RCHLEN'
-          !  ENDIF
-          !  IF(SEG(5,nseg).NE.0.AND.FLOWTYPE(3).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER PRECIP
-          !    NFLOWTYPE = NFLOWTYPE + 1
-          !    FLOWTYPE(3)='PRECIP'
-          !  ENDIF
-          !  IF(SEG(4,nseg).NE.0.AND.FLOWTYPE(4).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER EVAP
-          !    NFLOWTYPE = NFLOWTYPE + 1
-          !    FLOWTYPE(4)='EVAP'
-          !  ENDIF
-          !  IF(SEG(3,nseg).NE.0.AND.FLOWTYPE(5).EQ.'NA') THEN  ! CHECK FOR USER-SPECIFIED RUNOFF
-          !    NFLOWTYPE = NFLOWTYPE + 1
-          !    FLOWTYPE(5)='RUNOFF'
-          !  ENDIF
-          !ENDIF
+          IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+            IF(FLOWTYPE(1).EQ.'NA') THEN !Originally: (ITRFLG.EQ.1.AND.FLOWTYPE(1).EQ.'NA')
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(1)='VOLUME'
+            ENDIF
+            IF(FLOWTYPE(2).EQ.'NA') THEN
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(2)='RCHLEN'
+            ENDIF
+            IF(SEG(5,nseg).NE.0.AND.FLOWTYPE(3).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER PRECIP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(3)='PRECIP'
+            ENDIF
+            IF(SEG(4,nseg).NE.0.AND.FLOWTYPE(4).EQ.'NA') THEN  ! CHECK FOR SURFACE WATER EVAP
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(4)='EVAP'
+            ENDIF
+            IF(SEG(3,nseg).NE.0.AND.FLOWTYPE(5).EQ.'NA') THEN  ! CHECK FOR USER-SPECIFIED RUNOFF
+              NFLOWTYPE = NFLOWTYPE + 1
+              FLOWTYPE(5)='RUNOFF'
+            ENDIF
+          ENDIF
 C
 C19-----COMPUTE VARIABLES NEEDED FOR STREAM LEAKAGE.
           IF ( icalc.EQ.0 .OR. icalc.EQ.1 ) THEN
@@ -3548,9 +3549,9 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       lfold = 0
       fact = FACTOR
       maxwav = NSFRSETS*NSTRAIL
-      !IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-      !  NINTOT = 0              
-      !ENDIF
+      IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+        NINTOT = 0              
+      ENDIF
       IF ( IUZT.EQ.1 ) THEN
         SFRUZBD(4) = zero
         SFRUZBD(5) = zero
@@ -3666,11 +3667,11 @@ C7------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
             flowin = SEG(2, istsg)
 !EDM - Count connection for LMT
-            !IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-            !  IF ( ISEG(3, istsg).EQ.5 ) THEN  
-            !    NINTOT = NINTOT + 1 
-            !  ENDIF
-            !ENDIF
+            IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+              IF ( ISEG(3, istsg).EQ.5 ) THEN  
+                NINTOT = NINTOT + 1 
+              ENDIF
+            ENDIF
             IF ( IDIVAR(1,istsg).EQ.0 ) 
      +          sfrbudg_in = sfrbudg_in + SEG(2, istsg)
 C
@@ -3719,7 +3720,7 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
 !EDM - For LMT
                 IF( IDIVAR(1,istsg).GT.0 ) THEN
                   flowin = DVRSFLW(istsg)
-                  !IF(IUNIT(49).GT.0) NINTOT = NINTOT + 1
+                  IF(IUNIT(49).GT.0) NINTOT = NINTOT + 1
                 ENDIF
               END IF
             END IF
@@ -3755,9 +3756,9 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
                 IF ( istsg.EQ.IOTSG(itrib) ) THEN
                   trbflw = SGOTFLW(itrib)
                   flowin = flowin + trbflw
-                  !IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-                  !  NINTOT = NINTOT + 1   !EDM
-                  !ENDIF
+                  IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+                    NINTOT = NINTOT + 1   !EDM
+                  ENDIF
                 END IF
                 itrib = itrib + 1
               END DO
@@ -8416,6 +8417,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
       DEALLOCATE (GWFSFRDAT(IGRID)%factor)
+      DEALLOCATE (GWFSFRDAT(IGRID)%NFLOWTYPE)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FLOWTYPE)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8428,6 +8431,8 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
+      NFLOWTYPE=>GWFSFRDAT(IGRID)%NFLOWTYPE
+      FLOWTYPE=>GWFSFRDAT(IGRID)%FLOWTYPE
       NSS=>GWFSFRDAT(IGRID)%NSS
       NSTRM=>GWFSFRDAT(IGRID)%NSTRM
       NSFRPAR=>GWFSFRDAT(IGRID)%NSFRPAR
@@ -8540,6 +8545,8 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
+      GWFSFRDAT(IGRID)%NFLOWTYPE=>NFLOWTYPE
+      GWFSFRDAT(IGRID)%FLOWTYPE=>FLOWTYPE
       GWFSFRDAT(IGRID)%NSS=>NSS
       GWFSFRDAT(IGRID)%NSTRM=>NSTRM
       GWFSFRDAT(IGRID)%NSFRPAR=>NSFRPAR
