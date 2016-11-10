@@ -156,7 +156,7 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2014-07-01 23:30:24Z'
+      Version_uzf = 'gwf2uzf1_NWT.f 2016-11-10 12:17:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -2089,9 +2089,9 @@ C-------------SFR AND SWR REACHES
                   SEG(26, irun) = SEG(26, irun) + seepout1
                 END IF
               END IF
-              IF ( Iunitswr.GT.0 ) THEN
- !               CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
-              END IF
+!gsf          IF ( Iunitswr.GT.0 ) THEN
+!gsf            CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
+!gsf          END IF
 C-------------LAK REACHES
             ELSE IF ( irun.LT.0 ) THEN
               IF ( Iunitlak.GT.0 ) THEN
@@ -2269,10 +2269,13 @@ CDEP 05/05/2006
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
+C set excess precipitation to zero for integrated (GSFLOW) simulation
+        IF ( IGSFLOW.GT.0 ) THEN
+          Excespp(ic, ir) = 0.0
 ! EDM
-        IF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
+        ELSEIF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
           EXCESPP(ic, ir) =  (FINF(ic, ir) - 
-     +                 VKS(ic, ir))*DELC(ir)*DELR(ic)
+     +                       VKS(ic, ir))*DELC(ir)*DELR(ic)
           FINF(ic, ir) = VKS(ic, ir)
         ELSE
           EXCESPP(ic, ir) = 0.0
@@ -2280,8 +2283,6 @@ CDEP 05/05/2006
 ! EDM
         finfhold = FINF(ic, ir)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
-C set excess precipitation to zero for integrated (GSFLOW) simulation
-        IF ( IGSFLOW.GT.0 ) Excespp(ic, ir) = 0.0
         flength = DELC(ir)
         width = DELR(ic)
         cellarea = width*flength
