@@ -534,7 +534,7 @@ C
 C5D-----PRINT FLOW RATE IF REQUESTED.
       IF(IBD.LT.0) THEN
          IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
-   61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP',I6) !gsf
          WRITE(IOUT,62) L,IL,IR,IC,Q
    62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
      1       '   RATE ',1PG15.6)
