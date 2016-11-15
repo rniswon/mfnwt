@@ -93,7 +93,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr = 'gwf2sfr7_NWT.f 2015-07-30 21:46:59Z'
+      Version_sfr = 'gwf2sfr7_NWT.f 2016-11-10 12:10:00Z'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
@@ -105,6 +105,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
+      ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
       ALLOCATE (ITRFLG)
       ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
       ALLOCATE (NFLOWTYPE)
@@ -150,6 +151,9 @@ C         DLEAK, ISTCB1, ISTCB2.
         FLOWTYPE(4) = 'NA'
         FLOWTYPE(5) = 'NA'
       ENDIF
+      SFRUZINFIL = 0.0
+      SFRUZDELSTOR = 0.0
+      SFRUZRECH = 0.0
       CALL URDCOM(In, IOUT, line)
 ! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
@@ -186,7 +190,7 @@ C         DLEAK, ISTCB1, ISTCB2.
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
             IF(MAXVAL.LT.0) MAXVAL=0
             WRITE(IOUT,31) NUMTAB,MAXVAL
-   31    FORMAT(1X,I10,' Specifed inflow files will be read ',
+   31    FORMAT(1X,I10,' Specified inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
             found = .true.
           case('LOSSFACTOR')
@@ -3547,6 +3551,9 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       Transient_bd = 0.0
       lfold = 0
       fact = FACTOR
+      SFRUZINFIL = 0.0
+      SFRUZDELSTOR = 0.0
+      SFRUZRECH = 0.0
       maxwav = NSFRSETS*NSTRAIL
       IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
         NINTOT = 0              
@@ -6228,7 +6235,8 @@ C     ZONE BENEATH STREAMBED.
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 C     ******************************************************************
       USE GWFSFRMODULE, ONLY: ISUZN,NSTOTRL,NUMAVE,STRM,ITRLSTH,SFRUZBD,
-     +                        SUMLEAK,SUMRCH, NEARZERO, CLOSEZERO
+     +                        SUMLEAK,SUMRCH, NEARZERO, CLOSEZERO,
+     +                        SFRUZINFIL,SFRUZDELSTOR,SFRUZRECH
       USE GLOBAL,       ONLY: BUFF
 !!      USE GLOBAL,       ONLY: BUFF,IOUT
 !      USE GWFBASMODULE, ONLY: DELT
@@ -6251,7 +6259,7 @@ C     ------------------------------------------------------------------
      +                 Uzdpst(NSTOTRL), Uzthst(NSTOTRL)
       DOUBLE PRECISION H, Hld, Thr, Thetas, Epsilon, Ratin, Ratout,
      +                 Flobot, Sbot, Totflwt, Totuzstor, Totdelstor,
-     +                 Gwflow
+     +                 Gwflow, uzinfiltot
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
@@ -6271,6 +6279,7 @@ C
       Totflwt = 0.0D0
       Totdelstor = 0.0D0
       Totuzstor = 0.0D0
+      uzinfiltot = 0.0D0
       strtop = STRM(3, L)
       htest1 = H - Sbot
       htest2 = Hld - Sbot
@@ -6377,6 +6386,7 @@ C         STORAGE WHEN WATER TABLE RISES TO ELEVATION OF STREAMBED.
             Uzolsflx(i) = 0.0D0
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
+            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6415,6 +6425,7 @@ C         WHEN WATER TABLE REMAINS BELOW STREAMBED ELEVATION.
           Uzflwt(i) = Uzseep(i)*Uzwdth(i)*Strlen*Deltinc
           Uzolsflx(i) = Uzseep(i)
           SUMRCH(L) = SUMRCH(L) + Uzflwt(i)
+          uzinfiltot = uzinfiltot + Uzseep(i)
           iset = iset + ntotuzn
         END DO 
         STRM(29,L) = 0.0
@@ -6672,6 +6683,7 @@ C         WHEN NO WAVES INTERSECTED.
               uzstorhold = Uzstor(i)
               Uzstor(i) = fm*Uzwdth(i)*Strlen
               Delstor(i) = Uzstor(i) - uzstorhold
+              uzinfiltot = uzinfiltot + Uzseep(i)
 C
 C13-----CALCULATE CHANGE IN UNSATURATED ZONE STORAGE WHEN GROUND- 
 C         WATER LEVEL DROPS.
@@ -6715,6 +6727,7 @@ C         WATER LEVEL DROPS.
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
             Totuzstor = Totuzstor + Uzstor(i)
+            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6784,6 +6797,7 @@ C         BELOW STREAMBED.
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
             Totuzstor = Totuzstor + Uzstor(i)
+            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6859,6 +6873,10 @@ C17-----STORE UNSATURATED FLOW RATES FOR GAGE PACKAGE.
       STRM(21, L) = Totflwt/Deltinc
       STRM(22, L) = Totdelstor/Deltinc
       STRM(23, L) = Totuzstor
+      SFRUZINFIL = SFRUZINFIL + uzinfiltot
+      SFRUZDELSTOR = SFRUZDELSTOR + Totdelstor/Deltinc
+      SFRUZRECH = SFRUZRECH + Totflwt
+
       DEALLOCATE (loop)
 C18-----RETURN.
       RETURN
