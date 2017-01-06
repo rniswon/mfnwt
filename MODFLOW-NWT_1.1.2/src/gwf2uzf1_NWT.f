@@ -3504,17 +3504,19 @@ C
 C40-----UPDATE RATES AND BUFFERS FOR STORAGE CHANGES.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
-          DO ir = 1, NROW
-            DO ic = 1, NCOL
-              IF ( LAYNUM(ic, ir).GT.0
-     +             .AND. IUZFBND(ic,ir).NE.0 ) THEN
-                ill = LAYNUM(ic, ir)
-                IF ( ill.GT.0 ) THEN
-              BUFF(ic, ir, ill) = DELSTOR(IC,IR)/delt
+          IF ( IUZFOPT.EQ.1 .OR. IUZFOPT.EQ.2 ) THEN
+            DO ir = 1, NROW
+              DO ic = 1, NCOL
+                IF ( LAYNUM(ic, ir).GT.0
+     +               .AND. IUZFBND(ic,ir).NE.0 ) THEN
+                  ill = LAYNUM(ic, ir)
+                  IF ( ill.GT.0 ) THEN
+                    BUFF(ic, ir, ill) = DELSTOR(IC,IR)/delt
+                  END IF
                 END IF
-              END IF
+              END DO
             END DO
-          END DO
+        END IF
       END IF
 C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, uzsttext, IUZFCB1, 
