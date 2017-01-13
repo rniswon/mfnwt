@@ -1444,7 +1444,7 @@ C5B------DETERMINE LAKE AND NODAL LAYER,ROW,COLUMN NUMBER.
                 CONDUC = 0.0
               END IF  
               IF(CONDUC.GT.0.0) THEN
-                H=HNEW(IC,IR,IL)
+                H=HNEW(IC,IR,IL1)   !RGN this was IL and not IL1. 1/9/17
                 INOFLO = 0
 C
 C9A------CALCULATE SEEPAGE.
@@ -1983,7 +1983,7 @@ C           IS DEPENDENT ON VALUE OF THET1.
  ! 506          FORMAT(1X,'ERROR - NO AQUIFER UNDER LAKE CELL ',4I5)
              END IF
              IF(CONDUC.GT.0.0) THEN
-               H=HNEW(IC,IR,IL)
+               H=HNEW(IC,IR,IL1)  !RGN set IL to IL1 1/9/16
 C
 C5C------DETERMINE UPPERMOST ACTIVE CELL IF NOT CELL(IL)
 C
