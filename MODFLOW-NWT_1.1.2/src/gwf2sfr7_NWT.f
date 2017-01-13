@@ -85,15 +85,16 @@ C     ------------------------------------------------------------------
       INTEGER krck, irck, jrck, jsegck, ireachck, kkptflg, ib
       INTEGER lstsum, lstbeg, numinst, idum(1), ip, iterp, mstrmar
       INTEGER nssar, nstrmar, NPP, MXVL, IRFG
+      INTEGER intchk, Iostat
 !!      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG, ITRFLG
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
       REAL epsslpe
-      character(len=40) :: keyvalue
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr = 'gwf2sfr7_NWT.f 2016-11-10 12:10:00Z'
+      Version_sfr =
+     +'$Id: gwf2sfr7_NWT.f 7541 2015-07-30 21:46:59Z rniswon $'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
@@ -105,7 +106,6 @@ C     ------------------------------------------------------------------
       ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
-      ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
       ALLOCATE (ITRFLG)
       ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
       ALLOCATE (NFLOWTYPE)
@@ -151,27 +151,18 @@ C         DLEAK, ISTCB1, ISTCB2.
         FLOWTYPE(4) = 'NA'
         FLOWTYPE(5) = 'NA'
       ENDIF
-      SFRUZINFIL = 0.0
-      SFRUZDELSTOR = 0.0
-      SFRUZRECH = 0.0
+C
+C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
+C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
       CALL URDCOM(In, IOUT, line)
-! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      keyvalue = LINE(ISTART:ISTOP)
-      call upcase(keyvalue)
-      IF(keyvalue.EQ.'OPTIONS') THEN
-              write(iout,'(/1x,a)') 'PROCESSING '//
-     +              trim(adjustl(text)) //' OPTIONS'
-        do
-        CALL URDCOM(In, IOUT, line)
-        lloc = 1
+      DO
+        LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        keyvalue = LINE(ISTART:ISTOP)
-        call upcase(keyvalue)
-        select case (keyvalue)
+        select case (LINE(ISTART:ISTOP))
+          case('OPTIONS')
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
           case('REACHINPUT')
             IRFG = 1
             WRITE(IOUT,32)
@@ -190,7 +181,7 @@ C         DLEAK, ISTCB1, ISTCB2.
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
             IF(MAXVAL.LT.0) MAXVAL=0
             WRITE(IOUT,31) NUMTAB,MAXVAL
-   31    FORMAT(1X,I10,' Specified inflow files will be read ',
+   31    FORMAT(1X,I10,' Specifed inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
             found = .true.
           case('LOSSFACTOR')
@@ -201,17 +192,29 @@ C         DLEAK, ISTCB1, ISTCB2.
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
            found = .true.
-        case ('END')
-          CALL URDCOM(In, IOUT, line)
-          exit
-        case default
-    ! -- No options found
-        found = .false.
-        CALL URDCOM(In, IOUT, line)
-        exit
+          case ('END')
+            write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            exit
+          case default
+            read(line(istart:istop),*,IOSTAT=Iostat) intchk
+            if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+            else
+              ! Integer found.  This is likely NSTRM, so exit.
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +          trim(adjustl(text)) //' OPTIONS'
+              exit
+            endif
         end select
-      end do
-      end if
+        CALL URDCOM(In, IOUT, line)
+      ENDDO
 !
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
@@ -3551,9 +3554,6 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       Transient_bd = 0.0
       lfold = 0
       fact = FACTOR
-      SFRUZINFIL = 0.0
-      SFRUZDELSTOR = 0.0
-      SFRUZRECH = 0.0
       maxwav = NSFRSETS*NSTRAIL
       IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
         NINTOT = 0              
@@ -6235,8 +6235,7 @@ C     ZONE BENEATH STREAMBED.
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 C     ******************************************************************
       USE GWFSFRMODULE, ONLY: ISUZN,NSTOTRL,NUMAVE,STRM,ITRLSTH,SFRUZBD,
-     +                        SUMLEAK,SUMRCH, NEARZERO, CLOSEZERO,
-     +                        SFRUZINFIL,SFRUZDELSTOR,SFRUZRECH
+     +                        SUMLEAK,SUMRCH, NEARZERO, CLOSEZERO
       USE GLOBAL,       ONLY: BUFF
 !!      USE GLOBAL,       ONLY: BUFF,IOUT
 !      USE GWFBASMODULE, ONLY: DELT
@@ -6259,7 +6258,7 @@ C     ------------------------------------------------------------------
      +                 Uzdpst(NSTOTRL), Uzthst(NSTOTRL)
       DOUBLE PRECISION H, Hld, Thr, Thetas, Epsilon, Ratin, Ratout,
      +                 Flobot, Sbot, Totflwt, Totuzstor, Totdelstor,
-     +                 Gwflow, uzinfiltot
+     +                 Gwflow
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
@@ -6279,7 +6278,6 @@ C
       Totflwt = 0.0D0
       Totdelstor = 0.0D0
       Totuzstor = 0.0D0
-      uzinfiltot = 0.0D0
       strtop = STRM(3, L)
       htest1 = H - Sbot
       htest2 = Hld - Sbot
@@ -6386,7 +6384,6 @@ C         STORAGE WHEN WATER TABLE RISES TO ELEVATION OF STREAMBED.
             Uzolsflx(i) = 0.0D0
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
-            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6425,7 +6422,6 @@ C         WHEN WATER TABLE REMAINS BELOW STREAMBED ELEVATION.
           Uzflwt(i) = Uzseep(i)*Uzwdth(i)*Strlen*Deltinc
           Uzolsflx(i) = Uzseep(i)
           SUMRCH(L) = SUMRCH(L) + Uzflwt(i)
-          uzinfiltot = uzinfiltot + Uzseep(i)
           iset = iset + ntotuzn
         END DO 
         STRM(29,L) = 0.0
@@ -6683,7 +6679,6 @@ C         WHEN NO WAVES INTERSECTED.
               uzstorhold = Uzstor(i)
               Uzstor(i) = fm*Uzwdth(i)*Strlen
               Delstor(i) = Uzstor(i) - uzstorhold
-              uzinfiltot = uzinfiltot + Uzseep(i)
 C
 C13-----CALCULATE CHANGE IN UNSATURATED ZONE STORAGE WHEN GROUND- 
 C         WATER LEVEL DROPS.
@@ -6727,7 +6722,6 @@ C         WATER LEVEL DROPS.
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
             Totuzstor = Totuzstor + Uzstor(i)
-            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6797,7 +6791,6 @@ C         BELOW STREAMBED.
             Totflwt = Totflwt + Uzflwt(i)
             Totdelstor = Totdelstor + Delstor(i)
             Totuzstor = Totuzstor + Uzstor(i)
-            uzinfiltot = uzinfiltot + Uzseep(i)
           END IF
         END DO
         SUMRCH(L) = SUMRCH(L) + Totflwt
@@ -6873,10 +6866,6 @@ C17-----STORE UNSATURATED FLOW RATES FOR GAGE PACKAGE.
       STRM(21, L) = Totflwt/Deltinc
       STRM(22, L) = Totdelstor/Deltinc
       STRM(23, L) = Totuzstor
-      SFRUZINFIL = SFRUZINFIL + uzinfiltot
-      SFRUZDELSTOR = SFRUZDELSTOR + Totdelstor/Deltinc
-      SFRUZRECH = SFRUZRECH + Totflwt
-
       DEALLOCATE (loop)
 C18-----RETURN.
       RETURN

@@ -141,6 +141,7 @@ C     ------------------------------------------------------------------
      +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL,
      +        llocsave, icheck2
       REAL r, sy, fkmin, fkmax, range, finc, thick, smooth
+      INTEGER intchk, Iostat
       CHARACTER(LEN=200) line
       CHARACTER(LEN=24) aname(9)
       character(len=16)  :: text        = 'UZF'
@@ -156,7 +157,8 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2016-11-10 12:17:00Z'
+      Version_uzf =
+     +'$Id: gwf2uzf1_NWT.f 4071 2014-07-01 23:30:24Z rniswon $'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -191,23 +193,18 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
  9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4', 
      +        ', 02/06/2012', /, 9X, 'INPUT READ FROM UNIT', I3)
 !
+C
+C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
+C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
       CALL URDCOM(In, IOUT, line)
-! Check for alternate input.
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      keyvalue = LINE(ISTART:ISTOP)
-      call upcase(keyvalue)
-      IF(keyvalue.EQ.'OPTIONS') THEN
-              write(iout,'(/1x,a)') 'PROCESSING '//
-     +              trim(adjustl(text)) //' OPTIONS'
-        do
-        CALL URDCOM(In, IOUT, line)
-        lloc = 1
+      DO
+        LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        keyvalue = LINE(ISTART:ISTOP)
-        call upcase(keyvalue)
-        select case (keyvalue)
+        select case (LINE(ISTART:ISTOP))
+          case('OPTIONS')
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
           case('SPECIFYTHTR')
             ITHTRFLG = 1
             WRITE(iout,*)
@@ -263,7 +260,7 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
      +                         'USING LAND SURFACE K'
               WRITE(iout,*)
               found = .true.
-        case ('NETFLUX')
+          case ('NETFLUX')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
             IF(UNITRECH.LT.0) UNITRECH=0
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITDIS,R,IOUT,IN)
@@ -274,18 +271,30 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
      +                 'FILES WITH UNIT NUMBERS ',I10,I10, 
      +                 ', RESPECTIVELY')
 
-        case ('END')
-          CALL URDCOM(In, IOUT, line)
-          exit
-        case default
-    ! -- No options found
-        found = .false.
-        CALL URDCOM(In, IOUT, line)
-        exit
+          case ('END')
+            write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            exit
+          case default
+            read(line(istart:istop),*,IOSTAT=Iostat) intchk
+            if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+            else
+              ! Integer found.  This is likely NUZTOP, so exit.
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +          trim(adjustl(text)) //' OPTIONS'
+              exit
+            endif
         end select
-      end do
-      end if
- !
+        CALL URDCOM(In, IOUT, line)
+      ENDDO
+!
       if ( Ireadsurfk == 0 .and. Isurfkreject == 1) then
           WRITE(iout,*)
           WRITE(IOUT,'(A)')'WARNING REJECTSURFK SPECIFIED BUT ',
@@ -1927,6 +1936,7 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 ELSE 
                   RHS(ic, ir, il) = RHS(ic, ir, il) -
      +                              cellarea*finfhold
+
                 END IF
                 etact = 0.0D0               
               END IF
@@ -2089,9 +2099,9 @@ C-------------SFR AND SWR REACHES
                   SEG(26, irun) = SEG(26, irun) + seepout1
                 END IF
               END IF
-!gsf          IF ( Iunitswr.GT.0 ) THEN
-!gsf            CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
-!gsf          END IF
+              IF ( Iunitswr.GT.0 ) THEN
+                CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
+              END IF
 C-------------LAK REACHES
             ELSE IF ( irun.LT.0 ) THEN
               IF ( Iunitlak.GT.0 ) THEN
@@ -2269,13 +2279,10 @@ CDEP 05/05/2006
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
-C set excess precipitation to zero for integrated (GSFLOW) simulation
-        IF ( IGSFLOW.GT.0 ) THEN
-          Excespp(ic, ir) = 0.0
 ! EDM
-        ELSEIF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
+        IF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
           EXCESPP(ic, ir) =  (FINF(ic, ir) - 
-     +                       VKS(ic, ir))*DELC(ir)*DELR(ic)
+     +                 VKS(ic, ir))*DELC(ir)*DELR(ic)
           FINF(ic, ir) = VKS(ic, ir)
         ELSE
           EXCESPP(ic, ir) = 0.0
@@ -2283,6 +2290,8 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
 ! EDM
         finfhold = FINF(ic, ir)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
+C set excess precipitation to zero for integrated (GSFLOW) simulation
+        IF ( IGSFLOW.GT.0 ) Excespp(ic, ir) = 0.0
         flength = DELC(ir)
         width = DELR(ic)
         cellarea = width*flength
@@ -3504,17 +3513,19 @@ C
 C40-----UPDATE RATES AND BUFFERS FOR STORAGE CHANGES.
       IF ( ibd.GT.0 .OR. ibduzf.GT.0 ) THEN
           CALL INITARRAY(TOTCELLS,0.0,BUFF(:,:,1))
-          DO ir = 1, NROW
-            DO ic = 1, NCOL
-              IF ( LAYNUM(ic, ir).GT.0
-     +             .AND. IUZFBND(ic,ir).NE.0 ) THEN
-                ill = LAYNUM(ic, ir)
-                IF ( ill.GT.0 ) THEN
-              BUFF(ic, ir, ill) = DELSTOR(IC,IR)/delt
+          IF ( IUZFOPT.EQ.1 .OR. IUZFOPT.EQ.2 ) THEN
+            DO ir = 1, NROW
+              DO ic = 1, NCOL
+                IF ( LAYNUM(ic, ir).GT.0
+     +               .AND. IUZFBND(ic,ir).NE.0 ) THEN
+                  ill = LAYNUM(ic, ir)
+                  IF ( ill.GT.0 ) THEN
+                    BUFF(ic, ir, ill) = DELSTOR(IC,IR)/delt
+                  END IF
                 END IF
-              END IF
+              END DO
             END DO
-          END DO
+        END IF
       END IF
 C41-----SAVE REJECTED INFILTRATON RATES TO UNFORMATTED FILE.
         IF ( ibd.GT.0 ) CALL UBUDSV(Kkstp, Kkper, uzsttext, IUZFCB1, 
