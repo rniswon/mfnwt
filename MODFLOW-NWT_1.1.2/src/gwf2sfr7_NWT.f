@@ -93,8 +93,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr =
-     +'$Id: gwf2sfr7_NWT.f 7541 2015-07-30 21:46:59Z rniswon $'
+      Version_sfr = 'gwf2sfr7_NWT.f 2016-11-10 12:10:00Z'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
@@ -152,6 +151,9 @@ C         DLEAK, ISTCB1, ISTCB2.
         FLOWTYPE(4) = 'NA'
         FLOWTYPE(5) = 'NA'
       ENDIF
+      SFRUZINFIL = 0.0
+      SFRUZDELSTOR = 0.0
+      SFRUZRECH = 0.0
 C
 C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
 C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
@@ -182,7 +184,7 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
             IF(MAXVAL.LT.0) MAXVAL=0
             WRITE(IOUT,31) NUMTAB,MAXVAL
-   31    FORMAT(1X,I10,' Specifed inflow files will be read ',
+   31    FORMAT(1X,I10,' Specified inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')
             found = .true.
           case('LOSSFACTOR')
