@@ -58,6 +58,7 @@ C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFSFRMODULE
+      USE LMTMODULE,    ONLY: NFLOWTYPE
       USE GLOBAL,       ONLY: IOUT, IBOUND, BOTM, STRT, DELR, DELC, 
      +                        ITRSS, NCOL, NROW, LAYHDT, IUNIT  !CJM added ncol and nrow
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
@@ -107,8 +108,6 @@ C     ------------------------------------------------------------------
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
       ALLOCATE (ITRFLG)
-      ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
-      ALLOCATE (NFLOWTYPE)
       IF(IUNIT(49).GT.0) THEN
         ALLOCATE (NINTOT)                             !EDM - FOR LMT
       ENDIF
@@ -143,14 +142,6 @@ C         DLEAK, ISTCB1, ISTCB2.
       IFLG = 0
       found = .false.
       factor = 1.0
-      NFLOWTYPE=0
-      IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-        FLOWTYPE(1) = 'NA'
-        FLOWTYPE(2) = 'NA'
-        FLOWTYPE(3) = 'NA'
-        FLOWTYPE(4) = 'NA'
-        FLOWTYPE(5) = 'NA'
-      ENDIF
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
@@ -1086,6 +1077,7 @@ C     READ STREAM DATA FOR STRESS PERIOD
 C     Compute three new tables for lake outflow
 C     ******************************************************************
       USE GWFSFRMODULE
+      USE LMTMODULE,    ONLY: NFLOWTYPE,FLOWTYPE
       USE GLOBAL,       ONLY: IOUT, ISSFLG, IBOUND, BOTM, HNEW, NLAY, 
      +                        LAYHDT, IUNIT
       USE PARAMMODULE,  ONLY: MXPAR, PARTYP, IACTIVE, IPLOC
@@ -1325,6 +1317,14 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
+        IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+          FLOWTYPE(1) = 'NA'
+          FLOWTYPE(2) = 'NA'
+          FLOWTYPE(3) = 'NA'
+          FLOWTYPE(4) = 'NA'
+          FLOWTYPE(5) = 'NA'
+          NFLOWTYPE=0
+        ENDIF
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -8434,8 +8434,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
       DEALLOCATE (GWFSFRDAT(IGRID)%factor)
-      DEALLOCATE (GWFSFRDAT(IGRID)%NFLOWTYPE)
-      DEALLOCATE (GWFSFRDAT(IGRID)%FLOWTYPE)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8448,8 +8446,6 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
-      NFLOWTYPE=>GWFSFRDAT(IGRID)%NFLOWTYPE
-      FLOWTYPE=>GWFSFRDAT(IGRID)%FLOWTYPE
       NSS=>GWFSFRDAT(IGRID)%NSS
       NSTRM=>GWFSFRDAT(IGRID)%NSTRM
       NSFRPAR=>GWFSFRDAT(IGRID)%NSFRPAR
@@ -8562,8 +8558,6 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
-      GWFSFRDAT(IGRID)%NFLOWTYPE=>NFLOWTYPE
-      GWFSFRDAT(IGRID)%FLOWTYPE=>FLOWTYPE
       GWFSFRDAT(IGRID)%NSS=>NSS
       GWFSFRDAT(IGRID)%NSTRM=>NSTRM
       GWFSFRDAT(IGRID)%NSFRPAR=>NSFRPAR

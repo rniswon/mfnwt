@@ -45,20 +45,7 @@ C      SPECIFICATIONS:
 C      ------------------------------------------------------------------
 Crsr  Allocate lake variables used by SFR even if lakes not active so that
 C       argument lists are defined     
-      ALLOCATE (NLAKES, NLAKESAR,THETA,LAKUNIT,NSFRLAK,NLKFLWTYP)       !EDM
-      ALLOCATE(LKFLOWTYPE(6)) ! POSITION 1: STORAGE; 2: DELVOL; 3: PRECIP; 4: EVAP; 5: RUNOFF; 6: WITHDRAWL
-C
-C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
-      NLKFLWTYP=0
-      IF(IUNIT(49).NE.0) THEN
-        LKFLOWTYPE(1)='NA'
-        LKFLOWTYPE(2)='NA'
-        LKFLOWTYPE(3)='NA'
-        LKFLOWTYPE(4)='NA'
-        LKFLOWTYPE(5)='NA'
-        LKFLOWTYPE(6)='NA'
-      ENDIF
-C
+      ALLOCATE (NLAKES, NLAKESAR,THETA,LAKUNIT,NSFRLAK)       !EDM
       NLAKES = 0
       LAKUNIT = IN
       NLAKESAR = 1
@@ -371,7 +358,7 @@ Cdep    ALLOCATE SPACE FOR DEPTHTABLE, AREATABLE, AND VOLUMETABLE
       ALLOCATE (VOLUMETABLE(151,NLAKES))
 C Tributary inflow to lakes for LMT
       ALLOCATE (LAKSFR(NSSAR),ILKSEG(NSSAR),ILKRCH(NSSAR),SWLAK(NSSAR),
-     &          DELVOLLAK(NSSAR))
+     &          DELVOLLAK(NLAKES))
       ITRB = 0
       IDIV = 0
       FLOB = 0.0
@@ -409,6 +396,7 @@ C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       USE GLOBAL,       ONLY: IOUT, NCOL, NROW, NLAY, IFREFM, IBOUND,
      +                        LBOTM, BOTM, DELR, DELC, ISSFLG,IUNIT
 C
@@ -970,6 +958,17 @@ C
      2     3X,'WITHDRAW',3X,'BOTTOM',5X,'AREA',5X,/70('-'))
       IF (IUNITGWT.GT.0) WRITE (IOUTS,8)
  8    FORMAT (//1X,'LAKE',4X,'SOLUTE',6X,'CPPT',6X,'CRNF',6X,'CAUG'/)
+C
+C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
+      IF(IUNIT(49).NE.0) THEN
+        LKFLOWTYPE(1)='NA'
+        LKFLOWTYPE(2)='NA'
+        LKFLOWTYPE(3)='NA'
+        LKFLOWTYPE(4)='NA'
+        LKFLOWTYPE(5)='NA'
+        LKFLOWTYPE(6)='NA'
+        NLKFLWTYP=0
+      ENDIF
 C
       DO 300 LM=1,NLAKES
         IF(IFREFM.EQ.0) THEN
@@ -1752,6 +1751,7 @@ C     ------------------------------------------------------------------
      +                        HNOFLO, VBVL, VBNM
       USE GWFSFRMODULE, ONLY: STRIN, DLKSTAGE, SLKOTFLW
       USE GWFUZFMODULE, ONLY: SURFDEP,IUZFBND,FINF,VKS
+      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       IMPLICIT NONE
       !rsr: argument IUNITSFR not used
       CHARACTER*16 TEXT
@@ -4137,16 +4137,12 @@ Cdep  Added arrays that calculate lake budgets 6/9/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%LAKSEEP)
       DEALLOCATE (GWFLAKDAT(IGRID)%RUNF)      !EDM
       DEALLOCATE (GWFLAKDAT(IGRID)%RUNOFF)    !EDM
-      DEALLOCATE (GWFLAKDAT(IGRID)%LKFLOWTYPE)
-      DEALLOCATE (GWFLAKDAT(IGRID)%NLKFLWTYP)
       END SUBROUTINE GWF2LAK7DA
 
       SUBROUTINE SGWF2LAK7PNT(IGRID)
 C  Set pointers to LAK data for grid      
       USE GWFLAKMODULE
 C
-      LKFLOWTYPE=>GWFLAKDAT(IGRID)%LKFLOWTYPE
-      NLKFLWTYP=>GWFLAKDAT(IGRID)%NLKFLWTYP
       NLAKES=>GWFLAKDAT(IGRID)%NLAKES
       NLAKESAR=>GWFLAKDAT(IGRID)%NLAKESAR
       ILKCB=>GWFLAKDAT(IGRID)%ILKCB
@@ -4295,8 +4291,6 @@ C
 C  Save LAK data for a grid
       USE GWFLAKMODULE
 C
-      GWFLAKDAT(IGRID)%LKFLOWTYPE=>LKFLOWTYPE
-      GWFLAKDAT(IGRID)%NLKFLWTYP=>NLKFLWTYP
       GWFLAKDAT(IGRID)%ILKCB=>ILKCB
       GWFLAKDAT(IGRID)%NSSITR=>NSSITR
       GWFLAKDAT(IGRID)%MXLKND=>MXLKND

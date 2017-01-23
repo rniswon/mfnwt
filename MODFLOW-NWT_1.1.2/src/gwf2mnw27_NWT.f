@@ -167,8 +167,7 @@ C     ------------------------------------------------------------------
       USE DE4MODULE,ONLY:HCLOSEDE4
       USE PCGMODULE,ONLY:HCLOSEPCG
       USE GWFNWTMODULE,ONLY:Tol
-      USE GMGMODULE,ONLY:HCLOSEGMG
-      USE GLOBAL,ONLY:IUNIT
+!      USE GMGMODULE,ONLY:HCLOSEGMG
 !      USE PCGN,ONLY:HCLOSEPCGN
 C     ------------------------------------------------------------------
       INTEGER Qlimit,QCUT,firstnode,lastnode,
@@ -215,7 +214,7 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
       IF ( Iupcg.NE.0 ) SMALL = HCLOSEPCG
 !      IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
       IF ( Iunwt.NE.0 ) SMALL = TOL
-      IF ( IUNIT(42).NE.0 ) SMALL = HCLOSEGMG
+!      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
 !      IF ( Iupcgn.NE.0 ) SMALL = HCLOSEPCGN
 c     initialize
       WELLID=' '
