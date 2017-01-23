@@ -2468,9 +2468,13 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF
-      USE GWFDRNMODULE,ONLY:NDRAIN,DRAI
+!gsf      USE GWFDRNMODULE,ONLY:NDRAIN,DRAI
       CHARACTER*16 TEXT
       DOUBLE PRECISION HHNEW,EEL,CCDRN,CEL,QQ
+      !added so GSFLOW compiles, DRN package not available
+      INTEGER DRAI(5,1)
+      NDRAIN = 1
+      DRAI = 1.0
 C    
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2DRN7BD      CALL SGWF2DRN7PNT(IGRID)
@@ -2537,9 +2541,13 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW
-      USE GWFRIVMODULE,ONLY:NRIVER,RIVR
+!gsf      USE GWFRIVMODULE,ONLY:NRIVER,RIVR
       CHARACTER*16 TEXT      
       DOUBLE PRECISION HHNEW,CHRIV,RRBOT,CCRIV
+      !added so GSFLOW compiles, RIV package not available
+      INTEGER RIVR(6,1)
+      NRIVER = 1
+      RIVR = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2RIV7BD      CALL SGWF2RIV7PNT(IGRID)      
@@ -2613,8 +2621,14 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,BUFF
-      USE GWFRCHMODULE,ONLY:NRCHOP,RECH,IRCH
+!gsf      USE GWFRCHMODULE,ONLY:NRCHOP,RECH,IRCH
       CHARACTER*16 TEXT
+      !added so GSFLOW compiles, RCH package not available
+      REAL RECH(1,1)
+      INTEGER IRCH(1,1)
+      NRCHOP = 1
+      RECH = 0.0
+      IRCH = 1
 C
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2RCH7BD      CALL SGWF2RCH7PNT(IGRID)   
@@ -2696,9 +2710,17 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF      
-      USE GWFEVTMODULE,ONLY:NEVTOP,EVTR,EXDP,SURF,IEVT
+!gsf      USE GWFEVTMODULE,ONLY:NEVTOP,EVTR,EXDP,SURF,IEVT
       CHARACTER*16 TEXT
       DOUBLE PRECISION QQ,HH,XX,DD,SS,HHCOF,RRHS      
+      !added so GSFLOW compiles, EVT package not available
+      REAL SURF(1,1), EVTR(1,1), EXDP(1,1)
+      INTEGER IEVT(1,1)
+      NEVTOP = 1
+      SURF = 1.0
+      EVTR = 1.0
+      EXDP = 1.0
+      IEVT = 1
 C   
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2EVT7BD      CALL SGWF2EVT7PNT(IGRID)
@@ -2919,9 +2941,15 @@ C Modified from Fenske et al., (1996), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY 
-      USE GWFRESMODULE, ONLY: NRES,NRESOP,IRES,IRESL,BRES,CRES,
-     &                        BBRES,HRES  
+!gsf      USE GWFRESMODULE, ONLY: NRES,NRESOP,IRES,IRESL,BRES,CRES,
+!gsf     &                        BBRES,HRES  
       CHARACTER*16 TEXT    
+      !added so GSFLOW compiles, DRN package not available
+      INTEGER IRES(1,1), IRESL(1,1)
+      REAL BRES(1,1), CRES(1,1), BBRES(1,1), HRES(1)
+      NRES = 1
+      NRESOP = 1
+      DRAI = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID      
 c swm: already set in GWF2RES7BD      CALL SGWF2RES7PNT(IGRID)            
@@ -3043,8 +3071,14 @@ C Modified from Prudic (1989), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND      
-      USE GWFSTRMODULE,ONLY:NSTREM,STRM,ISTRM
+!gsf      USE GWFSTRMODULE,ONLY:NSTREM,STRM,ISTRM
       CHARACTER*16 TEXT     
+      !added so GSFLOW compiles, STR package not available
+      INTEGER ISTRM(3,1)
+      REAL STRM(11,1)
+      NSTREM = 1
+      ISTRM = 1
+      STRM = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID      
 c swm: already set in GWF2STR7BD   CALL SGWF2STR7PNT(IGRID)    
@@ -3228,13 +3262,24 @@ C Modified from Banta (2000), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY      
-      USE GWFETSMODULE, ONLY: NETSOP,NETSEG,IETS,ETSR,ETSX,ETSS,
-     &                        PXDP,PETM
+!gsf      USE GWFETSMODULE, ONLY: NETSOP,NETSEG,IETS,ETSR,ETSX,ETSS,
+!gsf     &                        PXDP,PETM
       CHARACTER*16 TEXT
       DOUBLE PRECISION QQ,HH,SS,DD,XX,HHCOF,RRHS,PXDP1,PXDP2
+      !added so GSFLOW compiles, ETS package not available
+      INTEGER IETS(1,1)
+      REAL ETSR(1,1), ETSX(1,1), ETSS(1,1), PXDP(1,1,1), PETM(1,1,1)
+      NETSOP = 1
+      NETSEG = 1
+      IETS = 1
+      ETSR = 1.0
+      ETSX = 1.0
+      ETSS = 1.0
+      PXDP = 1.0
+      PETM = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
-      CALL SGWF2ETS7PNT(IGRID)
+!gsf      CALL SGWF2ETS7PNT(IGRID)
 C      
       TEXT='ETS'
       ZERO=0.      
@@ -3368,12 +3413,18 @@ C Modified from Banta (2000), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,NCOL,NROW,NLAY
-      USE GWFDRTMODULE, ONLY: DRTF,NDRTCL,IDRTFL,NRFLOW
+!gsf      USE GWFDRTMODULE, ONLY: DRTF,NDRTCL,IDRTFL,NRFLOW
       CHARACTER*16 TEXT
       DOUBLE PRECISION HHNEW,EEL,CC,CEL,QQ,QQIN
+      !added so GSFLOW compiles, DRN package not available
+      REAL DRTF(9,1)
+      NRFLOW = 1
+      NDRTCL = 1
+      IDRTFL = 1
+      DRTF = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
-      CALL SGWF2DRT7PNT(IGRID)
+!gsf      CALL SGWF2DRT7PNT(IGRID)
 C      
       TEXT='DRT'
       ZERO=0.
@@ -4347,9 +4398,9 @@ C
 C-------WRITE GW-SW INTERACTION TERMS TO FTL FILE UNDER THE HEADING "SFR"
 C       Strm(11, L): FLOW TO/FROM AQUIFER
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) IL,IR,IC,STRM(11,L)
+          WRITE(IUMT3D) IL,IR,IC,STRM(11,L),STRLEN   !Eric needs to check this
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L)
+          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L),STRLEN  !Eric check
         ENDIF
       ENDDO
 C

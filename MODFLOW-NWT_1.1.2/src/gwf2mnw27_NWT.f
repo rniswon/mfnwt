@@ -167,8 +167,7 @@ C     ------------------------------------------------------------------
       USE DE4MODULE,ONLY:HCLOSEDE4
       USE PCGMODULE,ONLY:HCLOSEPCG
       USE GWFNWTMODULE,ONLY:Tol
-      USE GMGMODULE,ONLY:HCLOSEGMG
-      USE GLOBAL,ONLY:IUNIT
+!      USE GMGMODULE,ONLY:HCLOSEGMG
 !      USE PCGN,ONLY:HCLOSEPCGN
 C     ------------------------------------------------------------------
       INTEGER Qlimit,QCUT,firstnode,lastnode,
@@ -215,7 +214,7 @@ C-------SET SMALL DEPENDING ON CLOSURE CRITERIA OF THE SOLVER
       IF ( Iupcg.NE.0 ) SMALL = HCLOSEPCG
 !      IF ( Iulmg.NE.0 ) SMALL = 0.0D0  !LMG SETS HCLOSE TO ZERO
       IF ( Iunwt.NE.0 ) SMALL = TOL
-      IF ( IUNIT(42).NE.0 ) SMALL = HCLOSEGMG
+!      IF ( Iugmg.NE.0 ) SMALL = HCLOSEGMG
 !      IF ( Iupcgn.NE.0 ) SMALL = HCLOSEPCGN
 c     initialize
       WELLID=' '
@@ -3735,7 +3734,7 @@ C     ------------------------------------------------------------------
 C
 ! RGN added next 3 lines.
 !      h =  (mnw2(17,iw)-BOTM(C1,R1,L1))
-      h =  (HNEW(C1,R1,lbotm(L1))-BOTM(C1,R1,lbotm(L1)))
+      h =  (HNEW(C1,R1,L1)-BOTM(C1,R1,L1))  !got rid of LBOTM here RGN 1/6/17
       IF( h.LT.0.0 ) h = 0.0
       pi = 3.1415926535897932D0
       verysmall = 1.D-25
