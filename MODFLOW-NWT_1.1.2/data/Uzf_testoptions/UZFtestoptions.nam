@@ -13,6 +13,7 @@ DATA                 58 .\Uzf_testoptions\UZFtestoptions.out
 DATA(BINARY)         61 .\Uzf_testoptions\UZFtestoptions.uzfot
 DATA(BINARY)         100 .\Uzf_testoptions\netfluxin.unf
 DATA(BINARY)         101 .\Uzf_testoptions\netfluxout.unf
+DATA(BINARY)         102 .\Uzf_testoptions\cbc.unf
 DATA                 65 .\Uzf_testoptions\UZFtestoptions.uzf1
 DATA                 66 .\Uzf_testoptions\UZFtestoptions.uzf2 
 DATA                 67 .\Uzf_testoptions\UZFtestoptions.uzf3 

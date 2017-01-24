@@ -4480,10 +4480,10 @@ C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
         DO L=1,NSTRM
           XSA = STRM(31,L)
           SFRFLOWVAL(1,L) = XSA*STRM(1,L)   ! volume = XSA * reach length 
-          SFRFLOWVAL(2,L) = STRM(1,L)
-          SFRFLOWVAL(3,L) = STRM(14,L)   ! precip
-          SFRFLOWVAL(4,L) = STRM(13,L)   ! etsw (surf wat evap)
-          SFRFLOWVAL(5,L) = STRM(12,L)   ! user-specified runoff (variable 'runof')
+          SFRFLOWVAL(2,L) = STRM(1,L)       ! reach length
+          SFRFLOWVAL(3,L) = STRM(14,L)      ! precip
+          SFRFLOWVAL(4,L) = STRM(13,L)      ! etsw (surf wat evap)
+          SFRFLOWVAL(5,L) = STRM(12,L)      ! user-specified runoff (variable 'runof')
         ENDDO
 C
 C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
