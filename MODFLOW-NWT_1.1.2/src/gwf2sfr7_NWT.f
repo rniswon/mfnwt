@@ -186,20 +186,11 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
                   IF(MAXVAL.LT.0) MAXVAL=0
                   WRITE(IOUT,31) NUMTAB,MAXVAL
-                  exit
               case default
-                read(line(istart:istop),*,IOSTAT=Iostat) intchk
-               if( Iostat .ne. 0 ) then
-! Not an integer.  Likely misspelled or unsupported 
-! so terminate here.
-                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-                CALL USTOP('Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP))
-               end if
+                exit
              end select
            end do
-!
+!support old input style
           case('TRANSROUTE')
             ITRFLG = 1
             WRITE(iout,*)
