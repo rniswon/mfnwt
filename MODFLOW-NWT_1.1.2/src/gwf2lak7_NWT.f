@@ -45,7 +45,20 @@ C      SPECIFICATIONS:
 C      ------------------------------------------------------------------
 Crsr  Allocate lake variables used by SFR even if lakes not active so that
 C       argument lists are defined     
-      ALLOCATE (NLAKES, NLAKESAR,THETA,LAKUNIT,NSFRLAK)       !EDM
+      ALLOCATE (NLAKES, NLAKESAR,THETA,LAKUNIT,NSFRLAK,NLKFLWTYP)       !EDM
+      ALLOCATE(LKFLOWTYPE(6)) ! POSITION 1: STORAGE; 2: DELVOL; 3: PRECIP; 4: EVAP; 5: RUNOFF; 6: WITHDRAWL
+C
+C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
+      NLKFLWTYP=0
+      IF(IUNIT(49).NE.0) THEN
+        LKFLOWTYPE(1)='NA'
+        LKFLOWTYPE(2)='NA'
+        LKFLOWTYPE(3)='NA'
+        LKFLOWTYPE(4)='NA'
+        LKFLOWTYPE(5)='NA'
+        LKFLOWTYPE(6)='NA'
+      ENDIF
+C
       NLAKES = 0
       LAKUNIT = IN
       NLAKESAR = 1
@@ -396,7 +409,6 @@ C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFLAKMODULE
-      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       USE GLOBAL,       ONLY: IOUT, NCOL, NROW, NLAY, IFREFM, IBOUND,
      +                        LBOTM, BOTM, DELR, DELC, ISSFLG,IUNIT
 C
@@ -959,17 +971,6 @@ C
       IF (IUNITGWT.GT.0) WRITE (IOUTS,8)
  8    FORMAT (//1X,'LAKE',4X,'SOLUTE',6X,'CPPT',6X,'CRNF',6X,'CAUG'/)
 C
-C--REINITIALIZE LKFLOWTYPE WITH EACH STRESS PERIOD
-      IF(IUNIT(49).NE.0) THEN
-        LKFLOWTYPE(1)='NA'
-        LKFLOWTYPE(2)='NA'
-        LKFLOWTYPE(3)='NA'
-        LKFLOWTYPE(4)='NA'
-        LKFLOWTYPE(5)='NA'
-        LKFLOWTYPE(6)='NA'
-        NLKFLWTYP=0
-      ENDIF
-C
       DO 300 LM=1,NLAKES
         IF(IFREFM.EQ.0) THEN
           IF(ISS.NE.0.AND.KKPER.GT.1) READ(IN,'(6F10.4)') PRCPLK(LM),
@@ -1443,7 +1444,7 @@ C5B------DETERMINE LAKE AND NODAL LAYER,ROW,COLUMN NUMBER.
                 CONDUC = 0.0
               END IF  
               IF(CONDUC.GT.0.0) THEN
-                H=HNEW(IC,IR,IL)
+                H=HNEW(IC,IR,IL1)   !RGN this was IL and not IL1. 1/9/17
                 INOFLO = 0
 C
 C9A------CALCULATE SEEPAGE.
@@ -1751,7 +1752,6 @@ C     ------------------------------------------------------------------
      +                        HNOFLO, VBVL, VBNM
       USE GWFSFRMODULE, ONLY: STRIN, DLKSTAGE, SLKOTFLW
       USE GWFUZFMODULE, ONLY: SURFDEP,IUZFBND,FINF,VKS
-      USE LMTMODULE,    ONLY: LKFLOWTYPE,NLKFLWTYP
       IMPLICIT NONE
       !rsr: argument IUNITSFR not used
       CHARACTER*16 TEXT
@@ -1983,7 +1983,7 @@ C           IS DEPENDENT ON VALUE OF THET1.
  ! 506          FORMAT(1X,'ERROR - NO AQUIFER UNDER LAKE CELL ',4I5)
              END IF
              IF(CONDUC.GT.0.0) THEN
-               H=HNEW(IC,IR,IL)
+               H=HNEW(IC,IR,IL1)  !RGN set IL to IL1 1/9/16
 C
 C5C------DETERMINE UPPERMOST ACTIVE CELL IF NOT CELL(IL)
 C
@@ -4137,12 +4137,16 @@ Cdep  Added arrays that calculate lake budgets 6/9/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%LAKSEEP)
       DEALLOCATE (GWFLAKDAT(IGRID)%RUNF)      !EDM
       DEALLOCATE (GWFLAKDAT(IGRID)%RUNOFF)    !EDM
+      DEALLOCATE (GWFLAKDAT(IGRID)%LKFLOWTYPE)
+      DEALLOCATE (GWFLAKDAT(IGRID)%NLKFLWTYP)
       END SUBROUTINE GWF2LAK7DA
 
       SUBROUTINE SGWF2LAK7PNT(IGRID)
 C  Set pointers to LAK data for grid      
       USE GWFLAKMODULE
 C
+      LKFLOWTYPE=>GWFLAKDAT(IGRID)%LKFLOWTYPE
+      NLKFLWTYP=>GWFLAKDAT(IGRID)%NLKFLWTYP
       NLAKES=>GWFLAKDAT(IGRID)%NLAKES
       NLAKESAR=>GWFLAKDAT(IGRID)%NLAKESAR
       ILKCB=>GWFLAKDAT(IGRID)%ILKCB
@@ -4291,6 +4295,8 @@ C
 C  Save LAK data for a grid
       USE GWFLAKMODULE
 C
+      GWFLAKDAT(IGRID)%LKFLOWTYPE=>LKFLOWTYPE
+      GWFLAKDAT(IGRID)%NLKFLWTYP=>NLKFLWTYP
       GWFLAKDAT(IGRID)%ILKCB=>ILKCB
       GWFLAKDAT(IGRID)%NSSITR=>NSSITR
       GWFLAKDAT(IGRID)%MXLKND=>MXLKND

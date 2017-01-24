@@ -3734,7 +3734,7 @@ C     ------------------------------------------------------------------
 C
 ! RGN added next 3 lines.
 !      h =  (mnw2(17,iw)-BOTM(C1,R1,L1))
-      h =  (HNEW(C1,R1,lbotm(L1))-BOTM(C1,R1,lbotm(L1)))
+      h =  (HNEW(C1,R1,L1)-BOTM(C1,R1,L1))  !got rid of LBOTM here RGN 1/6/17
       IF( h.LT.0.0 ) h = 0.0
       pi = 3.1415926535897932D0
       verysmall = 1.D-25

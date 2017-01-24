@@ -58,7 +58,6 @@ C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFSFRMODULE
-      USE LMTMODULE,    ONLY: NFLOWTYPE
       USE GLOBAL,       ONLY: IOUT, IBOUND, BOTM, STRT, DELR, DELC, 
      +                        ITRSS, NCOL, NROW, LAYHDT, IUNIT  !CJM added ncol and nrow
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
@@ -86,11 +85,11 @@ C     ------------------------------------------------------------------
       INTEGER krck, irck, jrck, jsegck, ireachck, kkptflg, ib
       INTEGER lstsum, lstbeg, numinst, idum(1), ip, iterp, mstrmar
       INTEGER nssar, nstrmar, NPP, MXVL, IRFG
+      INTEGER intchk, Iostat
 !!      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG, ITRFLG
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
       REAL epsslpe
-      character(len=40) :: keyvalue
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
@@ -108,6 +107,8 @@ C     ------------------------------------------------------------------
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
       ALLOCATE (ITRFLG)
+      ALLOCATE (FLOWTYPE(5)) ! POSITION 1: VOLUME; 2: REACH LENGTH; 3: PRECIP; 4: EVAP; 5: RUNOFF
+      ALLOCATE (NFLOWTYPE)
       IF(IUNIT(49).GT.0) THEN
         ALLOCATE (NINTOT)                             !EDM - FOR LMT
       ENDIF
@@ -142,27 +143,29 @@ C         DLEAK, ISTCB1, ISTCB2.
       IFLG = 0
       found = .false.
       factor = 1.0
+      NFLOWTYPE=0
+      IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
+        FLOWTYPE(1) = 'NA'
+        FLOWTYPE(2) = 'NA'
+        FLOWTYPE(3) = 'NA'
+        FLOWTYPE(4) = 'NA'
+        FLOWTYPE(5) = 'NA'
+      ENDIF
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
+C
+C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
+C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
       CALL URDCOM(In, IOUT, line)
-! Check for alternate input (replacement for setting NSTRM<0).
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      
-      lloc = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      keyvalue = LINE(ISTART:ISTOP)
-      call upcase(keyvalue)
-      IF(keyvalue.EQ.'OPTIONS') THEN
-              write(iout,'(/1x,a)') 'PROCESSING '//
-     +              trim(adjustl(text)) //' OPTIONS'
-        do
-        CALL URDCOM(In, IOUT, line)
-        lloc = 1
+      DO
+        LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        keyvalue = LINE(ISTART:ISTOP)
-        call upcase(keyvalue)
-        select case (keyvalue)
+        select case (LINE(ISTART:ISTOP))
+          case('OPTIONS')
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
           case('REACHINPUT')
             IRFG = 1
             WRITE(IOUT,32)
@@ -192,17 +195,29 @@ C         DLEAK, ISTCB1, ISTCB2.
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
            found = .true.
-        case ('END')
-          CALL URDCOM(In, IOUT, line)
-          exit
-        case default
-    ! -- No options found
-        found = .false.
-        CALL URDCOM(In, IOUT, line)
-        exit
+          case ('END')
+            write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            exit
+          case default
+            read(line(istart:istop),*,IOSTAT=Iostat) intchk
+            if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+            else
+              ! Integer found.  This is likely NSTRM, so exit.
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +          trim(adjustl(text)) //' OPTIONS'
+              exit
+            endif
         end select
-      end do
-      end if
+        CALL URDCOM(In, IOUT, line)
+      ENDDO
 !
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
@@ -1077,7 +1092,6 @@ C     READ STREAM DATA FOR STRESS PERIOD
 C     Compute three new tables for lake outflow
 C     ******************************************************************
       USE GWFSFRMODULE
-      USE LMTMODULE,    ONLY: NFLOWTYPE,FLOWTYPE
       USE GLOBAL,       ONLY: IOUT, ISSFLG, IBOUND, BOTM, HNEW, NLAY, 
      +                        LAYHDT, IUNIT
       USE PARAMMODULE,  ONLY: MXPAR, PARTYP, IACTIVE, IPLOC
@@ -1317,14 +1331,6 @@ C
 C18-----COMPUTE STREAM REACH VARIABLES.
         irch = 1
         ksfropt = 0
-        IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-          FLOWTYPE(1) = 'NA'
-          FLOWTYPE(2) = 'NA'
-          FLOWTYPE(3) = 'NA'
-          FLOWTYPE(4) = 'NA'
-          FLOWTYPE(5) = 'NA'
-          NFLOWTYPE=0
-        ENDIF
         DO nseg = 1, NSS
           ireachck = ISTRM(5, irch)
           icalc = ISEG(1, nseg)
@@ -8434,6 +8440,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
       DEALLOCATE (GWFSFRDAT(IGRID)%factor)
+      DEALLOCATE (GWFSFRDAT(IGRID)%NFLOWTYPE)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FLOWTYPE)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8446,6 +8454,8 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
+      NFLOWTYPE=>GWFSFRDAT(IGRID)%NFLOWTYPE
+      FLOWTYPE=>GWFSFRDAT(IGRID)%FLOWTYPE
       NSS=>GWFSFRDAT(IGRID)%NSS
       NSTRM=>GWFSFRDAT(IGRID)%NSTRM
       NSFRPAR=>GWFSFRDAT(IGRID)%NSFRPAR
@@ -8558,6 +8568,8 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER IGRID
 C     ------------------------------------------------------------------
+      GWFSFRDAT(IGRID)%NFLOWTYPE=>NFLOWTYPE
+      GWFSFRDAT(IGRID)%FLOWTYPE=>FLOWTYPE
       GWFSFRDAT(IGRID)%NSS=>NSS
       GWFSFRDAT(IGRID)%NSTRM=>NSTRM
       GWFSFRDAT(IGRID)%NSFRPAR=>NSFRPAR
