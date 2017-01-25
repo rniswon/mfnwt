@@ -157,8 +157,7 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf =
-     +'$Id: gwf2uzf1_NWT.f 4071 2014-07-01 23:30:24Z rniswon $'
+      Version_uzf = 'gwf2uzf1_NWT.f 2016-11-10 12:17:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -213,6 +212,26 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
      +                'PERIOD'
             WRITE(iout,*)
             found = .true.
+!support old input style
+            do
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+              select case (LINE(ISTART:ISTOP))
+              case('SPECIFYTHTI')
+                ITHTIFLG = 1
+                WRITE(iout,*)
+              WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
+     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
+                WRITE(iout,*)
+              case('NOSURFLEAK')
+               Iseepsupress = 1
+               WRITE(iout,*)
+              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+               WRITE(iout,*)
+              case default
+                exit
+             end select
+            end do
+!support old input style
           case('SPECIFYTHTI')
             ITHTIFLG = 1
             WRITE(iout,*)
@@ -220,6 +239,20 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
      +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
             WRITE(iout,*)
             found = .true.
+!support old input style
+            do
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+              select case (LINE(ISTART:ISTOP))
+              case('NOSURFLEAK')
+               Iseepsupress = 1
+               WRITE(iout,*)
+              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+               WRITE(iout,*)
+              case default
+                exit
+             end select
+            end do
+!support old input style
           case('ETSQUARE')
             i=1
             CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
@@ -2279,10 +2312,13 @@ CDEP 05/05/2006
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
+C set excess precipitation to zero for integrated (GSFLOW) simulation
+        IF ( IGSFLOW.GT.0 ) THEN
+          Excespp(ic, ir) = 0.0
 ! EDM
-        IF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
+        ELSEIF ( FINF(ic, ir).GT.VKS(ic, ir) ) THEN
           EXCESPP(ic, ir) =  (FINF(ic, ir) - 
-     +                 VKS(ic, ir))*DELC(ir)*DELR(ic)
+     +                       VKS(ic, ir))*DELC(ir)*DELR(ic)
           FINF(ic, ir) = VKS(ic, ir)
         ELSE
           EXCESPP(ic, ir) = 0.0
@@ -2290,8 +2326,6 @@ CDEP 05/05/2006
 ! EDM
         finfhold = FINF(ic, ir)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
-C set excess precipitation to zero for integrated (GSFLOW) simulation
-        IF ( IGSFLOW.GT.0 ) Excespp(ic, ir) = 0.0
         flength = DELC(ir)
         width = DELR(ic)
         cellarea = width*flength

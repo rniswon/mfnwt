@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.0, 7/21/2016
+                            VERSION 1.1.2, 9/15/2016
                     BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
 
  LIST FILE: .\Ex_prob2\Pr2MF2005.LST
@@ -34,7 +34,7 @@
  FILE TYPE:LPF   UNIT   34   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.0, 6/21/2016 INPUT READ FROM UNIT    2
+ BAS -- BASIC PACKAGE, VERSION 1.1.2, 9/15/2016 INPUT READ FROM UNIT    2
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -20114,6 +20114,6 @@
          TOTAL TIME 2.27232E+08 3.78720E+06  63120.      2630.0      7.2005    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 12:56:59
- Elapsed run time:  1.279 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/09/12 12:20:16
+ Elapsed run time:  1.086 Seconds
 

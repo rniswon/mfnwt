@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.0, 7/21/2016
+                            VERSION 1.1.2, 9/15/2016
                     BASED ON MODFLOW-2005 VERSION 1.11.00 08/30/2013
 
  LIST FILE: .\Ex_prob1a\Pr1aMFNWT.LST
@@ -30,7 +30,7 @@
  FILE TYPE:DATA(BINARY)   UNIT   50   STATUS:UNKNOWN
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.0, 6/21/2016 INPUT READ FROM UNIT    4
+ BAS -- BASIC PACKAGE, VERSION 1.1.2, 9/15/2016 INPUT READ FROM UNIT    4
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -127,7 +127,7 @@
  HEADS WILL BE SAVED ON UNIT    0    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT Input File Problem 1a
 
- NWT1 -- Newton Solver, VERSION 1.1.0, 6/21/2016
+ NWT1 -- Newton Solver, VERSION 1.1.2, 9/15/2016
          INPUT READ FROM UNIT 23
 
  SPECIFIED OPTION:
@@ -161,7 +161,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.0, 6/21/2016
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.2, 9/15/2016
          INPUT READ FROM UNIT 33
 
  CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT   50
@@ -198,8 +198,8 @@
           0                 1           2            33    1     1       0.7539088564E+01      87    1    1         0.2359977035E+03      0.4653533802E+03
           0                 2           2            25    1     1      -0.9923955449E+00      38    1    1        -0.4836441019E+02      0.1038748470E+03
           0                 3           2            22    1     1      -0.2996809271E-01      13    1    1        -0.2124857629E+01      0.3793316789E+01
-          0                 4           2            22    1     1      -0.3156188762E-03      13    1    1        -0.2366526616E-01      0.4102885817E-01
-          0                 5           1            22    1     1      -0.3095472127E-05      13    1    1        -0.2322293731E-03      0.4024846541E-03
+          0                 4           2            22    1     1      -0.3156188760E-03      13    1    1        -0.2366526616E-01      0.4102885817E-01
+          0                 5           1            22    1     1      -0.3095473401E-05      13    1    1        -0.2322293658E-03      0.4024846497E-03
 
     ------------------------------------------------
        NWT REQUIRED            5 OUTER ITERATIONS 
@@ -269,6 +269,6 @@
          TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/07/21 12:56:40
- Elapsed run time:  0.031 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2016/09/12 12:19:57
+ Elapsed run time:  0.008 Seconds
 
