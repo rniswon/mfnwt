@@ -17,9 +17,8 @@ CONSTANT   1.500000E+01  BOT layer 11
 CONSTANT   1.000000E+01  BOT layer 12
 CONSTANT   5.000000E+00  BOT layer 13
 CONSTANT   0.000000E+00  BOT layer 14
+      1.        1       1.0    SS  PERLEN,NSTP,TSMULT,Ss/tr
    190.        10       1.0    TR  PERLEN,NSTP,TSMULT,Ss/tr
    518.        2       1.0    TR  PERLEN,NSTP,TSMULT,Ss/tr
    1922.       17       1.0    TR  PERLEN,NSTP,TSMULT,Ss/tr
-   
-      1.        1       1.0    SS  PERLEN,NSTP,TSMULT,Ss/tr
 

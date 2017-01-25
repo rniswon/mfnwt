@@ -15,3 +15,10 @@
 *.hobs
 *.cbc
 *.hed
+MODFLOW-NWT_1.1.2/output_test/Sfr2weltab.lst
+MODFLOW-NWT_1.1.2/output_test_64/output_test_swr1_64/SWRSample05.lst~develop
+*.lst~HEAD
+*.lst~develop
+MF_NWT/MF_NWT/Release/BuildLog.htm
+*.htm
+*.u2d

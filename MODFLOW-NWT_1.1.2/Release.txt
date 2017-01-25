@@ -18,6 +18,38 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
+o Version 1.1.2 09/15/2016:
+
+MODFLOW-NWT version 1.1.2 is based on MODFLOW-2005 version 1.11.0.
+
+Unsaturated-Zone Flow (UZF) Package
+
+A floating point exception was fixed.
+
+WELL (WEL) Package
+
+A bug was fixed that would cause the pumping rate to be calculated incorrectly
+when using the tabfile option and the time values specified in the tabfile
+did not extend to the end time of the simulation.
+
+Multi-Node Well (MNW2) Package
+
+A floating point exception was fixed.
+
+Streamflow Routing (SFR2) Package
+
+An access violation was fixed. 
+
+o Version 1.1.1 07/28/2016:
+
+MODFLOW-NWT version 1.1.1 is based on MODFLOW-2005 version 1.11.0.
+
+Unsaturated-Zone Flow (UZF) Package
+
+A bug was fixed to initialize a variable. This bug could affect convergence
+for problems that simulate linear groundwater ET in the UZF Package when
+using the NWT solver. 
+
 o Version 1.1.0 07/21/2016:
 
 MODFLOW-NWT version 1.1.0 is based on MODFLOW-2005 version 1.11.0. This 
@@ -393,9 +425,9 @@ NWT1_ilupc_mod.f, and NWT1_module.f
 
 Streamflow Routing (SFR2) Package
 
-A bug was fixed to avoid a memory-allocation error that occured when using
+A bug was fixed to avoid a memory-allocation error that occurred when using
 the tabfile option for models with more tabfiles than stream segments. Also,
-an unitialized variable was initialized.
+an uninitialized variable was initialized.
 
 Subsidence (SUB) Package
 
@@ -633,7 +665,7 @@ Streamflow Routing (SFR2) Package
 
 Some variables were made double precision and the precision used in calculations
 was made consistent. Some minor calculations were modified for solution efficiency.
-Allocation of some variables were changed to reduce the amount of random axcess memory (RAM)
+Allocation of some variables were changed to reduce the amount of random access memory (RAM)
 required for simulations. These changes did not affect simulation results. Initialization
 of some local variables was added.
 
@@ -968,7 +1000,7 @@ smoothing function was used in SFR2 to smooth the transition between the constan
 width and a zero stream width over the interval between zero depth and 1.0x10-5 (units defined on the 
 basis of the DIS file input variable LENUNI). Smoothing is applied automatically if ICALC=1 and the 
 stream depth is between zero and 1.0x10-5 and users should refer to the calculated stream depths to 
-determine if smoothing was applied to a particular reach in a simulation. SFR2 smoothes the constant-
+determine if smoothing was applied to a particular reach in a simulation. SFR2 smooths the constant-
 to-zero-width transition using the same smoothing function that is used by the WEL Package to decrease 
 specified pumping rates to zero when unconfined cells are dry (see Niswonger and others, 2011, p. 14). 
 

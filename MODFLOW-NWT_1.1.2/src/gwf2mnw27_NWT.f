@@ -29,7 +29,7 @@
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR MNW2 PACKAGE.
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.1, 7/28/2016
+!rgn------NEW VERSION NUMBER 1.1.2, 9/15/2016
 C     ******************************************************************
 C
 C     SPECIFICATIONS:
@@ -3734,7 +3734,7 @@ C     ------------------------------------------------------------------
 C
 ! RGN added next 3 lines.
 !      h =  (mnw2(17,iw)-BOTM(C1,R1,L1))
-      h =  (HNEW(C1,R1,lbotm(L1))-BOTM(C1,R1,lbotm(L1)))
+      h =  (HNEW(C1,R1,L1)-BOTM(C1,R1,L1))  !got rid of LBOTM here RGN 1/6/17
       IF( h.LT.0.0 ) h = 0.0
       pi = 3.1415926535897932D0
       verysmall = 1.D-25
@@ -3881,7 +3881,7 @@ c       MNWNOD(15,INODE) = 1.0D31
 c
 c QFM  rechecking Q cutoff within FM routine
 c skip this whole thing if 1st or 2nd iter
-      if(kiter.gt.2) then
+      if(kiter.gt.2) then  !RGN 11/14/2016   if(kiter.gt.0) then
 c   Retrieve Qfrcmn, Qfrcmx, Qdes
          if(mnw2(6,iw).ne.0) then
           QCUT = MNW2(8,iw)
@@ -4076,7 +4076,7 @@ c  Second time through loop, now that we have a guess for hwell, check to see if
 c  If so, use the bottom (instead of the low hwell) as the gradient driver in the qact calc
 c  Set the hwell_by_node to the bottom to flag this as a seepage face cell
 c  Sum the seepage (there may be more than one node's worth
-              if( kSeep.gt.1 .and. hwell.lt.Bottom )then
+              if( kSeep.gt.1 .and. hwell.lt.Bottom )then        !RGN 11/14/2016 hwell is not set for kiter<2
                 MNWNOD(4,INODE) = (bottom - hnew(ic,ir,il))
      & * MNWNOD(14,INODE)
                 MNWNOD(15,INODE) = bottom
@@ -5755,7 +5755,7 @@ C
 C
       DO 1 I=1,NS
        if ( abs(TD)>verysmall ) PP=XLN2*I/TD
-       IF ( pp.LT.verysmall ) THEN   !RGN 9/2/2016 changed 1e-14 to verysmall
+       IF ( pp>verysmall ) THEN   !RGN 9/2/2016 changed 1e-14 to verysmall;  !RGN 11/14/16 changed to pp>verysmall
          Q0=DSQRT(PP)
        ELSE
          Q0=0.0
