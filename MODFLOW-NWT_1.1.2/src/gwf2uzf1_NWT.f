@@ -2194,7 +2194,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFSFRMODULE, ONLY: FNETSEEP
+      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -5502,7 +5502,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%ROOTDPTH)
       DEALLOCATE (GWFUZFDAT(Igrid)%WCWILT)
       DEALLOCATE (GWFUZFDAT(Igrid)%FINF)
-      DEALLOCATE (GWFUZFDAT(Igrid)%RECHSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%DELSTOR)
       DEALLOCATE (GWFUZFDAT(Igrid)%UZOLSFLX)
       DEALLOCATE (GWFUZFDAT(Igrid)%HLDUZF)
@@ -5600,7 +5599,6 @@ C     ------------------------------------------------------------------
       ROOTDPTH=>GWFUZFDAT(Igrid)%ROOTDPTH
       WCWILT=>GWFUZFDAT(Igrid)%WCWILT
       FINF=>GWFUZFDAT(Igrid)%FINF
-      RECHSAVE=>GWFUZFDAT(Igrid)%RECHSAVE
       DELSTOR=>GWFUZFDAT(Igrid)%DELSTOR
       UZOLSFLX=>GWFUZFDAT(Igrid)%UZOLSFLX
       HLDUZF=>GWFUZFDAT(Igrid)%HLDUZF
@@ -5638,7 +5636,6 @@ C     ------------------------------------------------------------------
       INETFLUX=>GWFUZFDAT(Igrid)%INETFLUX
       Ireadsurfk=>GWFUZFDAT(Igrid)%Ireadsurfk
       Isurfkreject=>GWFUZFDAT(Igrid)%Isurfkreject
-      UNITRECH=>GWFUZFDAT(Igrid)%UNITRECH
       UNITDIS=>GWFUZFDAT(Igrid)%UNITDIS
       ISEEPREJECT=>GWFUZFDAT(Igrid)%ISEEPREJECT
       SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
@@ -5698,7 +5695,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%ROOTDPTH=>ROOTDPTH
       GWFUZFDAT(Igrid)%WCWILT=>WCWILT
       GWFUZFDAT(Igrid)%FINF=>FINF
-      GWFUZFDAT(Igrid)%RECHSAVE=>RECHSAVE
       GWFUZFDAT(Igrid)%DELSTOR=>DELSTOR
       GWFUZFDAT(Igrid)%UZOLSFLX=>UZOLSFLX
       GWFUZFDAT(Igrid)%HLDUZF=>HLDUZF

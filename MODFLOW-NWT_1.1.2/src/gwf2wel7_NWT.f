@@ -487,9 +487,11 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT
+      USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT,DELR,
+     1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
-     1                       NUMTAB,NUMSEGS,WELLIRR
+     1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
+     2                       UZFCOL,UZFROW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
@@ -593,12 +595,13 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,      ONLY:IOUT,NCOL,NROW,NLAY,IBOUND,BUFF,BOTM,LBOTM,
-     1                      HNEW
+     1                      HNEW,DELR,DELC
       USE GWFBASMODULE,ONLY:MSUM,ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBVL,VBNM
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
-     2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR
+     2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
+     3                      NUMCELLS,UZFCOL,UZFROW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFSFRMODULE, ONLY: DVRSFLW,SEG,NSS
 !External function interface
