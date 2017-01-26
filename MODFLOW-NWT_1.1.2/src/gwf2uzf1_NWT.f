@@ -1207,7 +1207,6 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
      +                        HNEW, DELR, DELC, BOTM, LBOTM
-      USE GWFSFRMODULE,ONLY:RECHSAVE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1272,7 +1271,6 @@ C        IRUNFLG IS NOT EQUAL TO ZERO.
                 FINF(ncck, nrck) = fks
               END IF
             END IF
-            IF ( IUNITSFR.GT.0 ) RECHSAVE(ncck, nrck) = FINF(ncck, nrck)
           END DO
         END DO
       END IF
@@ -1700,13 +1698,14 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
      +                        DELC, BOTM, IBOUND, HCOF, RHS,
-     +                        ITMUNI
+     +                        ITMUNI, IUNIT
 !!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
 !!     +                        DELC, BOTM, IBOUND, HCOF, RHS,
 !!     +                        ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE GWFSFRMODULE, ONLY: SFRIRR
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1788,6 +1787,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ibnd = IUZFBND(ic, ir)
         IF ( ibnd.GT.0 ) l = l + 1
         finfhold = FINF(ic, ir) 
+        IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         IF ( ibnd.EQ.0 ) finfhold = 0.0D0
         land = ABS(ibnd)
         UZFETOUT(ic, ir) = 0.0
@@ -2190,12 +2190,12 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
      +                        DELR, DELC, HNEW, BUFF, BOTM, 
-     +                        ITMUNI
+     +                        ITMUNI, IUNIT
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
       USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE, FNETSEEP
+!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -2325,6 +2325,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ENDIF
 ! EDM
         finfhold = FINF(ic, ir)
+        IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
@@ -5501,6 +5502,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%ROOTDPTH)
       DEALLOCATE (GWFUZFDAT(Igrid)%WCWILT)
       DEALLOCATE (GWFUZFDAT(Igrid)%FINF)
+      DEALLOCATE (GWFUZFDAT(Igrid)%RECHSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%DELSTOR)
       DEALLOCATE (GWFUZFDAT(Igrid)%UZOLSFLX)
       DEALLOCATE (GWFUZFDAT(Igrid)%HLDUZF)
@@ -5598,6 +5600,7 @@ C     ------------------------------------------------------------------
       ROOTDPTH=>GWFUZFDAT(Igrid)%ROOTDPTH
       WCWILT=>GWFUZFDAT(Igrid)%WCWILT
       FINF=>GWFUZFDAT(Igrid)%FINF
+      RECHSAVE=>GWFUZFDAT(Igrid)%RECHSAVE
       DELSTOR=>GWFUZFDAT(Igrid)%DELSTOR
       UZOLSFLX=>GWFUZFDAT(Igrid)%UZOLSFLX
       HLDUZF=>GWFUZFDAT(Igrid)%HLDUZF
@@ -5695,6 +5698,7 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%ROOTDPTH=>ROOTDPTH
       GWFUZFDAT(Igrid)%WCWILT=>WCWILT
       GWFUZFDAT(Igrid)%FINF=>FINF
+      GWFUZFDAT(Igrid)%RECHSAVE=>RECHSAVE
       GWFUZFDAT(Igrid)%DELSTOR=>DELSTOR
       GWFUZFDAT(Igrid)%UZOLSFLX=>UZOLSFLX
       GWFUZFDAT(Igrid)%HLDUZF=>HLDUZF

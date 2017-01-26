@@ -34,7 +34,7 @@
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: TO_CFP
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: EPS, THTS, THTI, THTR
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: PETRATE, ROOTDPTH
-        REAL,   SAVE,  DIMENSION(:,:),  POINTER :: WCWILT, FINF
+        REAL,   SAVE,  DIMENSION(:,:),  POINTER :: WCWILT,FINF
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: UZFETOUT, GWET
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: FNETEXFIL1
         REAL,   SAVE,  DIMENSION(:,:),  POINTER :: FNETEXFIL2, CUMGWET
@@ -84,7 +84,7 @@
         REAL,          DIMENSION(:,:),  POINTER :: TO_CFP
         REAL,          DIMENSION(:,:),  POINTER :: EPS, THTS, THTI, THTR
         REAL,          DIMENSION(:,:),  POINTER :: PETRATE, ROOTDPTH
-        REAL,          DIMENSION(:,:),  POINTER :: WCWILT, FINF
+        REAL,          DIMENSION(:,:),  POINTER :: WCWILT,FINF
         REAL,          DIMENSION(:,:),  POINTER :: UZFETOUT, GWET
         REAL,          DIMENSION(:,:),  POINTER :: FNETEXFIL1
         REAL,          DIMENSION(:,:),  POINTER :: FNETEXFIL2, CUMGWET
