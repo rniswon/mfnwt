@@ -504,7 +504,7 @@ C     ------------------------------------------------------------------
      1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
      1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
-     2                       UZFCOL,UZFROW,NUMSUP
+     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
@@ -555,10 +555,10 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
         IL = TABLAY(L)
         Q = RATETERP(TIME,L)
       END IF
-! Reset pumping based on diversion shortfall (SUPPLIMENTARY WELL)
+! Add additional pumping based on diversion shortfall (SUPPLIMENTARY WELL)
       IF ( NUMSUP > 0 ) THEN
         IF ( NUMSEGS(L) > 0 ) THEN
-          Q = 0.0
+!          Q = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             Q = Q -(SEG(2,J) - SGOTFLW(J))
@@ -619,7 +619,7 @@ C     ------------------------------------------------------------------
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
      2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
-     3                      NUMCELLS,UZFCOL,UZFROW
+     3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFSFRMODULE, ONLY: SGOTFLW,SEG,NSS
 !External function interface
@@ -703,10 +703,10 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           IL = TABLAY(L)
           QSAVE = RATETERP(TIME,L)
         END IF
-! Reset pumping based on diversion shortfall (SUPPLIMENTARY WELL)
+! Add additional pumping based on diversion shortfall (SUPPLIMENTARY WELL)
       IF ( NUMSUP > 0 ) THEN
         IF ( NUMSEGS(L) > 0 ) THEN
-          QSAVE = 0.0
+!          QSAVE = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             QSAVE = QSAVE -(SEG(2,J) - SGOTFLW(J))
