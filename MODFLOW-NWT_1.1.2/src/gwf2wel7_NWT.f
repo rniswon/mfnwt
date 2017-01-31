@@ -13,6 +13,7 @@
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
+        REAL,             SAVE, DIMENSION(:),   POINTER     ::IRRFACT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
         REAL,             SAVE,                 POINTER     ::PSIRAMP
@@ -41,6 +42,7 @@
         INTEGER,           DIMENSION(:,:),   POINTER     ::UZFROW
         INTEGER,           DIMENSION(:,:),   POINTER     ::UZFCOL
         REAL,              DIMENSION(:,:),   POINTER     ::WELLIRR
+        REAL,              DIMENSION(:),   POINTER     ::IRRFACT
         INTEGER,           DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,           DIMENSION(:),   POINTER     ::IRRWEL
         REAL,                              POINTER     ::PSIRAMP
@@ -318,7 +320,8 @@ C5B-----READ INSTANCES.
      +         NUMSEGS(MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
-     +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
+     +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR),
+     +         IRRFACT(MXACTWIRR))
       SFRSEG = 0
       UZFROW = 0
       UZFCOL = 0
@@ -326,6 +329,7 @@ C5B-----READ INSTANCES.
       IRRWEL = 0
       WELLIRR = 0.0
       NUMCELLS = 0
+      IRRFACT = 1.0
 C
 C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
@@ -343,7 +347,8 @@ C     ------------------------------------------------------------------
      1                       NNPWEL,WELAUX,WELL,NUMTAB,MAXVAL,TABTIME,
      2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
      3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
-     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMSUP,NUMIRR
+     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMSUP,NUMIRR,
+     5                       IRRFACT
       USE GWFSFRMODULE, ONLY: NSS
 C
       CHARACTER*6 CWELL
@@ -469,8 +474,8 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
           BACKSPACE(UNITIRR)
-          READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),(UZFROW(K,IRWL),
-     +                    UZFCOL(K,IRWL),K=1,NMCL)
+          READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),IRRFACT(IRWL),
+     +                    (UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
           DO K = 1, NUMCELLS(IRRWEL(J))
           IF ( UZFROW(K,IRRWEL(J))==0 .OR. UZFCOL(K,IRRWEL(J))==0 ) THEN
             WRITE(IOUT,*)'CELL ROW OR COLUMN NUMBER FOR SUPPLEMENTAL ',
@@ -504,7 +509,7 @@ C     ------------------------------------------------------------------
      1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
      1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
-     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR
+     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR,IRRFACT
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
@@ -593,7 +598,7 @@ C       THE RHS ACCUMULATOR.
 ! CALCULATE IRRIGATION FROM WELLS
        IF ( NUMIRR > 0 ) THEN
         IF ( NUMCELLS(L) > 0 ) THEN
-          SUBVOL = -Qp/NUMCELLS(L)
+          SUBVOL = -IRRFACT(L)*Qp/NUMCELLS(L)
           DO I = 1, NUMCELLS(L)
             SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
             WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
@@ -619,7 +624,7 @@ C     ------------------------------------------------------------------
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
      2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
-     3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR
+     3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFSFRMODULE, ONLY: SGOTFLW,SEG,NSS
 !External function interface
@@ -737,7 +742,7 @@ C
 ! CALCULATE IRRIGATION FROM WELLS
       IF ( NUMIRR > 0 ) THEN
         IF ( NUMCELLS(L) > 0 ) THEN
-          SUBVOL = -Q/NUMCELLS(L)
+          SUBVOL = -IRRFACT(L)*Q/NUMCELLS(L)
           DO I = 1, NUMCELLS(L)
             SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
             WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
@@ -947,6 +952,7 @@ C
         DEALLOCATE(MAXSEGS)
         DEALLOCATE(NUMCELLS)
         DEALLOCATE(WELLIRR)
+        DEALLOCATE(IRRFACT)
 C
       RETURN
       END
@@ -984,6 +990,7 @@ C
         MAXSEGS=>GWFWELDAT(IGRID)%MAXSEGS
         NUMCELLS=>GWFWELDAT(IGRID)%NUMCELLS
         WELLIRR=>GWFWELDAT(IGRID)%WELLIRR
+        IRRFACT=>GWFWELDAT(IGRID)%IRRFACT
 C
       RETURN
       END
@@ -1021,6 +1028,7 @@ C
         GWFWELDAT(IGRID)%MAXSEGS=>MAXSEGS
         GWFWELDAT(IGRID)%NUMCELLS=>NUMCELLS
         GWFWELDAT(IGRID)%WELLIRR=>WELLIRR
+        GWFWELDAT(IGRID)%IRRFACT=>IRRFACT
 C
       RETURN
       END

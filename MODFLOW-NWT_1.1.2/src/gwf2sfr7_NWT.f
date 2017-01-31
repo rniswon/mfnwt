@@ -63,7 +63,7 @@ C     ------------------------------------------------------------------
       USE GWFLPFMODULE, ONLY: SC2LPF=>SC2
       USE GWFBCFMODULE, ONLY: SC1, SC2, LAYCON
       USE GWFHUFMODULE, ONLY: SC2HUF
-      USE GWFUPWMODULE, ONLY: SC2UPW
+      USE GWFUPWMODULE, ONLY: SC2UPW,HKUPW,VKAUPW
       USE ICHKSTRBOT_MODULE
       IMPLICIT NONE
       INTRINSIC ABS, DBLE
@@ -112,7 +112,7 @@ C     ------------------------------------------------------------------
       IF(IUNIT(49).GT.0) THEN
         ALLOCATE (NINTOT)                             !EDM - FOR LMT
       ENDIF
-      ALLOCATE (FACTOR)
+      ALLOCATE (FACTOR,FACTORKH,FACTORKV)
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /, ' SFR7 -- STREAMFLOW ROUTING PACKAGE, '
@@ -141,6 +141,10 @@ C         DLEAK, ISTCB1, ISTCB2.
       lloc = 1
       IERR = 0
       IFLG = 0
+      STRHC1KHFLAG = 0
+      STRHC1KVFLAG = 0
+      FACTORKH=1.0
+      FACTORKV=1.0
       found = .false.
       factor = 1.0
       NFLOWTYPE=0
@@ -186,11 +190,24 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
                   IF(MAXVAL.LT.0) MAXVAL=0
                   WRITE(IOUT,31) NUMTAB,MAXVAL
+              case('STRHC1KH')
+                  STRHC1KHFLAG = 1
+                  WRITE(IOUT,*)
+                  CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
+     +                        IOUT,In)
+                  WRITE(IOUT,323) FACTORKH
+                  found = .true.
+              case('STRHC1KV')
+                STRHC1KVFLAG = 1
+                WRITE(IOUT,*)
+                CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
+     +                  IOUT,In)
+                WRITE(IOUT,324) FACTORKV
+                found = .true.
               case default
                 exit
-             end select
-           end do
-!support old input style
+              end select
+            end do
           case('TRANSROUTE')
             ITRFLG = 1
             WRITE(iout,*)
@@ -209,6 +226,20 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
             CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,IOUT,In)
             WRITE(IOUT,33) FACTOR
            found = .true.
+          case('STRHC1KH')
+            STRHC1KHFLAG = 1
+            WRITE(IOUT,*)
+            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
+     +                  IOUT,In)
+            WRITE(IOUT,323) FACTORKH
+            found = .true.
+          case('STRHC1KV')
+            STRHC1KVFLAG = 1
+            WRITE(IOUT,*)
+            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
+     +                  IOUT,In)
+            WRITE(IOUT,324) FACTORKV
+            found = .true.
           case ('END')
             write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
@@ -239,6 +270,10 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
   33  FORMAT('Stream loss will be calculated as a factor ',
      +                 'of the streambed hydraulic conductivity. ',
      +                 'Multiplication factor is equal to ',E20.10)
+  323 FORMAT('Streambed K will be set equal to KH of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
+  324       FORMAT('Streambed K will be set equal to KV of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
 !
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
@@ -1031,6 +1066,21 @@ C
         IF ( ISFROPT.EQ.2.OR.ISFROPT.EQ.4 )
      +    CALL SGWF2SFR7UHC(Iunitlpf, Iunitupw)
       END IF
+! set streambed K when option to use KV or KH are defined
+      if ( Iunitupw > 0 ) then
+      DO ichk = 1, NSTRM
+        krck = ISTRM(1, ichk)
+        irck = ISTRM(2, ichk)
+        jrck = ISTRM(3, ichk)
+        IF ( IBOUND(jrck, irck, krck).EQ.0 ) THEN
+            IF ( STRHC1KHFLAG.EQ.1 ) THEN
+                STRM(6,ichk) = FACTORKH*HKUPW(jrck,irck,krck)
+            ELSE IF ( STRHC1KVFLAG.EQ.1 ) THEN   
+                STRM(6,ichk) = FACTORKV*VKAUPW(jrck,irck,krck)
+            END IF
+        END IF
+      END DO
+      end if
 C
 C23-----SAVE POINTERS FOR GRID AND RETURN.
       CALL SGWF2SFR7PSV(Igrid)
@@ -8445,6 +8495,8 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%FNETSEEP)
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGDIM)
       DEALLOCATE (GWFSFRDAT(IGRID)%factor)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FACTORKH)
+      DEALLOCATE (GWFSFRDAT(IGRID)%FACTORKV)
       DEALLOCATE (GWFSFRDAT(IGRID)%NFLOWTYPE)
       DEALLOCATE (GWFSFRDAT(IGRID)%FLOWTYPE)
 C
@@ -8561,6 +8613,8 @@ C     ------------------------------------------------------------------
       FNETSEEP=>GWFSFRDAT(IGRID)%FNETSEEP
       NSEGDIM=>GWFSFRDAT(IGRID)%NSEGDIM
       factor=>GWFSFRDAT(IGRID)%factor
+      FACTORKH=>GWFSFRDAT(IGRID)%FACTORKH
+      FACTORKV=>GWFSFRDAT(IGRID)%FACTORKV
 C
       END SUBROUTINE SGWF2SFR7PNT
 C
@@ -8675,5 +8729,7 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%FNETSEEP=>FNETSEEP
       GWFSFRDAT(IGRID)%NSEGDIM=>NSEGDIM
       GWFSFRDAT(IGRID)%factor=>factor
+      GWFSFRDAT(IGRID)%FACTORKH=>FACTORKH
+      GWFSFRDAT(IGRID)%FACTORKV=>FACTORKV
 C
       END SUBROUTINE SGWF2SFR7PSV
