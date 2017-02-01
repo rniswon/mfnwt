@@ -15,3 +15,5 @@
 *.hobs
 *.cbc
 *.hed
+*.lst~HEAD
+*.lst~develop
