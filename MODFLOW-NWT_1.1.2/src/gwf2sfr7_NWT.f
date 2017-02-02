@@ -2259,7 +2259,6 @@ C20-----SET FLOW INTO DIVERSION IF SEGMENT IS DIVERSION.
             END IF
 C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
             IF ( istsg.GT.1 ) THEN
-              IF (Iunituzf.GT.0) THEN
                 iprvsg = ISTRM(4, ll)
                 IF ( DVRCH(iprvsg) .GT. 0) THEN
                   IDVFLG = 1
@@ -2271,7 +2270,6 @@ C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm
                       SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                                   dvt*(1.0-DVEFF(iprvsg))
                   END DO
-                END IF
               END IF
             END IF
 C

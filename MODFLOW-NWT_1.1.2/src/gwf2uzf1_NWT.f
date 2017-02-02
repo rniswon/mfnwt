@@ -1706,7 +1706,7 @@ C     ******************************************************************
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFSFRMODULE, ONLY: SFRIRR
-      USE GWFWELMODULE, ONLY: WELLIRR
+      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1791,7 +1791,9 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
 ! ADD SFR DIVERSION AS IRRIGATION
         IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
 ! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(2) > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
+          finfhold = finfhold + WELLIRR(IC,IR)
+        END IF
         IF ( ibnd.EQ.0 ) finfhold = 0.0D0
         land = ABS(ibnd)
         UZFETOUT(ic, ir) = 0.0
@@ -2199,7 +2201,7 @@ C     ******************************************************************
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
       USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR
-      USE GWFWELMODULE, ONLY: WELLIRR
+      USE GWFWELMODULE, ONLY: WELLIRR, NUMIRR
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -2331,7 +2333,9 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
 ! EDM
         finfhold = FINF(ic, ir)
         IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
-        IF ( IUNIT(2) > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
+            finfhold = finfhold + WELLIRR(IC,IR)
+        END IF
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
