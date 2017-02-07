@@ -3,16 +3,18 @@
         DOUBLE PRECISION,PARAMETER :: NEARZERO=1.0D-30
         DOUBLE PRECISION,SAVE :: THETAB, FLUXB, FLUXHLD2
         REAL,PARAMETER :: CLOSEZERO=1.0E-15
-        INTEGER, SAVE :: STRHC1KHFLAG, STRHC1KVFLAG
-        INTEGER, SAVE :: Nfoldflbt, NUMTAB, MAXVAL
+        INTEGER, SAVE, POINTER :: STRHC1KHFLAG, STRHC1KVFLAG
+        INTEGER, SAVE, POINTER :: Nfoldflbt, NUMTAB, MAXVAL
+        INTEGER, SAVE, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS
         INTEGER,SAVE,                 POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,SAVE,                 POINTER:: NFLOWTYPE
         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
-        INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(diverted recharge flag; then reharge cell count)
+        INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(number of irrigation cell per segment)
+        INTEGER,SAVE,  DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
         INTEGER,SAVE,  DIMENSION(:,:,:),POINTER:: DVRCELL !(store cells to apply diverted recharge)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRR  !(store original recharge values)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
-        REAL,   SAVE,  DIMENSION(:),POINTER:: DVEFF  !(store efficiency factor)
+        REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
         INTEGER,SAVE,POINTER:: NSS, NSTRM, NSFRPAR, ISTCB1, ISTCB2
         INTEGER,SAVE,POINTER:: IUZT, MAXPTS, IRTFLG, NUMTIM, NSEGDIM
         INTEGER,SAVE,POINTER:: ISFROPT, NSTRAIL, ISUZN, NSFRSETS
@@ -56,14 +58,18 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         DOUBLE PRECISION,SAVE,DIMENSION(:,:),POINTER:: QSTRM, SLKOTFLW
         DOUBLE PRECISION,SAVE,DIMENSION(:,:),POINTER:: DLKOTFLW,DLKSTAGE
       TYPE GWFSFRTYPE
+        INTEGER, POINTER :: STRHC1KHFLAG, STRHC1KVFLAG
+        INTEGER, POINTER :: Nfoldflbt, NUMTAB, MAXVAL
+        INTEGER, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS
         INTEGER,                      POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,                      POINTER:: NFLOWTYPE
         CHARACTER*16,  DIMENSION(:),  POINTER:: FLOWTYPE
         INTEGER,       DIMENSION(:),  POINTER:: DVRCH      !Diversions to recharge
+        INTEGER,       DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
         INTEGER,       DIMENSION(:,:,:),  POINTER:: DVRCELL  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: SFRIRR  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: DVRPERC  !Diversions to recharge
-        REAL,          DIMENSION(:),POINTER:: DVEFF  !Diversions to recharge
+        REAL,          DIMENSION(:,:),POINTER:: DVEFF  !Diversions to recharge
         INTEGER,     POINTER:: NSS, NSTRM, NSFRPAR, ISTCB1, ISTCB2
         INTEGER,     POINTER:: IUZT, MAXPTS, IRTFLG, NUMTIM, NSEGDIM
         INTEGER,     POINTER:: ISFROPT, NSTRAIL, ISUZN, NSFRSETS

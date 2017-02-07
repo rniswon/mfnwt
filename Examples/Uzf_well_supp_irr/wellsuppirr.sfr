@@ -1,5 +1,6 @@
 #SFR2 Package input for Testing supplimental pumping and irrigation
 options
+irrigate 1 92 2
 lossfactor 0.1
 tabfiles 2 13
 end

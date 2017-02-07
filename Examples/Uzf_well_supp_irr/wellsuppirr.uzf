@@ -7,7 +7,7 @@ etsquare    0.1
 rejectsurfk
 specifysurfk
 end
-1  1  1  1   0  61 25 20 4  1.0   NUZTOP IUZFOPT IRUNFLG IETFLG IUZFCB1 IUZFCB2 NTRAIL NSETS NUZGAGES
+1  1  1  1   0  61  10  20  4  1.0   NUZTOP IUZFOPT IRUNFLG IETFLG IUZFCB1 IUZFCB2 NTRAIL NSETS NUZGAGES SURFDEP
 INTERNAL          1 (20I4)    6         UZFBND
    1   1   0   0   0   0   0   0   0   0
    1   1   1   0   0   1   1   1   0   0
@@ -56,7 +56,7 @@ INTERNAL   5.0E-8 (10F4.0)    0         VKS
  1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0
  0.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0
  0.0 0.0 1.0 1.0 1.0 1.0 0.0 0.0 0.0 0.0
-INTERNAL   1.0E-9 (10F4.0)    0         surfk
+INTERNAL   1.0E-9 (10F4.0)    0          surfk
  1.0 1.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0
  1.0 1.0 1.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0
  0.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 0.0 0.0
@@ -76,7 +76,7 @@ CONSTANT   3.5                           BROOK-COREY EPSILON
 CONSTANT   0.30                          THTS
 CONSTANT   0.05                          THTR
 CONSTANT   0.06                          THTI
- 3  6 65  1
+ 6  8 65  1
  6  3 66  2
 10  5 67  3
 -68

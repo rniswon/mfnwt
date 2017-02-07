@@ -2200,7 +2200,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR
+      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR, NUMIRRSFR
       USE GWFWELMODULE, ONLY: WELLIRR, NUMIRR
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
@@ -2332,7 +2332,12 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ENDIF
 ! EDM
         finfhold = FINF(ic, ir)
-        IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+        IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
+            iF ( SFRIRR(IC,IR) .NE. 0 ) THEN
+                finfhold = FINF(ic, ir)
+            END IF
+            finfhold = finfhold + SFRIRR(IC,IR)
+        END IF
         IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
             finfhold = finfhold + WELLIRR(IC,IR)
         END IF
