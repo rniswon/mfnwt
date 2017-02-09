@@ -428,8 +428,9 @@ Cdep  changed DSTROT to FXLKOT
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-      ALLOCATE (IDVFLG)  !cjm
-      IDVFLG = 0         !cjm
+      ALLOCATE (DEMAND(nsegdim))
+      ALLOCATE (IDVFLG)  
+      IDVFLG = 0         
 Cdep  allocate space for stream outflow derivatives for lake package
       ALLOCATE (DLKOTFLW(200,nssar), SLKOTFLW(200,nssar))
       ALLOCATE (DLKSTAGE(200,nssar))
@@ -449,6 +450,7 @@ Cdep  allocate space for stream outflow derivatives for lake package
       DLKOTFLW = 0.0D0
       DLKSTAGE = 0.0D0
       SLKOTFLW = 0.0D0
+      DEMAND = 0.0
       ALLOCATE (IOTSG(nsegdim))
       IOTSG = 0
       ALLOCATE (SFRQ(5,nstrmar))
@@ -5298,7 +5300,7 @@ C     ******************************************************************
       USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
      +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
      +                        DVRCH, DVRCELL, DVEFF, DVRPERC, NUMIRRSFR,
-     +                        UNITIRR, IRRSEG 
+     +                        UNITIRR, IRRSEG, DEMAND
       USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -8281,7 +8283,7 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST,
+      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST, DEMAND,
      +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
 !!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
@@ -8297,6 +8299,7 @@ C1------CALL LINEAR INTERPOLATION ROUTINE
         DO i = 1, NUMTAB
           iseg = ISFRLIST(1,i)
           SEG(2,iseg) = FLOWTERP(TOTIM,i)  
+          DEMAND(iseg) = SEG(2, iseg)
         END DO
       END IF 
 C
@@ -8535,6 +8538,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMIRRSFR)
       DEALLOCATE (GWFSFRDAT(IGRID)%UNITIRR)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXCELLS)
+      DEALLOCATE (GWFSFRDAT(IGRID)%DEMAND)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8659,7 +8663,7 @@ C     ------------------------------------------------------------------
       NUMIRRSFR=>GWFSFRDAT(IGRID)%NUMIRRSFR
       UNITIRR=>GWFSFRDAT(IGRID)%UNITIRR
       MAXCELLS=>GWFSFRDAT(IGRID)%MAXCELLS
-C
+      DEMAND=>GWFSFRDAT(IGRID)%DEMAND
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8783,5 +8787,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%NUMIRRSFR=>NUMIRRSFR
       GWFSFRDAT(IGRID)%UNITIRR=>UNITIRR
       GWFSFRDAT(IGRID)%MAXCELLS=>MAXCELLS
+      GWFSFRDAT(IGRID)%DEMAND=>DEMAND
 C
       END SUBROUTINE SGWF2SFR7PSV

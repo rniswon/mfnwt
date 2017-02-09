@@ -528,7 +528,7 @@ C     ------------------------------------------------------------------
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: SGOTFLW,SEG,NSS
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -581,7 +581,7 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
 !          Q = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            Q = Q -(SEG(2,J) - SGOTFLW(J))
+            Q = Q -(DEMAND(J) - SGOTFLW(J))
             IF ( Q > 0.0 ) Q = 0.0
           END DO
         END IF
@@ -642,7 +642,7 @@ C     ------------------------------------------------------------------
      3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
      4                      IRRPCT,NUMSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
-      USE GWFSFRMODULE, ONLY: SGOTFLW,SEG,NSS
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS
 !External function interface
       INTERFACE 
         FUNCTION SMOOTH3(H,T,B,dQ)
@@ -730,7 +730,7 @@ C5C-----GET FLOW RATE FROM WELL LIST.
 !          QSAVE = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            QSAVE = QSAVE -(SEG(2,J) - SGOTFLW(J))
+            QSAVE = QSAVE - (DEMAND(J) - SGOTFLW(J))
             IF ( QSAVE > 0.0 ) QSAVE = 0.0
           END DO
         END IF
