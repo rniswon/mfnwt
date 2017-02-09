@@ -17,6 +17,7 @@
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
+        REAL,             SAVE, DIMENSION(:),   POINTER     ::PCTSUP
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
@@ -47,6 +48,7 @@
         REAL,              DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,           DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,           DIMENSION(:),   POINTER     ::IRRWEL
+        INTEGER,           DIMENSION(:),   POINTER     ::PCTSUP
         REAL,                              POINTER     ::PSIRAMP
         INTEGER,                           POINTER     ::IUNITRAMP
         INTEGER,                           POINTER     ::NUMTAB
@@ -319,7 +321,7 @@ C5B-----READ INSTANCES.
         MAXCELLS = 1
       END IF 
       ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWEL(NUMSUPHOLD),
-     +         NUMSEGS(MXACTWSUP))
+     +         NUMSEGS(MXACTWSUP),PCTSUP(MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
      +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
@@ -332,9 +334,10 @@ C5B-----READ INSTANCES.
       IRRWEL = 0
       WELLIRR = 0.0
       NUMCELLS = 0
-      IRRFACT = 1.0
+      IRRFACT = 0.0
       IRRPCT = 0.0
       NUMSEGS = 0
+      PCTSUP = 0.0
 C
 C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
@@ -353,7 +356,7 @@ C     ------------------------------------------------------------------
      2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
      3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
      4                       UZFCOL,NUMCELLS,NUMSEGS,NUMSUP,NUMIRR,
-     5                       IRRFACT,IRRPCT
+     5                       IRRFACT,IRRPCT,PCTSUP
       USE GWFSFRMODULE, ONLY: NSS
 C
       CHARACTER*6 CWELL
@@ -461,7 +464,7 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
           BACKSPACE(UNITSUP)
-          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
+          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),PCTSUP(ISPWL),
      +                    (SFRSEG(K,ISPWL),K=1,NMSG)
           DO K = 1, NUMSEGS(SUPWEL(J))
             IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
@@ -524,7 +527,8 @@ C     ------------------------------------------------------------------
      1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
      1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
-     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR,IRRFACT,IRRPCT
+     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR,IRRFACT,IRRPCT,
+     3                       PCTSUP
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
@@ -581,7 +585,7 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
 !          Q = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            Q = Q -(DEMAND(J) - SGOTFLW(J))
+            Q = Q - PCTSUP(L)*(DEMAND(J) - SGOTFLW(J))
             IF ( Q > 0.0 ) Q = 0.0
           END DO
         END IF
@@ -640,7 +644,7 @@ C     ------------------------------------------------------------------
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
      2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
      3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
-     4                      IRRPCT,NUMSUP
+     4                      IRRPCT,NUMSUP,PCTSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS
 !External function interface
@@ -730,7 +734,7 @@ C5C-----GET FLOW RATE FROM WELL LIST.
 !          QSAVE = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            QSAVE = QSAVE - (DEMAND(J) - SGOTFLW(J))
+            QSAVE = QSAVE - PCTSUP(L)*(DEMAND(J) - SGOTFLW(J))
             IF ( QSAVE > 0.0 ) QSAVE = 0.0
           END DO
         END IF
