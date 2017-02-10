@@ -426,13 +426,14 @@ C1B-----IF THERE ARE NEW NON-PARAMETER WELLS, READ THEM.
                  WRITE(IOUT,100)
                  CALL USTOP('')
              END IF
-             DO I = 1, TABVAL(J)
+             REWIND(TABUNIT)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
+             DO II = 1, TABVAL(J)
               LLOC = 1
               CALL URDCOM(TABUNIT,IOUT,LINE)
               CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,TABUNIT)
               CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,TABUNIT)
-              TABTIME(I,J) = TTIME
-              TABRATE(I,J) = TRATE
+              TABTIME(II,J) = TTIME
+              TABRATE(II,J) = TRATE
              END DO
            END DO
          END IF
