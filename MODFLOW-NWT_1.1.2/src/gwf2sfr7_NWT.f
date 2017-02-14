@@ -428,7 +428,7 @@ Cdep  changed DSTROT to FXLKOT
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-      ALLOCATE (DEMAND(nsegdim))
+      ALLOCATE (DEMAND(nsegdim),ACTUAL(nsegdim))
       ALLOCATE (IDVFLG)  
       IDVFLG = 0         
 Cdep  allocate space for stream outflow derivatives for lake package
@@ -451,6 +451,7 @@ Cdep  allocate space for stream outflow derivatives for lake package
       DLKSTAGE = 0.0D0
       SLKOTFLW = 0.0D0
       DEMAND = 0.0
+      ACTUAL = 0.0
       ALLOCATE (IOTSG(nsegdim))
       IOTSG = 0
       ALLOCATE (SFRQ(5,nstrmar))
@@ -8539,6 +8540,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%UNITIRR)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXCELLS)
       DEALLOCATE (GWFSFRDAT(IGRID)%DEMAND)
+      DEALLOCATE (GWFSFRDAT(IGRID)%ACTUAL)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8664,6 +8666,7 @@ C     ------------------------------------------------------------------
       UNITIRR=>GWFSFRDAT(IGRID)%UNITIRR
       MAXCELLS=>GWFSFRDAT(IGRID)%MAXCELLS
       DEMAND=>GWFSFRDAT(IGRID)%DEMAND
+      ACTUAL=>GWFSFRDAT(IGRID)%ACTUAL
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8788,5 +8791,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%UNITIRR=>UNITIRR
       GWFSFRDAT(IGRID)%MAXCELLS=>MAXCELLS
       GWFSFRDAT(IGRID)%DEMAND=>DEMAND
+      GWFSFRDAT(IGRID)%ACTUAL=>ACTUAL
 C
       END SUBROUTINE SGWF2SFR7PSV

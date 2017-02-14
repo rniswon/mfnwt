@@ -455,6 +455,7 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
 !      IF ( KPER == 1) THEN
       IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
       CALL URDCOM(UNITSUP,IOUT,LINE)
+      LLOC = 1
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
       IF ( ISPWL > 0 ) THEN
         BACKSPACE(UNITSUP)
@@ -533,7 +534,7 @@ C     ------------------------------------------------------------------
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -562,6 +563,8 @@ C     ------------------------------------------------------------------
       NWELLSTEMP = NWELLS
       WELLIRR = 0.0
       TIME = TOTIM
+      ACTUAL = 0.0
+      SUP = 0.0
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C1------IF NUMBER OF WELLS <= 0 THEN RETURN.
@@ -580,15 +583,18 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
         IL = TABLAY(L)
         Q = RATETERP(TIME,L)
       END IF
-! Add additional pumping based on diversion shortfall (SUPPLIMENTARY WELL)
+! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
       IF ( NUMSUP > 0 ) THEN
         IF ( NUMSEGS(L) > 0 ) THEN
-!          Q = 0.0
+          SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            Q = Q - PCTSUP(L)*(DEMAND(J) - SGOTFLW(J))
-            IF ( Q > 0.0 ) Q = 0.0
+            SUP = SUP + DEMAND(J) - SGOTFLW(J)           
           END DO
+          SUP = SUP - ACTUAL(J)
+          IF ( SUP < 0.0 ) SUP = 0.0
+          ACTUAL(J)  = ACTUAL(J) + SUP
+          Q = Q - PCTSUP(L)*SUP
         END IF
       END IF
 C
@@ -647,7 +653,7 @@ C     ------------------------------------------------------------------
      3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
      4                      IRRPCT,NUMSUP,PCTSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
 !External function interface
       INTERFACE 
         FUNCTION SMOOTH3(H,T,B,dQ)
@@ -667,11 +673,13 @@ C     ------------------------------------------------------------------
       END FUNCTION RATETERP
       END INTERFACE
       CHARACTER*16 TEXT
+      CHARACTER*20 TEXT1
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
       INTEGER Iunitnwt, iw1, NWELLSTEMP
       DATA TEXT /'           WELLS'/
+      DATA TEXT1 /'SUPPLEMENTARY WELLS'/
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
 C
@@ -685,6 +693,8 @@ C1------BUDGET FLAG.
       Qp = 1.0
       NWELLSTEMP = NWELLS
       WELLIRR = 0.0
+      ACTUAL  = 0.0
+      SUP = 0.0
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
       
       IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
@@ -729,15 +739,18 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           IL = TABLAY(L)
           QSAVE = RATETERP(TIME,L)
         END IF
-! Add additional pumping based on diversion shortfall (SUPPLIMENTARY WELL)
+! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
       IF ( NUMSUP > 0 ) THEN
         IF ( NUMSEGS(L) > 0 ) THEN
-!          QSAVE = 0.0
+          SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            QSAVE = QSAVE - PCTSUP(L)*(DEMAND(J) - SGOTFLW(J))
-            IF ( QSAVE > 0.0 ) QSAVE = 0.0
+            SUP = SUP + DEMAND(J) - SGOTFLW(J)           
           END DO
+          SUP = SUP - ACTUAL(J)
+          IF ( SUP < 0.0 ) SUP = 0.0
+          ACTUAL(J)  = ACTUAL(J) + SUP
+          QSAVE = QSAVE - PCTSUP(L)*SUP
         END IF
       END IF
 C
@@ -771,15 +784,33 @@ C
         END IF
       END IF
 C
-C5D-----PRINT FLOW RATE IF REQUESTED.
-      IF(IBD.LT.0) THEN
-         IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
-   61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-         WRITE(IOUT,62) L,IL,IR,IC,Q
-   62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
-     1       '   RATE ',1PG15.6)
-         IBDLBL=1
+      
+   !   IF ( NUMSUP > 0 ) THEN
+   !     IF ( NUMSEGS(L) > 0 ) THEN
+   !      IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
+   !61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   !      WRITE(IOUT,62) L,IL,IR,IC,Q
+   !62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+   !  1       '   RATE ',1PG15.6)
+   !      IBDLBL=1
+! write wells with reduced pumping
+      IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
+     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
+          IF ( iw1.EQ.1 ) THEN
+            WRITE(IUNITRAMP,*)
+            WRITE(IUNITRAMP,300)KPER,KSTP
+            WRITE(IUNITRAMP,400)
+          END IF
+          WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
+          iw1 = iw1 + 1 
       END IF
+!
+C5D-----PRINT FLOW RATE IF REQUESTED.
+       IF(IBD.LT.0) THEN
+          IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
+            WRITE(IOUT,62) L,IL,IR,IC,Q
+            IBDLBL=1
+       END IF
 C
 C5E-----ADD FLOW RATE TO BUFFER.
       BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
@@ -800,17 +831,11 @@ C5I-----COPY FLOW TO WELL LIST.
    99 IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
       WELL(NWELVL,L)=QQ
-! write wells with reduced pumping
-      IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
-     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
-        IF ( iw1.EQ.1 ) THEN
-          WRITE(IUNITRAMP,*)
-          WRITE(IUNITRAMP,300)KPER,KSTP
-          WRITE(IUNITRAMP,400)
-        END IF
-        WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
-        iw1 = iw1 + 1
-      END IF
+!
+      
+   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
   300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
      1      ' TIME STEP ',I5)
   400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
