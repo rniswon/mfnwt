@@ -591,10 +591,9 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
+            SUP = SUP - ACTUAL(J)
           END DO
-          SUP = SUP - ACTUAL(J)
           IF ( SUP < 0.0 ) SUP = 0.0
-          ACTUAL(J)  = ACTUAL(J) + SUP
           Q = Q - SUP
         END IF
       END IF
@@ -621,6 +620,18 @@ C       THE RHS ACCUMULATOR.
       ELSE
         RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
         Qp = Q
+      END IF
+!
+! calculate actual supplemental pumping
+      IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L) 
+            IF ( Q < 0.0 ) SUP = SUP - Qp
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
+        END IF
       END IF
 ! CALCULATE IRRIGATION FROM WELLS
        IF ( NUMIRR > 0 ) THEN
@@ -747,10 +758,9 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
+            SUP = SUP - ACTUAL(J)
           END DO
-          SUP = SUP - ACTUAL(J)
           IF ( SUP < 0.0 ) SUP = 0.0
-          ACTUAL(J)  = ACTUAL(J) + SUP
           QSAVE = QSAVE - SUP
         END IF
       END IF
@@ -774,6 +784,18 @@ C
         Q = Qsave
       END IF
       QQ=Q
+!
+! calculate actual supplemental pumping
+      IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L) 
+            IF ( Q < 0.0 ) SUP = SUP - Q
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
+        END IF
+      END IF
 ! CALCULATE IRRIGATION FROM WELLS
       IF ( NUMIRR > 0 ) THEN
         IF ( NUMCELLS(L) > 0 ) THEN
