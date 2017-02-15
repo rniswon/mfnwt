@@ -17,7 +17,7 @@
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
-        REAL,             SAVE, DIMENSION(:),   POINTER     ::PCTSUP
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
@@ -48,7 +48,7 @@
         REAL,              DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,           DIMENSION(:),   POINTER     ::SUPWEL
         INTEGER,           DIMENSION(:),   POINTER     ::IRRWEL
-        INTEGER,           DIMENSION(:),   POINTER     ::PCTSUP
+        REAL,              DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,                              POINTER     ::PSIRAMP
         INTEGER,                           POINTER     ::IUNITRAMP
         INTEGER,                           POINTER     ::NUMTAB
@@ -321,7 +321,7 @@ C5B-----READ INSTANCES.
         MAXCELLS = 1
       END IF 
       ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWEL(NUMSUPHOLD),
-     +         NUMSEGS(MXACTWSUP),PCTSUP(MXACTWSUP))
+     +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
      +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
@@ -453,6 +453,7 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
       END IF
 ! READ LSIT OF SEGEMENTS AND REACHES FOR CALCALATING SUPLEMENTAL PUMPING
 !      IF ( KPER == 1) THEN
+      IERR = 0
       IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
       CALL URDCOM(UNITSUP,IOUT,LINE)
       LLOC = 1
@@ -466,8 +467,8 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
           BACKSPACE(UNITSUP)
-          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),PCTSUP(ISPWL),
-     +                    (SFRSEG(K,ISPWL),K=1,NMSG)
+          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
+     +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
           DO K = 1, NUMSEGS(SUPWEL(J))
             IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
           END DO
@@ -589,12 +590,12 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            SUP = SUP + DEMAND(J) - SGOTFLW(J)           
+            SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
           END DO
           SUP = SUP - ACTUAL(J)
           IF ( SUP < 0.0 ) SUP = 0.0
           ACTUAL(J)  = ACTUAL(J) + SUP
-          Q = Q - PCTSUP(L)*SUP
+          Q = Q - SUP
         END IF
       END IF
 C
@@ -740,17 +741,17 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           QSAVE = RATETERP(TIME,L)
         END IF
 ! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
-      IF ( NUMSUP > 0 ) THEN
+       IF ( NUMSUP > 0 ) THEN
         IF ( NUMSEGS(L) > 0 ) THEN
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            SUP = SUP + DEMAND(J) - SGOTFLW(J)           
+            SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
           END DO
           SUP = SUP - ACTUAL(J)
           IF ( SUP < 0.0 ) SUP = 0.0
           ACTUAL(J)  = ACTUAL(J) + SUP
-          QSAVE = QSAVE - PCTSUP(L)*SUP
+          QSAVE = QSAVE - SUP
         END IF
       END IF
 C

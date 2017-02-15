@@ -11,7 +11,8 @@
         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(number of irrigation cell per segment)
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
-        INTEGER,SAVE,  DIMENSION(:,:,:),POINTER:: DVRCELL !(store cells to apply diverted recharge)
+        INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRROW !(store cells to apply diverted recharge)
+        INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRCOL
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRR  !(store original recharge values)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
@@ -68,7 +69,8 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         CHARACTER*16,  DIMENSION(:),  POINTER:: FLOWTYPE
         INTEGER,       DIMENSION(:),  POINTER:: DVRCH      !Diversions to recharge
         INTEGER,       DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
-        INTEGER,       DIMENSION(:,:,:),  POINTER:: DVRCELL  !Diversions to recharge
+        INTEGER,       DIMENSION(:,:),  POINTER:: IRRROW  !Diversions to recharge
+        INTEGER,       DIMENSION(:,:),  POINTER:: IRRCOL
         REAL,          DIMENSION(:,:),POINTER:: SFRIRR  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: DVRPERC  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: DVEFF  !Diversions to recharge
