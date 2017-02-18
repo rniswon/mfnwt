@@ -69,6 +69,7 @@ C     ******************************************************************
       etgw = c
       detdh = 0.0d0
       smint = smoothet*x
+      if ( smint < 1.0d-7 ) depth = 0.0d0
       if ( depth>0.0d0) then
           etgw = etgw*smoothuz(depth,detdh,smint)
       else
@@ -661,7 +662,7 @@ C
       END IF
 C
 C12-----READ VERTICAL HYDRAULIC CONDUCTIVITY FROM UZF INPUT FILE.
-      IF ( IUZFOPT.EQ.1 .OR. IUZFOPT.LE.0 ) THEN
+      IF ( abs(IUZFOPT).EQ.1 ) THEN    !RGN 2/6/17
         CALL U2DREL(VKS, aname(6), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
