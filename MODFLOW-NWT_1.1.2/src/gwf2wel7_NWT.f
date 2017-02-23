@@ -355,13 +355,13 @@ C     ------------------------------------------------------------------
      1                       NNPWEL,WELAUX,WELL,NUMTAB,MAXVAL,TABTIME,
      2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
      3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
-     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMSUP,NUMIRR,
-     5                       IRRFACT,IRRPCT,PCTSUP
+     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMIRR,
+     5                       IRRFACT,IRRPCT,PCTSUP,NUMSUP
       USE GWFSFRMODULE, ONLY: NSS
 C
       CHARACTER*6 CWELL
       CHARACTER(LEN=200)::LINE
-      INTEGER TABUNIT,I
+      INTEGER TABUNIT, I, NUMSUPSP
       REAL TTIME,TRATE
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
@@ -451,21 +451,30 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
      3            WELAUX,20,NAUX)
    30    CONTINUE
       END IF
-! READ LSIT OF SEGEMENTS AND REACHES FOR CALCALATING SUPLEMENTAL PUMPING
+! READ LIST OF SEGEMENTS AND REACHES FOR CALCALATING SUPLEMENTAL PUMPING
 !      IF ( KPER == 1) THEN
+      NUMSUPSP = 0
       IERR = 0
       IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
       CALL URDCOM(UNITSUP,IOUT,LINE)
       LLOC = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
-      IF ( ISPWL > 0 ) THEN
-        BACKSPACE(UNITSUP)
+      CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUPSP,R,IOUT,IN)
+      IF ( NUMSUPSP > NUMSUP )THEN
+        WRITE(IOUT,*)
+        WRITE(IOUT,102)NUMSUP,NUMSUPSP
+        CALL USTOP('')
+      END IF
         IERR = 0
-        DO J = 1, NUMSUP
+        DO J = 1, NUMSUPSP
           LLOC = 1
           CALL URDCOM(UNITSUP,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
+          IF ( NMSG > MAXSEGS )THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,103)MAXSEGS,NMSG
+            CALL USTOP('')
+          END IF
           BACKSPACE(UNITSUP)
           READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
      +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
@@ -474,26 +483,34 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
           END DO
         END DO
       END IF
-      END IF
       IF ( IERR == 1 ) THEN
         WRITE(IOUT,*)'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
      +               'SPECIFIED AS ZERO. MODEL STOPPING'
         CALL USTOP('')
       END IF
       IERR = 0
+      NUMIRRSP = 0
 ! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
 !
       IF ( NUMIRR > 0 .AND. IUNIT(44) > 0 ) THEN
         LLOC = 1
         CALL URDCOM(UNITIRR,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
-        IF ( IRWL > 0 ) THEN
-        BACKSPACE(UNITIRR)
-        DO J = 1, NUMIRR
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSP,R,IOUT,IN)
+        IF ( NUMIRRSP > NUMIRR )THEN
+          WRITE(IOUT,*)
+          WRITE(IOUT,104)NUMIRR,NUMIRRSP
+          CALL USTOP('')
+        END IF
+        DO J = 1, NUMIRRSP
           LLOC = 1
           CALL URDCOM(UNITIRR,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
+          IF ( NMCL > MAXCELLS )THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,105)MAXCELLS,NMCL
+            CALL USTOP('')
+          END IF
           BACKSPACE(UNITIRR)
           READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
      +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
@@ -506,7 +523,6 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
           END DO
         END DO
       END IF
-      END IF
 C
 C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
       CWELL=' WELLS'
@@ -515,6 +531,26 @@ C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
   101 FORMAT(1X,/1X,I6,A)
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
+  102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
+     +       'wells is less than the number specified in ',
+     +       'stress period. ',/
+     +       'Maximum wells and the number specified for stress ',
+     +       'period are: ',2i6)
+  103 FORMAT('***Error in WELL*** maximum number of segments ',
+     +       'for a supplementary well is less than the number  ',
+     +       'specified in stress period. ',/
+     +       'Maximum number of irrigation wells and the number '
+     +       'specified for stress period are: ',2i6)
+  104 FORMAT('***Error in WELL*** maximum number of irrigation ',
+     +       'wells is less than the number specified in stress ',
+     +       'period. ',/
+     +       'Maximum segments and the number specified for stress '
+     +       'period are: ',2i6)
+  105 FORMAT('***Error in WELL*** maximum number of cells ',
+     +       'irrigated by a well is less than the number ',
+     +       'specified in stress period. ',/
+     +       'Maximum cells and the number specified for stress '
+     +       'period are: ',2i6)
 C
 C6------RETURN
       RETURN
@@ -555,7 +591,7 @@ C     ------------------------------------------------------------------
       END FUNCTION RATETERP
       END INTERFACE
 !
-      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp
+      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,FMIN
       INTEGER Iunitnwt, NWELLSTEMP
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
@@ -590,7 +626,10 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
+            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = FMIN - SGOTFLW(J)
+            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
+            SUP = SUP + FMIN
             SUP = SUP - ACTUAL(J)
           END DO
           IF ( SUP < 0.0 ) SUP = 0.0
@@ -686,7 +725,7 @@ C     ------------------------------------------------------------------
       END INTERFACE
       CHARACTER*16 TEXT
       CHARACTER*20 TEXT1
-      DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE
+      DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
       INTEGER Iunitnwt, iw1, NWELLSTEMP
@@ -757,7 +796,10 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            SUP = SUP + PCTSUP(I,L)*(DEMAND(J) - SGOTFLW(J))  
+            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = FMIN - SGOTFLW(J)
+            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
+            SUP = SUP + FMIN
             SUP = SUP - ACTUAL(J)
           END DO
           IF ( SUP < 0.0 ) SUP = 0.0

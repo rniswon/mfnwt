@@ -5298,7 +5298,8 @@ C     ******************************************************************
       USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
      +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
      +                        DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
-     +                        NUMIRRSFR, UNITIRR, IRRSEG, DEMAND
+     +                        NUMIRRSFR, UNITIRR, IRRSEG, DEMAND,
+     +                        MAXCELLS
       USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5314,7 +5315,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER icalc, idum, ii, iqseg, isol, iupseg, jj, jk, lstend, n, 
      +        noutseg, nseg, nstrpts, i, k, istart, istop,sgnm,nmcl,
-     +        J,LLOC
+     +        J,LLOC,NUMIRRSFRSP
       REAL dum, totdum, R
       CHARACTER(LEN=200)::LINE
 C     ------------------------------------------------------------------
@@ -5594,11 +5595,26 @@ C10-----READ DATA SET 4G FOR SEGMENT IF SOLUTES SPECIFIED.
 C
 C10b----READ IRRIGATION SEGEMENT INFORMATION FROM SEPARATE FILE.
 C
-      DO J = 1, NUMIRRSFR
+      IF ( NUMIRRSFR > 0 ) THEN
+        NUMIRRSFRSP = 0
+        LLOC = 1
+        CALL URDCOM(UNITIRR,IOUT,LINE)
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
+        IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,9008)NUMIRRSFR,NUMIRRSFRSP
+            CALL USTOP('')
+        END IF
+        DO J = 1, NUMIRRSFRSP
           LLOC = 1
           CALL URDCOM(UNITIRR,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
+          IF ( NMCL > MAXCELLS ) THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,9009)MAXCELLS,NMCL
+            CALL USTOP('')
+          END IF
           IF ( SGNM > 0 ) THEN
             BACKSPACE(UNITIRR)
             READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
@@ -5615,12 +5631,21 @@ C
             END DO
           END IF
         END DO
-!C
+      END IF
+!
  9006 FORMAT(' ***Warning in SFR2*** ',/
      1       'Fraction of diversion for each cell in group sums '/,
      1       'to a value greater than one. Sum = ',E10.5)
  9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
      +       'cell specified as zero. Model stopping.')
+ 9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+     +       'segments is less than the number specified in ',
+     +       'stress period. ',/ 
+     +       'Maximum segments and the number specified are: ',2i6)
+ 9009 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+     +       'cells is less than the number specified in ',
+     +       'stress period. ',/ 
+     +       'Maximum cells and the number specified are: ',2i6)
 C
 C11-----RETURN.
       RETURN
