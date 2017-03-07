@@ -3562,6 +3562,8 @@ C--MANIPULATE IUZFRCH
       IF(NUZTOP.EQ.1.OR.NUZTOP.EQ.2) THEN ! No need to loop through layers with these options
         DO I=1,NROW
           DO J=1,NCOL
+            K=1
+            IF(NUZTOP.EQ.2) K=IUZFBND(J,I)
             IF(IBOUND(J,I,K).GT.0) THEN
               IF(NUZTOP.EQ.1) THEN ! Recharge to and discharge from only the top layer
                 IUZFRCH(J,I)=1
@@ -3577,9 +3579,9 @@ C--MANIPULATE IUZFRCH
           DO J=1,NCOL
             DO K=1,NLAY  
               IF(IBOUND(J,I,K).GT.0) THEN
-                IF(J.EQ.169) THEN
-                  CONTINUE
-                ENDIF
+                !IF(J.EQ.169) THEN
+                !  CONTINUE
+                !ENDIF
                 IF(HNEW(J,I,K).GT.BOTM(J,I,0)) THEN ! water table above land surface
                   IUZFRCH(J,I)=1
                   EXIT
@@ -4480,10 +4482,10 @@ C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
         DO L=1,NSTRM
           XSA = STRM(31,L)
           SFRFLOWVAL(1,L) = XSA*STRM(1,L)   ! volume = XSA * reach length 
-          SFRFLOWVAL(2,L) = STRM(1,L)       ! reach length
-          SFRFLOWVAL(3,L) = STRM(14,L)      ! precip
-          SFRFLOWVAL(4,L) = STRM(13,L)      ! etsw (surf wat evap)
-          SFRFLOWVAL(5,L) = STRM(12,L)      ! user-specified runoff (variable 'runof')
+          SFRFLOWVAL(2,L) = STRM(1,L)
+          SFRFLOWVAL(3,L) = STRM(14,L)   ! precip
+          SFRFLOWVAL(4,L) = STRM(13,L)   ! etsw (surf wat evap)
+          SFRFLOWVAL(5,L) = STRM(12,L)   ! user-specified runoff (variable 'runof')
         ENDDO
 C
 C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
