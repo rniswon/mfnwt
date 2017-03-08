@@ -9,10 +9,27 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABROW
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABCOL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABVAL
+        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::SFRSEG
+        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
+        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
         INTEGER,          SAVE,                 POINTER     ::MAXVAL
+        INTEGER,          SAVE,                 POINTER     ::NUMSUP
+        INTEGER,          SAVE,                 POINTER     ::UNITSUP
+        INTEGER,          SAVE,                 POINTER     ::NUMIRR
+        INTEGER,          SAVE,                 POINTER     ::UNITIRR
+        INTEGER,          SAVE,                 POINTER     ::MAXSEGS
+        INTEGER,          SAVE,                 POINTER     ::MAXCELLS
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
       TYPE GWFWELTYPE
         INTEGER,POINTER  ::NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL
         INTEGER,POINTER  ::NPWEL,IWELPB,NNPWEL,IRDPSI
@@ -24,10 +41,27 @@
         INTEGER,           DIMENSION(:),   POINTER     ::TABROW
         INTEGER,           DIMENSION(:),   POINTER     ::TABCOL
         INTEGER,           DIMENSION(:),   POINTER     ::TABVAL
+        INTEGER,           DIMENSION(:,:),   POINTER     ::SFRSEG
+        INTEGER,           DIMENSION(:,:),   POINTER     ::UZFROW
+        INTEGER,           DIMENSION(:,:),   POINTER     ::UZFCOL
+        REAL,              DIMENSION(:,:),   POINTER     ::WELLIRR
+        REAL,              DIMENSION(:,:),   POINTER     ::IRRFACT
+        REAL,              DIMENSION(:,:),   POINTER     ::IRRPCT
+        INTEGER,           DIMENSION(:),   POINTER     ::SUPWEL
+        INTEGER,           DIMENSION(:),   POINTER     ::IRRWEL
+        REAL,              DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,                              POINTER     ::PSIRAMP
         INTEGER,                           POINTER     ::IUNITRAMP
         INTEGER,                           POINTER     ::NUMTAB
         INTEGER,                           POINTER     ::MAXVAL
+        INTEGER,                           POINTER     ::NUMSUP
+        INTEGER,                           POINTER     ::NUMIRR
+        INTEGER,                           POINTER     ::UNITSUP
+        INTEGER,                           POINTER     ::UNITIRR
+        INTEGER,                           POINTER     ::MAXSEGS
+        INTEGER,                           POINTER     ::MAXCELLS
+        INTEGER,            DIMENSION(:),  POINTER     ::NUMCELLS
+        INTEGER,            DIMENSION(:),  POINTER     ::NUMSEGS
       END TYPE
       TYPE(GWFWELTYPE), SAVE:: GWFWELDAT(10)
       END MODULE GWFWELMODULE
@@ -40,7 +74,7 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
+      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
       USE GWFWELMODULE
       integer,intent(in) :: IUNITNWT,IGRID
       integer,intent(inout) :: IN
@@ -53,10 +87,17 @@ C
 C     ------------------------------------------------------------------
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL)
       ALLOCATE(NPWEL,IWELPB,NNPWEL,PSIRAMP,IUNITRAMP)
-      ALLOCATE(NUMTAB,MAXVAL)
+      ALLOCATE(NUMTAB,MAXVAL,NUMSUP,NUMIRR,UNITSUP,UNITIRR)
+      ALLOCATE(MAXSEGS,MAXCELLS)
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
+      NUMSUP = 0
+      NUMIRR = 0
+      UNITSUP = 0
+      UNITIRR = 0
+      MAXSEGS = 0
+      MAXCELLS = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
@@ -100,6 +141,25 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
                 NUMTAB=0
             END IF
             WRITE(IOUT,31) MAXVAL
+            found = .true.
+! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
+        case('SUPPLEMENTAL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
+            IF(NUMSUP.LT.0) NUMSUP=0
+            IF ( IUNIT(44) < 1 ) NUMSUP=0
+            WRITE(IOUT,33) NUMSUP
+            found = .true.
+! Pumped water will be added as irrigation
+        case('IRRIGATE')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRR,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
+            IF( NUMIRR.LT.0 ) NUMIRR = 0
+            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
+            IF ( IUNIT(55) < 1 ) NUMIRR = 0
+            WRITE(IOUT,34) NUMIRR
             found = .true.
         case ('END')
          write(iout,'(/1x,a)') 'END PROCESSING '//
@@ -162,9 +222,14 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
    31 FORMAT(1X,' Pumping rates will be read from time ',
      +                 'series input files. A maximum of ',I10,
      +                 ' row entries will be read per file')
-   32       FORMAT(1X,' Option to reduce pumping during cell ',
+   32 FORMAT(1X,' Option to reduce pumping during cell ',
      +                 'dewatering is activated and NWT solver ',I10,
      +                 ' is not being used. Option deactivated')
+   33 FORMAT(1X,' Option to pump supplmental water ',
+     +          'for surface diversion shortfall is activted. '
+     +          ' A total of ',I10, 'supplemental wells are active')
+   34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
+     +'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
 C
 C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
       ALLOCATE(WELAUX(20))
@@ -233,7 +298,49 @@ C5B-----READ INSTANCES.
   110       CONTINUE
           END IF
   120   CONTINUE
-      END IF
+          END IF
+! ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
+      NUMSUPHOLD = NUMSUP
+      MXACTWSUP = MXACTW
+      MXACTWIRR = MXACTW
+      NUMSUPHOLD = NUMSUP
+      NUMIRRHOLD = NUMIRR
+      MAXSEGSHOLD = MAXSEGS
+      NUMCOLS = NCOL
+      NUMROWS = NROW
+      MAXCELLSHOLD = MAXCELLS
+      IF ( NUMSUPHOLD.EQ.0 ) THEN
+          NUMSUPHOLD = 1
+          MXACTWSUP = 1
+          MAXSEGSHOLD = 1
+      END IF     
+      IF ( NUMIRRHOLD.EQ.0 ) THEN
+        MAXCELLSHOLD = 1
+        NUMIRRHOLD = 1
+        MXACTWIRR = 1
+        NUMCELLSHOLD = 1
+        NUMCOLS = 1
+        NUMROWS = 1
+        MAXCELLS = 1
+      END IF 
+      ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWEL(NUMSUPHOLD),
+     +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
+      ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
+     +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
+     +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
+      ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
+     +           IRRPCT(MAXCELLSHOLD,MXACTWIRR))
+      SFRSEG = 0
+      UZFROW = 0
+      UZFCOL = 0
+      SUPWEL = 0
+      IRRWEL = 0
+      WELLIRR = 0.0
+      NUMCELLS = 0
+      IRRFACT = 0.0
+      IRRPCT = 0.0
+      NUMSEGS = 0
+      PCTSUP = 0.0
 C
 C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
@@ -246,14 +353,19 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
+      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
       USE GWFWELMODULE, ONLY:NWELLS,MXWELL,NWELVL,IPRWEL,NPWEL,IWELPB,
      1                       NNPWEL,WELAUX,WELL,NUMTAB,MAXVAL,TABTIME,
-     2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL
+     2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
+     3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
+     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMIRR,
+     5                       IRRFACT,IRRPCT,PCTSUP,NUMSUP,MAXSEGS,
+     6                       MAXCELLS
+      USE GWFSFRMODULE, ONLY: NSS
 C
       CHARACTER*6 CWELL
       CHARACTER(LEN=200)::LINE
-      INTEGER TABUNIT,I
+      INTEGER TABUNIT, I, NUMSUPSP
       REAL TTIME,TRATE
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
@@ -318,6 +430,7 @@ C1B-----IF THERE ARE NEW NON-PARAMETER WELLS, READ THEM.
                  WRITE(IOUT,100)
                  CALL USTOP('')
              END IF
+             REWIND(TABUNIT)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
              DO II = 1, TABVAL(J)
               LLOC = 1
               CALL URDCOM(TABUNIT,IOUT,LINE)
@@ -342,6 +455,78 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
      3            WELAUX,20,NAUX)
    30    CONTINUE
       END IF
+! READ LIST OF SEGEMENTS AND REACHES FOR CALCALATING SUPLEMENTAL PUMPING
+!      IF ( KPER == 1) THEN
+      NUMSUPSP = 0
+      IERR = 0
+      IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
+      CALL URDCOM(UNITSUP,IOUT,LINE)
+      LLOC = 1
+      CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUPSP,R,IOUT,IN)
+      IF ( NUMSUPSP > NUMSUP )THEN
+        WRITE(IOUT,*)
+        WRITE(IOUT,102)NUMSUP,NUMSUPSP
+        CALL USTOP('')
+      END IF
+        IERR = 0
+        DO J = 1, NUMSUPSP
+          LLOC = 1
+          CALL URDCOM(UNITSUP,IOUT,LINE)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
+          IF ( NMSG > MAXSEGS )THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,103)MAXSEGS,NMSG
+            CALL USTOP('')
+          END IF
+          BACKSPACE(UNITSUP)
+          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
+     +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
+          DO K = 1, NUMSEGS(SUPWEL(J))
+            IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
+          END DO
+        END DO
+      END IF
+      IF ( IERR == 1 ) THEN
+        WRITE(IOUT,*)'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
+     +               'SPECIFIED AS ZERO. MODEL STOPPING'
+        CALL USTOP('')
+      END IF
+      IERR = 0
+      NUMIRRSP = 0
+! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
+!
+      IF ( NUMIRR > 0 .AND. IUNIT(44) > 0 ) THEN
+        LLOC = 1
+        CALL URDCOM(UNITIRR,IOUT,LINE)
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSP,R,IOUT,IN)
+        IF ( NUMIRRSP > NUMIRR )THEN
+          WRITE(IOUT,*)
+          WRITE(IOUT,104)NUMIRR,NUMIRRSP
+          CALL USTOP('')
+        END IF
+        DO J = 1, NUMIRRSP
+          LLOC = 1
+          CALL URDCOM(UNITIRR,IOUT,LINE)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
+          IF ( NMCL > MAXCELLS )THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,105)MAXCELLS,NMCL
+            CALL USTOP('')
+          END IF
+          BACKSPACE(UNITIRR)
+          READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
+     +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
+          DO K = 1, NUMCELLS(IRRWEL(J))
+          IF ( UZFROW(K,IRRWEL(J))==0 .OR. UZFCOL(K,IRRWEL(J))==0 ) THEN
+            WRITE(IOUT,*)'CELL ROW OR COLUMN NUMBER FOR SUPPLEMENTAL ',
+     +                 'WELL SPECIFIED AS ZERO. MODEL STOPPING'
+            CALL USTOP('')   
+          END IF
+          END DO
+        END DO
+      END IF
 C
 C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
       CWELL=' WELLS'
@@ -350,6 +535,26 @@ C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
   101 FORMAT(1X,/1X,I6,A)
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
+  102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
+     +       'wells is less than the number specified in ',
+     +       'stress period. ',/
+     +       'Maximum wells and the number specified for stress ',
+     +       'period are: ',2i6)
+  103 FORMAT('***Error in WELL*** maximum number of segments ',
+     +       'for a supplementary well is less than the number  ',
+     +       'specified in stress period. ',/
+     +       'Maximum number of irrigation wells and the number '
+     +       'specified for stress period are: ',2i6)
+  104 FORMAT('***Error in WELL*** maximum number of irrigation ',
+     +       'wells is less than the number specified in stress ',
+     +       'period. ',/
+     +       'Maximum segments and the number specified for stress '
+     +       'period are: ',2i6)
+  105 FORMAT('***Error in WELL*** maximum number of cells ',
+     +       'irrigated by a well is less than the number ',
+     +       'specified in stress period. ',/
+     +       'Maximum cells and the number specified for stress '
+     +       'period are: ',2i6)
 C
 C6------RETURN
       RETURN
@@ -361,12 +566,16 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT
+      USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT,DELR,
+     1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
-     1                       NUMTAB
+     1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
+     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR,IRRFACT,IRRPCT,
+     3                       PCTSUP
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -377,14 +586,26 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION, INTENT(OUT) :: dQ
       END FUNCTION SMOOTH3
       END INTERFACE
+!External function interface
+      INTERFACE 
+      FUNCTION RATETERP(TIME,L)
+      REAL RATETERP
+      REAL, INTENT(IN) :: TIME
+      INTEGER, INTENT(IN) :: L
+      END FUNCTION RATETERP
+      END INTERFACE
 !
-      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp
+      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,FMIN
       INTEGER Iunitnwt, NWELLSTEMP
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
       ZERO=0.0D0
       Qp = 0.0
       NWELLSTEMP = NWELLS
+      WELLIRR = 0.0
+      TIME = TOTIM
+      ACTUAL = 0.0
+      SUP = 0.0
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C1------IF NUMBER OF WELLS <= 0 THEN RETURN.
@@ -401,7 +622,23 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
         IR = TABROW(L)
         IC = TABCOL(L)
         IL = TABLAY(L)
-        Q = RATETERP(TOTIM,L)
+        Q = RATETERP(TIME,L)
+      END IF
+! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
+      IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L)
+            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = FMIN - SGOTFLW(J)
+            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
+            SUP = SUP + FMIN
+            SUP = SUP - ACTUAL(J)
+          END DO
+          IF ( SUP < 0.0 ) SUP = 0.0
+          Q = Q - SUP
+        END IF
       END IF
 C
 C2A-----IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
@@ -421,9 +658,33 @@ C       THE RHS ACCUMULATOR.
           A(IA(ij)) = A(IA(ij)) + dQp*Q
         ELSE
           RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
+          Qp = Q
         END IF
       ELSE
         RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
+        Qp = Q
+      END IF
+!
+! calculate actual supplemental pumping
+      IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L) 
+            IF ( Q < 0.0 ) SUP = SUP - Qp
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
+        END IF
+      END IF
+! CALCULATE IRRIGATION FROM WELLS
+       IF ( NUMIRR > 0 ) THEN
+        IF ( NUMCELLS(L) > 0 ) THEN
+          DO I = 1, NUMCELLS(L)
+            SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
+            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
+          END DO
+        END IF
       END IF
   100 CONTINUE
 C
@@ -438,13 +699,16 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,      ONLY:IOUT,NCOL,NROW,NLAY,IBOUND,BUFF,BOTM,LBOTM,
-     1                      HNEW
+     1                      HNEW,DELR,DELC
       USE GWFBASMODULE,ONLY:MSUM,ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBVL,VBNM
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
-     2                      NUMTAB
+     2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
+     3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
+     4                      IRRPCT,NUMSUP,PCTSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
 !External function interface
       INTERFACE 
         FUNCTION SMOOTH3(H,T,B,dQ)
@@ -455,12 +719,22 @@ C     ------------------------------------------------------------------
         DOUBLE PRECISION, INTENT(OUT) :: dQ
         END FUNCTION SMOOTH3
       END INTERFACE
+!External function interface
+      INTERFACE 
+      FUNCTION RATETERP(TIME,L)
+      REAL RATETERP
+      REAL, INTENT(IN) :: TIME
+      INTEGER, INTENT(IN) :: L
+      END FUNCTION RATETERP
+      END INTERFACE
       CHARACTER*16 TEXT
-      DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE
+      CHARACTER*20 TEXT1
+      DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
       INTEGER Iunitnwt, iw1, NWELLSTEMP
       DATA TEXT /'           WELLS'/
+      DATA TEXT1 /'SUPPLEMENTARY WELLS'/
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
 C
@@ -470,8 +744,12 @@ C1------BUDGET FLAG.
       RATIN=ZERO
       RATOUT=ZERO
       IBD=0
+      TIME = TOTIM
       Qp = 1.0
       NWELLSTEMP = NWELLS
+      WELLIRR = 0.0
+      ACTUAL  = 0.0
+      SUP = 0.0
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
       
       IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
@@ -514,8 +792,24 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           IR = TABROW(L)
           IC = TABCOL(L)
           IL = TABLAY(L)
-          QSAVE = RATETERP(TOTIM,L)
+          QSAVE = RATETERP(TIME,L)
         END IF
+! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
+       IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L)
+            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = FMIN - SGOTFLW(J)
+            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
+            SUP = SUP + FMIN
+            SUP = SUP - ACTUAL(J)
+          END DO
+          IF ( SUP < 0.0 ) SUP = 0.0
+          QSAVE = QSAVE - SUP
+        END IF
+      END IF
 C
       bbot = Botm(IC, IR, Lbotm(IL))
       ttop = Botm(IC, IR, Lbotm(IL)-1)
@@ -536,16 +830,56 @@ C
         Q = Qsave
       END IF
       QQ=Q
-C
-C5D-----PRINT FLOW RATE IF REQUESTED.
-      IF(IBD.LT.0) THEN
-         IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
-   61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-         WRITE(IOUT,62) L,IL,IR,IC,Q
-   62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
-     1       '   RATE ',1PG15.6)
-         IBDLBL=1
+!
+! calculate actual supplemental pumping
+      IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSEGS(L) > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L) 
+            IF ( Q < 0.0 ) SUP = SUP - Q
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
+        END IF
       END IF
+! CALCULATE IRRIGATION FROM WELLS
+      IF ( NUMIRR > 0 ) THEN
+        IF ( NUMCELLS(L) > 0 ) THEN
+          DO I = 1, NUMCELLS(L)
+            SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
+            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
+            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
+          END DO
+        END IF
+      END IF
+C
+      
+   !   IF ( NUMSUP > 0 ) THEN
+   !     IF ( NUMSEGS(L) > 0 ) THEN
+   !      IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
+   !61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   !      WRITE(IOUT,62) L,IL,IR,IC,Q
+   !62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+   !  1       '   RATE ',1PG15.6)
+   !      IBDLBL=1
+! write wells with reduced pumping
+      IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
+     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
+          IF ( iw1.EQ.1 ) THEN
+            WRITE(IUNITRAMP,*)
+            WRITE(IUNITRAMP,300)KPER,KSTP
+            WRITE(IUNITRAMP,400)
+          END IF
+          WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
+          iw1 = iw1 + 1 
+      END IF
+!
+C5D-----PRINT FLOW RATE IF REQUESTED.
+       IF(IBD.LT.0) THEN
+          IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
+            WRITE(IOUT,62) L,IL,IR,IC,Q
+            IBDLBL=1
+       END IF
 C
 C5E-----ADD FLOW RATE TO BUFFER.
       BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
@@ -566,17 +900,11 @@ C5I-----COPY FLOW TO WELL LIST.
    99 IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
       WELL(NWELVL,L)=QQ
-! write wells with reduced pumping
-      IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
-     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
-        IF ( iw1.EQ.1 ) THEN
-          WRITE(IUNITRAMP,*)
-          WRITE(IUNITRAMP,300)KPER,KSTP
-          WRITE(IUNITRAMP,400)
-        END IF
-        WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
-        iw1 = iw1 + 1
-      END IF
+!
+      
+   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
   300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
      1      ' TIME STEP ',I5)
   400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
@@ -726,6 +1054,22 @@ C
         DEALLOCATE(TABTIME)
         DEALLOCATE(TABRATE)
         DEALLOCATE(TABVAL)
+        DEALLOCATE(NUMSUP)
+        DEALLOCATE(NUMIRR)
+        DEALLOCATE(SFRSEG)
+        DEALLOCATE(UZFROW)
+        DEALLOCATE(UZFCOL)
+        DEALLOCATE(UNITSUP)
+        DEALLOCATE(UNITIRR)
+        DEALLOCATE(SUPWEL)
+        DEALLOCATE(IRRWEL)
+        DEALLOCATE(NUMSEGS)
+        DEALLOCATE(MAXSEGS)
+        DEALLOCATE(MAXCELLS)
+        DEALLOCATE(NUMCELLS)
+        DEALLOCATE(WELLIRR)
+        DEALLOCATE(IRRFACT)
+        DEALLOCATE(IRRPCT)
 C
       RETURN
       END
@@ -750,6 +1094,22 @@ C
         TABTIME=>GWFWELDAT(IGRID)%TABTIME
         TABRATE=>GWFWELDAT(IGRID)%TABRATE
         TABVAL=>GWFWELDAT(IGRID)%TABVAL
+        NUMSUP=>GWFWELDAT(IGRID)%NUMSUP
+        NUMIRR=>GWFWELDAT(IGRID)%NUMIRR
+        SFRSEG=>GWFWELDAT(IGRID)%SFRSEG
+        UZFROW=>GWFWELDAT(IGRID)%UZFROW
+        UZFCOL=>GWFWELDAT(IGRID)%UZFCOL
+        UNITSUP=>GWFWELDAT(IGRID)%UNITSUP
+        UNITIRR=>GWFWELDAT(IGRID)%UNITIRR
+        SUPWEL=>GWFWELDAT(IGRID)%SUPWEL
+        IRRWEL=>GWFWELDAT(IGRID)%IRRWEL
+        NUMSEGS=>GWFWELDAT(IGRID)%NUMSEGS
+        MAXSEGS=>GWFWELDAT(IGRID)%MAXSEGS
+        MAXCELLS=>GWFWELDAT(IGRID)%MAXCELLS
+        NUMCELLS=>GWFWELDAT(IGRID)%NUMCELLS
+        WELLIRR=>GWFWELDAT(IGRID)%WELLIRR
+        IRRFACT=>GWFWELDAT(IGRID)%IRRFACT
+        IRRPCT=>GWFWELDAT(IGRID)%IRRPCT
 C
       RETURN
       END
@@ -774,6 +1134,22 @@ C
         GWFWELDAT(IGRID)%TABTIME=>TABTIME
         GWFWELDAT(IGRID)%TABRATE=>TABRATE
         GWFWELDAT(IGRID)%TABVAL=>TABVAL
+        GWFWELDAT(IGRID)%NUMSUP=>NUMSUP
+        GWFWELDAT(IGRID)%NUMIRR=>NUMIRR
+        GWFWELDAT(IGRID)%SFRSEG=>SFRSEG
+        GWFWELDAT(IGRID)%UZFROW=>UZFROW
+        GWFWELDAT(IGRID)%UZFCOL=>UZFCOL
+        GWFWELDAT(IGRID)%UNITSUP=>UNITSUP
+        GWFWELDAT(IGRID)%UNITIRR=>UNITIRR
+        GWFWELDAT(IGRID)%SUPWEL=>SUPWEL
+        GWFWELDAT(IGRID)%IRRWEL=>IRRWEL
+        GWFWELDAT(IGRID)%NUMSEGS=>NUMSEGS
+        GWFWELDAT(IGRID)%MAXSEGS=>MAXSEGS
+        GWFWELDAT(IGRID)%MAXCELLS=>MAXCELLS
+        GWFWELDAT(IGRID)%NUMCELLS=>NUMCELLS
+        GWFWELDAT(IGRID)%WELLIRR=>WELLIRR
+        GWFWELDAT(IGRID)%IRRFACT=>IRRFACT
+        GWFWELDAT(IGRID)%IRRPCT=>IRRPCT
 C
       RETURN
       END

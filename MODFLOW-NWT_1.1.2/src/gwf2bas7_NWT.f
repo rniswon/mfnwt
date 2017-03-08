@@ -1852,7 +1852,7 @@ C6------SPECIAL CHECK FOR 1ST FILE.
      &             6X,'U.S. GEOLOGICAL SURVEY MODULAR',
      &             ' FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL',/,
      &             A,'VERSION ',A,/,20X,'BASED ON MODFLOW-2005 VERSION '
-     %             ,'1.11.00 08/30/2013'/)
+     %             ,'1.11.00 08/08/2013'/)
           WRITE(IOUT,78) FNAME(1:IFLEN),IOUT
 78        FORMAT(1X,'LIST FILE: ',A,/25X,'UNIT ',I4)
         ELSE
@@ -1887,10 +1887,26 @@ C11-----CHECK FOR MAJOR OPTIONS.
       ELSE
         DO 20 I=1,NIUNIT
            IF(LINE(ITYP1:ITYP2).EQ.CUNIT(I)) THEN
-              IUNIT(I)=IU
-              FILSTAT='OLD    '
-              FILACT=ACTION(1)
-              GO TO 30
+              IF ( LINE(ITYP1:ITYP1+4).EQ."IWRT" ) THEN  !next section modified for restart option !gsf
+                  IUNIT(I)=IU
+                  FILSTAT='UNKNOWN'
+                  FILACT=ACTION(2)
+                  FMTARG=FORM
+                  ACCARG=ACCESS
+                  GO TO 30
+              ELSEIF ( LINE(ITYP1:ITYP1+4).EQ."IRED" ) THEN
+                  IUNIT(I)=IU
+                  FILSTAT='UNKNOWN'
+                  FILACT=ACTION(2)
+                  FMTARG=FORM
+                  ACCARG=ACCESS
+                  GO TO 30
+              ELSE
+                IUNIT(I)=IU
+                FILSTAT='OLD    '
+                FILACT=ACTION(1)
+                GO TO 30
+              END IF
            END IF
 20      CONTINUE
         WRITE(IOUT,21) LINE(ITYP1:ITYP2)

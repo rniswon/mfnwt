@@ -69,6 +69,7 @@ C     ******************************************************************
       etgw = c
       detdh = 0.0d0
       smint = smoothet*x
+      if ( smint < 1.0d-7 ) depth = 0.0d0
       if ( depth>0.0d0) then
           etgw = etgw*smoothuz(depth,detdh,smint)
       else
@@ -1207,7 +1208,6 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
      +                        HNEW, DELR, DELC, BOTM, LBOTM
-      USE GWFSFRMODULE,ONLY:RECHSAVE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1272,7 +1272,6 @@ C        IRUNFLG IS NOT EQUAL TO ZERO.
                 FINF(ncck, nrck) = fks
               END IF
             END IF
-            IF ( IUNITSFR.GT.0 ) RECHSAVE(ncck, nrck) = FINF(ncck, nrck)
           END DO
         END DO
       END IF
@@ -1700,13 +1699,15 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
      +                        DELC, BOTM, IBOUND, HCOF, RHS,
-     +                        ITMUNI
+     +                        ITMUNI, IUNIT
 !!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
 !!     +                        DELC, BOTM, IBOUND, HCOF, RHS,
 !!     +                        ITMUNI, LENUNI, IOUT
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE GWFSFRMODULE, ONLY: SFRIRR
+      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1787,7 +1788,13 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ic = IUZHOLD(2, ll)
         ibnd = IUZFBND(ic, ir)
         IF ( ibnd.GT.0 ) l = l + 1
-        finfhold = FINF(ic, ir) 
+        finfhold = FINF(ic, ir)
+! ADD SFR DIVERSION AS IRRIGATION
+        IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+! ADD WELL PUMPING AS IRRIGATION
+        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
+          finfhold = finfhold + WELLIRR(IC,IR)
+        END IF
         IF ( ibnd.EQ.0 ) finfhold = 0.0D0
         land = ABS(ibnd)
         UZFETOUT(ic, ir) = 0.0
@@ -2190,12 +2197,13 @@ C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
      +                        DELR, DELC, HNEW, BUFF, BOTM, 
-     +                        ITMUNI
+     +                        ITMUNI, IUNIT
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE, FNETSEEP
+      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR, NUMIRRSFR
+      USE GWFWELMODULE, ONLY: WELLIRR, NUMIRR
+!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -2325,6 +2333,15 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ENDIF
 ! EDM
         finfhold = FINF(ic, ir)
+        IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
+            iF ( SFRIRR(IC,IR) .NE. 0 ) THEN
+                finfhold = FINF(ic, ir)
+            END IF
+            finfhold = finfhold + SFRIRR(IC,IR)
+        END IF
+        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
+            finfhold = finfhold + WELLIRR(IC,IR)
+        END IF
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
@@ -5635,7 +5652,6 @@ C     ------------------------------------------------------------------
       INETFLUX=>GWFUZFDAT(Igrid)%INETFLUX
       Ireadsurfk=>GWFUZFDAT(Igrid)%Ireadsurfk
       Isurfkreject=>GWFUZFDAT(Igrid)%Isurfkreject
-      UNITRECH=>GWFUZFDAT(Igrid)%UNITRECH
       UNITDIS=>GWFUZFDAT(Igrid)%UNITDIS
       ISEEPREJECT=>GWFUZFDAT(Igrid)%ISEEPREJECT
       SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
