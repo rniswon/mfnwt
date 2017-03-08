@@ -93,7 +93,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text        = 'SFR2'
       logical :: found
 C     ------------------------------------------------------------------
-      Version_sfr = 'gwf2sfr7_NWT.f 2016-11-10 12:10:00Z'
+      Version_sfr = 'gwf2sfr7_NWT.f 2017-03-08 09:55:00Z'
       iterp = 1
       idum(1) = 0
       ALLOCATE (NSS, NSTRM,TOTSPFLOW)
@@ -160,6 +160,7 @@ C         DLEAK, ISTCB1, ISTCB2.
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
+      NUMIRRSFR = 0
 C
 C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
 C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
