@@ -3511,6 +3511,8 @@ C--MANIPULATE IUZFRCH
       IF(NUZTOP.EQ.1.OR.NUZTOP.EQ.2) THEN ! No need to loop through layers with these options
         DO I=1,NROW
           DO J=1,NCOL
+            K=1
+            IF(NUZTOP.EQ.2) K=IUZFBND(J,I)
             IF(IBOUND(J,I,K).GT.0) THEN
               IF(NUZTOP.EQ.1) THEN ! Recharge to and discharge from only the top layer
                 IUZFRCH(J,I)=1
@@ -3526,9 +3528,6 @@ C--MANIPULATE IUZFRCH
           DO J=1,NCOL
             DO K=1,NLAY  
               IF(IBOUND(J,I,K).GT.0) THEN
-                IF(J.EQ.169) THEN
-                  CONTINUE
-                ENDIF
                 IF(HNEW(J,I,K).GT.BOTM(J,I,0)) THEN ! water table above land surface
                   IUZFRCH(J,I)=1
                   EXIT
@@ -4019,7 +4018,7 @@ C--GROUNDWATER DISCHARGE -> STREAM SEGMENT
                       WRITE(IUMT3D) CT,N,-1*ABS(Q*LEN_FRAC),1
                     ELSEIF(ILMTFMT.EQ.1) THEN
                       WRITE(IUMT3D,991) CT,N,-1*ABS(Q*LEN_FRAC),1
-  991                 FORMAT(2I16,F18.9,I2)
+  991                 FORMAT(2I16,F24.9,I2)
                     ENDIF
                   ENDIF
 C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> STREAM SEGMENT
@@ -4086,7 +4085,7 @@ C--GROUNDWATER DISCHARGE -> LAKE
                     WRITE(IUMT3D) ABS(LK),N,-1*ABS(Q),1
                   ELSEIF(ILMTFMT.EQ.1) THEN
                     WRITE(IUMT3D,992) ABS(LK),N,-1*ABS(Q),1
-  992               FORMAT(2I16,F18.9,I2)
+  992               FORMAT(2I16,F24.9,I2)
                   ENDIF
                 ENDIF
 C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> LAKE
@@ -4214,7 +4213,7 @@ C--GROUNDWATER DISCHARGE -> SINK
                   WRITE(IUMT3D) -999,N,-1*ABS(Q),1
                 ELSEIF(ILMTFMT.EQ.1) THEN
                   WRITE(IUMT3D,993) -999,N,-1*ABS(Q),1
-  993             FORMAT(2I16,F18.9,I2)
+  993             FORMAT(2I16,F24.9,I2)
                 ENDIF
               ENDIF
 C
@@ -4789,7 +4788,8 @@ C-----WRITE EXCHANGE TERMS WITH SFR
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) J,LAKSFR(I),-1*SWLAK(I),0  ! 0 is a dummy place holder
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) J,LAKSFR(I),-1*SWLAK(I),0  
+          WRITE(IUMT3D,881) J,LAKSFR(I),-1*SWLAK(I),0
+  881     FORMAT(2I16,F24.9,I2)
         ENDIF
       ENDDO      
 C

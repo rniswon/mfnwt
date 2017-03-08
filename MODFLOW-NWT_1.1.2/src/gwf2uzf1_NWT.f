@@ -158,7 +158,7 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2016-11-10 12:17:00Z'
+      Version_uzf = 'gwf2uzf1_NWT.f 2017-03-08 09:56:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -1706,7 +1706,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFSFRMODULE, ONLY: SFRIRR
+      USE GWFSFRMODULE, ONLY: SFRIRR, NUMIRRSFR
       USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR
 
       IMPLICIT NONE
@@ -1790,10 +1790,12 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( ibnd.GT.0 ) l = l + 1
         finfhold = FINF(ic, ir)
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+        IF ( IUNIT(44) > 0 ) THEN
+          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+        ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
-          finfhold = finfhold + WELLIRR(IC,IR)
+        IF ( IUNIT(2) > 0 ) THEN
+          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
         IF ( ibnd.EQ.0 ) finfhold = 0.0D0
         land = ABS(ibnd)
@@ -2334,13 +2336,13 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
 ! EDM
         finfhold = FINF(ic, ir)
         IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
-            iF ( SFRIRR(IC,IR) .NE. 0 ) THEN
+            IF ( SFRIRR(IC,IR) .NE. 0 ) THEN
                 finfhold = FINF(ic, ir)
             END IF
             finfhold = finfhold + SFRIRR(IC,IR)
         END IF
-        IF ( IUNIT(2) > 0 .AND. NUMIRR > 0 ) THEN
-            finfhold = finfhold + WELLIRR(IC,IR)
+        IF ( IUNIT(2) > 0 ) THEN
+          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)

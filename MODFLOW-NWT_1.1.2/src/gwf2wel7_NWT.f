@@ -27,6 +27,7 @@
         INTEGER,          SAVE,                 POINTER     ::NUMIRR
         INTEGER,          SAVE,                 POINTER     ::UNITIRR
         INTEGER,          SAVE,                 POINTER     ::MAXSEGS
+        INTEGER,          SAVE,                 POINTER     ::MAXCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
       TYPE GWFWELTYPE
@@ -58,6 +59,7 @@
         INTEGER,                           POINTER     ::UNITSUP
         INTEGER,                           POINTER     ::UNITIRR
         INTEGER,                           POINTER     ::MAXSEGS
+        INTEGER,                           POINTER     ::MAXCELLS
         INTEGER,            DIMENSION(:),  POINTER     ::NUMCELLS
         INTEGER,            DIMENSION(:),  POINTER     ::NUMSEGS
       END TYPE
@@ -86,7 +88,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL)
       ALLOCATE(NPWEL,IWELPB,NNPWEL,PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NUMSUP,NUMIRR,UNITSUP,UNITIRR)
-      ALLOCATE(MAXSEGS)
+      ALLOCATE(MAXSEGS,MAXCELLS)
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
@@ -95,6 +97,7 @@ C     ------------------------------------------------------------------
       UNITSUP = 0
       UNITIRR = 0
       MAXSEGS = 0
+      MAXCELLS = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
@@ -356,7 +359,8 @@ C     ------------------------------------------------------------------
      2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
      3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
      4                       UZFCOL,NUMCELLS,NUMSEGS,NUMIRR,
-     5                       IRRFACT,IRRPCT,PCTSUP,NUMSUP
+     5                       IRRFACT,IRRPCT,PCTSUP,NUMSUP,MAXSEGS,
+     6                       MAXCELLS
       USE GWFSFRMODULE, ONLY: NSS
 C
       CHARACTER*6 CWELL
@@ -1061,6 +1065,7 @@ C
         DEALLOCATE(IRRWEL)
         DEALLOCATE(NUMSEGS)
         DEALLOCATE(MAXSEGS)
+        DEALLOCATE(MAXCELLS)
         DEALLOCATE(NUMCELLS)
         DEALLOCATE(WELLIRR)
         DEALLOCATE(IRRFACT)
@@ -1100,6 +1105,7 @@ C
         IRRWEL=>GWFWELDAT(IGRID)%IRRWEL
         NUMSEGS=>GWFWELDAT(IGRID)%NUMSEGS
         MAXSEGS=>GWFWELDAT(IGRID)%MAXSEGS
+        MAXCELLS=>GWFWELDAT(IGRID)%MAXCELLS
         NUMCELLS=>GWFWELDAT(IGRID)%NUMCELLS
         WELLIRR=>GWFWELDAT(IGRID)%WELLIRR
         IRRFACT=>GWFWELDAT(IGRID)%IRRFACT
@@ -1139,6 +1145,7 @@ C
         GWFWELDAT(IGRID)%IRRWEL=>IRRWEL
         GWFWELDAT(IGRID)%NUMSEGS=>NUMSEGS
         GWFWELDAT(IGRID)%MAXSEGS=>MAXSEGS
+        GWFWELDAT(IGRID)%MAXCELLS=>MAXCELLS
         GWFWELDAT(IGRID)%NUMCELLS=>NUMCELLS
         GWFWELDAT(IGRID)%WELLIRR=>WELLIRR
         GWFWELDAT(IGRID)%IRRFACT=>IRRFACT
