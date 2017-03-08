@@ -212,6 +212,26 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
      +                'PERIOD'
             WRITE(iout,*)
             found = .true.
+!support old input style
+            do
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+              select case (LINE(ISTART:ISTOP))
+              case('SPECIFYTHTI')
+                ITHTIFLG = 1
+                WRITE(iout,*)
+              WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
+     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
+                WRITE(iout,*)
+              case('NOSURFLEAK')
+               Iseepsupress = 1
+               WRITE(iout,*)
+              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+               WRITE(iout,*)
+              case default
+                exit
+             end select
+            end do
+!support old input style
           case('SPECIFYTHTI')
             ITHTIFLG = 1
             WRITE(iout,*)
@@ -219,6 +239,20 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
      +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
             WRITE(iout,*)
             found = .true.
+!support old input style
+            do
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+              select case (LINE(ISTART:ISTOP))
+              case('NOSURFLEAK')
+               Iseepsupress = 1
+               WRITE(iout,*)
+              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+               WRITE(iout,*)
+              case default
+                exit
+             end select
+            end do
+!support old input style
           case('ETSQUARE')
             i=1
             CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
@@ -627,7 +661,7 @@ C
       END IF
 C
 C12-----READ VERTICAL HYDRAULIC CONDUCTIVITY FROM UZF INPUT FILE.
-      IF ( IUZFOPT.EQ.1 .OR. IUZFOPT.LE.0 ) THEN
+      IF ( abs(IUZFOPT).EQ.1 ) THEN    !RGN 2/6/17
         CALL U2DREL(VKS, aname(6), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR ERRORS IN VERTICAL HYDRAULIC CONDUCTIVITY
@@ -2099,7 +2133,7 @@ C-------------SFR AND SWR REACHES
                 END IF
               END IF
               IF ( Iunitswr.GT.0 ) THEN
-!                CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
+                CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
               END IF
 C-------------LAK REACHES
             ELSE IF ( irun.LT.0 ) THEN

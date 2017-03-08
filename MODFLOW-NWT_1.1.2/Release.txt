@@ -160,12 +160,12 @@ specification. Characters can be specified as upper or lower case.
 
 Optional character variables for SFR2 in any order:
 
-OPTIONS
+[OPTIONS]
 [REACHINPUT]
 [TRANSROUTE]
 [TABFILES Numtab Maxval]
 [LOSSFACTOR Factor]
-END
+[END]
 
 Definitions for new character variable option:
 

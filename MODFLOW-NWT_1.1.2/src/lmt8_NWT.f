@@ -2468,13 +2468,9 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF
-!gsf      USE GWFDRNMODULE,ONLY:NDRAIN,DRAI
+      USE GWFDRNMODULE,ONLY:NDRAIN,DRAI
       CHARACTER*16 TEXT
       DOUBLE PRECISION HHNEW,EEL,CCDRN,CEL,QQ
-      !added so GSFLOW compiles, DRN package not available
-      INTEGER DRAI(5,1)
-      NDRAIN = 1
-      DRAI = 1.0
 C    
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2DRN7BD      CALL SGWF2DRN7PNT(IGRID)
@@ -2541,13 +2537,9 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW
-!gsf      USE GWFRIVMODULE,ONLY:NRIVER,RIVR
+      USE GWFRIVMODULE,ONLY:NRIVER,RIVR
       CHARACTER*16 TEXT      
       DOUBLE PRECISION HHNEW,CHRIV,RRBOT,CCRIV
-      !added so GSFLOW compiles, RIV package not available
-      INTEGER RIVR(6,1)
-      NRIVER = 1
-      RIVR = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2RIV7BD      CALL SGWF2RIV7PNT(IGRID)      
@@ -2621,14 +2613,8 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,BUFF
-!gsf      USE GWFRCHMODULE,ONLY:NRCHOP,RECH,IRCH
+      USE GWFRCHMODULE,ONLY:NRCHOP,RECH,IRCH
       CHARACTER*16 TEXT
-      !added so GSFLOW compiles, RCH package not available
-      REAL RECH(1,1)
-      INTEGER IRCH(1,1)
-      NRCHOP = 1
-      RECH = 0.0
-      IRCH = 1
 C
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2RCH7BD      CALL SGWF2RCH7PNT(IGRID)   
@@ -2710,17 +2696,9 @@ C Modified from Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND,HNEW,BUFF      
-!gsf      USE GWFEVTMODULE,ONLY:NEVTOP,EVTR,EXDP,SURF,IEVT
+      USE GWFEVTMODULE,ONLY:NEVTOP,EVTR,EXDP,SURF,IEVT
       CHARACTER*16 TEXT
       DOUBLE PRECISION QQ,HH,XX,DD,SS,HHCOF,RRHS      
-      !added so GSFLOW compiles, EVT package not available
-      REAL SURF(1,1), EVTR(1,1), EXDP(1,1)
-      INTEGER IEVT(1,1)
-      NEVTOP = 1
-      SURF = 1.0
-      EVTR = 1.0
-      EXDP = 1.0
-      IEVT = 1
 C   
 C--SET POINTERS FOR THE CURRENT GRID
 c swm: already set in GWF2EVT7BD      CALL SGWF2EVT7PNT(IGRID)
@@ -2941,15 +2919,9 @@ C Modified from Fenske et al., (1996), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY 
-!gsf      USE GWFRESMODULE, ONLY: NRES,NRESOP,IRES,IRESL,BRES,CRES,
-!gsf     &                        BBRES,HRES  
+      USE GWFRESMODULE, ONLY: NRES,NRESOP,IRES,IRESL,BRES,CRES,
+     &                        BBRES,HRES  
       CHARACTER*16 TEXT    
-      !added so GSFLOW compiles, DRN package not available
-      INTEGER IRES(1,1), IRESL(1,1)
-      REAL BRES(1,1), CRES(1,1), BBRES(1,1), HRES(1)
-      NRES = 1
-      NRESOP = 1
-      DRAI = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID      
 c swm: already set in GWF2RES7BD      CALL SGWF2RES7PNT(IGRID)            
@@ -3071,14 +3043,8 @@ C Modified from Prudic (1989), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL,      ONLY:NCOL,NROW,NLAY,IBOUND      
-!gsf      USE GWFSTRMODULE,ONLY:NSTREM,STRM,ISTRM
+      USE GWFSTRMODULE,ONLY:NSTREM,STRM,ISTRM
       CHARACTER*16 TEXT     
-      !added so GSFLOW compiles, STR package not available
-      INTEGER ISTRM(3,1)
-      REAL STRM(11,1)
-      NSTREM = 1
-      ISTRM = 1
-      STRM = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID      
 c swm: already set in GWF2STR7BD   CALL SGWF2STR7PNT(IGRID)    
@@ -3262,24 +3228,13 @@ C Modified from Banta (2000), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,BUFF,NCOL,NROW,NLAY      
-!gsf      USE GWFETSMODULE, ONLY: NETSOP,NETSEG,IETS,ETSR,ETSX,ETSS,
-!gsf     &                        PXDP,PETM
+      USE GWFETSMODULE, ONLY: NETSOP,NETSEG,IETS,ETSR,ETSX,ETSS,
+     &                        PXDP,PETM
       CHARACTER*16 TEXT
       DOUBLE PRECISION QQ,HH,SS,DD,XX,HHCOF,RRHS,PXDP1,PXDP2
-      !added so GSFLOW compiles, ETS package not available
-      INTEGER IETS(1,1)
-      REAL ETSR(1,1), ETSX(1,1), ETSS(1,1), PXDP(1,1,1), PETM(1,1,1)
-      NETSOP = 1
-      NETSEG = 1
-      IETS = 1
-      ETSR = 1.0
-      ETSX = 1.0
-      ETSS = 1.0
-      PXDP = 1.0
-      PETM = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
-!gsf      CALL SGWF2ETS7PNT(IGRID)
+      CALL SGWF2ETS7PNT(IGRID)
 C      
       TEXT='ETS'
       ZERO=0.      
@@ -3413,18 +3368,12 @@ C Modified from Banta (2000), Harbaugh (2005)
 C last modified: 06-23-2016
 C
       USE GLOBAL ,      ONLY: HNEW,IBOUND,NCOL,NROW,NLAY
-!gsf      USE GWFDRTMODULE, ONLY: DRTF,NDRTCL,IDRTFL,NRFLOW
+      USE GWFDRTMODULE, ONLY: DRTF,NDRTCL,IDRTFL,NRFLOW
       CHARACTER*16 TEXT
       DOUBLE PRECISION HHNEW,EEL,CC,CEL,QQ,QQIN
-      !added so GSFLOW compiles, DRN package not available
-      REAL DRTF(9,1)
-      NRFLOW = 1
-      NDRTCL = 1
-      IDRTFL = 1
-      DRTF = 1.0
 C
 C--SET POINTERS FOR THE CURRENT GRID
-!gsf      CALL SGWF2DRT7PNT(IGRID)
+      CALL SGWF2DRT7PNT(IGRID)
 C      
       TEXT='DRT'
       ZERO=0.
@@ -3579,9 +3528,6 @@ C--MANIPULATE IUZFRCH
           DO J=1,NCOL
             DO K=1,NLAY  
               IF(IBOUND(J,I,K).GT.0) THEN
-                !IF(J.EQ.169) THEN
-                !  CONTINUE
-                !ENDIF
                 IF(HNEW(J,I,K).GT.BOTM(J,I,0)) THEN ! water table above land surface
                   IUZFRCH(J,I)=1
                   EXIT
@@ -4072,7 +4018,7 @@ C--GROUNDWATER DISCHARGE -> STREAM SEGMENT
                       WRITE(IUMT3D) CT,N,-1*ABS(Q*LEN_FRAC),1
                     ELSEIF(ILMTFMT.EQ.1) THEN
                       WRITE(IUMT3D,991) CT,N,-1*ABS(Q*LEN_FRAC),1
-  991                 FORMAT(2I16,F18.9,I2)
+  991                 FORMAT(2I16,F24.9,I2)
                     ENDIF
                   ENDIF
 C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> STREAM SEGMENT
@@ -4139,7 +4085,7 @@ C--GROUNDWATER DISCHARGE -> LAKE
                     WRITE(IUMT3D) ABS(LK),N,-1*ABS(Q),1
                   ELSEIF(ILMTFMT.EQ.1) THEN
                     WRITE(IUMT3D,992) ABS(LK),N,-1*ABS(Q),1
-  992               FORMAT(2I16,F18.9,I2)
+  992               FORMAT(2I16,F24.9,I2)
                   ENDIF
                 ENDIF
 C--INFILTRATION INHIBITED DUE TO SHALLOW GROUNDWATER -> LAKE
@@ -4267,7 +4213,7 @@ C--GROUNDWATER DISCHARGE -> SINK
                   WRITE(IUMT3D) -999,N,-1*ABS(Q),1
                 ELSEIF(ILMTFMT.EQ.1) THEN
                   WRITE(IUMT3D,993) -999,N,-1*ABS(Q),1
-  993             FORMAT(2I16,F18.9,I2)
+  993             FORMAT(2I16,F24.9,I2)
                 ENDIF
               ENDIF
 C
@@ -4400,9 +4346,9 @@ C
 C-------WRITE GW-SW INTERACTION TERMS TO FTL FILE UNDER THE HEADING "SFR"
 C       Strm(11, L): FLOW TO/FROM AQUIFER
         IF(ILMTFMT.EQ.0) THEN
-          WRITE(IUMT3D) IL,IR,IC,STRM(11,L),STRLEN   !Eric needs to check this
+          WRITE(IUMT3D) IL,IR,IC,STRM(11,L)
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L),STRLEN  !Eric check
+          WRITE(IUMT3D,*) IL,IR,IC,STRM(11,L)
         ENDIF
       ENDDO
 C
@@ -4482,10 +4428,10 @@ C  FLOW RATES FOR THE DIFFERENT FLOW TYPES. (ORDER IS IMPORTANT)
         DO L=1,NSTRM
           XSA = STRM(31,L)
           SFRFLOWVAL(1,L) = XSA*STRM(1,L)   ! volume = XSA * reach length 
-          SFRFLOWVAL(2,L) = STRM(1,L)
-          SFRFLOWVAL(3,L) = STRM(14,L)   ! precip
-          SFRFLOWVAL(4,L) = STRM(13,L)   ! etsw (surf wat evap)
-          SFRFLOWVAL(5,L) = STRM(12,L)   ! user-specified runoff (variable 'runof')
+          SFRFLOWVAL(2,L) = STRM(1,L)       ! reach length
+          SFRFLOWVAL(3,L) = STRM(14,L)      ! precip
+          SFRFLOWVAL(4,L) = STRM(13,L)      ! etsw (surf wat evap)
+          SFRFLOWVAL(5,L) = STRM(12,L)      ! user-specified runoff (variable 'runof')
         ENDDO
 C
 C--CONSOLIDATE THE COLUMNS TO THE LEFT (IN EFFECT, REMOVE COLUMNS THAT ARE ALL ZEROS)
@@ -4842,7 +4788,8 @@ C-----WRITE EXCHANGE TERMS WITH SFR
         IF(ILMTFMT.EQ.0) THEN
           WRITE(IUMT3D) J,LAKSFR(I),-1*SWLAK(I),0  ! 0 is a dummy place holder
         ELSEIF(ILMTFMT.EQ.1) THEN
-          WRITE(IUMT3D,*) J,LAKSFR(I),-1*SWLAK(I),0  
+          WRITE(IUMT3D,881) J,LAKSFR(I),-1*SWLAK(I),0
+  881     FORMAT(2I16,F24.9,I2)
         ENDIF
       ENDDO      
 C
