@@ -8442,6 +8442,51 @@ C
       smooth = y
       END FUNCTION smooth
 C
+C-------SUBROUTINE SFR2MODSIM
+      SUBROUTINE SFR2MODSIM()
+C     *******************************************************************
+C     COMPUTE FLOW AND DELTA FLOW OVER THE SEGMENT FOR MIDSOM.
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: STRM, ISTRM, ISEG, NSTRM
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER ISTSG, IRNUM, L
+      DOUBLE PRECISION FLOWIN, FLOWOT
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER REACHES TO SET FLOWS
+C
+C2------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
+        DO l = 1, NSTRM
+C
+C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
+          ISTSG = ISTRM(4, l)
+          IRNUM = ISTRM(5, l)         
+C
+C3------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
+          IF ( IRNUM.EQ.1 ) THEN
+            FLOWIN = STRM(10, l)
+          END IF
+C4------CHECK IF LAST REACH IN SEGMENT TO GET OUTFLOW    
+          IF ( IRNUM.EQ.ISEG(4,ISTSG)) THEN 
+            FLOWOT = STRM(9,l)
+          END IF
+        END DO
+C
+C5------RETURN.
+      RETURN
+      END SUBROUTINE SFR2MODSIM
+C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)
 C  Save SFR data for a grid.
