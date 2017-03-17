@@ -4194,7 +4194,12 @@ C--IF THERE ARE NO CONNECTIONS RETURN
 C
       DO IR=1,NROW
         DO IC=1,NCOL
-          SNK=IRUNBND(IC,IR)
+          IF(IRUNFLG.EQ.0) THEN
+            SNK=0
+          ELSE
+            SNK=IRUNBND(IC,IR)
+          ENDIF
+C
           IF(SNK.EQ.0.) THEN !IRUNFLG=0 OR IRUNBND(J,I)=0 (EITHER WAY, WATER LEAVES SYSTEM)
             IF(SEEPOUT(IC,IR).NE.0. .OR. EXCESPP(IC,IR).NE.0. .OR. 
      &         REJ_INF(IC,IR).NE.0.) THEN
