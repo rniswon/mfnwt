@@ -11,11 +11,8 @@ UZF                  19 wellsuppirr.uzf
 GAGE                 32 wellsuppirr.gag
 data                 55 seg1.tab
 data                 56 seg9.tab
-data                 63 seg10.tab
-data                 57 allwells.tab
 DATA                 58 wellsuppirr.out
 data                 59 wellsuppirr.irr
-data                 92 wellsuppirr.irs
 data                 60 wellsuppirr.sup
 DATA(BINARY)         61 wellsuppirr.uzfot
 DATA(BINARY)         100 netfluxin.unf
