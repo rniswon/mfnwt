@@ -509,8 +509,10 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       ALLOCATE (FINF(NCOL,NROW),PETRATE(NCOL,NROW),UZFETOUT(NCOL,NROW))
       IF ( Isavefinf > 0 ) THEN
         ALLOCATE(FINFSAVE(NCOL,NROW))
-        FINFSAVE = 0.0
+      ELSE
+        ALLOCATE(FINFSAVE(1,1))
       END IF
+      FINFSAVE = 0.0
       ALLOCATE (GWET(NCOL,NROW))
       IF ( IETBUD.GT.0 ) THEN
         ALLOCATE (CUMGWET(NCOL,NROW))
@@ -1813,7 +1815,6 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( Iseepreject > 0 .and. IGSFLOW == 0 ) fkseep = surfk(ic,ir)
         IF ( Isurfkreject > 0 ) fkreject = surfk(ic, ir)
         finfsaveadd = 0.0
-        IF ( ibnd.GT.0 ) l = l + 1
         finfhold = FINF(ic, ir)
 ! saving specified FINF in gsflow 5-8-2017
         IF ( Isavefinf+Igsflow == 2 ) THEN
