@@ -1887,9 +1887,9 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
               lakflg = 1
               IF ( STGNEW(lakid).GT.BOTM(ic, ir, il-1) )
      +             lakflginf = 1
-            END IF
 ! Define land surface when lakes are present
-            IF ( land.LT.il ) land = il
+              IF ( land.LT.il ) land = il     ! moved this into check for lake cell RGN 6/14/17
+            END IF
           END IF
         END IF   
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
@@ -2478,8 +2478,8 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
             lakflg = 1
             IF( STGNEW(lakid).GT.BOTM(ic, ir, il-1) )
      +          lakflginf = 1
+            IF ( land.LT.il ) land = il   ! moved this into check for lake cell RGN 6/14/17
           END IF
-          IF ( land.LT.il ) land = il
         END IF
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
           IF ( IBOUND(ic, ir, il).GT.0 ) THEN
