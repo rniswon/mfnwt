@@ -2319,6 +2319,11 @@ CDEP 05/05/2006
       DO ll = 1, NUMCELLS
         ir = IUZHOLD(1, ll)
         ic = IUZHOLD(2, ll)
+        If(KKPER.ge.359) Then
+          If(ir.eq.188.and.ic.eq.205) Then
+            CONTINUE
+          ENDIF
+        ENDIF
         ibnd = IUZFBND(ic, ir)
         volinflt = 0.0D0
         IF ( ibnd.GT.0 ) l = l + 1
@@ -5354,75 +5359,75 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
           Cellflux(land) = finfact
           DO kknt =land, NLAY
             IF ( IUZFBND(Nuzc, Nuzr).GT.0 .AND. IUZFOPT.GT.0 ) THEN
-            Nwv = NWAVST(Nuzc, Nuzr)
-            kkntm1 = kknt - 1
-            IF ( kknt==land ) THEN
-              depthinc = celtop -
-     +                 BOTM(Nuzc, Nuzr, kknt)
-            ELSE
-              depthinc = BOTM(Nuzc, Nuzr, kkntm1)-
-     +                 BOTM(Nuzc, Nuzr, kknt)
-            END IF
-            IF (depthinc.GT.CLOSEZERO ) THEN         
-              IF ( depthsave-ghdif.LT.CLOSEZERO ) THEN
-                depthsave = depthsave + depthinc
-                IF ( depthsave.GE.ghdif ) THEN
-                  depthinc = depthinc - (depthsave-ghdif)
-                  depthsave = ghdif                
-                END IF
-                IF ( depthinc.GT.CLOSEZERO ) THEN
-                fm = 0.0D0
-                jj = 0
-                jk = iset + Nwv - 1
-                nwavm1 = jk - 1
-                DO WHILE ( jk.GT.iset-1 )
-                  IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
-                    jk = jk - 1
-                END DO
-                IF ( jj.GT.iset ) THEN
-                  fm = fm + (Theta(jj-1)-thr)
-     +                 *(depthsave-Depth(jj))
-                  DO j = jj, nwavm1
-                    fm = fm + (Theta(j)-thr)
-     +                   *(Depth(j)-Depth(j+1))
-                  END DO
-                  fm = fm + (Theta(Nwv)-thr)
-     +                 *Depth(Nwv)
-                ELSE
-                  fm = fm + (Theta(Nwv)-thr)*depthsave
-                END IF
-                avwat = fm-totalwc
-                IF ( iss.EQ.0 )THEN
-                  delstor = (avwat-GRIDSTOR(Nuzc, Nuzr, kknt))
-! An increase in storage is negative for MT3D
-                  Celldelst(kknt) = -delstor/DELT
-                  Cellflux(kknt+1) = Cellflux(kknt)-delstor/DELT - 
-     +                           GRIDET(Nuzc, Nuzr, kknt)/DELT
-                  IF ( Cellflux(kknt+1).LT.0.0 ) Cellflux(kknt+1) = 0.0 
-                ELSE
-                  Celldelst(kknt) = 0.0D0
-                  Cellflux(kknt+1) = Cellflux(kknt)
-                END IF
-                GRIDSTOR(Nuzc, Nuzr, kknt) = avwat
-                totalwc = fm
-                Celltheta(kknt) = thr + avwat/depthinc
-                iret = kknt
-                ELSE
-                  GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
-                  Celltheta(kknt) = 0.0
-                  Celldelst(kknt) = 0.0
-                  Cellflux(kknt)= 0.0
-                  GRIDET(Nuzc, Nuzr, kknt) = 0.0
-                END IF
+              Nwv = NWAVST(Nuzc, Nuzr)
+              kkntm1 = kknt - 1
+              IF ( kknt==land ) THEN
+                depthinc = celtop -
+     +                   BOTM(Nuzc, Nuzr, kknt)
+              ELSE
+                depthinc = BOTM(Nuzc, Nuzr, kkntm1)-
+     +                   BOTM(Nuzc, Nuzr, kknt)
               END IF
-            ELSE
-              GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
-              Celltheta(kknt) = 0.0
-              Celldelst(kknt) = 0.0
-              Cellflux(kknt)= 0.0
-              GRIDET(Nuzc, Nuzr, kknt) = 0.0
-              Cellflux(kknt+1) = finfact
-            END IF
+              IF (depthinc.GT.CLOSEZERO ) THEN         
+                IF ( depthsave-ghdif.LT.CLOSEZERO ) THEN
+                  depthsave = depthsave + depthinc
+                  IF ( depthsave.GE.ghdif ) THEN
+                    depthinc = depthinc - (depthsave-ghdif)
+                    depthsave = ghdif                
+                  END IF
+                  IF ( depthinc.GT.CLOSEZERO ) THEN
+                    fm = 0.0D0
+                    jj = 0
+                    jk = iset + Nwv - 1
+                    nwavm1 = jk - 1
+                    DO WHILE ( jk.GT.iset-1 )
+                      IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
+                        jk = jk - 1
+                    END DO
+                    IF ( jj.GT.iset ) THEN
+                      fm = fm + (Theta(jj-1)-thr)
+     +                     *(depthsave-Depth(jj))
+                      DO j = jj, nwavm1
+                        fm = fm + (Theta(j)-thr)
+     +                       *(Depth(j)-Depth(j+1))
+                      END DO
+                      fm = fm + (Theta(Nwv)-thr)
+     +                     *Depth(Nwv)
+                    ELSE
+                      fm = fm + (Theta(Nwv)-thr)*depthsave
+                    END IF
+                    avwat = fm-totalwc
+                    IF ( iss.EQ.0 )THEN
+                      delstor = (avwat-GRIDSTOR(Nuzc, Nuzr, kknt))
+! An increase in storage is negative for MT3D
+                      Celldelst(kknt) = -delstor/DELT
+                      Cellflux(kknt+1) = Cellflux(kknt)-delstor/DELT - 
+     +                               GRIDET(Nuzc, Nuzr, kknt)/DELT
+                      IF(Cellflux(kknt+1).LT.0.0) Cellflux(kknt+1) = 0.0
+                    ELSE
+                      Celldelst(kknt) = 0.0D0
+                      Cellflux(kknt+1) = Cellflux(kknt)
+                    END IF
+                    GRIDSTOR(Nuzc, Nuzr, kknt) = avwat
+                    totalwc = fm
+                    Celltheta(kknt) = thr + avwat/depthinc
+                    iret = kknt
+                  ELSE
+                    GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
+                    Celltheta(kknt) = 0.0
+                    Celldelst(kknt) = 0.0
+                    Cellflux(kknt)= 0.0
+                    GRIDET(Nuzc, Nuzr, kknt) = 0.0
+                  END IF
+                END IF
+              ELSE
+                GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
+                Celltheta(kknt) = 0.0
+                Celldelst(kknt) = 0.0
+                Cellflux(kknt)= 0.0
+                GRIDET(Nuzc, Nuzr, kknt) = 0.0
+                Cellflux(kknt+1) = finfact
+              END IF
             END IF
           END DO
  !       END IF
