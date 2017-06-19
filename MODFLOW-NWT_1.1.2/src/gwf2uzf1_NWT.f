@@ -1436,13 +1436,15 @@ C
 C14------INITIALIZE UNSATURATED ZONE IF ACTIVE.
 C
 C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
-      IF ( Kkper.GT.2 ) THEN
-        iflginit = 0
-      ELSE IF ( Kkper.EQ.1 ) THEN
+!      IF ( Kkper.GT.2 ) THEN           !changed this to allow for multiple SS periods
+!        iflginit = 0
+!      ELSE IF ( Kkper.EQ.1 ) THEN
+      IF ( Kkper.EQ.1 ) THEN
         iflginit = 1
+      ELSE IF ( iss.EQ.0 .AND. ISSFLG(Kkper-1).NE.0 ) THEN
+        iflginit = 2
       ELSE
-        IF ( iss.EQ.0 .AND. ISSFLG(Kkper-1).NE.0 )
-     +       iflginit = 2
+        iflginit = 0   
       END IF
       IF ( iflginit.GE.1 ) THEN
         l = 0
