@@ -1295,7 +1295,6 @@ C------SET POINTERS FOR THE CURRENT GRID.
       SURFDPTH = DBLE(SURFDEPTH)
       VOLNEW1 = 0.0
       VOLNEW2 = 0.0
-
 C1------IF LKNODE<=0 THERE ARE NO LAKE NODES. RETURN.
       IF (LKNODE.LE.0) RETURN
       ISS = ISSFLG(KKPER)
@@ -1669,17 +1668,17 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==3)then
- !     write(iout,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
+ !     IF (lake==1)then
+ !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
  !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGNEW(LAKE),
- !    3                resid1,SURFA(LAKE),deriv,dstg
- !     write(iout,222)PRECIP3(LAKE),EVAP3(LAKE),RUNF(LAKE),RUNOFF(LAKE),
+ !    3                resid1,SURFA(LAKE),deriv,dstg,l1,kkiter,kkstp
+ !     write(521,222)PRECIP3(LAKE),EVAP3(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW3,SURFIN(LAKE),OUTFLOW,
  !    2                SEEP3(LAKE),VOLNEW2,VOLOLDD(LAKE),STGNEW(LAKE),
- !    3                resid2,SRFPT,deriv,dstg
+ !    3                resid2,SRFPT,deriv,dstg,l1,kkiter,kkstp
  !     END IF
- !222  format(15e20.10)
+ !222  format(15e20.10,3i5)
                 IF(STGNEW(LAKE).LT.BOTTMS(LAKE)) 
      +             STGNEW(LAKE)=BOTTMS(LAKE)
                 IF(DSTG.LE.SSCNCR) NCNCVR(LAKE) = 1
@@ -1708,6 +1707,7 @@ C17D----NEW LAKE STAGE COMPUTED FROM LAKE VOLUME.
               IF(STGNEW(LAKE).LT.BOTTMS(LAKE)) 
      +             STGNEW(LAKE)=BOTTMS(LAKE)
             END IF
+          VOL(LAKE) = VOL2   !RGN this is needed for MODSIM
         END DO
         IF ( IICNVG==1 ) EXIT CONVERGE
       END DO CONVERGE
@@ -3506,66 +3506,86 @@ C          to "FUNCTION"
       USE GWFLAKMODULE, ONLY: AREATABLE, DEPTHTABLE
       IMPLICIT NONE
       DOUBLE PRECISION STAGE, AREA, TOLF2, FOLD
-      DOUBLE PRECISION a1, a2, d1, d2
-      INTEGER LN, IFLG, I
+      DOUBLE PRECISION a1, a2, d1, d2, SLOPE
+      INTEGER LN, I
       TOLF2=1.0E-7
+      AREA = 0.0D0
+      FINTERP = 0.0D0
       IF (STAGE.GT.DEPTHTABLE(151,LN))THEN
-        FINTERP =  AREATABLE(151,LN) 
+        a1 = AREATABLE(150,LN)
+        a2 = AREATABLE(151,LN)
+        d1 = DEPTHTABLE(150,LN)
+        d2 = DEPTHTABLE(151,LN)
+        SLOPE = (a2-a1)/(d2-d1)
+        FINTERP =  SLOPE*STAGE+a2-SLOPE*d2
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
+      DO
         a1 = AREATABLE(I,LN)
         a2 = AREATABLE(I+1,LN)
         d1 = DEPTHTABLE(I,LN)
         d2 = DEPTHTABLE(I+1,LN)
-        FOLD=ABS(STAGE-d1)     
-        IF (FOLD .LE. TOLF2) THEN  
-          AREA=AREATABLE(I,LN)
-          IFLG = 1
-        ELSEIF (STAGE.GT.d1 .AND. STAGE.LT.d2)THEN
-          AREA=((a2-a1)/(d2-d1))*STAGE+a2-((a2-a1)/(d2-d1))*d2
-          IFLG = 1
+        SLOPE = (a2-a1)/(d2-d1)
+        FOLD= STAGE-d1     
+        IF (FOLD .LE. 0.0D0) THEN  
+          AREA=A1
+          EXIT
+        ELSEIF (STAGE.GE.d1 .AND. STAGE.LE.d2)THEN
+          AREA=SLOPE*STAGE+a2-SLOPE*d2
+          EXIT
         END IF
         I = I + 1
-        IF( I.GT.150 ) THEN
-          IFLG = 1 
-          AREA = AREATABLE(151,LN)
+        IF( I.GT.150 ) THEN 
+          AREA=SLOPE*STAGE+a2-SLOPE*d2
+          EXIT
         END IF
       END DO
       FINTERP = AREA
       RETURN
       END FUNCTION FINTERP
 !  RGN Added function statements to compute calculate surface area form volume     
-      DOUBLE PRECISION FUNCTION SURFTERP (VOLUME,LN)
+      DOUBLE PRECISION FUNCTION SURFTERP (VOL,LN)
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C          OF LAKE VOLUME TO CACULATE LAKE AREA.
       USE GWFLAKMODULE, ONLY: AREATABLE, VOLUMETABLE
-      DOUBLE PRECISION VOLUME
+      IMPLICIT NONE
+      DOUBLE PRECISION a1, a2, V1, V2, SLOPE, TOLF2, FOLD, AREA
+      INTEGER LN, I
+      DOUBLE PRECISION VOL
       TOLF2=1.0E-7
-      IF (VOLUME.GT.VOLUMETABLE(151,LN))THEN
-        SURFTERP =  AREATABLE(151,LN) 
+      AREA = 0.0D0
+      SURFTERP = 0.0D0
+      IF (VOL.GT.VOLUMETABLE(151,LN))THEN
+        a1 = AREATABLE(150,LN)
+        a2 = AREATABLE(151,LN)
+        V1 = VOLUMETABLE(150,LN)
+        V2 = VOLUMETABLE(150,LN)
+        SLOPE = (a2-a1)/(V2-V1)
+        SURFTERP =  SLOPE*VOL+a2-SLOPE*V2 
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
-        FOLD=ABS(VOLUME-VOLUMETABLE(I,LN))     
-        IF (FOLD .LE. TOLF2) THEN  
-          AREA=AREATABLE(I,LN)
-          IFLG = 1
-        ELSEIF (VOLUME.GT.VOLUMETABLE(I,LN) .AND. VOLUME.LT.
-     1          VOLUMETABLE(I+1,LN))THEN
-          AREA=((AREATABLE(I+1,LN)-AREATABLE(I,LN))/
-     1         (VOLUMETABLE(I+1,LN)- VOLUMETABLE(I,LN)))*
-     2         VOLUME+AREATABLE(I+1,LN)-((AREATABLE(I+1,LN)-
-     3         AREATABLE(I,LN))/(VOLUMETABLE(I+1,LN)-
-     4         VOLUMETABLE(I,LN)))*VOLUMETABLE(I+1,LN)                 
-          IFLG = 1
+      DO 
+        FOLD=ABS(VOL-VOLUMETABLE(I,LN))    
+        a1 = AREATABLE(I,LN)
+        a2 = AREATABLE(I+1,LN)
+        V1 = VOLUMETABLE(I,LN)
+        V2 = VOLUMETABLE(I+1,LN)
+        SLOPE = (a2-a1)/(V2-V1)
+        FOLD = VOL-V1
+        IF (FOLD .LE. 0.0D0) THEN  
+          AREA=A1
+          EXIT
+        ELSEIF (VOL.GE.V1 .AND. VOL.LE.V2)THEN
+          AREA=SLOPE*VOL+a2-SLOPE*V2                
+          EXIT
         END IF
         I = I + 1
-        IF( I.GT.150 ) IFLG = 1 
+        IF( I.GT.150 ) THEN 
+          AREA=SLOPE*VOL+a2-SLOPE*V2
+          EXIT
+        END IF
       END DO
       SURFTERP = AREA
       RETURN
@@ -3576,77 +3596,88 @@ C     used in solving lake stage in the FORMULATE SUBROUTINE (LAK7FM).
       DOUBLE PRECISION FUNCTION VOLTERP (STAGE,LN)
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C          OF LAKE STAGE TO CACULATE LAKE VOLUME.
-      USE GWFLAKMODULE, ONLY: VOLUMETABLE, DEPTHTABLE, AREATABLE
+      USE GWFLAKMODULE, ONLY: VOLUMETABLE, DEPTHTABLE
       IMPLICIT NONE
-      INTEGER LN, IFLG, I
-      DOUBLE PRECISION STAGE, VOLUME, TOLF2, FOLD
+      INTEGER LN, I
+      DOUBLE PRECISION STAGE, VOL, TOLF2, FOLD
+      DOUBLE PRECISION D1, D2, V1, V2, SLOPE
       TOLF2=1.0E-7
+      VOLTERP = 0.0D0
+      VOL = 0.0D0
       IF (STAGE.GT.DEPTHTABLE(151,LN))THEN
- ! bug 5/4/09 changed FINTERP TO VOLUME
-        VOLTERP =  VOLUMETABLE(151,LN)+(STAGE-DEPTHTABLE(151,LN))*
-     +             AREATABLE(151,LN) 
+        V1 = VOLUMETABLE(150,LN)
+        V2 = VOLUMETABLE(151,LN)
+        D1 = DEPTHTABLE(150,LN)
+        D2 = DEPTHTABLE(151,LN)
+        SLOPE = (V2-V1)/(D2-D1)
+        VOLTERP = SLOPE*STAGE+V2-SLOPE*D2
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
-        FOLD=ABS(STAGE-DEPTHTABLE(I,LN))     
-        IF (FOLD .LE. TOLF2) THEN  
-          VOLUME=VOLUMETABLE(I,LN)
-          IFLG = 1
-        ELSEIF (STAGE.GT.DEPTHTABLE(I,LN) .AND. STAGE.LT.
-     1          DEPTHTABLE(I+1,LN))THEN
-          VOLUME=((VOLUMETABLE(I+1,LN)-VOLUMETABLE(I,LN))/
-     1         (DEPTHTABLE(I+1,LN)- DEPTHTABLE(I,LN)))*
-     2         STAGE+VOLUMETABLE(I+1,LN)-((VOLUMETABLE(I+1,LN)-
-     3         VOLUMETABLE(I,LN))/(DEPTHTABLE(I+1,LN)-
-     4         DEPTHTABLE(I,LN)))*DEPTHTABLE(I+1,LN)                 
-          IFLG = 1
+      DO
+        V1 = VOLUMETABLE(I,LN)
+        V2 = VOLUMETABLE(I+1,LN)
+        D1 = DEPTHTABLE(I,LN)
+        D2 = DEPTHTABLE(I+1,LN)
+        SLOPE = (V2-V1)/(D2-D1)
+        FOLD = STAGE-D1     
+        IF (FOLD .LE. 0.0d0) THEN  
+          VOL=V1
+          EXIT
+        ELSEIF (STAGE.GE.D1 .AND. STAGE.LE.D2)THEN
+          VOL = SLOPE*STAGE+V2-SLOPE*D2                
+          EXIT
         END IF
         I = I + 1
         IF( I.GT.150 ) THEN
-          IFLG = 1 
-          VOLUME = VOLUMETABLE(151,LN)
+          VOL = SLOPE*STAGE+V2-SLOPE*D2
+          EXIT
         END IF
       END DO
-      VOLTERP = VOLUME
-      IF ( VOLTERP.LT.TOLF2 ) VOLTERP = TOLF2
+      VOLTERP = VOL
       RETURN
       END FUNCTION VOLTERP
 !     Interpolate lake STAGE as a function of lake VOLUME
 C     used in solving lake stage in the FORMULATE SUBROUTINE (LAK7FM).      
-      DOUBLE PRECISION FUNCTION STGTERP (VOLUME,LN)
+      DOUBLE PRECISION FUNCTION STGTERP (VOL,LN)
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C          OF LAKE VOLUME TO CACULATE LAKE STAGE.
       USE GWFLAKMODULE, ONLY: VOLUMETABLE, DEPTHTABLE,AREATABLE
-      DOUBLE PRECISION VOLUME
+      IMPLICIT NONE
+      DOUBLE PRECISION STAGE, VOL, TOLF2, FOLD
+      DOUBLE PRECISION D1, D2, V1, V2, SLOPE
+      INTEGER LN, I
 !!      DOUBLE PRECISION VOLUME, STAGE
       TOLF2=1.0E-7
-      IF (VOLUME.GT.VOLUMETABLE(151,LN))THEN
-        STGTERP =  DEPTHTABLE(151,LN)+(VOLUME-VOLUMETABLE(151,LN))/
-     +             AREATABLE(151,LN) 
+      STGTERP = 0.0D0
+      IF (VOL.GT.VOLUMETABLE(151,LN))THEN
+        D1 = DEPTHTABLE(150,LN)
+        D2 = DEPTHTABLE(151,LN)
+        V1 = VOLUMETABLE(150,LN)
+        V2 = VOLUMETABLE(151,LN)
+        SLOPE = (D2-D1)/(V2-V1)
+        STGTERP =  SLOPE*VOL+D2-SLOPE*V2
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
-        FOLD=ABS(VOLUME-VOLUMETABLE(I,LN))     
-        IF (FOLD .LE. TOLF2) THEN  
-          STGTERP=DEPTHTABLE(I,LN)
-          IFLG = 1
-        ELSEIF (VOLUME.GT.VOLUMETABLE(I,LN) .AND. VOLUME.LT.
-     1          VOLUMETABLE(I+1,LN))THEN
-          STGTERP=((DEPTHTABLE(I+1,LN)-DEPTHTABLE(I,LN))/
-     1         (VOLUMETABLE(I+1,LN)- VOLUMETABLE(I,LN)))*
-     2         VOLUME+DEPTHTABLE(I+1,LN)-((DEPTHTABLE(I+1,LN)-
-     3         DEPTHTABLE(I,LN))/(VOLUMETABLE(I+1,LN)-
-     4         VOLUMETABLE(I,LN)))*VOLUMETABLE(I+1,LN)                 
-          IFLG = 1
+      DO
+        D1 = DEPTHTABLE(I,LN)
+        D2 = DEPTHTABLE(I+1,LN)
+        V1 = VOLUMETABLE(I,LN)
+        V2 = VOLUMETABLE(I+1,LN)
+        SLOPE = (D2-D1)/(V2-V1)
+        FOLD = VOL-V1    
+        IF (FOLD .LE. 0.0d0) THEN  
+          STGTERP=D1
+          EXIT
+        ELSEIF (VOL.GE.V1 .AND. VOL.LE.V2)THEN
+          STGTERP =  SLOPE*VOL+D2-SLOPE*V2                 
+          EXIT
         END IF
         I = I + 1
-        IF( I.GT.150 ) THEN
-          IFLG = 1 
-          STGTERP= 0.0
+        IF( I.GT.150 ) THEN 
+          STGTERP =  SLOPE*VOL+D2-SLOPE*V2
+          EXIT
         END IF
       END DO
       RETURN
@@ -3655,38 +3686,43 @@ C------FUNCTION DERIVTERP FOR INTERPOLATING DERIVATIVE OF LAKE OUTFLOW.
       DOUBLE PRECISION FUNCTION DERIVTERP (STAGE,LSEG)
 Cdep&rgn  FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C          OF LAKE STAGE TO CACULATE LAKE OUTFLOW DERIVATIVE.
-C         ADDED 5/16/2006-- changed 12/2007 from "DOUBLE PRECISION FUNCTION"
-C          to "FUNCTION"
       USE GWFSFRMODULE, ONLY: DLKOTFLW, DLKSTAGE
-      DOUBLE PRECISION STAGE, DEROTFLW, FOLD
+      IMPLICIT NONE
+      DOUBLE PRECISION STAGE, DOTFLW, FOLD, TOLF2
+      DOUBLE PRECISION DS1, DS2, DF1, DF2, SLOPE
+      INTEGER LSEG, I
       TOLF2=1.0E-7
+      DERIVTERP = 0.0D0
       IF (STAGE.GT.DLKSTAGE(200,LSEG))THEN
-        DERIVTERP =  DLKOTFLW(200,LSEG)
+        DF1 = DLKOTFLW(199,LSEG)
+        DF2 = DLKOTFLW(200,LSEG)
+        DS1 = DLKSTAGE(199,LSEG)
+        DS2 = DLKSTAGE(200,LSEG)
+        SLOPE = (DF2-DF1)/(DS2-DS1)
+        DERIVTERP =  SLOPE*STAGE+DF2-SLOPE*DS2
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
-        FOLD=ABS(STAGE-DLKSTAGE(I,LSEG))     
-        IF (FOLD .LE. TOLF2) THEN  
-          DEROTFLW=DLKOTFLW(I,LSEG)
-          IFLG = 1          !rsr, changed ISFLG to IFLG
-        ELSEIF (STAGE.LT.DLKSTAGE(1,LSEG)) THEN
-          DEROTFLW=0.0D0
-          IFLG = 1
-        ELSEIF (STAGE.GT.DLKSTAGE(I,LSEG) .AND. STAGE.LT.
-     1          DLKSTAGE(I+1,LSEG))THEN
-          DEROTFLW=((DLKOTFLW(I+1,LSEG)-DLKOTFLW(I,LSEG))/
-     1         (DLKSTAGE(I+1,LSEG)- DLKSTAGE(I,LSEG)))*
-     2         STAGE+DLKOTFLW(I+1,LSEG)-((DLKOTFLW(I+1,LSEG)-
-     3         DLKOTFLW(I,LSEG))/(DLKSTAGE(I+1,LSEG)-
-     4         DLKSTAGE(I,LSEG)))*DLKSTAGE(I+1,LSEG)
-          IFLG = 1
+      DO
+        DF1 = DLKOTFLW(I,LSEG)
+        DF2 = DLKOTFLW(I+1,LSEG)
+        DS1 = DLKSTAGE(I,LSEG)
+        DS2 = DLKSTAGE(I+1,LSEG)
+        SLOPE = (DF2-DF1)/(DS2-DS1)
+        FOLD= STAGE-DS1   
+        IF (FOLD .LE. 0.0D0) THEN  
+          DERIVTERP=0.0D0
+          EXIT
+        ELSEIF (STAGE.GE.DS1 .AND. STAGE.LE.DS2)THEN
+          DERIVTERP=SLOPE*STAGE+DF2-SLOPE*DS2
+          EXIT
         END IF
         I = I + 1
-        IF( I.GT.199) IFLG = 1
+        IF( I.GT.199) THEN
+          DERIVTERP=SLOPE*STAGE+DF2-SLOPE*DS2
+          EXIT
+        END IF
       END DO
-      DERIVTERP = DEROTFLW
       RETURN
       END FUNCTION DERIVTERP 
 C------FUNCTION OUTFLWTERP FOR INTERPOLATING DERIVATIVE OF LAKE OUTFLOW. 
@@ -3696,35 +3732,42 @@ C          OF LAKE OUTFLOW STORED IN SLKOTFLW ARRAY.
 C         ADDED 5/16/2006-- changed 12/2007 from "DOUBLE PRECISION FUNCTION"
 C          to "FUNCTION"
       USE GWFSFRMODULE, ONLY: SLKOTFLW, DLKSTAGE
-      DOUBLE PRECISION STAGE, OUTFLOW, FOLD
+      IMPLICIT NONE
+      DOUBLE PRECISION STAGE, OUTFLOW, FOLD, TOLF2
+      DOUBLE PRECISION SL1, SL2, DL1, DL2, SLOPE
+      INTEGER LSEG, I
       TOLF2=1.0E-9
+      OUTFLWTERP = 0.0D0
       IF (STAGE.GT.DLKSTAGE(200,LSEG))THEN
-        OUTFLWTERP =  SLKOTFLW(200,LSEG) 
+        SL1 = SLKOTFLW(199,LSEG)
+        SL2 = SLKOTFLW(200,LSEG)
+        DL1 = DLKSTAGE(199,LSEG)
+        DL2 = DLKSTAGE(200,LSEG)
+        SLOPE = (SL2-SL1)/(DL2-DL1)
+        OUTFLWTERP =  SLOPE*STAGE+SL2-SLOPE*DL2 
         RETURN
       END IF
-      IFLG = 0
       I = 1
-      DO WHILE ( IFLG.EQ.0 )
-        FOLD=DABS(STAGE-DLKSTAGE(I,LSEG))     
-        IF (FOLD .LE. TOLF2) THEN
-          OUTFLOW=SLKOTFLW(I,LSEG)
-          IFLG = 1
-        ELSEIF (STAGE.LT.DLKSTAGE(1,LSEG)) THEN
-          OUTFLOW=0.0D0
-          IFLG = 1
-        ELSEIF (STAGE.GT.DLKSTAGE(I,LSEG) .AND. STAGE.LT.
-     1          DLKSTAGE(I+1,LSEG))THEN
-          OUTFLOW=((SLKOTFLW(I+1,LSEG)-SLKOTFLW(I,LSEG))/
-     1         (DLKSTAGE(I+1,LSEG)- DLKSTAGE(I,LSEG)))*
-     2         STAGE+SLKOTFLW(I+1,LSEG)-((SLKOTFLW(I+1,LSEG)-
-     3         SLKOTFLW(I,LSEG))/(DLKSTAGE(I+1,LSEG)-
-     4         DLKSTAGE(I,LSEG)))*DLKSTAGE(I+1,LSEG)
-          IFLG = 1
+      DO
+        SL1 = SLKOTFLW(I,LSEG)
+        SL2 = SLKOTFLW(I+1,LSEG)
+        DL1 = DLKSTAGE(I,LSEG)
+        DL2 = DLKSTAGE(I+1,LSEG)
+        SLOPE = (SL2-SL1)/(DL2-DL1)
+        FOLD= STAGE-DL1    
+        IF (FOLD .LE. 0.0d0) THEN
+          OUTFLWTERP=0.0d0
+          EXIT
+        ELSEIF (STAGE.GE.DL1 .AND. STAGE.LE.DL2)THEN
+          OUTFLWTERP = SLOPE*STAGE+SL2-SLOPE*DL2 
+          EXIT
         END IF
         I = I + 1
-        IF( I.GT.199) IFLG = 1
+        IF( I.GT.199) THEN
+          OUTFLWTERP = SLOPE*STAGE+SL2-SLOPE*DL2
+          EXIT
+        END IF
       END DO
-      OUTFLWTERP = OUTFLOW
       RETURN
       END FUNCTION OUTFLWTERP    
 C
@@ -3996,6 +4039,41 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
       RETURN
       END SUBROUTINE GET_FLOBOT   
 C
+C-------SUBROUTINE LAK2MODSIM
+      SUBROUTINE LAK2MODSIM()
+C     *******************************************************************
+C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER LAKE
+      DOUBLE PRECISION DELTAVOL, DELTAQ
+C     -------------------------------------------------------------------
+C
+C
+C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
+C
+        DO LAKE=1,NLAKES
+          DELTAQ = SURFIN(LAKE) - SURFOT(LAKE)
+          DELTAVOL = VOL(LAKE) - VOLOLDD(LAKE) 
+          DELTAVOL = DELTAVOL - DELTAQ
+        END DO
+C
+C5------RETURN.
+      RETURN
+      END SUBROUTINE LAK2MODSIM
 C   
 C
       SUBROUTINE GWF2LAK7DA(IUNITLAK, IGRID)
