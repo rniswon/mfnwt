@@ -8453,7 +8453,7 @@ C
 C-------SUBROUTINE SFR2MODSIM
       SUBROUTINE SFR2MODSIM()
 C     *******************************************************************
-C     COMPUTE FLOW AND DELTA FLOW OVER THE SEGMENT FOR MIDSOM.
+C     COMPUTE FLOW AND DELTA FLOW OVER THE SEGMENT FOR MODSIM.
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFSFRMODULE, ONLY: STRM, ISTRM, ISEG, NSTRM
