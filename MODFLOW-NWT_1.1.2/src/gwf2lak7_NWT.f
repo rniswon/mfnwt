@@ -1303,8 +1303,8 @@ C2------PROCESS EACH CELL IN THE ILAKE LIST.
 Cdep   added STGITER, and STGNEW to INITIALIZATION.
       DO LK=1,NLAKES
         IF(KKITER.EQ.1)THEN
-         STGITER(LK) = STGOLD(LK)
-         STGNEW(LK) = STGOLD(LK)
+           STGITER(LK) = STGOLD(LK)
+           STGNEW(LK) = STGOLD(LK)
         END IF
         NCNCVR(LK) = 0
         LIMERR(LK) = 0
@@ -1668,10 +1668,10 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==1)then
+ !     IF (lake==1 .and. kkper==2)then
  !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
- !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGNEW(LAKE),
+ !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
  !    3                resid1,SURFA(LAKE),deriv,dstg,l1,kkiter,kkstp
  !     write(521,222)PRECIP3(LAKE),EVAP3(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW3,SURFIN(LAKE),OUTFLOW,
@@ -1707,7 +1707,7 @@ C17D----NEW LAKE STAGE COMPUTED FROM LAKE VOLUME.
               IF(STGNEW(LAKE).LT.BOTTMS(LAKE)) 
      +             STGNEW(LAKE)=BOTTMS(LAKE)
             END IF
-          VOL(LAKE) = VOL2   !RGN this is needed for MODSIM
+          VOL(LAKE) = VOLTERP(STGNEW(LAKE),LAKE)
         END DO
         IF ( IICNVG==1 ) EXIT CONVERGE
       END DO CONVERGE
@@ -1900,7 +1900,7 @@ C2C------INITIALIZE SUMMATION PARAMETERS.
             PRECIP(LAKE)=ZERO
             SEEP(LAKE)=ZERO
             SEEPUZ(LAKE)=ZERO
-            VOL(LAKE)=ZERO
+!            VOL(LAKE)=ZERO
             SURFA(LAKE)=ZERO
             GWIN(LAKE)=ZERO
             GWOUT(LAKE)=ZERO
@@ -2103,23 +2103,23 @@ C
 C18------COMPUTE LAKE VOLUME FROM ALL INFLOWS AND OUTFLOWS FOR 
 C          TRANSIENT SIMULATION AND THEN COMPUTE STGNEW FROM
 C          NEW VOLUME.
-!RGN Volume made equal to sum of inflows and outflows plus
+!RGN Volume made equal to sum of inflows and outflows plus  ! 6/30/2017 commenting this out as it causes issues for small lakes
 !RGN   plus lake storage from previous time step  4/17/09
-         IF(ISS.EQ.0)THEN
-           VOL2 = VOLOLDD(LAKE)+(PRECIP(LAKE)-EVAP(LAKE)
-     +                -WDRAW+RUNFD+SURFIN(LAKE)-SURFOT(LAKE)+GWIN(LAKE)    !10/4/2014 added SEEPUZ(LAKE)
-     +                -GWOUT(LAKE)-SEEPUZ(LAKE))*DELT
-          IF(VOL2.LE.0.0) VOL2=0.0
-          VOL(LAKE) = VOL2
-          STGNEW(LAKE)= STGTERP(VOL2,LAKE)
-C
-C18B-----COMPUTE LAKE VOLUME FROM ALL INFLOWS AND OUTFLOWS FOR 
-C          STEADY STATE SIMULATION.
-         ELSE
-           VOL2 = VOLTERP(STGNEW(LAKE),LAKE)
-           IF(VOL2.LE.0.0D0) VOL2 = 0.0D0
-           VOL(LAKE) = VOL2
-         END IF
+!         IF(ISS.EQ.0)THEN
+!           VOL2 = VOLOLDD(LAKE)+(PRECIP(LAKE)-EVAP(LAKE)
+!     +                -WDRAW+RUNFD+SURFIN(LAKE)-SURFOT(LAKE)+GWIN(LAKE)    !10/4/2014 added SEEPUZ(LAKE)
+!     +                -GWOUT(LAKE)-SEEPUZ(LAKE))*DELT
+!          IF(VOL2.LE.0.0) VOL2=0.0
+!          VOL(LAKE) = VOL2
+!          STGNEW(LAKE)= STGTERP(VOL2,LAKE)
+!C
+!C18B-----COMPUTE LAKE VOLUME FROM ALL INFLOWS AND OUTFLOWS FOR 
+!C          STEADY STATE SIMULATION.
+!         ELSE
+!           VOL2 = VOLTERP(STGNEW(LAKE),LAKE)
+!           IF(VOL2.LE.0.0D0) VOL2 = 0.0D0
+!           VOL(LAKE) = VOL2
+!         END IF
 C18C-----STGON IS FRACTION OF STGOLD AND STGNEW AND SURFACE AREA
 C
 C          IS BASED ON STGOLD.
