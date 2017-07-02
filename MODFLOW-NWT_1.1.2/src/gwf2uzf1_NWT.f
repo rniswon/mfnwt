@@ -1268,7 +1268,7 @@ C4------CHECK FOR NEGATIVE INFILTRATION RATES.
           DO ncck = 1, NCOL
             IF ( IUZFBND(ncck, nrck).NE.0 ) THEN
               fks = VKS(ncck, nrck)
- !             IF ( Isurfkreject > 0 ) fks = SURFK(ncck, nrck)
+              IF ( Isurfkreject > 0 ) fks = SURFK(ncck, nrck)
               surfinf = FINF(ncck, nrck)
               IF ( FINF(ncck, nrck).LT.0.0 ) THEN
                 WRITE (IOUT, 9002) nrck, ncck
@@ -1451,13 +1451,15 @@ C
 C14------INITIALIZE UNSATURATED ZONE IF ACTIVE.
 C
 C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
-      IF ( Kkper.GT.2 ) THEN
-        iflginit = 0
-      ELSE IF ( Kkper.EQ.1 ) THEN
+!      IF ( Kkper.GT.2 ) THEN           !changed this to allow for multiple SS periods
+!        iflginit = 0
+!      ELSE IF ( Kkper.EQ.1 ) THEN
+      IF ( Kkper.EQ.1 ) THEN
         iflginit = 1
+      ELSE IF ( iss.EQ.0 .AND. ISSFLG(Kkper-1).NE.0 ) THEN
+        iflginit = 2
       ELSE
-        IF ( iss.EQ.0 .AND. ISSFLG(Kkper-1).NE.0 )
-     +       iflginit = 2
+        iflginit = 0   
       END IF
       IF ( iflginit.GE.1 ) THEN
         l = 0
@@ -1829,6 +1831,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IUNIT(44) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
+! ADD WELL PUMPING AS IRRIGATION
         IF ( IUNIT(2) > 0 ) THEN
           IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
@@ -1853,7 +1856,7 @@ C
 C3------SEARCH FOR UPPERMOST ACTIVE CELL.
         il = 0
         IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
-          il = land
+          il = ABS(ibnd)
           IF ( il.GT.0 ) THEN
             IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
           ELSE
@@ -1874,6 +1877,7 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
         END IF
         IF ( land.LT.0 ) land = ABS(land)
         IF ( land.EQ.0 ) land = 1
+        IF ( ibnd.EQ.0 ) il = 0
 
 ! Suppress seepout and ET beneath a lake
         lakflg = 0
@@ -1888,7 +1892,7 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
               IF ( STGNEW(lakid).GT.BOTM(ic, ir, il-1) )
      +             lakflginf = 1
 ! Define land surface when lakes are present
-              IF ( land.LT.il ) land = il     ! moved this into check for lake cell RGN 6/14/17
+              IF ( land.LT.il ) land = il   ! moved this into check for lake cell RGN 6/14/17
             END IF
           END IF
         END IF   
@@ -1914,6 +1918,12 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
           flength = DELC(ir)
           width = DELR(ic)
           cellarea = flength*width
+          fks = VKS(ic, ir)
+          IF ( Iseepreject > 0 ) then
+            fkseep = surfk(ic,ir)
+          ELSE
+            fkseep = VKS(ic,ir)   
+          END IF
           IF ( IUZFOPT.GT.0 ) THEN
             ths = THTS(ic, ir)
             thr = THTR(ic, ir)
@@ -2394,7 +2404,18 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ELSE
           EXCESPP(ic, ir) = 0.0
         ENDIF
-!
+! EDM
+        finfhold = FINF(ic, ir)
+        IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
+            IF ( SFRIRR(IC,IR) .NE. 0 ) THEN
+                finfhold = FINF(ic, ir)
+            END IF
+            finfhold = finfhold + SFRIRR(IC,IR)
+        END IF
+        IF ( IUNIT(2) > 0 ) THEN
+          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+        END IF
+        IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
         cellarea = width*flength
@@ -2412,11 +2433,13 @@ C
 C5-----SEARCH FOR UPPERMOST ACTIVE CELL.
         IF ( NUZTOP.EQ.1 ) THEN
           il = 1
-          IF ( IBOUND(ic, ir, il).LT.1 ) THEN
+          IF ( ibnd.EQ.0 ) THEN
+            il = 0
+          ELSE IF ( IBOUND(ic, ir, il).LT.1 ) THEN
             il = 0
           END IF
         ELSE IF ( NUZTOP.EQ.2 ) THEN
-          il = land
+          il = ABS(ibnd)
           IF ( il.GT.0 ) THEN
             IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
           ELSE
@@ -2426,6 +2449,7 @@ C5-----SEARCH FOR UPPERMOST ACTIVE CELL.
 C
 C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
         IF ( il.EQ.0 ) THEN
+          IF ( ibnd.NE.0 ) THEN
             IF ( NUZTOP.LT.2 ) THEN
               WRITE (IOUT, *) '***WARNING***NUZTOP IS 1 AND UPPERMOST', 
      +                        ' LAYER FOR ROW ', ir, ' AND COLUMN ', ic,
@@ -2440,6 +2464,7 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
               WRITE (IOUT, *) 'UNSATURATED FLOW WILL NOT BE ADDED TO ',
      +                        'AN ACTIVE LAYER'
             END IF
+          END IF
         END IF
         IF ( NUZTOP.EQ.3 ) THEN
           ill = 1
@@ -2455,9 +2480,10 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
           END DO
           IF ( land.LT.0 ) land = ABS(land)
           IF ( land.EQ.0 ) land = 1
+          IF ( ibnd.EQ.0 ) il = 0
 C
 C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
-          IF ( il.EQ.0 ) THEN
+          IF ( ibnd.NE.0 .AND. il.EQ.0 ) THEN
             WRITE (IOUT, *) '***WARNING***NUZTOP IS 3 AND ALL LAYERS '
      +                  , ' IN ROW ', ir, ' AND COLUMN ', ic, 
      +                  ' ARE', ' INACTIVE.'
@@ -2468,6 +2494,7 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           END IF
         END IF
         LAYNUM(ic, ir) = il
+        IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = 1
 ! Suppress seepout and ET beneath a lake
         lakflg = 0
         lakflginf = 0
@@ -2478,7 +2505,7 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
             lakflg = 1
             IF( STGNEW(lakid).GT.BOTM(ic, ir, il-1) )
      +          lakflginf = 1
-            IF ( land.LT.il ) land = il   ! moved this into check for lake cell RGN 6/14/17
+          IF ( land.LT.il ) land = il  ! moved this into check for lake cell RGN 6/14/17
           END IF
         END IF
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
@@ -2496,6 +2523,12 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           ELSE
             celtop = BOTM(ic, ir, land-1) - 0.5D0*SURFDEP
             celthick = BOTM(ic, ir, land-1) - BOTM(ic, ir, il)
+          END IF
+          fks = VKS(ic, ir)
+          IF ( Iseepreject > 0 ) then
+            fkseep = surfk(ic,ir)
+          ELSE
+            fkseep = fks  
           END IF
           etact = 0.0D0
 C
@@ -3242,11 +3275,12 @@ C30-----NO UNSATURATED ZONE AND GROUND WATER DISCHARGES TO SURFACE.
           END IF
         ELSE !IF ( ibnd.LT.0 ) THEN    !RGN 5/11/2012
           ratin = ratin + finfact*cellarea
-      END IF
+        END IF
         ratout2 = ratout2 + SEEPOUT(ic, ir)
 C IF SOLUTE ROUTING (MT3D) IS ACTIVE THEN CALCULATE INTERCELL FLUXES
 C AND WATER CONTENTS
         IF ( RTSOLUTE.GT.0 ) THEN
+          IF ( ibnd.NE.0 ) THEN
             CALL CELL_AVERAGE( UZDPST(:,l), UZTHST(:,l), RTSOLFL(:,ll),
      +                         RTSOLWC(:,ll), RTSOLDS(:,ll), ic, ir, il,
      +                         Celtop, H, iret, finfact, thr, land, iss)
@@ -3257,6 +3291,7 @@ C SET UZ INTERCELL FLUX TO ZERO WHEN BELOW WATER TABLE
                 UZSPIT(k) = 0.0D0
               END DO
             END IF
+          END IF
         END IF
       END IF
       END DO
@@ -5384,75 +5419,75 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
           Cellflux(land) = finfact
           DO kknt =land, NLAY
             IF ( IUZFBND(Nuzc, Nuzr).GT.0 .AND. IUZFOPT.GT.0 ) THEN
-            Nwv = NWAVST(Nuzc, Nuzr)
-            kkntm1 = kknt - 1
-            IF ( kknt==land ) THEN
-              depthinc = celtop -
-     +                 BOTM(Nuzc, Nuzr, kknt)
-            ELSE
-              depthinc = BOTM(Nuzc, Nuzr, kkntm1)-
-     +                 BOTM(Nuzc, Nuzr, kknt)
-            END IF
-            IF (depthinc.GT.CLOSEZERO ) THEN         
-              IF ( depthsave-ghdif.LT.CLOSEZERO ) THEN
-                depthsave = depthsave + depthinc
-                IF ( depthsave.GE.ghdif ) THEN
-                  depthinc = depthinc - (depthsave-ghdif)
-                  depthsave = ghdif                
-                END IF
-                IF ( depthinc.GT.CLOSEZERO ) THEN
-                fm = 0.0D0
-                jj = 0
-                jk = iset + Nwv - 1
-                nwavm1 = jk - 1
-                DO WHILE ( jk.GT.iset-1 )
-                  IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
-                    jk = jk - 1
-                END DO
-                IF ( jj.GT.iset ) THEN
-                  fm = fm + (Theta(jj-1)-thr)
-     +                 *(depthsave-Depth(jj))
-                  DO j = jj, nwavm1
-                    fm = fm + (Theta(j)-thr)
-     +                   *(Depth(j)-Depth(j+1))
-                  END DO
-                  fm = fm + (Theta(Nwv)-thr)
-     +                 *Depth(Nwv)
-                ELSE
-                  fm = fm + (Theta(Nwv)-thr)*depthsave
-                END IF
-                avwat = fm-totalwc
-                IF ( iss.EQ.0 )THEN
-                  delstor = (avwat-GRIDSTOR(Nuzc, Nuzr, kknt))
-! An increase in storage is negative for MT3D
-                  Celldelst(kknt) = -delstor/DELT
-                  Cellflux(kknt+1) = Cellflux(kknt)-delstor/DELT - 
-     +                           GRIDET(Nuzc, Nuzr, kknt)/DELT
-                  IF ( Cellflux(kknt+1).LT.0.0 ) Cellflux(kknt+1) = 0.0 
-                ELSE
-                  Celldelst(kknt) = 0.0D0
-                  Cellflux(kknt+1) = Cellflux(kknt)
-                END IF
-                GRIDSTOR(Nuzc, Nuzr, kknt) = avwat
-                totalwc = fm
-                Celltheta(kknt) = thr + avwat/depthinc
-                iret = kknt
-                ELSE
-                  GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
-                  Celltheta(kknt) = 0.0
-                  Celldelst(kknt) = 0.0
-                  Cellflux(kknt)= 0.0
-                  GRIDET(Nuzc, Nuzr, kknt) = 0.0
-                END IF
+              Nwv = NWAVST(Nuzc, Nuzr)
+              kkntm1 = kknt - 1
+              IF ( kknt==land ) THEN
+                depthinc = celtop -
+     +                   BOTM(Nuzc, Nuzr, kknt)
+              ELSE
+                depthinc = BOTM(Nuzc, Nuzr, kkntm1)-
+     +                   BOTM(Nuzc, Nuzr, kknt)
               END IF
-            ELSE
-              GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
-              Celltheta(kknt) = 0.0
-              Celldelst(kknt) = 0.0
-              Cellflux(kknt)= 0.0
-              GRIDET(Nuzc, Nuzr, kknt) = 0.0
-              Cellflux(kknt+1) = finfact
-            END IF
+              IF (depthinc.GT.CLOSEZERO ) THEN         
+                IF ( depthsave-ghdif.LT.CLOSEZERO ) THEN
+                  depthsave = depthsave + depthinc
+                  IF ( depthsave.GE.ghdif ) THEN
+                    depthinc = depthinc - (depthsave-ghdif)
+                    depthsave = ghdif                
+                  END IF
+                  IF ( depthinc.GT.CLOSEZERO ) THEN
+                    fm = 0.0D0
+                    jj = 0
+                    jk = iset + Nwv - 1
+                    nwavm1 = jk - 1
+                    DO WHILE ( jk.GT.iset-1 )
+                      IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
+                        jk = jk - 1
+                    END DO
+                    IF ( jj.GT.iset ) THEN
+                      fm = fm + (Theta(jj-1)-thr)
+     +                     *(depthsave-Depth(jj))
+                      DO j = jj, nwavm1
+                        fm = fm + (Theta(j)-thr)
+     +                       *(Depth(j)-Depth(j+1))
+                      END DO
+                      fm = fm + (Theta(Nwv)-thr)
+     +                     *Depth(Nwv)
+                    ELSE
+                      fm = fm + (Theta(Nwv)-thr)*depthsave
+                    END IF
+                    avwat = fm-totalwc
+                    IF ( iss.EQ.0 )THEN
+                      delstor = (avwat-GRIDSTOR(Nuzc, Nuzr, kknt))
+! An increase in storage is negative for MT3D
+                      Celldelst(kknt) = -delstor/DELT
+                      Cellflux(kknt+1) = Cellflux(kknt)-delstor/DELT - 
+     +                               GRIDET(Nuzc, Nuzr, kknt)/DELT
+                      IF(Cellflux(kknt+1).LT.0.0) Cellflux(kknt+1) = 0.0
+                    ELSE
+                      Celldelst(kknt) = 0.0D0
+                      Cellflux(kknt+1) = Cellflux(kknt)
+                    END IF
+                    GRIDSTOR(Nuzc, Nuzr, kknt) = avwat
+                    totalwc = fm
+                    Celltheta(kknt) = thr + avwat/depthinc
+                    iret = kknt
+                  ELSE
+                    GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
+                    Celltheta(kknt) = 0.0
+                    Celldelst(kknt) = 0.0
+                    Cellflux(kknt)= 0.0
+                    GRIDET(Nuzc, Nuzr, kknt) = 0.0
+                  END IF
+                END IF
+              ELSE
+                GRIDSTOR(Nuzc, Nuzr, kknt) = 0.0
+                Celltheta(kknt) = 0.0
+                Celldelst(kknt) = 0.0
+                Cellflux(kknt)= 0.0
+                GRIDET(Nuzc, Nuzr, kknt) = 0.0
+                Cellflux(kknt+1) = finfact
+              END IF
             END IF
           END DO
  !       END IF
