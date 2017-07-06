@@ -8451,18 +8451,20 @@ C
       END FUNCTION smooth
 C
 C-------SUBROUTINE SFR2MODSIM
-      SUBROUTINE SFR2MODSIM(FLOWIN, FLOWOT, SEEPNET)
+!      SUBROUTINE SFR2MODSIM(EXCHANGE)
+      SUBROUTINE SFR2MODSIM(FLOWIN, FLOWOT, SEEPNET, EXCHANGE)
 C     *******************************************************************
 C     COMPUTE FLOW AND DELTA FLOW OVER THE SEGMENT FOR MIDSOM.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, ISTRM, ISEG, NSTRM
+      USE GWFSFRMODULE, ONLY: STRM, ISTRM, ISEG, NSTRM, NSS
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
       DOUBLE PRECISION, INTENT(INOUT) :: FLOWIN, FLOWOT, SEEPNET
+      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -8472,15 +8474,17 @@ C     -------------------------------------------------------------------
       INTEGER :: ISTSG, IRNUM, L, ISTSGOLD
 C     -------------------------------------------------------------------
 C
-        SEEPNET = 0.0
-        FLOWIN = 0.0
-        FLOWOT = 0.0
+        SEEPNET = 0.0D0
+        FLOWIN = 0.0D0
+        FLOWOT = 0.0D0
         ISTSG = 0
+        EXCHANGE = 0.0D0
+! just need gain/loss and not inflow and outflow through segment
 C
 C1------LOOP OVER REACHES TO SET FLOWS
 C
 C2------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
-        DO l = 1, NSTRM
+        DO l = 1, NSTRM ! # of reaches
 C
 C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
           ISTSGOLD = ISTSG
@@ -8488,16 +8492,19 @@ C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
           IRNUM = ISTRM(5, l)  
 C
 C5------SUM GAINS/LOSSES FOR ALL REACHES IN SEGMENT.
-          IF( ISTSG /= ISTSGOLD ) SEEPNET = 0.0
+          IF( ISTSG /= ISTSGOLD ) EXCHANGE(ISTSG) = 0.0
           SEEPNET = SEEPNET + STRM(11, l)
+          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + STRM(11, l)
 C
 C6------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( IRNUM.EQ.1 ) THEN
             FLOWIN = STRM(10, l)
+            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + FLOWIN
           END IF
 C7------CHECK IF LAST REACH IN SEGMENT TO GET OUTFLOW    
           IF ( IRNUM.EQ.ISEG(4,ISTSG)) THEN 
             FLOWOT = STRM(9,l)
+            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) - FLOWOT
           END IF
         END DO
 C

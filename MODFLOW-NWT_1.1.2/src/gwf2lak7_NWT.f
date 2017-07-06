@@ -3998,7 +3998,7 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
       END SUBROUTINE GET_FLOBOT   
 C
 C-------SUBROUTINE LAK2MODSIM
-      SUBROUTINE LAK2MODSIM(DELTAVOL, DELTAQ)
+      SUBROUTINE LAK2MODSIM(DELTAVOL, DELTAQ,ENDVOL)
 C     *******************************************************************
 C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
@@ -4011,6 +4011,7 @@ C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL, DELTAQ
+      DOUBLE PRECISION, INTENT(INOUT) :: ENDVOL(NLAKES)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4027,6 +4028,7 @@ C
           DELTAQ = SURFIN(LAKE) - SURFOT(LAKE)
           DELTAVOL = VOL(LAKE) - VOLOLDD(LAKE) 
           DELTAVOL = DELTAVOL - DELTAQ
+          ENDVOL(LAKE) = VOL(LAKE)
         END DO
 C
 C5------RETURN.
