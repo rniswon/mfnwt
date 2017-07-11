@@ -8451,49 +8451,85 @@ C
       END FUNCTION smooth
 C
 C-------SUBROUTINE SFR2MODSIM
-      SUBROUTINE SFR2MODSIM()
+C
+      SUBROUTINE SFR2MODSIM(EXCHANGE)
 C     *******************************************************************
-C     COMPUTE FLOW AND DELTA FLOW OVER THE SEGMENT FOR MODSIM.
+C     COMPUTE NET SEEPAGE OVER A SEGMENT FOR MODSIM.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, ISTRM, ISEG, NSTRM
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER ISTSG, IRNUM, L
-      DOUBLE PRECISION FLOWIN, FLOWOT
+      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD
 C     -------------------------------------------------------------------
+C
+        ISTSG = 0
+        EXCHANGE = 0.0D0
 C
 C1------LOOP OVER REACHES TO SET FLOWS
 C
-C2------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
 C
-C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
+C2------DETERMINE STREAM SEGMENT NUMBER.
+          ISTSGOLD = ISTSG
           ISTSG = ISTRM(4, l)
-          IRNUM = ISTRM(5, l)         
 C
-C3------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
-          IF ( IRNUM.EQ.1 ) THEN
-            FLOWIN = STRM(10, l)
-          END IF
-C4------CHECK IF LAST REACH IN SEGMENT TO GET OUTFLOW    
-          IF ( IRNUM.EQ.ISEG(4,ISTSG)) THEN 
-            FLOWOT = STRM(9,l)
-          END IF
+C3------SUM GAINS/LOSSES FOR ALL REACHES IN SEGMENT.
+          IF( ISTSG /= ISTSGOLD ) EXCHANGE(ISTSG) = 0.0
+          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + STRM(11, l)
+C
         END DO
 C
-C5------RETURN.
+C8------RETURN.
       RETURN
       END SUBROUTINE SFR2MODSIM
+C
+C-------SUBROUTINE MODSIM2SFR
+C
+      SUBROUTINE MODSIM2SFR(DIVS)
+C     *******************************************************************
+C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION 
+C     SEGMENTS.
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFSFRMODULE, ONLY: NSS, SEG
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: DIVS(NSS)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER :: ISEG
+C     -------------------------------------------------------------------
+C
+C1------LOOP OVER SEGMETS
+C
+        DO ISEG = 1, NSS
+C
+C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
+C            
+          SEG(2,iseg) = DIVS(ISEG)
+        END DO
+C
+C8------RETURN.
+      RETURN
+      END SUBROUTINE MODSIM2SFR
 C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)
