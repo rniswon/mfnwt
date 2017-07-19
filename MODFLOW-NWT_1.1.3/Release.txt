@@ -22,17 +22,25 @@ o Version 1.1.3 08/01/2017:
 
 Well (WEL) package
 Added ability to reuse the same well tabfile for more than one well. Changed 
-reading the tabfiles to allow comment lines in tabfiles.
+reading the tabfiles to allow comment lines in tabfiles. Modified output of
+pumping rates to LST file to separate from printing of wells with reduced
+pumping. Modified keyword input formats to support backward compatibility
+of previous keyword input formats. 
 
 Unsaturated-Zone Flow (UZF) package
 Fixed bug that occurred when IUZFOPT=0 and element 0 accessed in array DELSTOR.  
 Fixed keyword options to support old format. Fixed bug in UZ initialization to 
 allow multiple consecutive steady state stress periods. Fixed bug causing UZF 
-land surface to be incorrectly set for cells uderlying lake cells. 
+land surface to be incorrectly set for cells underlying lake cells. 
+
+Streamflow Routing (SFR2) Package
+Keyword options were modified to allow for backward compatibility of previous input
+formats of keywords, including single line lists of keywords and keywords not
+surrounded by OPTIONS and END identifiers.
 
 Lake (LAK) Package
 Fixed array index from DELVOLLAK(NSSAR) to DELVOLLAK(NLAKES). Fixed lake package 
-derivatives for better solutions. Fixed instability issue with lake package with 
+derivatives for better solutions. Fixed instability issue with Lake Package for 
 small lakes and large surface inflow and outflow.
 
 Multi-Node Well (MNW2) Package

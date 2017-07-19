@@ -193,150 +193,15 @@ C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /' UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4', 
      +        ', 02/06/2012', /, 9X, 'INPUT READ FROM UNIT', I3)
-!
 C
-C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
-C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
+C2A------COMMENTS/FIRST LINE.
       CALL URDCOM(In, IOUT, line)
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      DO
-        LLOC=1
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        select case (LINE(ISTART:ISTOP))
-          case('OPTIONS')
-            write(iout,'(/1x,a)') 'PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-          case('SPECIFYTHTR')
-            ITHTRFLG = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
-     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
-     +                'PERIOD'
-            WRITE(iout,*)
-            found = .true.
-!support old input style
-            do
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-              select case (LINE(ISTART:ISTOP))
-              case('SPECIFYTHTI')
-                ITHTIFLG = 1
-                WRITE(iout,*)
-              WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
-     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
-                WRITE(iout,*)
-              case('NOSURFLEAK')
-               Iseepsupress = 1
-               WRITE(iout,*)
-              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
-               WRITE(iout,*)
-              case default
-                exit
-             end select
-            end do
-!support old input style
-          case('SPECIFYTHTI')
-            ITHTIFLG = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
-     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
-            WRITE(iout,*)
-            found = .true.
-!support old input style
-            do
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-              select case (LINE(ISTART:ISTOP))
-              case('NOSURFLEAK')
-               Iseepsupress = 1
-               WRITE(iout,*)
-              WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
-               WRITE(iout,*)
-              case default
-                exit
-             end select
-            end do
-!support old input style
-          case('ETSQUARE')
-            i=1
-            CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
-     +                  IOUT, In)
-            SMOOTHET = smooth
-            IF( SMOOTHET<1.0E-7 ) SMOOTHET = 1.0D-7
-            IF( SMOOTHET>1.0 ) SMOOTHET = 1.0D0
-            ETOPT = 2
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')
-     +            ' A SQUARE ET FUNCTION WILL BE USED TO SIMULATE GW ET'
-            WRITE(iout,*)
-            found = .true.
-          case('NOSURFLEAK')
-            Iseepsupress = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
-            WRITE(iout,*)
-            found = .true.
-          case('SPECIFYSURFK')
-            Ireadsurfk = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')'HYDRAULIC CONDUCTIVITY OF LAND SURFACE ',
-     +                       'WILL BE READ'
-            WRITE(iout,*)
-            found = .true.
-          case('REJECTSURFK')
-              Isurfkreject = 1
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
-     +                    ,'LAND SURFACE K'
-              WRITE(iout,*)
-            found = .true.
-          case('SEEPSURFK')
-              Iseepreject = 1
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'SURFACE LEAKAGE WILL BE CALCULATED ',
-     +                         'USING LAND SURFACE K'
-              WRITE(iout,*)
-              found = .true.
-          case('SAVEFINF')
-              Isavefinf = 1
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'VALUES SPECIFIED IN FINF FOR ',
-     +                         'TRANSIENT GSFLOW MODELS WILL BE SAVED'
-              WRITE(iout,*)
-              found = .true.
-          case ('NETFLUX')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
-            IF(UNITRECH.LT.0) UNITRECH=0
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITDIS,R,IOUT,IN)
-            IF(UNITDIS.LT.0) UNITDIS=0
-            IF ( UNITRECH > 0 .AND. UNITDIS > 0 ) INETFLUX = 1
-            IF ( INETFLUX > 0 ) WRITE(IOUT,31) UNITRECH,UNITDIS
-   31 FORMAT(1X,' OUTPUT WILL BE WRITTEN TO NETRECH AND NETDIS ',
-     +                 'FILES WITH UNIT NUMBERS ',I10,I10, 
-     +                 ', RESPECTIVELY')
-
-          case ('END')
-            write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-            CALL URDCOM(In, IOUT, line)
-            exit
-          case default
-            read(line(istart:istop),*,IOSTAT=Iostat) intchk
-            if( Iostat .ne. 0 ) then
-              ! Not an integer.  Likely misspelled or unsupported 
-              ! so terminate here.
-              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-              CALL USTOP('Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP))
-            else
-              ! Integer found.  This is likely NUZTOP, so exit.
-              write(iout,'(/1x,a)') 'END PROCESSING '//
-     +          trim(adjustl(text)) //' OPTIONS'
-              exit
-            endif
-        end select
-        CALL URDCOM(In, IOUT, line)
-      ENDDO
-!
+C
+C2B------CHECK FOR KEYWORDS.  
+C
+      CALL PARSEUZFOPTIONS(In,LINE,text)
+C
       if ( Ireadsurfk == 0 .and. Isurfkreject == 1) then
           WRITE(iout,*)
           WRITE(IOUT,'(A)')'WARNING REJECTSURFK SPECIFIED BUT ',
@@ -1087,6 +952,164 @@ C31-----SAVE POINTERS FOR GRID AND RETURN.
       CALL SGWF2UZF1PSV(Igrid)
       RETURN
       END SUBROUTINE GWF2UZF1AR
+C
+C-------SUBROUTINE PARSEUZFOPTIONS
+      SUBROUTINE PARSEUZFOPTIONS(In,LINE,text)
+C     ******************************************************************
+C     PARSE KEYWORD OPTIONS
+C     ******************************************************************
+      USE GWFUZFMODULE
+      USE GLOBAL,       ONLY: IUNIT, IOUT
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     ------------------------------------------------------------------
+C     ARGUMENTS
+C     ------------------------------------------------------------------
+      INTEGER, INTENT(IN) :: In
+      CHARACTER(LEN=200), INTENT(INOUT) :: line
+      character(len=16), INTENT(IN)  :: text
+C     ------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     ------------------------------------------------------------------
+      DOUBLE PRECISION test
+      INTEGER istart, istop, lloc, iheader, i
+      REAL r, SMOOTH
+      INTEGER intchk, Iostat
+      logical :: found
+C     ------------------------------------------------------------------
+      IHEADER = 0
+      LLOC=1
+      found = .false.
+      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+      IF ( LINE(ISTART:ISTOP)=='OPTIONS') THEN
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+        IHEADER = 1 
+        found = .true.
+      END IF
+      IF ( IHEADER == 1 ) THEN
+        CALL URDCOM(In, IOUT, line)
+        DO
+        LLOC=1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        select case (LINE(ISTART:ISTOP))
+          case('SPECIFYTHTI')
+            ITHTIFLG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
+     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
+            WRITE(iout,*)
+          case('ETSQUARE')
+            i=1
+            CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
+     +                  IOUT, In)
+            SMOOTHET = smooth
+            IF( SMOOTHET<1.0E-7 ) SMOOTHET = 1.0D-7
+            IF( SMOOTHET>1.0 ) SMOOTHET = 1.0D0
+            ETOPT = 2
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')
+     +            ' A SQUARE ET FUNCTION WILL BE USED TO SIMULATE GW ET'
+            WRITE(iout,*)
+          case('NOSURFLEAK')
+            Iseepsupress = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+            WRITE(iout,*)
+          case('SPECIFYSURFK')
+            Ireadsurfk = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')'HYDRAULIC CONDUCTIVITY OF LAND SURFACE ',
+     +                       'WILL BE READ'
+            WRITE(iout,*)
+            found = .true.
+          case('REJECTSURFK')
+              Isurfkreject = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
+     +                    ,'LAND SURFACE K'
+              WRITE(iout,*)
+          case('SEEPSURFK')
+              Iseepreject = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'SURFACE LEAKAGE WILL BE CALCULATED ',
+     +                         'USING LAND SURFACE K'
+              WRITE(iout,*)
+              found = .true.
+          case('SAVEFINF')
+              Isavefinf = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'VALUES SPECIFIED IN FINF FOR ',
+     +                         'TRANSIENT GSFLOW MODELS WILL BE SAVED'
+              WRITE(iout,*)
+          case ('NETFLUX')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITRECH,R,IOUT,IN)
+            IF(UNITRECH.LT.0) UNITRECH=0
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITDIS,R,IOUT,IN)
+            IF(UNITDIS.LT.0) UNITDIS=0
+            IF ( UNITRECH > 0 .AND. UNITDIS > 0 ) INETFLUX = 1
+            IF ( INETFLUX > 0 ) WRITE(IOUT,31) UNITRECH,UNITDIS
+   31 FORMAT(1X,' OUTPUT WILL BE WRITTEN TO NETRECH AND NETDIS ',
+     +                 'FILES WITH UNIT NUMBERS ',I10,I10, 
+     +                 ', RESPECTIVELY')
+
+          case ('END')
+            write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            exit
+          case default
+            read(line(istart:istop),*,IOSTAT=Iostat) intchk
+            if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+            else
+              ! Integer found.  This is likely NUZTOP, so exit.
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +          trim(adjustl(text)) //' OPTIONS'
+              exit
+            endif
+        end select
+        CALL URDCOM(In, IOUT, line)
+        ENDDO
+      ELSE   
+! SUPPORT OLD KEYWORD FORMAT  
+        do
+        select case (LINE(ISTART:ISTOP))
+        case('SPECIFYTHTR')
+          ITHTRFLG = 1
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
+     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
+     +                'PERIOD'
+          WRITE(iout,*)
+          found = .true.
+        case('SPECIFYTHTI')
+          ITHTIFLG = 1
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
+     +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
+          WRITE(iout,*)
+          found = .true.
+        case('NOSURFLEAK')
+          Iseepsupress = 1
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
+          WRITE(iout,*)
+          found = .true.
+        case default
+          exit
+        end select
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        end do
+      if (found == .true.) CALL URDCOM(In, IOUT, line)
+      END IF
+      END SUBROUTINE
 C
 C------SUBROUTINE SGWF2UZF1VKS
       SUBROUTINE SGWF2UZF1VKS(Iunithuf, Iunitlpf, Iunitupw) 

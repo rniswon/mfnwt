@@ -85,7 +85,7 @@ C     ------------------------------------------------------------------
       INTEGER krck, irck, jrck, jsegck, ireachck, kkptflg, ib
       INTEGER lstsum, lstbeg, numinst, idum(1), ip, iterp, mstrmar
       INTEGER nssar, nstrmar, NPP, MXVL, IRFG
-      INTEGER intchk, Iostat
+!      INTEGER intchk, Iostat
 !!      INTEGER nssar, nstrmar, Ltyp, NPP, MXVL, IRFG, ITRFLG
       INTEGER k, kkrch, IERR, IFLG
       REAL r, seglen, sumlen, thsslpe, thislpe, uhcslpe, rchlen, dist
@@ -162,134 +162,13 @@ C         DLEAK, ISTCB1, ISTCB2.
       SFRUZRECH = 0.0
       NUMIRRSFR = 0
 C
-C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
-C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
+C2A------COMMENTS/FIRST LINE.
       CALL URDCOM(In, IOUT, line)
       CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-      DO
-        LLOC=1
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        select case (LINE(ISTART:ISTOP))
-          case('OPTIONS')
-            write(iout,'(/1x,a)') 'PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-          case('REACHINPUT')
-            IRFG = 1
-            WRITE(IOUT,32)
-            found = .true.
-!support old input style
-            do
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-              select case (LINE(ISTART:ISTOP))
-              case('TRANSROUTE')
-                  ITRFLG = 1
-                  WRITE(iout,*)
-                  WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS ',
-     +                            'IS ACTIVE'
-                  WRITE(iout,*)
-              case('TABFILES')
-                  CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-                  IF(NUMTAB.LT.0) NUMTAB=0
-                  CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
-                  IF(MAXVAL.LT.0) MAXVAL=0
-                  WRITE(IOUT,31) NUMTAB,MAXVAL
-              case('STRHC1KH')
-                  STRHC1KHFLAG = 1
-                  WRITE(IOUT,*)
-                  CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
-     +                        IOUT,In)
-                  WRITE(IOUT,323) FACTORKH
-                  found = .true.
-              case('STRHC1KV')
-                STRHC1KVFLAG = 1
-                WRITE(IOUT,*)
-                CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
-     +                  IOUT,In)
-                WRITE(IOUT,324) FACTORKV
-                found = .true.
-              case default
-                exit
-              end select
-            end do
-          case('TRANSROUTE')
-            ITRFLG = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS IS ACTIVE'
-            WRITE(iout,*)
-            found = .true.
-          case('TABFILES')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-            IF(NUMTAB.LT.0) NUMTAB=0
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
-            IF(MAXVAL.LT.0) MAXVAL=0
-            WRITE(IOUT,31) NUMTAB,MAXVAL
-            found = .true.
-          case('LOSSFACTOR')
-            WRITE(IOUT,*)
-            CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,IOUT,In)
-            WRITE(IOUT,33) FACTOR
-           found = .true.
-          case('STRHC1KH')
-            STRHC1KHFLAG = 1
-            WRITE(IOUT,*)
-            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
-     +                  IOUT,In)
-            WRITE(IOUT,323) FACTORKH
-            found = .true.
-          case('STRHC1KV')
-            STRHC1KVFLAG = 1
-            WRITE(IOUT,*)
-            CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
-     +                  IOUT,In)
-            WRITE(IOUT,324) FACTORKV
-            found = .true.
-! Pumped water will be added as irrigation
-          case('IRRIGATE')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)    !FILE UNIT
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
-            IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
-            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(55) < 1 ) NUMIRRSFR = 0
-            WRITE(IOUT,34) NUMIRRSFR
-            found = .true.
-          case ('END')
-            write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-            CALL URDCOM(In, IOUT, line)
-            exit
-          case default
-            read(line(istart:istop),*,IOSTAT=Iostat) intchk
-            if( Iostat .ne. 0 ) then
-              ! Not an integer.  Likely misspelled or unsupported 
-              ! so terminate here.
-              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-              CALL USTOP('Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP))
-            else
-              ! Integer found.  This is likely NSTRM, so exit.
-              write(iout,'(/1x,a)') 'END PROCESSING '//
-     +          trim(adjustl(text)) //' OPTIONS'
-              exit
-            endif
-        end select
-        CALL URDCOM(In, IOUT, line)
-      ENDDO
-   32 FORMAT(1X,I10,' Some stream information will be read by reach. ',
-     +                'This option replaces NSTRM<0')
-   31 FORMAT(1X,I10,' Specified inflow files will be read ',
-     +                 'with a maximum of ',I10,' row entries per file')
-  33  FORMAT('Stream loss will be calculated as a factor ',
-     +                 'of the streambed hydraulic conductivity. ',
-     +                 'Multiplication factor is equal to ',E20.10)
-  323 FORMAT('Streambed K will be set equal to KH of aquifer ',
-     +                 'Multiplied by a factor equal to ',E20.10)
-  324 FORMAT('Streambed K will be set equal to KV of aquifer ',
-     +                 'Multiplied by a factor equal to ',E20.10)
-   34 FORMAT(1X,'Option to apply diverted water as irrigtion is active.'
-     +'diverted irrigation water will be applied to ',I10,' UZF Cells.')
-!
+C
+C2B------CHECK FOR KEYWORDS.  
+      CALL PARSESFROPTIONS(In,Iout,IRFG,NPP,MXVL,TEXT,LINE)
+C
       lloc = 1
       CALL URWORD(line, lloc, istart, istop, 2, NSTRM, r, IOUT, In)
       CALL URWORD(line, lloc, istart, istop, 2, NSS, r, IOUT, In)
@@ -1106,8 +985,200 @@ C
 C23-----SAVE POINTERS FOR GRID AND RETURN.
       CALL SGWF2SFR7PSV(Igrid)
       RETURN
-      END SUBROUTINE GWF2SFR7AR
+      END SUBROUTINE
 C
+C
+!
+C-------SUBROUTINE PARSEOPTIONS
+      SUBROUTINE PARSESFROPTIONS(In,Iout,IRFG,NPP,MXVL,TEXT,line)
+C     ******************************************************************
+C     INTERPRET KEYWORDS TO DETERMINE ACTIVE OPTIONS. COMBINES 
+C     OLD APPROACH AND NEW APPROACH. FOR NEW APPROACH KEYWORDS
+C     MUST BE SURROUNDED BY "OPTIONS" AND "END"
+C     ******************************************************************
+      USE GWFSFRMODULE
+      USE GLOBAL,       ONLY: iunit
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C     ARGUMENTS
+C     ------------------------------------------------------------------
+      INTEGER, INTENT(IN) :: In, Iout
+      INTEGER, INTENT(INOUT) :: IRFG,NPP,MXVL
+      character(len=16)  :: text
+      CHARACTER(LEN=200)::LINE
+C     ------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     ------------------------------------------------------------------
+      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,IHEADER
+      logical :: found
+      real :: R
+C     ------------------------------------------------------------------
+C
+      IHEADER = 0
+      LLOC=1
+      found = .false.
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        IF ( LINE(ISTART:ISTOP)=='OPTIONS') THEN
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            IHEADER = 1 
+            found = .true.
+        END IF
+        IF ( IHEADER == 1 ) THEN
+          CALL URDCOM(In, IOUT, line)
+          DO
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+            select case (LINE(ISTART:ISTOP))
+            case('REACHINPUT')
+              IRFG = 1
+              WRITE(IOUT,32)
+            case('TRANSROUTE')
+              ITRFLG = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS IS ACTIVE'
+              WRITE(iout,*)
+            case('TABFILES')
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
+              IF(NUMTAB.LT.0) NUMTAB=0
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
+              IF(MAXVAL.LT.0) MAXVAL=0
+              WRITE(IOUT,31) NUMTAB,MAXVAL
+            case('LOSSFACTOR')
+              WRITE(IOUT,*)
+              CALL URWORD(line, lloc, istart, istop, 3, i, FACTOR,
+     +                    IOUT,In)
+              WRITE(IOUT,33) FACTOR
+            case('STRHC1KH')
+              STRHC1KHFLAG = 1
+              WRITE(IOUT,*)
+              CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH, 
+     +                    IOUT,In)
+              WRITE(IOUT,323) FACTORKH
+            case('STRHC1KV')
+              STRHC1KVFLAG = 1
+              WRITE(IOUT,*)
+              CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
+     +                    IOUT,In)
+              WRITE(IOUT,324) FACTORKV
+! Pumped water will be added as irrigation
+            case('IRRIGATE')
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)    !FILE UNIT
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
+              IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
+              IF ( MAXCELLS < 1 ) MAXCELLS = 1 
+              IF ( IUNIT(55) < 1 ) NUMIRRSFR = 0
+              WRITE(IOUT,34) NUMIRRSFR
+            case ('END')
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +              trim(adjustl(text)) //' OPTIONS'
+              CALL URDCOM(In, IOUT, line)
+              found = .true.
+              exit
+            case default
+              read(line(istart:istop),*,IOSTAT=Iostat) intchk
+              if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+                CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+              else
+              ! Integer found.  This is likely NSTRM, so exit.
+                write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+                exit
+              endif
+            end select
+            CALL URDCOM(In, IOUT, line)
+          ENDDO
+        ELSE
+!support old input style
+          do
+            select case (LINE(ISTART:ISTOP))
+            case('REACHINPUT')
+              IRFG = 1
+              WRITE(IOUT,32)
+              found = .true.
+            case('TRANSROUTE')
+              ITRFLG = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS ',
+     +                        'IS ACTIVE'
+              WRITE(iout,*)
+              found = .true.
+            case('TABFILES')
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
+              IF(NUMTAB.LT.0) NUMTAB=0
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
+              IF(MAXVAL.LT.0) MAXVAL=0
+              WRITE(IOUT,31) NUMTAB,MAXVAL
+              found = .true.
+            case('STRHC1KH')
+              STRHC1KHFLAG = 1
+              WRITE(IOUT,*)
+              CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKH,
+     +                        IOUT,In)
+              WRITE(IOUT,323) FACTORKH
+              found = .true.
+            case('STRHC1KV')
+              STRHC1KVFLAG = 1
+              WRITE(IOUT,*)
+              CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
+     +                    IOUT,In)
+              WRITE(IOUT,324) FACTORKV
+              found = .true.
+            case('LOSSFACTOR')
+              ! LOSSFACTOR NOT SUPPORTED WITHOUT "OPTIONS" HEADER
+              ! SO TERMINATE HERE.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              WRITE(IOUT,*) 'For Option: '//LINE(ISTART:ISTOP),',',
+     +                      ' KEYWORDS MUST BE PROCEEDED BY "OPTIONS" ',
+     +                      'AND FOLLOWED BY "END"'
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+              found = .true.
+            case('IRRIGATE')
+              ! IRRIGATE NOT SUPPORTED WITHOUT "OPTIONS" HEADER
+              ! SO TERMINATE HERE.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              WRITE(IOUT,*) 'For Option: '//LINE(ISTART:ISTOP),',',
+     +                      ' KEYWORDS MUST BE PROCEEDED BY "OPTIONS" ',
+     +                      'AND FOLLOWED BY "END"'
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+              found = .true.
+            case default
+            exit
+            end select
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+          end do
+          if (found == .true.) CALL URDCOM(In, IOUT, line)
+      end if
+!
+   32 FORMAT(1X,I10,' Some stream information will be read by reach. ',
+     +                'This option replaces NSTRM<0')
+   31 FORMAT(1X,I10,' Specified inflow files will be read ',
+     +                 'with a maximum of ',I10,' row entries per file')
+  33  FORMAT('Stream loss will be calculated as a factor ',
+     +                 'of the streambed hydraulic conductivity. ',
+     +                 'Multiplication factor is equal to ',E20.10)
+  323 FORMAT('Streambed K will be set equal to KH of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
+  324 FORMAT('Streambed K will be set equal to KV of aquifer ',
+     +                 'Multiplied by a factor equal to ',E20.10)
+   34 FORMAT(1X,'Option to apply diverted water as irrigtion is active.'
+     +,'diverted irrigation water will be applied to ',I10,
+     + ' UZF Cells.')
+C
+C2------RETURN.
+      RETURN
+      END SUBROUTINE PARSESFROPTIONS
+!
 C-------SUBROUTINE SGWF2SFR7UHC
       SUBROUTINE SGWF2SFR7UHC(Iunitlpf, Iunitupw)
 C     ******************************************************************
@@ -4131,7 +4202,8 @@ C34-----STORE STREAM INFLOW, OUTFLOW, AND LEAKAGE FOR EACH REACH.
           STRM(9, l) = flowot
           STRM(10, l) = flowin
           STRM(11, l) = flobot
-          IF ( flobot<0.0) SEG(27,istsg) = SEG(27,istsg) + flobot
+          IF ( flobot<0.0) SEG(27,istsg) = SEG(27,istsg) + 
+     +                     flobot*DELTINC/DELT
           STRM(17, l) = hdiff
           STRM(18, l) = grad
           STRM(19, l) = h
@@ -4181,29 +4253,29 @@ C37-----ADD RATES TO BUFFERS.
             FOLDFLBT(l) = flobot
           ELSE
             gwflow = flobot
-            BUFF(ic, ir, il) = BUFF(ic, ir, il) + flobot
+            BUFF(ic, ir, il) = BUFF(ic, ir, il) + flobot*DELTINC/DELT
             IF ( IUZT.GT.0 ) totdelstor = 0.0D0
 C
 C38-----SUBTRACT FLOBOT FROM RATOUT WHEN GROUND WATER DISCHARGES
 C         TO STREAM REACH.
             IF ( flobot.LT.0.0D0 ) THEN
-              ratout = ratout - flobot
+              ratout = ratout - flobot*DELTINC/DELT
               SFRUZBD(9) = -flobot
             END IF
 C 
 C39-----ADD FLOBOT TO RATIN WHEN STREAM RECHARGES GROUND WATER.
             IF ( flobot.GT.0.0D0 ) THEN
-              ratin = ratin + flobot
+              ratin = ratin + flobot*DELTINC/DELT
               SFRUZBD(8) = flobot
             END IF
             IF ( icalccheck.EQ.1 .AND. sbot.GT.h ) THEN
-              totflwt = flobot*DELT
-              SFRUZBD(1) = SFRUZBD(1) + flobot*DELT
+              totflwt = flobot*DELTINC
+              SFRUZBD(1) = SFRUZBD(1) + flobot*DELTINC
               SFRUZBD(2) = 0.0
-              SFRUZBD(3) = SFRUZBD(3) + flobot*DELT
-              SFRUZBD(4) = SFRUZBD(4) + flobot
+              SFRUZBD(3) = SFRUZBD(3) + flobot*DELTINC
+              SFRUZBD(4) = SFRUZBD(4) + flobot*DELTINC/DELT
               SFRUZBD(5) = 0.0
-              SFRUZBD(6) = SFRUZBD(6) + flobot
+              SFRUZBD(6) = SFRUZBD(6) + flobot*DELTINC/DELT
             ELSE IF ( sbot.LT.h ) THEN
               totflwt = 0.0
             END IF
@@ -4212,7 +4284,8 @@ C
 C40-----PRINT STREAMFLOWS AND RATES FOR EACH REACH TO MAIN LIST IF
 C         REQUESTED (ISTCB1<0 and IBD<0)AND NO UNSATURATED FLOW.
           IF ( IUZT.EQ.0 ) THEN
-            IF ( ibd.LT.0 .AND. IPTFLG.LE.0 ) THEN
+            IF ( irt.EQ.numdelt ) THEN
+              IF ( ibd.LT.0 .AND. IPTFLG.LE.0 ) THEN
               IF ( ibdlbl.EQ.0 ) WRITE (IOUT, 9004) txtlst, Kkper, Kkstp
               WRITE (IOUT, 9005) il, ir, ic, ISTRM(4, l), ISTRM(5, l), 
      +                           STRM(10, l), STRM(11, l), STRM(9, l), 
@@ -4220,11 +4293,11 @@ C         REQUESTED (ISTCB1<0 and IBD<0)AND NO UNSATURATED FLOW.
      +                          SNGL(etstr), STRM(15, l), SNGL(depth), 
      +                           STRM(5, l), STRM(16, l), SNGL(grad)
               ibdlbl = 1
-            END IF
+              END IF
 C
 C41-----PRINT STREAMFLOWS AND RATES FOR EACH REACH TO STREAM LIST
 C         IF REQUESTED (ISTCB2>0).
-            IF ( ibdst.LT.0 .AND. IPTFLG.LE.0 ) THEN
+              IF ( ibdst.LT.0 .AND. IPTFLG.LE.0 ) THEN
               IF ( ibstlb.EQ.0 ) WRITE (iout2, 9004) txtlst, Kkper,
      +                                               Kkstp
               WRITE (iout2, 9005) il, ir, ic, ISTRM(4, l), ISTRM(5, l), 
@@ -4233,11 +4306,13 @@ C         IF REQUESTED (ISTCB2>0).
      +                            SNGL(etstr), STRM(15, l), SNGL(depth),
      +                            STRM(5, l), STRM(16, l), SNGL(grad)
               ibstlb = 1
-            END IF
+             END IF
+           END IF
 C
 C42-----PRINT STREAMLFOWS AND RATES FOR EACH REACH TO MAIN LIST
 C         WHEN UNSATURATED FLOW IS ACTIVE.
           ELSE
+            IF ( irt.EQ.numdelt ) THEN
             IF (ibd.LT.0 .AND. IPTFLG.LE.0 .AND. imassroute.EQ.1) THEN
               IF ( ibdlbl.EQ.0 ) WRITE (IOUT, 9006) txtlst, Kkper, Kkstp
               WRITE (IOUT, 9007) il, ir, ic, ISTRM(4,l), ISTRM(5,l), 
@@ -4276,7 +4351,8 @@ C         WHEN UNSATRATED FLOW IS ACTIVE.
                 ibstlb = 1
               END IF
             END IF
-          END IF
+           END IF
+         END IF
 C43B----SAVE SEEPAGE TO ARRAY FOR PRINTING NET SEEPAGE IN UZF
           FNETSEEP(IC,IR) = gwflow
 C

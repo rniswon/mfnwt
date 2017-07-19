@@ -109,81 +109,14 @@ C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
 C
 C2------READ MAXIMUM NUMBER OF WELLS AND UNIT OR FLAG FOR
 C2------CELL-BY-CELL FLOW TERMS.
-C
-C2A------CHECK FOR KEYWORDS.  IF NO VALID KEYWORDS FOUND
-C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
       CALL URDCOM(In, IOUT, line)
       CALL UPARLSTAL(IN,IOUT,LINE,NPWEL,MXPW)
-      DO
-        LLOC=1
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        select case (LINE(ISTART:ISTOP))
-        case('OPTIONS')
-            write(iout,'(/1x,a)') 'PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-! REDUCING PUMPING FOR DRY CELLS
-        case('SPECIFY')
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
-          IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
-          IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
-          WRITE(IOUT,*)
-          WRITE(IOUT,9) PSIRAMP,IUNITRAMP
-          IF ( Iunitnwt.EQ.0 ) write(IOUT,32)
-! SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
-        case('TABFILES')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
-            IF(NUMTAB.LT.0) NUMTAB=0
-            WRITE(IOUT,30) NUMTAB
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
-            IF(MAXVAL.LT.0) THEN
-                MAXVAL=1
-                NUMTAB=0
-            END IF
-            WRITE(IOUT,31) MAXVAL
-            found = .true.
-! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
-        case('SUPPLEMENTAL')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
-            IF(NUMSUP.LT.0) NUMSUP=0
-            IF ( IUNIT(44) < 1 ) NUMSUP=0
-            WRITE(IOUT,33) NUMSUP
-            found = .true.
-! Pumped water will be added as irrigation
-        case('IRRIGATE')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRR,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
-            IF( NUMIRR.LT.0 ) NUMIRR = 0
-            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(55) < 1 ) NUMIRR = 0
-            WRITE(IOUT,34) NUMIRR
-            found = .true.
-        case ('END')
-         write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-            CALL URDCOM(In, IOUT, line)
-            exit
-          case default
-            read(line(istart:istop),*,IOSTAT=Iostat) intchk
-            if( Iostat .ne. 0 ) then
-              ! Not an integer.  Likely misspelled or unsupported 
-              ! so terminate here.
-              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-              CALL USTOP('Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP))
-            else
-              ! Integer found.  This is likely NSTRM, so exit.
-              write(iout,'(/1x,a)') 'END PROCESSING '//
-     +          trim(adjustl(text)) //' OPTIONS'
-              exit
-            endif
-        end select
-        CALL URDCOM(In, IOUT, line)
-      ENDDO
+C
+C
+C2A------CHECK FOR KEYWORDS.  
+C
+      CALL PARSEWELLOPTIONS(In, Iout, LINE, IUNITNWT)
+C
 ! ALLOCATE VARS FOR TIME SERIES WELL RATES
       NUMTABHOLD = NUMTAB
       IF ( NUMTABHOLD.EQ.0 ) NUMTABHOLD = 1
@@ -212,24 +145,6 @@ C        THEN VERIFY THAT FIRST VALUE IS INTEGER AND PROCEED.
     7 FORMAT(1X,'CELL-BY-CELL FLOWS WILL BE PRINTED WHEN ICBCFL NOT 0')
       IF(IWELCB.GT.0) WRITE(IOUT,8) IWELCB
     8 FORMAT(1X,'CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT ',I4)
-    9 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
-     +       ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
-     +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
-     +       ' WELLS WITH REDUCED PUMPING WILL BE '
-     +       'REPORTED TO FILE UNIT NUMBER',I5)
-   30 FORMAT(1X,' Pumping rates will be read from time ',
-     +                 'series input files. ',I10,' files will be read')
-   31 FORMAT(1X,' Pumping rates will be read from time ',
-     +                 'series input files. A maximum of ',I10,
-     +                 ' row entries will be read per file')
-   32 FORMAT(1X,' Option to reduce pumping during cell ',
-     +                 'dewatering is activated and NWT solver ',I10,
-     +                 ' is not being used. Option deactivated')
-   33 FORMAT(1X,' Option to pump supplmental water ',
-     +          'for surface diversion shortfall is activted. '
-     +          ' A total of ',I10, 'supplemental wells are active')
-   34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
-     +'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
 C
 C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
       ALLOCATE(WELAUX(20))
@@ -252,10 +167,40 @@ C3------READ AUXILIARY VARIABLES AND PRINT FLAG.
          IPRWEL = 0
          GO TO 10
       END IF
-! Check keyword for specifying PSI (NWT). !Moved above
-!      CALL URDCOM(IN,IOUT,LINE)
-!      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
-!
+! Check keyword for specifying PSI (NWT). This is to support previous versions of NWT
+      CALL URDCOM(IN,IOUT,LINE)
+      CALL UPARLSTAL(IN,IOUT,LINE,NPP,MXVL)
+      LLOC=1
+      CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+      IF(LINE(ISTART:ISTOP).EQ.'SPECIFY') THEN
+         CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
+         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
+         IF ( Iunitnwt.EQ.0 ) THEN
+             write(IOUT,32)
+         ELSE
+           IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
+           IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
+           WRITE(IOUT,*)
+           WRITE(IOUT,9) PSIRAMP,IUNITRAMP
+         END IF
+      ELSE
+         BACKSPACE IN
+         IF ( IUNITNWT.GT.0 )THEN
+           IUNITRAMP = IOUT
+      WRITE(IOUT,*)' PHIRAMP WILL BE SET TO A DEFAULT VALUE OF 1.0E-5'
+      WRITE(IOUT,*) ' WELLS WITH REDUCED PUMPING WILL BE '
+     +                      ,'REPORTED TO THE MAIN LISTING FILE'
+         END IF
+      END IF
+    9 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
+     +       ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
+     +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
+     +       ' WELLS WITH REDUCED PUMPING WILL BE '
+     +       'REPORTED TO FILE UNIT NUMBER',I5)
+   32 FORMAT(1X,' Option to reduce pumping during cell ',
+     +          'dewatering is activated and NWT solver ',I10,
+     +          ' is not being used. Option deactivated')
+C
 C3A-----THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
 C3A-----CELL-BY-CELL FLOW.
       NWELVL=5+NAUX
@@ -345,7 +290,129 @@ C
 C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
       RETURN
-      END
+      END SUBROUTINE
+C
+      SUBROUTINE PARSEWELLOPTIONS(IN,IOUT,line,IUNITNWT)
+C     ******************************************************************
+C     READ WELL DATA FOR A STRESS PERIOD
+C     ******************************************************************
+C
+C        SPECIFICATIONS:
+C     ------------------------------------------------------------------
+      USE GLOBAL,       ONLY:IUNIT
+      USE GWFWELMODULE
+      USE GWFSFRMODULE, ONLY: NSS
+C
+      INTEGER, INTENT(IN) :: IN,IOUT,IUNITNWT
+      character(len=200), intent(INOUT) :: line
+C     ------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     ------------------------------------------------------------------
+      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,IHEADER
+      logical :: found
+      real :: R
+      character(len=16)  :: text
+C     ------------------------------------------------------------------
+C
+      LLOC=1
+      found = .false.
+        DO
+        LLOC=1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        select case (LINE(ISTART:ISTOP))
+        case('OPTIONS')
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            found = .true.
+! REDUCING PUMPING FOR DRY CELLS
+        case('SPECIFY')
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
+          IF ( IUNITNWT.EQ.0 ) THEN
+            write(IOUT,32)
+          ELSE
+            IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
+            IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
+            WRITE(IOUT,*)
+            WRITE(IOUT,9) PSIRAMP,IUNITRAMP
+          END IF
+          found = .true.
+! SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
+        case('TABFILES')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
+            IF(NUMTAB.LT.0) NUMTAB=0
+            WRITE(IOUT,30) NUMTAB
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
+            IF(MAXVAL.LT.0) THEN
+                MAXVAL=1
+                NUMTAB=0
+            END IF
+            WRITE(IOUT,31) MAXVAL
+            found = .true.
+! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
+        case('SUPPLEMENTAL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
+            IF(NUMSUP.LT.0) NUMSUP=0
+            IF ( IUNIT(44) < 1 ) NUMSUP=0
+            WRITE(IOUT,33) NUMSUP
+            found = .true.
+! Pumped water will be added as irrigation
+        case('IRRIGATE')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRR,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
+            IF( NUMIRR.LT.0 ) NUMIRR = 0
+            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
+            IF ( IUNIT(55) < 1 ) NUMIRR = 0
+            WRITE(IOUT,34) NUMIRR
+            found = .true.
+        case ('END')
+         write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            found = .true.
+            exit
+          case default
+            read(line(istart:istop),*,IOSTAT=Iostat) intchk
+            if( Iostat .ne. 0 ) then
+              ! Not an integer.  Likely misspelled or unsupported 
+              ! so terminate here.
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+            else
+              ! Integer found.  This is likely NSTRM, so exit.
+              write(iout,'(/1x,a)') 'END PROCESSING '//
+     +          trim(adjustl(text)) //' OPTIONS'
+              exit
+            endif
+        end select
+        if (found == .true.) CALL URDCOM(In, IOUT, line)
+      ENDDO
+    9 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
+     +       ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
+     +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
+     +       ' WELLS WITH REDUCED PUMPING WILL BE '
+     +       'REPORTED TO FILE UNIT NUMBER',I5)
+   30 FORMAT(1X,' Pumping rates will be read from time ',
+     +                 'series input files. ',I10,' files will be read')
+   31 FORMAT(1X,' Pumping rates will be read from time ',
+     +                 'series input files. A maximum of ',I10,
+     +                 ' row entries will be read per file')
+   32 FORMAT(1X,' Option to reduce pumping during cell ',
+     +                 'dewatering is activated and NWT solver ',I10,
+     +                 ' is not being used. Option deactivated')
+   33 FORMAT(1X,' Option to pump supplmental water ',
+     +          'for surface diversion shortfall is activted. '
+     +          ' A total of ',I10, 'supplemental wells are active')
+   34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
+     +'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
+      END SUBROUTINE     
+C
+C
       SUBROUTINE GWF2WEL7RP(IN,KPER,IGRID)
 C     ******************************************************************
 C     READ WELL DATA FOR A STRESS PERIOD
@@ -873,13 +940,6 @@ C
           WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
           iw1 = iw1 + 1 
       END IF
-!
-C5D-----PRINT FLOW RATE IF REQUESTED.
-       IF(IBD.LT.0) THEN
-          IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
-            WRITE(IOUT,62) L,IL,IR,IC,Q
-            IBDLBL=1
-       END IF
 C
 C5E-----ADD FLOW RATE TO BUFFER.
       BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
@@ -911,7 +971,25 @@ C5I-----COPY FLOW TO WELL LIST.
      1       '        GW-HEAD       CELL-BOT')
   500 FORMAT(3I6,4E15.6)
 
-  100 CONTINUE
+  100       CONTINUE
+!
+C5D-----PRINT FLOW RATE IF REQUESTED.
+       IF(IBDLBL.EQ.0.AND.IBD.LT.0) WRITE(IOUT,61) TEXT,KPER,KSTP
+       DO L=1,NWELLSTEMP
+         IF ( NUMTAB.LE.0 ) THEN
+           IR=WELL(2,L)
+           IC=WELL(3,L)
+           IL=WELL(1,L)
+         ELSE
+           IR = TABROW(L)
+           IC = TABCOL(L)
+           IL = TABLAY(L)  
+         END IF
+         IF(IBD.LT.0) THEN
+              WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
+         END IF
+       END DO
+C
       IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
 C
 C6------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
