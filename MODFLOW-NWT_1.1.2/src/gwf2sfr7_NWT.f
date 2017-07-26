@@ -8502,7 +8502,7 @@ C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION
 C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG
+      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8523,8 +8523,10 @@ C
         DO ISEG = 1, NSS
 C
 C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
-C            
-          SEG(2,iseg) = DIVS(ISEG)
+C         
+          IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
+            SEG(2,iseg) = DIVS(ISEG)
+          END IF
         END DO
 C
 C8------RETURN.
