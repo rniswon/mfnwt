@@ -176,6 +176,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
       ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
+      ALLOCATE (ETDEMANDFLAG)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
@@ -188,6 +189,7 @@ C     ------------------------------------------------------------------
       LAYNUM = 0
       SMOOTHET = 0.0D0
       smooth = 0.0
+      ETDEMANDFLAG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
@@ -994,6 +996,14 @@ C     ------------------------------------------------------------------
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         select case (LINE(ISTART:ISTOP))
+          case('SPECIFYTHTR')
+            ITHTRFLG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
+     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
+     +                'PERIOD'
+            WRITE(iout,*)
+            found = .true.
           case('SPECIFYTHTI')
             ITHTIFLG = 1
             WRITE(iout,*)
@@ -1026,9 +1036,15 @@ C     ------------------------------------------------------------------
             found = .true.
           case('REJECTSURFK')
               Isurfkreject = 1
-              WRITE(iout,*)
+              WRITE(iout,*)Isurfkreject
               WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
      +                    ,'LAND SURFACE K'
+              WRITE(iout,*)
+          case('ETDEMAND')
+              ETDEMANDFLAG = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')'AGRICULTURAL DEMANDS WILL BE '
+     +                        ,'CALCULATED USING ET DEFICIT'
               WRITE(iout,*)
           case('SEEPSURFK')
               Iseepreject = 1
@@ -1414,7 +1430,7 @@ C         IUZFOPT IS ZERO.
      +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
           ELSE
 C
-C12-----READ IN ARRAY FOR ET EXTINCTION DEPTH.
+C12-----READ IN ARRAY FOR ET WATER CONTENT.
             CALL U2DREL(WCWILT, aname(4), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR EXTINCTION WATER CONTENT LESS THAN RESIDUAL WATER
@@ -1722,7 +1738,16 @@ C27-----IF NO UNSATURATED ZONE, SET ARRAYS VALUES TO ZERO.
         END DO
       END IF
 C
-C28-----RETURN.
+C28-----INITIALIZE SURFACE WATER DEMANDS USING PET.
+      !if ( ETDEMANDFLAG > 0 ) then
+      !    if ( kkper == 1 .and. issflg(kkper)==0 ) then
+      !      CALL IRRDEMANDRP()
+      !    else if ( kkper > 1 ) then
+      !      if ( issflg(kkper-1)==1 ) CALL IRRDEMANDRP()
+      !    end if
+      !end if
+C
+C29-----RETURN.
       RETURN
       END SUBROUTINE GWF2UZF1RP
 C
@@ -1790,6 +1815,7 @@ C2------LOOP THROUGH UNSATURATED ZONE FLOW CELLS.
       idelt = 1
       finfhold = 0.0
       nlayp1 = NLAY + 1
+      if (kkiter==1 .and. issflg(kkper)==0 ) CALL IRRDEMANDRP()
       IF ( IETFLG.GT.0 ) THEN                      
         IF ( ITMUNI.EQ.1 ) THEN
           fact = 86400.0D0          
@@ -2033,6 +2059,7 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END DO
                 totflux = totfluxtot
                 etact = totetact
+                UZFETOUT(ic, ir) = etact*cellarea
                 IF ( totflux.LT.0.0D0 ) THEN
                   totflux = 0.0D0
                 ELSE
@@ -2130,6 +2157,8 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               A(IA(ij)) = A(IA(ij)) - dET*etgw
             END IF
           END IF
+! Calculate sediment water deficit for irrigation demand
+          
         END IF
       END IF
       END DO
@@ -2137,7 +2166,11 @@ C
 C8------ADD OVERLAND FLOW TO STREAMS, LAKES AND CONDUITS. 
       IF ( IRUNFLG.GT.0 .AND. (Iunitsfr.GT.0.OR.
      +     Iunitlak.GT.0.OR.Iunitswr.GT.0) )
-     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )
+     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )      
+C
+C28-----CALCULATE SURFACE WATER DEMANDS USING PET.
+      if ( ETDEMANDFLAG > 0 .AND. ISS == 0 ) 
+     +      CALL IRRDEMANDFM(Kkper, Kkstp, Kkiter)
 
 C9------RETURN.
       RETURN
@@ -3885,8 +3918,16 @@ C60----LOOP OVER GAGING STATIONS.
                 gdelstor = UZTOTBAL(iuzcol, iuzrow, 2)
                 ginfltr = UZOLSFLX(iuzcol, iuzrow)*
      +                  DELC(iuzrow)*DELR(iuzcol)
-                gaplinfltr = FINF(iuzcol, iuzrow)*
-     +                     (DELC(iuzrow)*DELR(iuzcol))
+                gaplinfltr = FINF(iuzcol, iuzrow)
+                if ( IUNIT(2) > 0 ) then
+                  if ( NUMIRR > 0 ) gaplinfltr = gaplinfltr + 
+     +                                           WELLIRR(iuzcol, iuzrow)
+                end if
+                if ( IUNIT(44) > 0 ) then
+                  if ( NUMIRRSFR > 0 ) gaplinfltr = gaplinfltr + 
+     +                                            SFRIRR(iuzcol, iuzrow)
+                end if
+                gaplinfltr = gaplinfltr*(DELC(iuzrow)*DELR(iuzcol))
                 IF ( IUZFOPT.GT.0 ) THEN
                   guzstore = UZSTOR(iuzcol, iuzrow) 
                   grchr = UZFLWT(iuzcol, iuzrow)/DELT
@@ -5554,6 +5595,134 @@ C
         END IF
       END IF 
       END FUNCTION CAPH
+! ----------------------------------------------------------------------
+
+      function unsat_stor(d1,uzthst,uzdpst,ic,ir,nwav)
+!     ******************************************************************
+!     unsat_stor---- sums up mobile water over depth interval
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY:NWAVST
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      DOUBLE PRECISION, intent(inout) :: d1
+      DOUBLE PRECISION, intent(inout) :: uzthst(NWAV), uzdpst(NWAV)
+      ! -- dummy
+      DOUBLE PRECISION :: fm, unsat_stor
+      integer :: j, k,nwavm1,jj, numwaves
+! ----------------------------------------------------------------------
+      fm = 0.0d0
+      DEM30 = 1.0d-30
+      numwaves = NWAVST(ic, ir)
+      j = numwaves + 1
+      k = numwaves
+      nwavm1 = k-1
+      if ( d1 > uzdpst(1) ) d1 = uzdpst(1)
+      !
+      !find deepest wave above depth d1, counter held as j
+      do while ( k > 0 )
+        if ( uzdpst(k) - d1 < -DEM30) j = k
+          k = k - 1
+      end do
+      if ( j > numwaves ) then
+        fm = fm + (uzthst(numwaves)-thtr)*d1
+      elseif ( numwaves > 1 ) then
+        if ( j > 1 ) then
+          fm = fm + (uzthst(j-1)-thtr)*(d1-uzdpst(j))
+        end if
+        do jj = j, nwavm1
+          fm = fm + (uzthst(jj)-thtr)*(uzdpst(jj)-uzdpst(jj+1))
+        end do
+        fm = fm + (uzthst(numwaves)-thtr)*(uzdpst(numwaves))
+      else
+        fm = fm + (uzthst(1)-thtr)*d1
+      end if
+      unsat_stor = fm
+      end function unsat_stor
+!
+      subroutine IRRDEMANDFM(Kkper, Kkstp, Kkiter)
+!     ******************************************************************
+!     irrdemand---- sums up irrigation demand based on actual ET
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
+     +                        surfk,ROOTDPTH
+      USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,
+     +                        NUMIRRSFRSP,IRRSEG,SFRIRR
+      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR 
+      USE GLOBAL,     ONLY: DELR, DELC, IUNIT
+      USE GWFBASMODULE, ONLY: DELT
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      ! -- dummy
+      DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
+      double precision :: zerod30,done,dzero
+      integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0e-30
+      done = 1.0d0
+      dzero = 0.0d0
+      do i = 1, NUMIRRSFRSP
+        iseg = IRRSEG(i)
+        do k = 1, DVRCH(iseg)
+           finfsum = dzero
+           ic = IRRCOL(k,iseg)
+           ir = IRRROW(k,iseg)
+           fks = VKS(ic, ir)
+           IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
+           if ( IUNIT(2) > 0 ) then
+              if ( NUMIRR > 0 ) finfsum = finfsum + WELLIRR(ic,ir)
+           end if
+           finfsum = finfsum + SFRIRR(ic,ir)
+           area = delr(ic)*delc(ir)
+           pet = PETRATE(ic,ir)
+           uzet = uzfetout(ic,ir)/DELT
+           aet = (gwet(ic,ir)+uzet)/area
+           if ( aet < zerod30 ) aet = zerod30
+           factor = KCROP(K,iseg)*pet/aet - KCROP(K,iseg)
+           if ( finfsum >= fks ) factor = dzero
+           SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
+           if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
+      write(222,333)Kkper, Kkstp, Kkiter,SEG(2,iseg),pet,aet,factor
+333     format(3i6,4e20.10)
+        end do
+      end do
+      return
+      end subroutine IRRDEMANDFM
+!
+      subroutine IRRDEMANDRP()
+!     ******************************************************************
+!     irrdemand---- sets initial crop demand to PET
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY: PETRATE
+      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
+     +                        IRRSEG
+      USE GLOBAL,     ONLY: DELR, DELC
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      ! -- dummy
+      DOUBLE PRECISION :: factor, area, uzet, pet
+      integer :: k,iseg,ic,ir,i
+! ----------------------------------------------------------------------
+!
+      do i = 1, NUMIRRSFRSP
+        iseg = IRRSEG(i)
+        do k = 1, DVRCH(iseg)
+           ic = IRRCOL(k,iseg)
+           ir = IRRROW(k,iseg)
+           area = delr(ic)*delc(ir)
+           pet = PETRATE(ic,ir)
+           SEG(2,iseg) = 0.0d0
+        end do
+      end do
+      return
+      end subroutine IRRDEMANDRP
+! ----------------------------------------------------------------------
 C
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)

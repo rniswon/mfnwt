@@ -103,7 +103,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (ITMP, IRDFLG, IPTFLG, NP)
       ALLOCATE (CONST, DLEAK, IRTFLG, NUMTIM, WEIGHT, FLWTOL)
       ALLOCATE (NSEGDIM)
-      ALLOCATE (NUMIRRSFR,UNITIRR,MAXCELLS)  
+      ALLOCATE (NUMIRRSFR,UNITIRR,MAXCELLS,NUMIRRSFRSP)  
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
@@ -161,6 +161,7 @@ C         DLEAK, ISTCB1, ISTCB2.
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
       NUMIRRSFR = 0
+      NUMIRRSFRSP = 0
 C
 C2A------COMMENTS/FIRST LINE.
       CALL URDCOM(In, IOUT, line)
@@ -282,13 +283,13 @@ Cdep  changed DSTROT to FXLKOT
       ALLOCATE (HWTPRM(nstrmar,NUMTIM))
       ALLOCATE (FNETSEEP(NCOL,NROW)) !rgn printing net recharge in UZF
       IF ( NUMIRRSFR > 0 ) THEN
-        ALLOCATE (DVRCH(NSS),DVEFF(MAXCELLS,NSS))     
+        ALLOCATE (DVRCH(NSS),DVEFF(MAXCELLS,NSS),KCROP(MAXCELLS,NSS))
         ALLOCATE (IRRROW(MAXCELLS,NSS),IRRCOL(MAXCELLS,NSS)) 
         ALLOCATE (DVRPERC(MAXCELLS,NSS))  
         ALLOCATE (SFRIRR(NCOL,NROW))  
         ALLOCATE (IRRSEG(NSS))              ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
       ELSE
-        ALLOCATE (DVRCH(1),DVEFF(1,1))      
+        ALLOCATE (DVRCH(1),DVEFF(1,1),KCROP(1,1))      
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
         ALLOCATE (DVRPERC(1,1))  
         ALLOCATE (SFRIRR(1,1))  
@@ -301,7 +302,8 @@ Cdep  changed DSTROT to FXLKOT
       HWTPRM = 0.0
       ISTRM = 0
       DVRCH = 0    
-      DVEFF = 0.0    
+      DVEFF = 0.0
+      KCROP = 0.0
       IRRROW = 0  
       IRRCOL = 0
       SFRIRR = 0.0      
@@ -3589,7 +3591,7 @@ C         STREAMBED BOTTOM ELEVATION.
  !      fin=fin+sumrch(l)
             END IF
             END IF
-C80B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
+C80B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE
             IF ( istsg.GT.1 .AND. NUMIRRSFR > 0 ) THEN
                 IF ( DVRCH(istsg) .GT. 0) THEN
                   DO icount = 1, DVRCH(istsg)
@@ -4378,7 +4380,7 @@ cDEP   need to fix for unsaturated flow
             SFRQ(3, l) = flobot
             SFRQ(5, l) = qc
       END IF
-C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
+C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE 
             IF ( istsg.GT.1  .AND. NUMIRRSFR > 0 ) THEN
                 IF ( DVRCH(istsg) .GT. 0) THEN
                   DO icount = 1, DVRCH(istsg)
@@ -5376,7 +5378,7 @@ C     ******************************************************************
      +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
      +                        DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
      +                        NUMIRRSFR, UNITIRR, IRRSEG, DEMAND,
-     +                        MAXCELLS
+     +                        MAXCELLS, KCROP, NUMIRRSFRSP
       USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5392,7 +5394,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER icalc, idum, ii, iqseg, isol, iupseg, jj, jk, lstend, n, 
      +        noutseg, nseg, nstrpts, i, k, istart, istop,sgnm,nmcl,
-     +        J,LLOC,NUMIRRSFRSP
+     +        J,LLOC
       REAL dum, totdum, R
       CHARACTER(LEN=200)::LINE
 C     ------------------------------------------------------------------
@@ -5695,8 +5697,8 @@ C
           IF ( SGNM > 0 ) THEN
             BACKSPACE(UNITIRR)
             READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),          
-     +               IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
             totdum  = 0.0
             DO K = 1, NMCL
               IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
@@ -8517,6 +8519,8 @@ C
       END IF
       smooth = y
       END FUNCTION smooth
+!
+! ----------------------------------------------------------------------
 C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)
@@ -8638,6 +8642,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMIRRSFR)
+      DEALLOCATE (GWFSFRDAT(IGRID)%NUMIRRSFRSP)
       DEALLOCATE (GWFSFRDAT(IGRID)%UNITIRR)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXCELLS)
       DEALLOCATE (GWFSFRDAT(IGRID)%DEMAND)
@@ -8765,6 +8770,7 @@ C     ------------------------------------------------------------------
       NUMTAB=>GWFSFRDAT(IGRID)%NUMTAB
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
       NUMIRRSFR=>GWFSFRDAT(IGRID)%NUMIRRSFR
+      NUMIRRSFRSP=>GWFSFRDAT(IGRID)%NUMIRRSFRSP
       UNITIRR=>GWFSFRDAT(IGRID)%UNITIRR
       MAXCELLS=>GWFSFRDAT(IGRID)%MAXCELLS
       DEMAND=>GWFSFRDAT(IGRID)%DEMAND
@@ -8890,7 +8896,8 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%Nfoldflbt=>Nfoldflbt
       GWFSFRDAT(IGRID)%NUMTAB=>NUMTAB
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
-      GWFSFRDAT(IGRID)%NUMIRRSFR=>NUMIRRSFR
+      GWFSFRDAT(IGRID)%NUMIRRSFR=>NUMIRRSFR  
+      GWFSFRDAT(IGRID)%NUMIRRSFRSP=>NUMIRRSFRSP
       GWFSFRDAT(IGRID)%UNITIRR=>UNITIRR
       GWFSFRDAT(IGRID)%MAXCELLS=>MAXCELLS
       GWFSFRDAT(IGRID)%DEMAND=>DEMAND

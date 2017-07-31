@@ -5,7 +5,7 @@
         REAL,PARAMETER :: CLOSEZERO=1.0E-15
         INTEGER, SAVE, POINTER :: STRHC1KHFLAG, STRHC1KVFLAG
         INTEGER, SAVE, POINTER :: Nfoldflbt, NUMTAB, MAXVAL
-        INTEGER, SAVE, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS
+        INTEGER, SAVE, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS,NUMIRRSFRSP
         INTEGER,SAVE,                 POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,SAVE,                 POINTER:: NFLOWTYPE
         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
@@ -16,6 +16,7 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRR  !(store original recharge values)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
+        REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROP  !(crop coefficient)
         INTEGER,SAVE,POINTER:: NSS, NSTRM, NSFRPAR, ISTCB1, ISTCB2
         INTEGER,SAVE,POINTER:: IUZT, MAXPTS, IRTFLG, NUMTIM, NSEGDIM
         INTEGER,SAVE,POINTER:: ISFROPT, NSTRAIL, ISUZN, NSFRSETS
@@ -63,7 +64,7 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
       TYPE GWFSFRTYPE
         INTEGER, POINTER :: STRHC1KHFLAG, STRHC1KVFLAG
         INTEGER, POINTER :: Nfoldflbt, NUMTAB, MAXVAL
-        INTEGER, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS
+        INTEGER, POINTER :: NUMIRRSFR,UNITIRR,MAXCELLS,NUMIRRSFRSP
         INTEGER,                      POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,                      POINTER:: NFLOWTYPE
         CHARACTER*16,  DIMENSION(:),  POINTER:: FLOWTYPE
@@ -74,6 +75,7 @@ C        INTEGER,SAVE,                 POINTER:: NFLOWTYPE          !edm
         REAL,          DIMENSION(:,:),POINTER:: SFRIRR  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: DVRPERC  !Diversions to recharge
         REAL,          DIMENSION(:,:),POINTER:: DVEFF  !Diversions to recharge
+        REAL,          DIMENSION(:,:),POINTER:: KCROP  !Crop coefficient
         INTEGER,     POINTER:: NSS, NSTRM, NSFRPAR, ISTCB1, ISTCB2
         INTEGER,     POINTER:: IUZT, MAXPTS, IRTFLG, NUMTIM, NSEGDIM
         INTEGER,     POINTER:: ISFROPT, NSTRAIL, ISUZN, NSFRSETS
