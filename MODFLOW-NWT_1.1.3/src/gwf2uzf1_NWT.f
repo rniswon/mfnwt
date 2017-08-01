@@ -160,7 +160,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
       Version_uzf = 'gwf2uzf1_NWT.f 2017-03-08 09:56:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT, Isavefinf)
-      ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject)
+      ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject,ETOFH_FLAG)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
       Ireadsurfk = 0     ! Ireadsurfk = 1 means surfk will be read
       Isurfkreject = 0   ! Infiltration will be rejected using surfk
@@ -169,6 +169,7 @@ C     ------------------------------------------------------------------
       NUMCELLS = NCOL*NROW
       TOTCELLS = NUMCELLS*NLAY
       IPRCNT = 0
+      ETOFH_FLAG = 0
       ALLOCATE (LAYNUM(NCOL,NROW))
       ALLOCATE (NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM)
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
@@ -401,7 +402,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       ALLOCATE (WCWILT(NUZCL,NUZRW))
       WCWILT = 0.0
       ALLOCATE (SEEPOUT(NCOL,NROW), EXCESPP(NCOL,NROW))
-      IF ( RTSOLUTE.GT.0 ) THEN
+      IF ( ETOFH_FLAG.GT.0 ) THEN
         ALLOCATE (AIR_ENTRY(NCOL,NROW), H_ROOT(NCOL,NROW))
       ELSE
         ALLOCATE (AIR_ENTRY(1,1), H_ROOT(1,1))
@@ -411,7 +412,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       EXCESPP = 0.0
       REJ_INF = 0.0
       AIR_ENTRY = -16.0
-      H_ROOT = -15000.0
+      H_ROOT = -35000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
       IUZLIST = 0
       ALLOCATE (NWAVST(NUZCL,NUZRW))
@@ -2156,9 +2157,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               ij = Icell(IC,IR,IL)
               A(IA(ij)) = A(IA(ij)) - dET*etgw
             END IF
-          END IF
-! Calculate sediment water deficit for irrigation demand
-          
+          END IF         
         END IF
       END IF
       END DO
@@ -4873,7 +4872,7 @@ C     REMOVE WATER FROM UNSATURATED ZONE CAUSED BY EVAPOTRANSPIRATION
 C     ******************************************************************
       USE GWFUZFMODULE, ONLY: NWAV, NEARZERO, ZEROD6, RTSOLUTE, GRIDET,
      +                        Closezero, AIR_ENTRY, H_ROOT, ZEROD15,
-     +                        ZEROD9, ZEROD7
+     +                        ZEROD9, ZEROD7,ETOFH_FLAG
       USE GLOBAL,       ONLY: NLAY, BOTM, IOUT
 !!      USE GLOBAL,       ONLY: NLAY, LBOTM, BOTM, IOUT
       IMPLICIT NONE
@@ -4904,11 +4903,11 @@ C     ------------------------------------------------------------------
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
      +        kjm1
       INTEGER jpntm1, jpntp1, kknt, kkntm1, jj, nwavm1, iset,
-     +        ETOFH_FLAG, KKK
+     +        KKK
 C     ------------------------------------------------------------------
 C
 C1------INITIALIZE VARIABLES.
-      ETOFH_FLAG = 0
+!      ETOFH_FLAG = 0
       FACTOR = 1.0D0
       PET = Rateud*Rootdepth
       eps_m1 = DBLE(Eps) - 1.0D0
@@ -5649,20 +5648,21 @@ C
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk,ROOTDPTH
       USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,
-     +                        NUMIRRSFRSP,IRRSEG,SFRIRR
+     +                        NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND,SGOTFLW
       USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR 
       USE GLOBAL,     ONLY: DELR, DELC, IUNIT
       USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
       !arguments
       ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod30,done,dzero
+      double precision :: zerod3,done,dzero
       integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
 ! ----------------------------------------------------------------------
 !
-      zerod30 = 1.0e-30
+      zerod3 = 1.0d-3
       done = 1.0d0
       dzero = 0.0d0
       do i = 1, NUMIRRSFRSP
@@ -5681,13 +5681,18 @@ C
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
-           if ( aet < zerod30 ) aet = zerod30
+           if ( aet < dzero ) aet = dzero
            factor = KCROP(K,iseg)*pet/aet - KCROP(K,iseg)
            if ( finfsum >= fks ) factor = dzero
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
-      write(222,333)Kkper, Kkstp, Kkiter,SEG(2,iseg),pet,aet,factor
-333     format(3i6,4e20.10)
+           if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+           if ( PET-AET < zerod3*PET ) then
+               demand(iseg) = SEG(2,iseg)
+           end if
+      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,pet,aet,
+     +              SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
+333     format(6i6,6e20.10)
         end do
       end do
       return
@@ -5702,6 +5707,7 @@ C
       USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
      +                        IRRSEG
       USE GLOBAL,     ONLY: DELR, DELC
+      IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
       !arguments
@@ -5820,6 +5826,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%SMOOTHET)
       DEALLOCATE (GWFUZFDAT(Igrid)%FINFSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%Isavefinf)
+      DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5918,6 +5925,7 @@ C     ------------------------------------------------------------------
       SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
       FINFSAVE=>GWFUZFDAT(Igrid)%FINFSAVE
       ISAVEFINF=>GWFUZFDAT(Igrid)%ISAVEFINF
+      ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -6017,5 +6025,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%SMOOTHET=>SMOOTHET
       GWFUZFDAT(Igrid)%FINFSAVE=>FINFSAVE
       GWFUZFDAT(Igrid)%Isavefinf=>Isavefinf
+      GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
 C
       END SUBROUTINE SGWF2UZF1PSV

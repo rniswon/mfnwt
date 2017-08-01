@@ -9,7 +9,7 @@
         INTEGER,SAVE,                 POINTER:: IDVFLG   !diverison recharge is active flag
         INTEGER,SAVE,                 POINTER:: NFLOWTYPE
         CHARACTER*16, SAVE, DIMENSION(:), POINTER :: FLOWTYPE
-        INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(number of irrigation cell per segment)
+        INTEGER,SAVE,  DIMENSION(:),  POINTER:: DVRCH   !(number of irrigation cells per segment)
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRROW !(store cells to apply diverted recharge)
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRCOL

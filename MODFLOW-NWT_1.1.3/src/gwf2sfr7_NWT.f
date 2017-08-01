@@ -1328,7 +1328,8 @@ C         SEGMENTS. Moved NSEGCK below ELSE IF 6/9/2005 dep
         CALL USTOP(' ')
       ELSE IF ( NSFRPAR.EQ.0 .AND. IUZT.EQ.0 ) THEN
         WRITE (IOUT, 9003)
-        RETURN
+!        RETURN
+        GOTO 900     !need to read agoptions for every stress period
       ELSE IF ( NSFRPAR.NE.0 ) THEN
 C
 C5------INITIALIZE NSEGCK TO 0 FOR SEGMENTS THAT ARE DEFINED BY 
@@ -2080,6 +2081,9 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
      +       'FROM FILE UNIT NUMBER ',I6,/)
  9031 FORMAT(10X,'TIMES',20X,'INFLOWS')
  9032 FORMAT(5X,F20.10,1X,F20.10)
+C
+C4-----READ AND SET AG-OPTIONS VARIABLES
+ 900  CALL AGOPTIONS(IN,IOUT)
       RETURN
       END SUBROUTINE GWF2SFR7RP
 C
@@ -5375,10 +5379,7 @@ C     ******************************************************************
 !      USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
 !     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
       USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
-     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
-     +                        DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
-     +                        NUMIRRSFR, UNITIRR, IRRSEG, DEMAND,
-     +                        MAXCELLS, KCROP, NUMIRRSFRSP
+     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
       USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5401,9 +5402,7 @@ C     ------------------------------------------------------------------
 C
 C1------READ STREAM SEGMENT DATA.
       lstend = Lstbeg + Nlst - 1
-      DO iqseg = Lstbeg, lstend
-          DVRPERC = 0.0  
-          DVRCH = 0.0    
+      DO iqseg = Lstbeg, lstend   
 C
 C2------ONLY READ FIRST 4 VARIABLES TO DETERMINE VALUE OF IUPSEG.
         READ (In, *) n, icalc, noutseg, iupseg
@@ -5668,64 +5667,7 @@ C10-----READ DATA SET 4G FOR SEGMENT IF SOLUTES SPECIFIED.
             END IF
           END DO
       END IF
-! set demand for supplemental pumping
-      DEMAND(nseg) = SEG(2, nseg)
       END DO
-C
-C10b----READ IRRIGATION SEGEMENT INFORMATION FROM SEPARATE FILE.
-C
-      IF ( NUMIRRSFR > 0 ) THEN
-        NUMIRRSFRSP = 0
-        LLOC = 1
-        CALL URDCOM(UNITIRR,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
-        IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,9008)NUMIRRSFR,NUMIRRSFRSP
-            CALL USTOP('')
-        END IF
-        DO J = 1, NUMIRRSFRSP
-          LLOC = 1
-          CALL URDCOM(UNITIRR,IOUT,LINE)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
-          IF ( NMCL > MAXCELLS ) THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,9009)MAXCELLS,NMCL
-            CALL USTOP('')
-          END IF
-          IF ( SGNM > 0 ) THEN
-            BACKSPACE(UNITIRR)
-            READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
-     +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
-            totdum  = 0.0
-            DO K = 1, NMCL
-              IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
-                totdum = totdum + DVRPERC(NMCL,SGNM)
-                WRITE(IOUT,9007)
-                CALL USTOP('')   
-                IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
-              END IF
-            END DO
-          END IF
-        END DO
-      END IF
-!
- 9006 FORMAT(' ***Warning in SFR2*** ',/
-     1       'Fraction of diversion for each cell in group sums '/,
-     1       'to a value greater than one. Sum = ',E10.5)
- 9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
-     +       'cell specified as zero. Model stopping.')
- 9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
-     +       'segments is less than the number specified in ',
-     +       'stress period. ',/ 
-     +       'Maximum segments and the number specified are: ',2i6)
- 9009 FORMAT('***Error in SFR2*** maximum number of irrigation ',
-     +       'cells is less than the number specified in ',
-     +       'stress period. ',/ 
-     +       'Maximum cells and the number specified are: ',2i6)
-C
 C11-----RETURN.
       RETURN
       END SUBROUTINE SGWF2SFR7RDSEG
@@ -8378,7 +8320,7 @@ C
 C
 C
 !     -----------------------------------------------------------------
-      SUBROUTINE GWF2SFR7AD(Iunitlak)
+      SUBROUTINE GWF2SFR7AD(In, Iunitlak, kkstp, kkper, Igrid)
 C     ******************************************************************
 C     DETERMINE SPECIFIED INFLOWS FOR TIME STEP BASED ON TABULAR VALUES
 C     ******************************************************************
@@ -8392,19 +8334,31 @@ C     ------------------------------------------------------------------
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
       USE GLOBAL, ONLY: IOUT
       IMPLICIT NONE
+C        ARGUMENTS
+      INTEGER, INTENT(IN) :: In, Iunitlak, IGRID, KKSTP, KKPER
+C     ------------------------------------------------------------------
+C        VARIABLES
+C     ------------------------------------------------------------------
       EXTERNAL FLOWTERP
       REAL FLOWTERP
-      INTEGER i, iseg, Iunitlak, istsg, lk
+      INTEGER i, iseg, istsg, lk
 C     ------------------------------------------------------------------
+C
+C
+C-------SET POINTERS FOR CURRENT GRID.
+      CALL SGWF2SFR7PNT(Igrid)
 C
 C1------CALL LINEAR INTERPOLATION ROUTINE
       IF ( NUMTAB.GT.0 ) THEN
         DO i = 1, NUMTAB
           iseg = ISFRLIST(1,i)
           SEG(2,iseg) = FLOWTERP(TOTIM,i)  
-          DEMAND(iseg) = SEG(2, iseg)
         END DO
-      END IF 
+      END IF
+C-------RESET DEMAND IF IT CHANGES
+      DO ISEG=1, NSS
+        DEMAND(iseg) = SEG(2, iseg)
+      END DO
 C
 C DEP moved the from SFR7FM
 C DEP FXLKOT is now adjusted in LAK7FM for limiting to available lake water.
@@ -8416,16 +8370,17 @@ C2------COMPUTE INFLOW OF A STREAM SEGMENT EMANATING FROM A LAKE.
             lk = IABS(IDIVAR(1, istsg))
 C3------CHECK IF LAKE OUTFLOW IS SPECIFIED AT A FIXED RATE.
              FXLKOT(istsg) = SEG(2, istsg)
-           ELSE IF ( SEG(2, istsg).LE.-CLOSEZERO ) THEN
+          ELSE IF ( SEG(2, istsg).LE.-CLOSEZERO ) THEN
              WRITE (IOUT, 9001) istsg
  9001        FORMAT (/5X, '*** WARNING *** NEGATIVE LAKE OUTFLOW ',
      +                  'NOT ALLOWED; SEG = ', I6, /10X, 
      +                  'CODE WILL ASSUME FLOW = 0.0'/)
              SEG(2, istsg) = 0.0
              FXLKOT(istsg) = 0.0
-           END IF
-         END IF
-       END DO
+          END IF
+        END IF
+      END DO
+C----RETURN
       RETURN
       END
 C
@@ -8519,6 +8474,90 @@ C
       END IF
       smooth = y
       END FUNCTION smooth
+!
+! ----------------------------------------------------------------------
+C
+C-------SUBROUTINE GWF2SFR7AG
+      SUBROUTINE AGOPTIONS(IN,IOUT)
+C  READ AG-OPTIONS INPUT DATA
+      USE GWFSFRMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
+     +                          NUMIRRSFR, UNITIRR, IRRSEG, MAXCELLS, 
+     +                          KCROP, NUMIRRSFRSP
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C     ARGUMENTS
+      INTEGER, INTENT(IN) :: IN, IOUT
+C     ------------------------------------------------------------------
+C     VARIABLES
+C     ------------------------------------------------------------------
+      INTEGER NSEG,LLOC,ISTART,ISTOP,J,SGNM,NMCL,K
+      REAL R 
+      DOUBLE PRECISION :: totdum
+      CHARACTER(LEN=200)::LINE
+C     ------------------------------------------------------------------
+C2--- INITIALIZE AG VARIABLES TO ZERO
+      DVRPERC = 0.0  
+      DVRCH = 0.0 
+      KCROP = 0.0
+C
+C1
+C----READ IRRIGATION SEGEMENT INFORMATION.
+C
+      IF ( NUMIRRSFR > 0 ) THEN
+        NUMIRRSFRSP = 0
+        LLOC = 1
+        CALL URDCOM(UNITIRR,IOUT,LINE)
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
+        IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,9008)NUMIRRSFR,NUMIRRSFRSP
+            CALL USTOP('')
+        END IF
+        DO J = 1, NUMIRRSFRSP
+          LLOC = 1
+          CALL URDCOM(UNITIRR,IOUT,LINE)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
+          IF ( NMCL > MAXCELLS ) THEN
+            WRITE(IOUT,*)
+            WRITE(IOUT,9009)MAXCELLS,NMCL
+            CALL USTOP('')
+          END IF
+          IF ( SGNM > 0 ) THEN
+            BACKSPACE(UNITIRR)
+            READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
+     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+            totdum  = 0.0
+            DO K = 1, NMCL
+              IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
+                totdum = totdum + DVRPERC(NMCL,SGNM)
+                WRITE(IOUT,9007)
+                CALL USTOP('')   
+                IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
+              END IF
+            END DO
+          END IF
+        END DO
+      END IF
+!
+ 9006 FORMAT(' ***Warning in SFR2*** ',/
+     1       'Fraction of diversion for each cell in group sums '/,
+     1       'to a value greater than one. Sum = ',E10.5)
+ 9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
+     +       'cell specified as zero. Model stopping.')
+ 9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+     +       'segments is less than the number specified in ',
+     +       'stress period. ',/ 
+     +       'Maximum segments and the number specified are: ',2i6)
+ 9009 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+     +       'cells is less than the number specified in ',
+     +       'stress period. ',/ 
+     +       'Maximum cells and the number specified are: ',2i6)
+C11-----RETURN.
+      RETURN
+      END
+C
 !
 ! ----------------------------------------------------------------------
 C
