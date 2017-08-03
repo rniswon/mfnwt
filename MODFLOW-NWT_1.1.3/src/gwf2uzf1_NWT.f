@@ -1299,6 +1299,7 @@ C       STRESS PERIOD.
         WRITE (IOUT, *) 'USING INFILTRATION RATE FROM PREVIOUS STRESS '
         WRITE (IOUT, *) 'PERIOD.', 'CURRENT PERIOD IS: ', Kkper
       ELSE
+        IF ( ETDEMANDFLAG > 0 ) CALL APPLYKCROP()
 C
 C3------READ IN ARRAY FOR INFILTRATION RATE.
         CALL U2DREL(FINF, aname(1), NROW, NCOL, 0, In, IOUT)
@@ -5658,41 +5659,52 @@ C
       !arguments
       ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod3,done,dzero
+      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+     +                    aettotal
       integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
 ! ----------------------------------------------------------------------
 !
-      zerod3 = 1.0d-3
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
       done = 1.0d0
       dzero = 0.0d0
+      finfsum = dzero
       do i = 1, NUMIRRSFRSP
         iseg = IRRSEG(i)
+      if(kkper==8.and.kkstp==5)then
+      dzero = 0.0d0
+      end if
         do k = 1, DVRCH(iseg)
-           finfsum = dzero
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
            fks = VKS(ic, ir)
            IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
            if ( IUNIT(2) > 0 ) then
-              if ( NUMIRR > 0 ) finfsum = finfsum + WELLIRR(ic,ir)
+              if ( NUMIRR > 0 ) finfsum = finfsum + WELLIRR(ic,ir)*area
            end if
-           finfsum = finfsum + SFRIRR(ic,ir)
            area = delr(ic)*delc(ir)
+           finfsum = finfsum + SFRIRR(ic,ir)*area
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
-           if ( aet < dzero ) aet = dzero
-           factor = KCROP(K,iseg)*pet/aet - KCROP(K,iseg)
-           if ( finfsum >= fks ) factor = dzero
+           if ( aet < zerod30 ) aet = zerod30
+!           factor = (pet-(done-KCROP(K,ISEG))*pet)/aet
+           factor = pet/aet - done
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
-           if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-           if ( PET-AET < zerod3*PET ) then
-               demand(iseg) = SEG(2,iseg)
-           end if
-      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,pet,aet,
-     +              SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
-333     format(6i6,6e20.10)
+           dum = pet
+           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
+        pettotal = pettotal + pet
+        aettotal = aettotal + aet
+      if(k==2)then
+      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
+     +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
+ 333  format(6i6,5e20.10)
+      end if
+        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
+        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+        if ( pettotal-aettotal < zerod2*pettotal ) demand(iseg) = 
+     +                                             SEG(2,iseg)
         end do
       end do
       return
@@ -5705,13 +5717,10 @@ C
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: PETRATE
       USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
-     +                        IRRSEG
+     +                        IRRSEG,KCROP
       USE GLOBAL,     ONLY: DELR, DELC
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
-      !modules
-      !arguments
-      ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, pet
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
@@ -5722,7 +5731,6 @@ C
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
            area = delr(ic)*delc(ir)
-           pet = PETRATE(ic,ir)
            SEG(2,iseg) = 0.0d0
         end do
       end do
@@ -5730,6 +5738,34 @@ C
       end subroutine IRRDEMANDRP
 ! ----------------------------------------------------------------------
 C
+      subroutine APPLYKCROP()
+!     ******************************************************************
+!     APPLYKCROP---- Apply crop ceofficient to ETo
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY: PETRATE
+      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
+     +                        IRRSEG,KCROP
+      USE GLOBAL,     ONLY: DELR, DELC
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      DOUBLE PRECISION :: factor, area, uzet, pet
+      integer :: k,iseg,ic,ir,i
+! ----------------------------------------------------------------------
+!
+      do i = 1, NUMIRRSFRSP
+        iseg = IRRSEG(i)
+        do k = 1, DVRCH(iseg)
+           ic = IRRCOL(k,iseg)
+           ir = IRRROW(k,iseg)
+           PETRATE(ic,ir) = KCROP(K,ISEG)*PETRATE(IC,IR)
+        end do
+      end do
+      return
+      END subroutine APPLYKCROP
+C
+C
+! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)
 C    Deallocate UZF DATA. 
