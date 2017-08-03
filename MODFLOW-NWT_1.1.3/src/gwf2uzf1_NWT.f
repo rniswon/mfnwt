@@ -5668,22 +5668,16 @@ C
       zerod2 = 1.0d-2
       done = 1.0d0
       dzero = 0.0d0
-      finfsum = dzero
-      do i = 1, NUMIRRSFRSP
+      do i = 1, NUMIRRSFRSP   !this won't work for GW only
         iseg = IRRSEG(i)
-      if(kkper==8.and.kkstp==5)then
-      dzero = 0.0d0
-      end if
+        finfsum = dzero
         do k = 1, DVRCH(iseg)
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
            fks = VKS(ic, ir)
            IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
-           if ( IUNIT(2) > 0 ) then
-              if ( NUMIRR > 0 ) finfsum = finfsum + WELLIRR(ic,ir)*area
-           end if
            area = delr(ic)*delc(ir)
-           finfsum = finfsum + SFRIRR(ic,ir)*area
+           finfsum = finfsum + fks*area
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
@@ -5694,18 +5688,18 @@ C
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
            dum = pet
            if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
-        pettotal = pettotal + pet
-        aettotal = aettotal + aet
+           pettotal = pettotal + pet
+           aettotal = aettotal + aet
       if(k==2)then
       write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
      +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
  333  format(6i6,5e20.10)
       end if
+        end do
         if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
         if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
         if ( pettotal-aettotal < zerod2*pettotal ) demand(iseg) = 
      +                                             SEG(2,iseg)
-        end do
       end do
       return
       end subroutine IRRDEMANDFM
