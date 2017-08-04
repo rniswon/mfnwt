@@ -5682,7 +5682,6 @@ C
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
-!           factor = (pet-(done-KCROP(K,ISEG))*pet)/aet
            factor = pet/aet - done
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
