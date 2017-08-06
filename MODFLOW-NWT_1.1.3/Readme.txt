@@ -137,7 +137,7 @@ the same unformatted file structure.
 
 D. TESTING
 
-Ten sample problems with MODFLOW-NWT data sets are provided to verify that 
+Eleven sample problems with MODFLOW-NWT data sets are provided to verify that 
 MODFLOW-NWT is correctly installed and running on the system.  The sample 
 problems also may be looked at as examples of how to use the program. Five of 
 the test problems (Pr1a, Pr1b, Pr2, Pr3_lower (32 bit and 64 bit), and  

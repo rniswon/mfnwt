@@ -17,3 +17,5 @@
 *.hed
 *.lst~HEAD
 *.lst~develop
+Examples/AgOptions/Uzf_well_supp_irr/fort.222
+Examples/AgOptions/Uzf_well_supp_irr/cbc.unf

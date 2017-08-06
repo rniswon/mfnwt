@@ -103,7 +103,6 @@ C     ------------------------------------------------------------------
       ALLOCATE (ITMP, IRDFLG, IPTFLG, NP)
       ALLOCATE (CONST, DLEAK, IRTFLG, NUMTIM, WEIGHT, FLWTOL)
       ALLOCATE (NSEGDIM)
-      ALLOCATE (NUMIRRSFR,UNITIRR,MAXCELLS)  
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
@@ -160,7 +159,6 @@ C         DLEAK, ISTCB1, ISTCB2.
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
-      NUMIRRSFR = 0
 C
 C2A------COMMENTS/FIRST LINE.
       CALL URDCOM(In, IOUT, line)
@@ -281,35 +279,15 @@ Cdep  changed DSTROT to FXLKOT
       ALLOCATE (QSTRM(nstrmar,NUMTIM))
       ALLOCATE (HWTPRM(nstrmar,NUMTIM))
       ALLOCATE (FNETSEEP(NCOL,NROW)) !rgn printing net recharge in UZF
-      IF ( NUMIRRSFR > 0 ) THEN
-        ALLOCATE (DVRCH(NSS),DVEFF(MAXCELLS,NSS))     
-        ALLOCATE (IRRROW(MAXCELLS,NSS),IRRCOL(MAXCELLS,NSS)) 
-        ALLOCATE (DVRPERC(MAXCELLS,NSS))  
-        ALLOCATE (SFRIRR(NCOL,NROW))  
-        ALLOCATE (IRRSEG(NSS))              ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
-      ELSE
-        ALLOCATE (DVRCH(1),DVEFF(1,1))      
-        ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
-        ALLOCATE (DVRPERC(1,1))  
-        ALLOCATE (SFRIRR(1,1))  
-        ALLOCATE (IRRSEG(1))
-      END IF
       STRM = 0.0  
       HSTRM = 0.0
       QSTRM = 0.0
       HWDTH = 0.0
       HWTPRM = 0.0
-      ISTRM = 0
-      DVRCH = 0    
-      DVEFF = 0.0    
-      IRRROW = 0  
-      IRRCOL = 0
-      SFRIRR = 0.0      
-      DVRPERC = 0.0   
+      ISTRM = 0  
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-      ALLOCATE (DEMAND(nsegdim),ACTUAL(nsegdim))
       ALLOCATE (IDVFLG)  
       IDVFLG = 0         
 Cdep  allocate space for stream outflow derivatives for lake package
@@ -331,8 +309,6 @@ Cdep  allocate space for stream outflow derivatives for lake package
       DLKOTFLW = 0.0D0
       DLKSTAGE = 0.0D0
       SLKOTFLW = 0.0D0
-      DEMAND = 0.0
-      ACTUAL = 0.0
       ALLOCATE (IOTSG(nsegdim))
       IOTSG = 0
       ALLOCATE (SFRQ(5,nstrmar))
@@ -1061,15 +1037,6 @@ C
               CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
      +                    IOUT,In)
               WRITE(IOUT,324) FACTORKV
-! Pumped water will be added as irrigation
-            case('IRRIGATE')
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)    !FILE UNIT
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
-              IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
-              IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-              IF ( IUNIT(55) < 1 ) NUMIRRSFR = 0
-              WRITE(IOUT,34) NUMIRRSFR
             case ('END')
               write(iout,'(/1x,a)') 'END PROCESSING '//
      +              trim(adjustl(text)) //' OPTIONS'
@@ -1087,8 +1054,10 @@ C
      +                   //' Option: '//LINE(ISTART:ISTOP))
               else
               ! Integer found.  This is likely NSTRM, so exit.
-                write(iout,'(/1x,a)') 'END PROCESSING '//
+                if ( found ==.true. ) then
+                  write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
+                end if
                 exit
               endif
             end select
@@ -1153,6 +1122,10 @@ C
      +                   //' Option: '//LINE(ISTART:ISTOP))
               found = .true.
             case default
+              if ( found ==.true. ) then
+                  write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+              end if
             exit
             end select
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -2193,7 +2166,6 @@ C2b-----START INTERNAL TIME LOOP FOR STREAMFLOW ROUTING.
         numdelt = 1
       END IF
       DO irt = 1, numdelt
-        SFRIRR = 0.0
 C
 C3------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
         DO l = 1, NSTRM
@@ -2401,16 +2373,12 @@ C24-----INITIALIZE VARIABLES.
           hld = HLDSFR(l)
 ! Added code to test for BCF or LPF 11/19/07
           IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
-          avhc = STRM(6, l)
           sbdthk = STRM(8, l)
           hstr = depth + STRM(3, l)
+          avhc = STRM(6, l)
 ! factor for losing streams
-          if ( hstr-h > 0.0 ) then
-            avhc = avhc*fact
-          else
-            avhc = STRM(6, l)
-          end if
           cstr = STRM(16, l)
+          if ( hstr-h > 0.0 ) avhc = avhc*fact
           precip = STRM(14, l)
           etstr = STRM(13, l)
           runof = STRM(12, l)
@@ -2724,10 +2692,14 @@ C         AND STREAMBED LEAKAGE WHEN ICALC IS GREATER THAN 0.
               depth1 = depthp
               depth2 = depth1 + 2.0D0*(deps)
               hstr = depth1 + STRM(3, l)
-              if ( hstr-h > 0.0 ) then
-                avhc = avhc*fact
+              if ( hstr-h > 0.0d0 ) then
+                avhc = STRM(6, l)*fact
+                cstr = STRM(16, l)*fact
+                strleak = strlen*avhc
               else
                 avhc = STRM(6, l)
+                cstr = STRM(16, l)
+                strleak = strlen*avhc
               end if
 C
 C41-----CALCULATE FLOBOT1 AND FLOBOT2 FOR ICALC EQUAL TO 1.
@@ -3589,19 +3561,6 @@ C         STREAMBED BOTTOM ELEVATION.
  !      fin=fin+sumrch(l)
             END IF
             END IF
-C80B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
-            IF ( istsg.GT.1 .AND. NUMIRRSFR > 0 ) THEN
-                IF ( DVRCH(istsg) .GT. 0) THEN
-                  DO icount = 1, DVRCH(istsg)
-                    irr = IRRROW(icount,istsg)
-                    icc = IRRCOL(icount,istsg)
-                      dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-                      dvt = dvt/(DELR(IC)*DELC(IR))
-                      SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
-     +                                   dvt*(1.0-DVEFF(ICOUNT,istsg))
-                  END DO
-              END IF
-            END IF
 !      write(iout,*)'in fm',l,fin,fout
         END DO !rsr, end l = 1, NSTRM loop
 C        
@@ -3710,7 +3669,6 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
-      SFRIRR = 0.0
       maxwav = NSFRSETS*NSTRAIL
       IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
         NINTOT = 0              
@@ -3977,7 +3935,6 @@ C26-----DETERMINE LEAKAGE THROUGH STREAMBED.
               areamax = 0.0
               fbcheck = 1.0D-12/DELT
               IF ( fbcheck.LT.5.0D-8 ) fbcheck = 5.0D-8
-              avhc = STRM(6, l)
               IF ( icalc.EQ.2 ) THEN
                 DO i = 1, ISUZN
                   UZSEEP(i, l) = 0.0D0
@@ -4017,7 +3974,6 @@ C26b-----SET STREAMBED HYDRAULIC CONDUCTIVITY AND STREAM LEAKAGE TO
 C         ZERO WHEN NOT AN ACTIVE CELL.
           IF ( IBOUND(ic, ir, il).LE.0 ) THEN
             avhc = 0.0
-!           strleak = 0.0D0
             h = hstr
           END IF
           IF ( ilay.LE.NLAY .AND. IBOUND(ic, ir, il).GT.0 ) THEN
@@ -4025,6 +3981,7 @@ C
 C27-----COMPUTE HEAD DIFFERENCE ACROSS STREAMBED.
             h = HNEW(ic, ir, il)
             hld = HLDSFR(l)
+            avhc = STRM(6, l)
 ! Added code to test for BCF or LPF 11/19/07
             IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
             IF ( irt.EQ.numdelt ) HLDSFR(l) = h
@@ -4377,20 +4334,7 @@ cDEP   need to fix for unsaturated flow
             SFRQ(2, l) = (qc + qd)/2.0
             SFRQ(3, l) = flobot
             SFRQ(5, l) = qc
-      END IF
-C20B-----STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE  !cjm   
-            IF ( istsg.GT.1  .AND. NUMIRRSFR > 0 ) THEN
-                IF ( DVRCH(istsg) .GT. 0) THEN
-                  DO icount = 1, DVRCH(istsg)
-                    irr = IRRROW(icount,istsg)
-                    icc = IRRCOL(icount,istsg)
-                    dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-                    dvt = dvt/(DELR(IC)*DELC(IR))
-                    SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
-     +                               dvt*(1.0-DVEFF(ICOUNT,istsg))
-                  END DO
-                END IF
-            END IF
+          END IF
         END DO
 !        IF ( Irtflg.NE.0 )WRITE(IOUT,*)
 !     +         'TRANSIENT FLOW ERROR = ', Transient_bd
@@ -5373,10 +5317,7 @@ C     ******************************************************************
 !      USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
 !     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
       USE GWFSFRMODULE, ONLY: NSS, MAXPTS, ISFROPT, IDIVAR, IOTSG, ISEG,
-     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT,
-     +                        DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
-     +                        NUMIRRSFR, UNITIRR, IRRSEG, DEMAND,
-     +                        MAXCELLS
+     +                        SEG, XSEC, QSTAGE, CONCQ, CONCRUN,CONCPPT
       USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5392,7 +5333,7 @@ C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER icalc, idum, ii, iqseg, isol, iupseg, jj, jk, lstend, n, 
      +        noutseg, nseg, nstrpts, i, k, istart, istop,sgnm,nmcl,
-     +        J,LLOC,NUMIRRSFRSP
+     +        J,LLOC
       REAL dum, totdum, R
       CHARACTER(LEN=200)::LINE
 C     ------------------------------------------------------------------
@@ -5400,8 +5341,6 @@ C
 C1------READ STREAM SEGMENT DATA.
       lstend = Lstbeg + Nlst - 1
       DO iqseg = Lstbeg, lstend
-          DVRPERC = 0.0  
-          DVRCH = 0.0    
 C
 C2------ONLY READ FIRST 4 VARIABLES TO DETERMINE VALUE OF IUPSEG.
         READ (In, *) n, icalc, noutseg, iupseg
@@ -5418,14 +5357,6 @@ C2------ONLY READ FIRST 4 VARIABLES TO DETERMINE VALUE OF IUPSEG.
           END IF
           CALL USTOP(' ')
         END IF
-C        
-C2a-----DETERMINE IF SEGMENT OUTFLOW WILL BE DIVERTED TO RECHARGE MF CELLS  !cjm
-   !     IF ( N.LT.0 ) THEN
-   !       N = ABS(N)
-   !       DVRCH(N) = 1
-	  !ELSE              
-	  !  DVRCH(N) = 0
-   !     END IF
 C
 C3------DETERMINE WHERE DATA ARE STORED.
         IF ( Ichk.NE.0 ) THEN
@@ -5666,63 +5597,8 @@ C10-----READ DATA SET 4G FOR SEGMENT IF SOLUTES SPECIFIED.
             END IF
           END DO
       END IF
-! set demand for supplemental pumping
-      DEMAND(nseg) = SEG(2, nseg)
       END DO
-C
-C10b----READ IRRIGATION SEGEMENT INFORMATION FROM SEPARATE FILE.
-C
-      IF ( NUMIRRSFR > 0 ) THEN
-        NUMIRRSFRSP = 0
-        LLOC = 1
-        CALL URDCOM(UNITIRR,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
-        IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,9008)NUMIRRSFR,NUMIRRSFRSP
-            CALL USTOP('')
-        END IF
-        DO J = 1, NUMIRRSFRSP
-          LLOC = 1
-          CALL URDCOM(UNITIRR,IOUT,LINE)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
-          IF ( NMCL > MAXCELLS ) THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,9009)MAXCELLS,NMCL
-            CALL USTOP('')
-          END IF
-          IF ( SGNM > 0 ) THEN
-            BACKSPACE(UNITIRR)
-            READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),          
-     +               IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
-            totdum  = 0.0
-            DO K = 1, NMCL
-              IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
-                totdum = totdum + DVRPERC(NMCL,SGNM)
-                WRITE(IOUT,9007)
-                CALL USTOP('')   
-                IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
-              END IF
-            END DO
-          END IF
-        END DO
-      END IF
 !
- 9006 FORMAT(' ***Warning in SFR2*** ',/
-     1       'Fraction of diversion for each cell in group sums '/,
-     1       'to a value greater than one. Sum = ',E10.5)
- 9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
-     +       'cell specified as zero. Model stopping.')
- 9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
-     +       'segments is less than the number specified in ',
-     +       'stress period. ',/ 
-     +       'Maximum segments and the number specified are: ',2i6)
- 9009 FORMAT('***Error in SFR2*** maximum number of irrigation ',
-     +       'cells is less than the number specified in ',
-     +       'stress period. ',/ 
-     +       'Maximum cells and the number specified are: ',2i6)
 C
 C11-----RETURN.
       RETURN
@@ -8384,8 +8260,8 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST, DEMAND,
-     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
+      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST,SEG, FXLKOT, 
+     +                        IDIVAR, CLOSEZERO
 !!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
       USE GLOBAL, ONLY: IOUT
@@ -8400,7 +8276,6 @@ C1------CALL LINEAR INTERPOLATION ROUTINE
         DO i = 1, NUMTAB
           iseg = ISFRLIST(1,i)
           SEG(2,iseg) = FLOWTERP(TOTIM,i)  
-          DEMAND(iseg) = SEG(2, iseg)
         END DO
       END IF 
 C
@@ -8554,12 +8429,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%CONST)
       DEALLOCATE (GWFSFRDAT(IGRID)%DLEAK)
       DEALLOCATE (GWFSFRDAT(IGRID)%IOTSG)
-      DEALLOCATE (GWFSFRDAT(IGRID)%DVRCH)    
-      DEALLOCATE (GWFSFRDAT(IGRID)%DVEFF)  
-      DEALLOCATE (GWFSFRDAT(IGRID)%IRRROW) 
-      DEALLOCATE (GWFSFRDAT(IGRID)%IRRCOL)
-      DEALLOCATE (GWFSFRDAT(IGRID)%SFRIRR) 
-      DEALLOCATE (GWFSFRDAT(IGRID)%DVRPERC) 
       DEALLOCATE (GWFSFRDAT(IGRID)%IDVFLG) 
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGCK)
       DEALLOCATE (GWFSFRDAT(IGRID)%ITRLSTH)
@@ -8637,11 +8506,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%Nfoldflbt)
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
-      DEALLOCATE (GWFSFRDAT(IGRID)%NUMIRRSFR)
-      DEALLOCATE (GWFSFRDAT(IGRID)%UNITIRR)
-      DEALLOCATE (GWFSFRDAT(IGRID)%MAXCELLS)
-      DEALLOCATE (GWFSFRDAT(IGRID)%DEMAND)
-      DEALLOCATE (GWFSFRDAT(IGRID)%ACTUAL)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8684,12 +8548,6 @@ C     ------------------------------------------------------------------
       IRTFLG=>GWFSFRDAT(IGRID)%IRTFLG
       IOTSG=>GWFSFRDAT(IGRID)%IOTSG
       IDVFLG=>GWFSFRDAT(IGRID)%IDVFLG 
-      DVRCH=>GWFSFRDAT(IGRID)%DVRCH    
-      DVEFF=>GWFSFRDAT(IGRID)%DVEFF  
-      IRRROW=>GWFSFRDAT(IGRID)%IRRROW
-      IRRCOL=>GWFSFRDAT(IGRID)%IRRCOL
-      SFRIRR=>GWFSFRDAT(IGRID)%SFRIRR 
-      DVRPERC=>GWFSFRDAT(IGRID)%DVRPERC 
       NSEGCK=>GWFSFRDAT(IGRID)%NSEGCK
       ITRLSTH=>GWFSFRDAT(IGRID)%ITRLSTH
       ISEG=>GWFSFRDAT(IGRID)%ISEG
@@ -8764,11 +8622,6 @@ C     ------------------------------------------------------------------
       Nfoldflbt=>GWFSFRDAT(IGRID)%Nfoldflbt
       NUMTAB=>GWFSFRDAT(IGRID)%NUMTAB
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
-      NUMIRRSFR=>GWFSFRDAT(IGRID)%NUMIRRSFR
-      UNITIRR=>GWFSFRDAT(IGRID)%UNITIRR
-      MAXCELLS=>GWFSFRDAT(IGRID)%MAXCELLS
-      DEMAND=>GWFSFRDAT(IGRID)%DEMAND
-      ACTUAL=>GWFSFRDAT(IGRID)%ACTUAL
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8810,12 +8663,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%IRTFLG=>IRTFLG
       GWFSFRDAT(IGRID)%IOTSG=>IOTSG
       GWFSFRDAT(IGRID)%IDVFLG=>IDVFLG
-      GWFSFRDAT(IGRID)%DVRCH=>DVRCH
-      GWFSFRDAT(IGRID)%DVEFF=>DVEFF
-      GWFSFRDAT(IGRID)%IRRROW=>IRRROW
-      GWFSFRDAT(IGRID)%IRRCOL=>IRRCOL
-      GWFSFRDAT(IGRID)%DVRPERC=>DVRPERC
-      GWFSFRDAT(IGRID)%SFRIRR=>SFRIRR
       GWFSFRDAT(IGRID)%NSEGCK=>NSEGCK
       GWFSFRDAT(IGRID)%ITRLSTH=>ITRLSTH
       GWFSFRDAT(IGRID)%ISEG=>ISEG
@@ -8890,10 +8737,5 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%Nfoldflbt=>Nfoldflbt
       GWFSFRDAT(IGRID)%NUMTAB=>NUMTAB
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
-      GWFSFRDAT(IGRID)%NUMIRRSFR=>NUMIRRSFR
-      GWFSFRDAT(IGRID)%UNITIRR=>UNITIRR
-      GWFSFRDAT(IGRID)%MAXCELLS=>MAXCELLS
-      GWFSFRDAT(IGRID)%DEMAND=>DEMAND
-      GWFSFRDAT(IGRID)%ACTUAL=>ACTUAL
 C
       END SUBROUTINE SGWF2SFR7PSV

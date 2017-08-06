@@ -1000,6 +1000,13 @@ C     ------------------------------------------------------------------
             WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
      +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
             WRITE(iout,*)
+         case('SPECIFYTHTR')
+          ITHTRFLG = 1
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
+     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
+     +                'PERIOD'
+          WRITE(iout,*)
           case('ETSQUARE')
             i=1
             CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
@@ -1746,8 +1753,6 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFSFRMODULE, ONLY: SFRIRR, NUMIRRSFR
-      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1850,18 +1855,10 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           !END IF
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
-! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
-        ENDIF
-! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
-        END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
           Excespp(ic, ir) = 0.0
-        ELSEIF ( finfhold - VKS(ic, ir) > zero ) THEN
+        ELSEIF ( finfhold - fkreject > zero ) THEN
           EXCESPP(ic, ir) =  (finfhold - fkreject)*DELC(ir)*DELR(ic)
           finfhold = fkreject
         ELSE
@@ -2274,8 +2271,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR, NUMIRRSFR
-      USE GWFWELMODULE, ONLY: WELLIRR, NUMIRR
+      USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -2411,33 +2407,16 @@ CDEP 05/05/2006
           !END IF
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
-! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
-        ENDIF
-        IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
-        END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
           Excespp(ic, ir) = 0.0
-        ELSEIF ( finfhold - VKS(ic, ir) > zero ) THEN
+        ELSEIF ( finfhold - fkreject > zero ) THEN
           EXCESPP(ic, ir) =  (finfhold - fkreject)*DELC(ir)*DELR(ic)
           finfhold = fkreject
         ELSE
           EXCESPP(ic, ir) = 0.0
         ENDIF
 ! EDM
-        finfhold = FINF(ic, ir)
-        IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
-            IF ( SFRIRR(IC,IR) .NE. 0 ) THEN
-                finfhold = FINF(ic, ir)
-            END IF
-            finfhold = finfhold + SFRIRR(IC,IR)
-        END IF
-        IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
-        END IF
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
