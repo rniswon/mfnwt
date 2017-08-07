@@ -1089,8 +1089,10 @@ C
      +                   //' Option: '//LINE(ISTART:ISTOP))
               else
               ! Integer found.  This is likely NSTRM, so exit.
-                write(iout,'(/1x,a)') 'END PROCESSING '//
+                if ( found ==.true. ) then
+                  write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
+                end if
                 exit
               endif
             end select
@@ -1155,6 +1157,10 @@ C
      +                   //' Option: '//LINE(ISTART:ISTOP))
               found = .true.
             case default
+              if ( found ==.true. ) then
+                  write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+              end if
             exit
             end select
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -2407,16 +2413,12 @@ C24-----INITIALIZE VARIABLES.
           hld = HLDSFR(l)
 ! Added code to test for BCF or LPF 11/19/07
           IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
-          avhc = STRM(6, l)
           sbdthk = STRM(8, l)
           hstr = depth + STRM(3, l)
+          avhc = STRM(6, l)
 ! factor for losing streams
-          if ( hstr-h > 0.0 ) then
-            avhc = avhc*fact
-          else
-            avhc = STRM(6, l)
-          end if
           cstr = STRM(16, l)
+          if ( hstr-h > 0.0 ) avhc = avhc*fact
           precip = STRM(14, l)
           etstr = STRM(13, l)
           runof = STRM(12, l)
@@ -2730,10 +2732,14 @@ C         AND STREAMBED LEAKAGE WHEN ICALC IS GREATER THAN 0.
               depth1 = depthp
               depth2 = depth1 + 2.0D0*(deps)
               hstr = depth1 + STRM(3, l)
-              if ( hstr-h > 0.0 ) then
-                avhc = avhc*fact
+              if ( hstr-h > 0.0d0 ) then
+                avhc = STRM(6, l)*fact
+                cstr = STRM(16, l)*fact
+                strleak = strlen*avhc
               else
                 avhc = STRM(6, l)
+                cstr = STRM(16, l)
+                strleak = strlen*avhc
               end if
 C
 C41-----CALCULATE FLOBOT1 AND FLOBOT2 FOR ICALC EQUAL TO 1.
@@ -4031,6 +4037,7 @@ C
 C27-----COMPUTE HEAD DIFFERENCE ACROSS STREAMBED.
             h = HNEW(ic, ir, il)
             hld = HLDSFR(l)
+            avhc = STRM(6, l)
 ! Added code to test for BCF or LPF 11/19/07
             IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
             IF ( irt.EQ.numdelt ) HLDSFR(l) = h
@@ -5419,14 +5426,6 @@ C2------ONLY READ FIRST 4 VARIABLES TO DETERMINE VALUE OF IUPSEG.
           END IF
           CALL USTOP(' ')
         END IF
-C        
-C2a-----DETERMINE IF SEGMENT OUTFLOW WILL BE DIVERTED TO RECHARGE MF CELLS  !cjm
-   !     IF ( N.LT.0 ) THEN
-   !       N = ABS(N)
-   !       DVRCH(N) = 1
-	  !ELSE              
-	  !  DVRCH(N) = 0
-   !     END IF
 C
 C3------DETERMINE WHERE DATA ARE STORED.
         IF ( Ichk.NE.0 ) THEN
