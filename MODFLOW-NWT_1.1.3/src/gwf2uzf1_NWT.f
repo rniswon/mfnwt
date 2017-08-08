@@ -4894,13 +4894,13 @@ C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       DOUBLE PRECISION diff, thetaout, fm, st, fhold, eps_m1
-      DOUBLE PRECISION depth2, theta2, flux2, speed2, zero
+      DOUBLE PRECISION depth2, theta2, flux2, speed2, dzero
       DOUBLE PRECISION thsrinv, epsfksths, avwat1, avwat, FMP
       DIMENSION depth2(Nwv), theta2(Nwv), flux2(Nwv), speed2(Nwv)
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
       DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom
-      double precision zerod3, zerod4, zerod5, zerod10, done
+      double precision zerod2, zerod4, zerod5, zerod10, done
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
      +        kjm1, itest, k
@@ -4909,12 +4909,12 @@ C     ------------------------------------------------------------------
 C
 C1------INITIALIZE VARIABLES.
       done = 1.0d0
-      zero = 0.0d0
-      zerod3 = 1.0d-3
+      dzero = 0.0d0
+      zerod2 = 1.0d-2
       zerod4 = 1.0d-4
       zerod5 = 1.0d-5
       zerod10 = 1.0d-10
-      FACTOR = 1.0D0
+      FACTOR = 1.001D0
       if ( Rootdepth < zerod7 ) return
       if ( Thetas-Thetar < zerod7 ) return
       pet = Rateud*Rootdepth
@@ -4930,12 +4930,12 @@ C1------INITIALIZE VARIABLES.
       if ( thetaout.LE.zerod10 ) return
       thsrinv = 1.0/(Thetas-Thetar) 
       epsfksths = Eps*Fksat*thsrinv
-      Etout = zero
+      Etout = dzero
       feps = zerod5
       jpntm1 = Jpnt - 1
       jpntp1 = Jpnt + 1
-      FMP = 0.0D0
-      fm = zerod10
+      FMP = dzero
+      fm = dzero
       DO ii = 1, Nwv
         depth2(ii) = Depth(ii)
         theta2(ii) = Theta(ii)
@@ -4956,11 +4956,21 @@ C1------INITIALIZE VARIABLES.
         END IF
       END DO
       itest = 0
+      k=0
 C MASTER LOOP FOR REDUCING ACTUAL ET TO POTENTIAL ET.
       do while ( itest == 0 )
         k = k + 1
-        if ( k.GT.1 .AND. ABS(fmp-pet).GT.zerod3*pet) 
-     1      factor = factor*pet/fm
+!RESET AND TRY AGAIN
+          DO ii = 1, Nwv
+            Depth(ii) = depth2(ii)
+            Theta(ii) = theta2(ii)
+            Flux(ii) = flux2(ii)
+            Speed(ii) = speed2(ii)
+            Ltrail(ii) = ltrail2(ii)
+            Itrwave(ii) = itrwave2(ii)
+          END DO
+          Numwaves = Nwv
+          Etout = 0.0D0
 C
 C2------ONE WAVE IN PROFILE THAT IS SHALLOWER THAN ET EXTINCTION DEPTH.
         IF ( Numwaves.EQ.1 .AND. Depth(Jpnt).LE.Rootdepth ) THEN
@@ -5319,8 +5329,8 @@ C10-----CALCULATE ACTUAL ET.
 C
 C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
         Etout = st - fm
-        fm = Etout/Etime
-        IF ( Etout.LT.0.0 ) THEN
+        fmp = Etout/Etime
+        IF ( Etout.LT.dzero ) THEN
           DO ii = 1, Nwv
             Depth(ii) = depth2(ii)
             Theta(ii) = theta2(ii)
@@ -5331,32 +5341,22 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           END DO
           Numwaves = Nwv
           Etout = 0.0D0
-        ELSEIF ( PET-FM.LT.-ZEROD15 .AND. ETOFH_FLAG.GT.0 ) THEN
-! IF ET IS GREATER THAN PET THEN RESET AND TRY AGAIN
-          DO ii = 1, Nwv
-            Depth(ii) = depth2(ii)
-            Theta(ii) = theta2(ii)
-            Flux(ii) = flux2(ii)
-            Speed(ii) = speed2(ii)
-            Ltrail(ii) = ltrail2(ii)
-            Itrwave(ii) = itrwave2(ii)
-          END DO
-          Numwaves = Nwv
-          Etout = 0.0D0
-        ELSE
           itest = 1
         END IF
- ! END WHILE LOOP FOR AET>PET
-        FMP = FM
-        IF ( K.GT.30 ) THEN
-          write(iout,*)'PET DIFF ERROR ', FM-PET,thetaout
-          FMP = PET
+          if ( abs(factor - done) < zerod7 ) then
+            factor = factor/(fmp/pet)
+          else
+            itest = 1
+          end if
+!        FMP = FM
+        IF ( K.GT.20 ) THEN
+          write(iout,222)'PET DIFF ERROR ', ir,ic,FMP-PET,PET
           itest = 1
         ELSEIF ( ETOFH_FLAG == 0 ) THEN
-          FMP = PET
           itest = 1
         END IF
       END DO
+  222 format(a20,2i5,2e20.10)
  ! Calculate ET by grid cell for MT3D
       IF ( RTSOLUTE.GT.0 .AND. mtflg.EQ.1) THEN 
         depthsave = 0.0D0
