@@ -169,7 +169,7 @@ C     ------------------------------------------------------------------
       NUMCELLS = NCOL*NROW
       TOTCELLS = NUMCELLS*NLAY
       IPRCNT = 0
-      ETOFH_FLAG = 0
+      ETOFH_FLAG = 1
       ALLOCATE (LAYNUM(NCOL,NROW))
       ALLOCATE (NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM)
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
@@ -4900,42 +4900,42 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
       DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom
+      double precision zerod3, zerod4, zerod5, zerod10, done
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
-     +        kjm1
-      INTEGER jpntm1, jpntp1, kknt, kkntm1, jj, nwavm1, iset,
-     +        KKK
+     +        kjm1, itest, k
+      INTEGER jpntm1, jpntp1, kknt, kkntm1, jj, nwavm1, iset
 C     ------------------------------------------------------------------
 C
 C1------INITIALIZE VARIABLES.
-!      ETOFH_FLAG = 0
+      done = 1.0d0
+      zero = 0.0d0
+      zerod3 = 1.0d-3
+      zerod4 = 1.0d-4
+      zerod5 = 1.0d-5
+      zerod10 = 1.0d-10
       FACTOR = 1.0D0
-      PET = Rateud*Rootdepth
+      if ( Rootdepth < zerod7 ) return
+      if ( Thetas-Thetar < zerod7 ) return
+      pet = Rateud*Rootdepth
       eps_m1 = DBLE(Eps) - 1.0D0
-!      CAPH = 0.0
-!      HCAP = CAPH
+      HA = 0.0
+      HROOT = 0.0
       IF ( ETOFH_FLAG.GT.0 ) THEN
         HA = AIR_ENTRY(ic,ir)
         HROOT = H_ROOT(ic,ir)
-      ELSE
-        HA = 0.0
-        HROOT = 0.0
       END IF
-      zero = 1.0D-10
       icheckwilt = 0
       thetaout = Etime*Rateud
-      IF ( thetaout.LE.zero ) RETURN
-      IF ( Thetas-Thetar.LT.ZEROD7 ) THEN
-        thsrinv = 1.0/ZEROD7
-      ELSE
-        thsrinv = 1.0/(Thetas-Thetar) 
-      END IF
+      if ( thetaout.LE.zerod10 ) return
+      thsrinv = 1.0/(Thetas-Thetar) 
       epsfksths = Eps*Fksat*thsrinv
-      Etout = 0.0D0
-      feps = 1.0D-5
+      Etout = zero
+      feps = zerod5
       jpntm1 = Jpnt - 1
       jpntp1 = Jpnt + 1
       FMP = 0.0D0
+      fm = zerod10
       DO ii = 1, Nwv
         depth2(ii) = Depth(ii)
         theta2(ii) = Theta(ii)
@@ -4955,12 +4955,12 @@ C1------INITIALIZE VARIABLES.
           st = st + (Depth(ii)-Depth(ii+1))*Theta(ii)
         END IF
       END DO
-      KKK = 0
+      itest = 0
 C MASTER LOOP FOR REDUCING ACTUAL ET TO POTENTIAL ET.
-      DO WHILE ( ABS(FMP-PET).GT.1.0e-3*PET .OR. KKK.EQ.0 )
-        KKK = KKK + 1
-        IF ( KKK.GT.1 .AND. ABS(FMP-PET).GT.1.0e-3*PET) 
-     +       FACTOR = FACTOR/(FM/PET)
+      do while ( itest == 0 )
+        k = k + 1
+        if ( k.GT.1 .AND. ABS(fmp-pet).GT.zerod3*pet) 
+     1      factor = factor*pet/fm
 C
 C2------ONE WAVE IN PROFILE THAT IS SHALLOWER THAN ET EXTINCTION DEPTH.
         IF ( Numwaves.EQ.1 .AND. Depth(Jpnt).LE.Rootdepth ) THEN
@@ -4995,16 +4995,12 @@ C         DEPTH.
             Theta(Jpnt+Numwaves) = Thetar + Wiltwc
             numadd = 1
           END IF
-!  rgn modified next line 5/26/09.
           fhold = Theta(jpntm1+Numwaves) - Theta(Jpnt+Numwaves)
           IF ( numadd.EQ.1 .AND. fhold.GT.NEARZERO) THEN
             Flux(Jpnt+Numwaves) = Fksat*(((Theta(Jpnt+Numwaves)-Thetar)
      +                            *thsrinv)**Eps)
-!          IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-!          Speed(Jpnt+Numwaves) = epsfksths * (fhold**eps_m1)
-!  rgn added new calculation for speed 5/26/09.
-       bottom  = Theta(jpntm1+Numwaves)-Theta(Jpnt+Numwaves)
-       IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
+            bottom  = Theta(jpntm1+Numwaves)-Theta(Jpnt+Numwaves)
+          IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
             Speed(Jpnt+Numwaves) = (Flux(jpntm1+Numwaves)-
      +                              Flux(Jpnt+Numwaves))/bottom
             Depth(Jpnt+Numwaves) = Rootdepth
@@ -5347,14 +5343,18 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           END DO
           Numwaves = Nwv
           Etout = 0.0D0
+        ELSE
+          itest = 1
         END IF
  ! END WHILE LOOP FOR AET>PET
         FMP = FM
-        IF ( KKK.GT.20 ) THEN
+        IF ( K.GT.30 ) THEN
           write(iout,*)'PET DIFF ERROR ', FM-PET,thetaout
           FMP = PET
+          itest = 1
         ELSEIF ( ETOFH_FLAG == 0 ) THEN
           FMP = PET
+          itest = 1
         END IF
       END DO
  ! Calculate ET by grid cell for MT3D
