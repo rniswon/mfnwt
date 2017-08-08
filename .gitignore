@@ -19,3 +19,6 @@
 *.lst~develop
 Examples/AgOptions/Uzf_well_supp_irr/fort.222
 Examples/AgOptions/Uzf_well_supp_irr/cbc.unf
+Examples/AgOptions/~$Test_analysis.xlsx
+Examples/AgOptions/Uzf_well_supp_irr/wellsuppirr.lst
+Examples/AgOptions/Test_analysis.xlsx
