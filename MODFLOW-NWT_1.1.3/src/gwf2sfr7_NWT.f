@@ -1130,7 +1130,7 @@ C
             end select
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
           end do
-          if (found == .true.) CALL URDCOM(In, IOUT, line)
+          if ( found ) CALL URDCOM(In, IOUT, line)
       end if
 !
    32 FORMAT(1X,I10,' Some stream information will be read by reach. ',

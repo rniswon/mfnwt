@@ -283,14 +283,14 @@ C
      +                   //' Option: '//LINE(ISTART:ISTOP))
               else
               ! Integer found.  This is likely NSTRM, so exit.
-                if ( found == .true. ) then
+                if ( found ) then
                   write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
                 end if
               exit
             endif
         end select
-        if (found == .true.) CALL URDCOM(In, IOUT, line)
+        if ( found ) CALL URDCOM(In, IOUT, line)
       ENDDO
     9 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
      +       ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
