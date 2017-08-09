@@ -394,9 +394,11 @@
  No named parameters
 
  PROCESSING SFR2 OPTIONS
-
+ 
+  Some stream information will be read by reach. This option replaces NSTRM<0
 
  END PROCESSING SFR2 OPTIONS
+ 
 
 
  NUMBER OF STREAM REACHES IS  100
@@ -46146,6 +46148,6 @@
          TOTAL TIME 1.29600E+08 2.16000E+06  36000.      1500.0      4.1068    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/05 19:50:19
- Elapsed run time: 30.049 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/09 16:38:57
+ Elapsed run time: 28.517 Seconds
 

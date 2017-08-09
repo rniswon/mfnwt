@@ -396,9 +396,11 @@
 
  PROCESSING SFR2 OPTIONS
  
+ 
 Stream loss will be calculated as a factor of the streambed hydraulic conductivity. Multiplication factor is equal to     0.1000000015E+00
 
  END PROCESSING SFR2 OPTIONS
+ 
 
 
  NUMBER OF STREAM REACHES IS   36
@@ -469,6 +471,7 @@ Stream loss will be calculated as a factor of the streambed hydraulic conductivi
  No named parameters
 
  PROCESSING UZF OPTIONS
+ 
  
  INITIAL WATER CONTENT (THTI) WILL BE 
 READ FOR THE FIRST SS OR TR STRESS PERIOD
@@ -10117,6 +10120,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/05 19:50:24
- Elapsed run time:  0.847 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/09 16:39:00
+ Elapsed run time:  0.773 Seconds
 
