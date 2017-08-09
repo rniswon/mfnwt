@@ -311,7 +311,7 @@ Cdep  changed DSTROT to FXLKOT
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
       ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-      ALLOCATE (DEMAND(nsegdim),ACTUAL(nsegdim))
+      ALLOCATE (DEMAND(nsegdim),ACTUAL(nsegdim),SUPACT(nsegdim))
       ALLOCATE (IDVFLG)  
       IDVFLG = 0         
 Cdep  allocate space for stream outflow derivatives for lake package
@@ -334,6 +334,7 @@ Cdep  allocate space for stream outflow derivatives for lake package
       DLKSTAGE = 0.0D0
       SLKOTFLW = 0.0D0
       DEMAND = 0.0
+      SUPACT = 0.0
       ACTUAL = 0.0
       ALLOCATE (IOTSG(nsegdim))
       IOTSG = 0
@@ -8327,7 +8328,7 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST, DEMAND,
+      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST, DEMAND, SUPACT,
      +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
 !!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
@@ -8357,6 +8358,7 @@ C1------CALL LINEAR INTERPOLATION ROUTINE
 C-------RESET DEMAND IF IT CHANGES
       DO ISEG=1, NSS
         DEMAND(iseg) = SEG(2, iseg)
+        SUPACT(ISEG) = DEMAND(iseg)
       END DO
 C
 C DEP moved the from SFR7FM
@@ -8685,6 +8687,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXCELLS)
       DEALLOCATE (GWFSFRDAT(IGRID)%DEMAND)
       DEALLOCATE (GWFSFRDAT(IGRID)%ACTUAL)
+      DEALLOCATE (GWFSFRDAT(IGRID)%SUPACT)
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8813,6 +8816,7 @@ C     ------------------------------------------------------------------
       MAXCELLS=>GWFSFRDAT(IGRID)%MAXCELLS
       DEMAND=>GWFSFRDAT(IGRID)%DEMAND
       ACTUAL=>GWFSFRDAT(IGRID)%ACTUAL
+      SUPACT=>GWFSFRDAT(IGRID)%SUPACT
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8940,5 +8944,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%MAXCELLS=>MAXCELLS
       GWFSFRDAT(IGRID)%DEMAND=>DEMAND
       GWFSFRDAT(IGRID)%ACTUAL=>ACTUAL
+      GWFSFRDAT(IGRID)%SUPACT=>SUPACT
 C
       END SUBROUTINE SGWF2SFR7PSV

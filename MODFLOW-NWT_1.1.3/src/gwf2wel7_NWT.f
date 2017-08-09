@@ -642,7 +642,7 @@ C     ------------------------------------------------------------------
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL,SUPACT
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -697,7 +697,7 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = PCTSUP(I,L)*SUPACT(J)
             FMIN = FMIN - SGOTFLW(J)
             IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
             SUP = SUP + FMIN
@@ -775,7 +775,7 @@ C     ------------------------------------------------------------------
      3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
      4                      IRRPCT,NUMSUP,PCTSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL
+      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL,SUPACT
 !External function interface
       INTERFACE 
         FUNCTION SMOOTH3(H,T,B,dQ)
@@ -867,7 +867,7 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
-            FMIN = PCTSUP(I,L)*DEMAND(J)
+            FMIN = PCTSUP(I,L)*SUPACT(J)
             FMIN = FMIN - SGOTFLW(J)
             IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
             SUP = SUP + FMIN

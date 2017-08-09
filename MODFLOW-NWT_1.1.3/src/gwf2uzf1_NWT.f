@@ -4899,7 +4899,7 @@ C     ------------------------------------------------------------------
       DIMENSION depth2(Nwv), theta2(Nwv), flux2(Nwv), speed2(Nwv)
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
-      DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom
+      DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom, etoutold
       double precision zerod2, zerod4, zerod5, zerod10, done
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
@@ -4914,7 +4914,8 @@ C1------INITIALIZE VARIABLES.
       zerod4 = 1.0d-4
       zerod5 = 1.0d-5
       zerod10 = 1.0d-10
-      FACTOR = 1.001D0
+      FACTOR = DONE+ZEROD2
+      etoutold = DZERO
       if ( Rootdepth < zerod7 ) return
       if ( Thetas-Thetar < zerod7 ) return
       pet = Rateud*Rootdepth
@@ -5342,8 +5343,10 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           Numwaves = Nwv
           Etout = 0.0D0
           itest = 1
-        END IF
-          if ( abs(factor - done) < zerod7 ) then
+      END IF
+          if( abs((etout-etoutold)/etout) < zerod5 ) itest = 1
+          etoutold = etout
+          if ( abs(fmp/pet - done) > zerod2 ) then
             factor = factor/(fmp/pet)
           else
             itest = 1
@@ -5648,7 +5651,7 @@ C
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk,ROOTDPTH
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,
+      USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,SUPACT,
      +                        NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND,SGOTFLW
       USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR 
       USE GLOBAL,     ONLY: DELR, DELC, IUNIT
@@ -5697,7 +5700,8 @@ C
         end do
         if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
         if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-        if ( pettotal-aettotal < zerod2*pettotal ) demand(iseg) = 
+        SUPACT(iseg) = DEMAND(iseg)
+        if ( pettotal-aettotal < zerod2*pettotal ) SUPACT(iseg) = 
      +                                             SEG(2,iseg)
       end do
       return
