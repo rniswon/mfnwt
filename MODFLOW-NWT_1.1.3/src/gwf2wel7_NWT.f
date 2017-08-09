@@ -226,13 +226,14 @@ C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,IHEADER
-      logical :: found
+      logical :: found,option
       real :: R
       character(len=16)  :: text
 C     ------------------------------------------------------------------
 C
       LLOC=1
       found = .false.
+      option = .false.
         DO
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -241,8 +242,22 @@ C
             write(iout,'(/1x,a)') 'PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
             found = .true.
-! REDUCING PUMPING FOR DRY CELLS
+            option = .true.
+! REDUCING PUMPING FOR DRY CELLS OLD STYLE
         case('SPECIFY')
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
+          IF ( IUNITNWT.EQ.0 ) THEN
+            write(IOUT,32)
+          ELSE
+            IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
+            IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
+            WRITE(IOUT,*)
+            WRITE(IOUT,9) PSIRAMP,IUNITRAMP
+          END IF
+          found = .true.
+! REDUCING PUMPING FOR DRY CELLS
+        case('PHIRAMP')
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
           IF ( IUNITNWT.EQ.0 ) THEN
@@ -274,19 +289,20 @@ C
             exit
           case default
             read(line(istart:istop),*,IOSTAT=Iostat) intchk
-            if( Iostat .ne. 0 ) then
+            if ( option ) then
+              WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+              CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+
+            elseif( Iostat .ne. 0 ) then
               ! Not an integer.  Likely misspelled or unsupported 
               ! so terminate here.
               WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP)
               CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
-              else
-              ! Integer found.  This is likely NSTRM, so exit.
-                if ( found ) then
-                  write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-                end if
+            else
               exit
             endif
         end select

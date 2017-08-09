@@ -184,6 +184,7 @@ C
 !        CALL USTOP(' ')
         IRFG = 1
         NSTRM = ABS(NSTRM)
+        ITRFLG = 1    !option for transient routing
       END IF
 C
 C3------READ ISFROPT FLAGS WHEN NSTRM IS LESS THAN ZERO.
@@ -994,13 +995,24 @@ C
       LLOC=1
       found = .false.
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        IF ( LINE(ISTART:ISTOP)=='OPTIONS') THEN
-            write(iout,'(/1x,a)') 'PROCESSING '//
+        ! determine the type of header (-1=error, 0=noheader, 1=old style, 2=new style)
+      select case(line(istart:istop))
+      case('OPTIONS')
+        write(iout,'(/1x,a)') 'PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
-            IHEADER = 1 
-            found = .true.
-        END IF
-        IF ( IHEADER == 1 ) THEN
+        write(iout,*)
+        iheader = 2
+      case('REACHINPUT', 'TRANSROUTE', 'TABFILES', 'LOSSFACTOR')
+        iheader = 1
+      case default
+        read(line(istart:istop),*,IOSTAT=Iostat) intchk
+        if( Iostat == 0 ) then
+          iheader = 0
+        else
+          iheader = -1
+        endif
+      end select
+        IF ( IHEADER == 2 ) THEN
           CALL URDCOM(In, IOUT, line)
           DO
             LLOC=1
@@ -1040,32 +1052,24 @@ C
             case ('END')
               write(iout,'(/1x,a)') 'END PROCESSING '//
      +              trim(adjustl(text)) //' OPTIONS'
+              write(iout,*)
               CALL URDCOM(In, IOUT, line)
               found = .true.
               exit
             case default
-              read(line(istart:istop),*,IOSTAT=Iostat) intchk
-              if( Iostat .ne. 0 ) then
               ! Not an integer.  Likely misspelled or unsupported 
               ! so terminate here.
                 WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP)
                 CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
-              else
-              ! Integer found.  This is likely NSTRM, so exit.
-                if ( found ==.true. ) then
-                  write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-                end if
-                exit
-              endif
             end select
             CALL URDCOM(In, IOUT, line)
           ENDDO
-        ELSE
+        ELSE IF ( iheader == 1 ) THEN
 !support old input style
           do
+            if (istart == len(line)) exit
             select case (LINE(ISTART:ISTOP))
             case('REACHINPUT')
               IRFG = 1
@@ -1074,8 +1078,7 @@ C
             case('TRANSROUTE')
               ITRFLG = 1
               WRITE(iout,*)
-              WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS ',
-     +                        'IS ACTIVE'
+              WRITE(IOUT,'(A)')' TRANSIENT ROUTING IN STREAMS IS ACTIVE'
               WRITE(iout,*)
               found = .true.
             case('TABFILES')
@@ -1110,30 +1113,25 @@ C
               CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
               found = .true.
-            case('IRRIGATE')
-              ! IRRIGATE NOT SUPPORTED WITHOUT "OPTIONS" HEADER
-              ! SO TERMINATE HERE.
+            case default
               WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-              WRITE(IOUT,*) 'For Option: '//LINE(ISTART:ISTOP),',',
-     +                      ' KEYWORDS MUST BE PROCEEDED BY "OPTIONS" ',
-     +                      'AND FOLLOWED BY "END"'
+     +                    //' Option: '//LINE(ISTART:ISTOP)
               CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
-              found = .true.
-            case default
-              if ( found ==.true. ) then
-                  write(iout,'(/1x,a)') 'END PROCESSING '//
-     +            trim(adjustl(text)) //' OPTIONS'
-              end if
-            exit
             end select
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
           end do
           if ( found ) CALL URDCOM(In, IOUT, line)
+      else
+        if( Iostat .ne. 0 ) then
+          WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                    //' Option: '//LINE(ISTART:ISTOP)
+          CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+        end if
       end if
 !
-   32 FORMAT(1X,I10,' Some stream information will be read by reach. ',
+   32 FORMAT(1X,' Some stream information will be read by reach. ',
      +                'This option replaces NSTRM<0')
    31 FORMAT(1X,I10,' Specified inflow files will be read ',
      +                 'with a maximum of ',I10,' row entries per file')

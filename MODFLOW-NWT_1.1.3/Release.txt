@@ -25,7 +25,9 @@ Added ability to reuse the same well tabfile for more than one well. Changed
 reading the tabfiles to allow comment lines in tabfiles. Modified output of
 pumping rates to LST file to separate from printing of wells with reduced
 pumping. Modified keyword input formats to support backward compatibility
-of previous keyword input formats. 
+of previous keyword input formats. Character variable PHIRAMP can be used
+instead of SPECIFY for inputing PHIRAMP and optional output file unit number
+for writing reduced pumping rates.
 
 Unsaturated-Zone Flow (UZF) package
 Fixed bug that occurred when IUZFOPT=0 and element 0 accessed in array DELSTOR.  
