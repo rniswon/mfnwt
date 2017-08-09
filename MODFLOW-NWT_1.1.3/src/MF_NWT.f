@@ -574,8 +574,15 @@ C7C5---PRINT AND/OR SAVE DATA.
 C
 C7C6---JUMP TO END OF PROGRAM IF CONVERGENCE WAS NOT ACHIEVED.
           IF ( IUNIT(63).GT.0 ) THEN
-            IF ( ICNVGFLG.EQ.0 ) THEN
-              IF(ICNVG.EQ.0) GO TO 110
+            IF(ICNVG.EQ.0) THEN
+              NCVGERR=NCVGERR+1
+              IF ( ICNVGFLG.EQ.0 ) THEN
+                WRITE(IOUT,87) BUDPERC
+                WRITE(IOUT,*) 'STOPPING SIMULATION'
+                GO TO 110
+              ELSE
+                WRITE(IOUT,*) 'CONTINUING EXECUTION'
+              END IF
             END IF
           ELSE
             IF(ICNVG.EQ.0) THEN
