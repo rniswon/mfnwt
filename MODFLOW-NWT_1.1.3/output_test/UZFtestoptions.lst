@@ -368,7 +368,7 @@
   14    0.000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.2000       0.000    
   15    0.000       0.000      0.1000      0.1000      0.1000      0.1000       0.000       0.000       0.000       0.000    
 
- WEL -- WELL PACKAGE FOR NWT VERSION 1.1.2,  9/15/2016 INPUT READ FROM UNIT   16
+ WEL -- WELL PACKAGE FOR NWT VERSION 1.1.3,  8/01/2017 INPUT READ FROM UNIT   16
  #Well Package input for test simulation 2
  No named parameters
  MAXIMUM OF     10 ACTIVE WELLS AT ONE TIME
@@ -10120,6 +10120,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/09 16:39:00
- Elapsed run time:  0.773 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/10 12:28:23
+ Elapsed run time:  0.725 Seconds
 
