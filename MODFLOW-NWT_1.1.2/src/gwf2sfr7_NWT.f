@@ -8454,10 +8454,11 @@ C-------SUBROUTINE SFR2MODSIM
 C
       SUBROUTINE SFR2MODSIM(EXCHANGE)
 C     *******************************************************************
-C     COMPUTE NET SEEPAGE OVER A SEGMENT FOR MODSIM.
-!--------MARCH 8, 2017
+C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
+C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
+C--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM
+      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8470,24 +8471,39 @@ C     -------------------------------------------------------------------
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD
+      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD, REACHNUMINSEG
+      DOUBLE PRECISION :: FLOWIN, FLOWOUT
 C     -------------------------------------------------------------------
 C
-        ISTSG = 0
+        ISTSG = 1
+        ISTSGOLD = ISTSG
+        REACHNUMINSEG = 0
         EXCHANGE = 0.0D0
+        FLOWIN = 0.0D0
+        FLOWOUT = 0.0D0
 C
-C1------LOOP OVER REACHES TO SET FLOWS
+C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
 C
-        DO l = 1, NSTRM
+        DO L = 1, NSTRM
 C
 C2------DETERMINE STREAM SEGMENT NUMBER.
+          REACHNUMINSEG = REACHNUMINSEG + 1
           ISTSGOLD = ISTSG
-          ISTSG = ISTRM(4, l)
+          ISTSG = ISTRM(4, L)
 C
-C3------SUM GAINS/LOSSES FOR ALL REACHES IN SEGMENT.
-          IF( ISTSG /= ISTSGOLD ) EXCHANGE(ISTSG) = 0.0
-          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + STRM(11, l)
+C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
+          IF( ISTSG /= ISTSGOLD ) THEN
+            REACHNUMINSEG = 1
+          END IF
 C
+C4------IF FIRST REACH IN SEGMENT THEN SET FLOWIN
+          IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
+C
+C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
+          IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
+            FLOWOUT = STRM(9,L)
+            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + FLOWIN - FLOWOUT
+          END IF
         END DO
 C
 C8------RETURN.
