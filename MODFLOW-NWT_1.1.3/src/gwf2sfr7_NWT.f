@@ -2419,7 +2419,10 @@ C24-----INITIALIZE VARIABLES.
           avhc = STRM(6, l)
 ! factor for losing streams
           cstr = STRM(16, l)
-          if ( hstr-h > 0.0 ) avhc = avhc*fact
+          if ( hstr-h > 0.0 ) then
+            avhc = STRM(6, l)*fact
+            cstr = STRM(16, l)*fact
+          end if
           precip = STRM(14, l)
           etstr = STRM(13, l)
           runof = STRM(12, l)
@@ -3683,7 +3686,7 @@ C     ------------------------------------------------------------------
      +                 hld, fbcheck, totflwt, totdelstor, totuzstor,
      +                 thetas, epsilon, thr, qa, qb, qc, qd, awdth,
      +                 bwdth, gwflow, dvrsn, fbot, depthtr, strtop,
-     +                 dwdh, fact
+     +                 dwdh
       EXTERNAL CALC_XSA
       DOUBLE PRECISION CALC_XSA
 C     ------------------------------------------------------------------
@@ -3719,7 +3722,6 @@ C         ACCUMULATORS (RATIN AND RATOUT).
       Transient_bd_tot = 0.0
       Transient_bd = 0.0
       lfold = 0
-      fact = FACTOR
       SFRUZINFIL = 0.0
       SFRUZDELSTOR = 0.0
       SFRUZRECH = 0.0
