@@ -985,32 +985,42 @@ C     ------------------------------------------------------------------
       LLOC=1
       found = .false.
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-      IF ( LINE(ISTART:ISTOP)=='OPTIONS') THEN
-            write(iout,'(/1x,a)') 'PROCESSING '//
+        ! determine the type of header (-1=error, 0=noheader, 1=old style, 2=new style)
+      select case(line(istart:istop))
+      case('OPTIONS')
+        write(iout,'(/1x,a)') 'PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
-        IHEADER = 1 
-        found = .true.
-      END IF
-      IF ( IHEADER == 1 ) THEN
+        write(iout,*)
+        iheader = 2
+      case('SPECIFYTHTR','SPECIFYTHTI','NOSURFLEAK')
+        iheader = 1
+      case default
+        read(line(istart:istop),*,IOSTAT=Iostat) intchk
+        if( Iostat == 0 ) then
+          iheader = 0
+        else
+          iheader = -1
+        endif
+      end select
+      IF ( IHEADER == 2 ) THEN
         CALL URDCOM(In, IOUT, line)
         DO
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         select case (LINE(ISTART:ISTOP))
-          case('SPECIFYTHTR')
-            ITHTRFLG = 1
-            WRITE(iout,*)
-            WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
-     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
-     +                'PERIOD'
-            WRITE(iout,*)
-            found = .true.
           case('SPECIFYTHTI')
             ITHTIFLG = 1
             WRITE(iout,*)
             WRITE(IOUT,'(A)')' INITIAL WATER CONTENT (THTI) WILL BE ',
      +                 'READ FOR THE FIRST SS OR TR STRESS PERIOD'
             WRITE(iout,*)
+         case('SPECIFYTHTR')
+          ITHTRFLG = 1
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' RESIDUAL WATER CONTENT (THTR) WILL BE ',
+     +                'READ AND USED FOR THE FIRST TRANSIENT STRESS ',
+     +                'PERIOD'
+          WRITE(iout,*)
           case('ETSQUARE')
             i=1
             CALL URWORD(line, lloc, istart, istop, 3, i, smooth, 
@@ -1037,7 +1047,7 @@ C     ------------------------------------------------------------------
             found = .true.
           case('REJECTSURFK')
               Isurfkreject = 1
-              WRITE(iout,*)Isurfkreject
+              WRITE(iout,*)
               WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
      +                    ,'LAND SURFACE K'
               WRITE(iout,*)
@@ -1077,26 +1087,19 @@ C     ------------------------------------------------------------------
             CALL URDCOM(In, IOUT, line)
             exit
           case default
-            read(line(istart:istop),*,IOSTAT=Iostat) intchk
-            if( Iostat .ne. 0 ) then
-              ! Not an integer.  Likely misspelled or unsupported 
+              !Likely misspelled or unsupported 
               ! so terminate here.
               WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP)
               CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
-            else
-              ! Integer found.  This is likely NUZTOP, so exit.
-              write(iout,'(/1x,a)') 'END PROCESSING '//
-     +          trim(adjustl(text)) //' OPTIONS'
-              exit
-            endif
-        end select
-        CALL URDCOM(In, IOUT, line)
+          end select
+          CALL URDCOM(In, IOUT, line)
         ENDDO
-      ELSE   
+      ELSE IF ( IHEADER == 1 ) THEN  
 ! SUPPORT OLD KEYWORD FORMAT  
         do
+        if (istart == len(line)) exit
         select case (LINE(ISTART:ISTOP))
         case('SPECIFYTHTR')
           ITHTRFLG = 1
@@ -1120,11 +1123,23 @@ C     ------------------------------------------------------------------
           WRITE(iout,*)
           found = .true.
         case default
-          exit
+          !Likely misspelled or unsupported 
+          ! so terminate here.
+          WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+          CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
         end select
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         end do
-      if (found == .true.) CALL URDCOM(In, IOUT, line)
+        if ( found ) CALL URDCOM(In, IOUT, line)
+      else
+        if( Iostat .ne. 0 ) then
+          WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                    //' Option: '//LINE(ISTART:ISTOP)
+          CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+        end if
       END IF
       END SUBROUTINE
 C
@@ -1889,7 +1904,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
           Excespp(ic, ir) = 0.0
-        ELSEIF ( finfhold - VKS(ic, ir) > zero ) THEN
+        ELSEIF ( finfhold - fkreject > zero ) THEN
           EXCESPP(ic, ir) =  (finfhold - fkreject)*DELC(ir)*DELR(ic)
           finfhold = fkreject
         ELSE
@@ -2454,7 +2469,7 @@ CDEP 05/05/2006
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
           Excespp(ic, ir) = 0.0
-        ELSEIF ( finfhold - VKS(ic, ir) > zero ) THEN
+        ELSEIF ( finfhold - fkreject > zero ) THEN
           EXCESPP(ic, ir) =  (finfhold - fkreject)*DELC(ir)*DELR(ic)
           finfhold = fkreject
         ELSE

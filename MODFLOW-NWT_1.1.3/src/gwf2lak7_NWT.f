@@ -2105,21 +2105,21 @@ C          TRANSIENT SIMULATION AND THEN COMPUTE STGNEW FROM
 C          NEW VOLUME.
 !RGN Volume made equal to sum of inflows and outflows plus  ! 6/30/2017 commenting this out as it causes issues for small lakes
 !RGN   plus lake storage from previous time step  4/17/09
-!         IF(ISS.EQ.0)THEN
-!           VOL2 = VOLOLDD(LAKE)+(PRECIP(LAKE)-EVAP(LAKE)
-!     +                -WDRAW+RUNFD+SURFIN(LAKE)-SURFOT(LAKE)+GWIN(LAKE)    !10/4/2014 added SEEPUZ(LAKE)
-!     +                -GWOUT(LAKE)-SEEPUZ(LAKE))*DELT
-!          IF(VOL2.LE.0.0) VOL2=0.0
-!          VOL(LAKE) = VOL2
-!          STGNEW(LAKE)= STGTERP(VOL2,LAKE)
+         IF(ISS.EQ.0)THEN
+           VOL2 = VOLOLDD(LAKE)+(PRECIP(LAKE)-EVAP(LAKE)
+     +                -WDRAW+RUNFD+SURFIN(LAKE)-SURFOT(LAKE)+GWIN(LAKE)    !10/4/2014 added SEEPUZ(LAKE)
+     +                -GWOUT(LAKE)-SEEPUZ(LAKE))*DELT
+          IF(VOL2.LE.0.0) VOL2=0.0
+          VOL(LAKE) = VOL2
+          STGNEW(LAKE)= STGTERP(VOL2,LAKE)
 !C
 !C18B-----COMPUTE LAKE VOLUME FROM ALL INFLOWS AND OUTFLOWS FOR 
 !C          STEADY STATE SIMULATION.
-!         ELSE
-!           VOL2 = VOLTERP(STGNEW(LAKE),LAKE)
-!           IF(VOL2.LE.0.0D0) VOL2 = 0.0D0
-!           VOL(LAKE) = VOL2
-!         END IF
+         ELSE
+           VOL2 = VOLTERP(STGNEW(LAKE),LAKE)
+           IF(VOL2.LE.0.0D0) VOL2 = 0.0D0
+           VOL(LAKE) = VOL2
+         END IF
 C18C-----STGON IS FRACTION OF STGOLD AND STGNEW AND SURFACE AREA
 C
 C          IS BASED ON STGOLD.
