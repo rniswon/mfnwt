@@ -1,0 +1,8 @@
+LIST                  1 .\Ex_prob2\Pr2MFNWT.LST
+BAS6                  2 .\Ex_prob2\Pr2.BA6
+DIS                  10 .\Ex_prob2\Pr2.DIS
+RCH                  18 .\Ex_prob2\Pr2.RCH
+OC                   20 .\Ex_prob2\Pr2.OC
+DATA(BINARY)         32 .\Ex_prob2\Pr2MFNWT.BUD
+NWT                  34 .\Ex_prob2\Pr2.NWT
+UPW                  35 .\Ex_prob2\Pr2.UPW

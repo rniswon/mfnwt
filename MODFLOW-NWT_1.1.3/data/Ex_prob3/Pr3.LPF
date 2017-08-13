@@ -1,0 +1,12 @@
+# MODFLOW2005 Upstream Weighted Package Input File
+# Test Problem 3 for UPW Package and NWT Solver
+     0     -9999.     0                           ILPFCB, HDRY, NPLPF
+1                                             LAYTYP
+1                                             LAYAVG
+1.0                                           CHANI
+1                                             LAYVKA
+-1                                             LAYWET
+.5 1 1
+CONSTANT       1.                             HK
+CONSTANT       1.                             VKA
+CONSTANT       0.1                            WETDRY
