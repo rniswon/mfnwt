@@ -17,9 +17,3 @@
 *.hed
 *.lst~HEAD
 *.lst~develop
-MODFLOW-NWT_1.1.3/src/gwf2ago7_NWT.f
-Examples/AgOptions/Uzf_well_supp_irr/wellsuppirr.uzf4
-Examples/AgOptions/Uzf_well_supp_irr/fort.222
-Examples/AgOptions/Test_analysis.xlsx
-MF_NWT/MF_NWT/x64/Release/MF_NWT_ag.zip
-Examples/AgOptions/Uzf_well_supp_irr/cbc.unf
