@@ -3264,6 +3264,7 @@ C         AND SET DEPTH TO DEPTHP AND FLOBOT TO FLOBOTP.
               flobotold = flobot1
               IF ( ibflg.EQ.1 ) flobotold = flobotp
               SFRQ(4, l) = width
+              hstr = depth + STRM(3, l)
 C
 C63-----END OF NEWTON LOOP.
             END DO
@@ -8495,14 +8496,14 @@ C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
 C     ------------------------------------------------------------------
 C2--- INITIALIZE AG VARIABLES TO ZERO
-      DVRPERC = 0.0  
-      DVRCH = 0.0 
-      KCROP = 0.0
 C
 C1
 C----READ IRRIGATION SEGEMENT INFORMATION.
 C
       IF ( NUMIRRSFR > 0 ) THEN
+        DVRPERC = 0.0  
+        DVRCH = 0.0 
+        KCROP = 0.0
         NUMIRRSFRSP = 0
         LLOC = 1
         CALL URDCOM(UNITIRR,IOUT,LINE)
@@ -8524,8 +8525,12 @@ C
           END IF
           IF ( SGNM > 0 ) THEN
             BACKSPACE(UNITIRR)
+     !!       READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
+     !!+                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     !!+                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+! no crop coefficient
             READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),
      +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
             totdum  = 0.0
             DO K = 1, NMCL
