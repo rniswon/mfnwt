@@ -2371,12 +2371,12 @@ C24-----INITIALIZE VARIABLES.
           hld = HLDSFR(l)
 ! Added code to test for BCF or LPF 11/19/07
           IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
+          avhc = STRM(6, l)
           sbdthk = STRM(8, l)
           hstr = depth + STRM(3, l)
-          avhc = STRM(6, l)
 ! factor for losing streams
-          cstr = STRM(16, l)
           if ( hstr-h > 0.0 ) avhc = avhc*fact
+          cstr = STRM(16, l)
           precip = STRM(14, l)
           etstr = STRM(13, l)
           runof = STRM(12, l)
@@ -2690,15 +2690,8 @@ C         AND STREAMBED LEAKAGE WHEN ICALC IS GREATER THAN 0.
               depth1 = depthp
               depth2 = depth1 + 2.0D0*(deps)
               hstr = depth1 + STRM(3, l)
-              if ( hstr-h > 0.0d0 ) then
-                avhc = STRM(6, l)*fact
-                cstr = STRM(16, l)*fact
-                strleak = strlen*avhc
-              else
-                avhc = STRM(6, l)
-                cstr = STRM(16, l)
-                strleak = strlen*avhc
-              end if
+              avhc = STRM(6, l)
+              if ( hstr-h > 0.0 ) avhc = STRM(6, l)*fact
 C
 C41-----CALCULATE FLOBOT1 AND FLOBOT2 FOR ICALC EQUAL TO 1.
 Cdep  Corrected depth1+dlh and depth2+dlh to be depth1 and depth2.
