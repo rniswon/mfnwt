@@ -1252,9 +1252,7 @@ C     ------------------------------------------------------------------
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
      +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
-     +        ierr,IFLG,lloc,istart,istop
-      CHARACTER(LEN=200)::LINE
-      REAL TTIME,TRATE
+     +        ierr,IFLG
 C     ------------------------------------------------------------------
 C
 C-------SET POINTERS FOR CURRENT GRID.
@@ -2033,14 +2031,8 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             numval = ISFRLIST(2,i)
             iunitnum = ISFRLIST(3,i)
             DO j = 1, numval
-              LLOC = 1
-              CALL URDCOM(iunitnum,IOUT,LINE)
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,II,TTIME,IOUT,
-     +                    iunitnum)
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,II,TRATE,IOUT,
-     +                    iunitnum)
-              TABTIME(j,ISFRLIST(1,i)) = TTIME
-              TABFLOW(j,ISFRLIST(1,i)) = TRATE
+              READ(iunitnum,*)TABTIME(j,ISFRLIST(1,i)),
+     +                     TABFLOW(j,ISFRLIST(1,i))
               IF ( TABFLOW(j,ISFRLIST(1,i)).LT.0.0 ) THEN
                 TABFLOW(j,ISFRLIST(1,i)) = 0.0
                 WRITE(IOUT,9029)
@@ -2379,12 +2371,12 @@ C24-----INITIALIZE VARIABLES.
           hld = HLDSFR(l)
 ! Added code to test for BCF or LPF 11/19/07
           IF ( ABS(SNGL(hld)-HDRY).LT.CLOSEZERO ) hld = h
+          avhc = STRM(6, l)
           sbdthk = STRM(8, l)
           hstr = depth + STRM(3, l)
-          avhc = STRM(6, l)
 ! factor for losing streams
-          cstr = STRM(16, l)
           if ( hstr-h > 0.0 ) avhc = avhc*fact
+          cstr = STRM(16, l)
           precip = STRM(14, l)
           etstr = STRM(13, l)
           runof = STRM(12, l)
@@ -2698,15 +2690,8 @@ C         AND STREAMBED LEAKAGE WHEN ICALC IS GREATER THAN 0.
               depth1 = depthp
               depth2 = depth1 + 2.0D0*(deps)
               hstr = depth1 + STRM(3, l)
-              if ( hstr-h > 0.0d0 ) then
-                avhc = STRM(6, l)*fact
-                cstr = STRM(16, l)*fact
-                strleak = strlen*avhc
-              else
-                avhc = STRM(6, l)
-                cstr = STRM(16, l)
-                strleak = strlen*avhc
-              end if
+              avhc = STRM(6, l)
+              if ( hstr-h > 0.0 ) avhc = STRM(6, l)*fact
 C
 C41-----CALCULATE FLOBOT1 AND FLOBOT2 FOR ICALC EQUAL TO 1.
 Cdep  Corrected depth1+dlh and depth2+dlh to be depth1 and depth2.
@@ -8398,87 +8383,6 @@ C
       END IF
       smooth = y
       END FUNCTION smooth
-C
-C-------SUBROUTINE SFR2MODSIM
-C
-      SUBROUTINE SFR2MODSIM(EXCHANGE)
-C     *******************************************************************
-C     COMPUTE NET SEEPAGE OVER A SEGMENT FOR MODSIM.
-!--------MARCH 8, 2017
-C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM
-      IMPLICIT NONE
-C     -------------------------------------------------------------------
-C     SPECIFICATIONS:
-C     -------------------------------------------------------------------
-C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
-C     -------------------------------------------------------------------
-!      INTEGER 
-!      DOUBLE PRECISION 
-C     -------------------------------------------------------------------
-C     LOCAL VARIABLES
-C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD
-C     -------------------------------------------------------------------
-C
-        ISTSG = 0
-        EXCHANGE = 0.0D0
-C
-C1------LOOP OVER REACHES TO SET FLOWS
-C
-        DO l = 1, NSTRM
-C
-C2------DETERMINE STREAM SEGMENT NUMBER.
-          ISTSGOLD = ISTSG
-          ISTSG = ISTRM(4, l)
-C
-C3------SUM GAINS/LOSSES FOR ALL REACHES IN SEGMENT.
-          IF( ISTSG /= ISTSGOLD ) EXCHANGE(ISTSG) = 0.0
-          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + STRM(11, l)
-C
-        END DO
-C
-C8------RETURN.
-      RETURN
-      END SUBROUTINE SFR2MODSIM
-C
-C-------SUBROUTINE MODSIM2SFR
-C
-      SUBROUTINE MODSIM2SFR(DIVS)
-C     *******************************************************************
-C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION 
-C     SEGMENTS.
-!--------MARCH 8, 2017
-C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG
-      IMPLICIT NONE
-C     -------------------------------------------------------------------
-C     SPECIFICATIONS:
-C     -------------------------------------------------------------------
-C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: DIVS(NSS)
-C     -------------------------------------------------------------------
-!      INTEGER 
-!      DOUBLE PRECISION 
-C     -------------------------------------------------------------------
-C     LOCAL VARIABLES
-C     -------------------------------------------------------------------
-      INTEGER :: ISEG
-C     -------------------------------------------------------------------
-C
-C1------LOOP OVER SEGMETS
-C
-        DO ISEG = 1, NSS
-C
-C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
-C            
-          SEG(2,iseg) = DIVS(ISEG)
-        END DO
-C
-C8------RETURN.
-      RETURN
-      END SUBROUTINE MODSIM2SFR
 C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)
