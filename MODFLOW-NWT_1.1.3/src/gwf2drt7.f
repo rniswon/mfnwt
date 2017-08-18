@@ -353,7 +353,6 @@ C5A-----GET LAYER, ROW & COLUMN OF CELL CONTAINING DRAIN.
           IF (ILR.NE.0) THEN  ! Condition added 8/26/08 ERB
             IRR = DRTF(7,L)
             ICR = DRTF(8,L)
-            IF (IBOUND(ICR,IRR,ILR) .LE. 0) ILR = 0
           ENDIF
         END IF
 C
@@ -375,7 +374,7 @@ C5D-----SUBTRACT Q FROM RATOUT.
           Q=QQ
           RATOUT=RATOUT-QQ
           IF (IDRTFL.GT.0) THEN
-            IF (ILR.NE.0) THEN
+            IF (ILR.NE.0 .AND. IBOUND(ICR,IRR,ILR).GT.0) THEN
               RFPROP = DRTF(9,L)
               QQIN = RFPROP*(CC*HHNEW-CEL)
               QIN = QQIN
@@ -451,6 +450,7 @@ C     ******************************************************************
       DIMENSION DRTF(NDRTVL,MXDRT)
       CHARACTER*200 LINE,FNAME
       DATA NUNOPN/99/
+      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
       IERR = 0
@@ -479,7 +479,7 @@ C  Check for and decode EXTERNAL and SFAC records.
         IN=NUNOPN
         WRITE(IOUT,520) IN,FNAME
   520   FORMAT(1X,/1X,'OPENING FILE ON UNIT ',I4,':',/1X,A)
-        OPEN(UNIT=IN,FILE=FNAME)
+        OPEN(UNIT=IN,FILE=FNAME,ACTION=ACTION(1))
         ICLOSE=1
         READ(IN,'(A)') LINE
       ENDIF
