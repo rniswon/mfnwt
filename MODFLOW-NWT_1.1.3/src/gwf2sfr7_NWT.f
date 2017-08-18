@@ -1252,7 +1252,9 @@ C     ------------------------------------------------------------------
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
      +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
-     +        ierr,IFLG
+     +        ierr,IFLG,LLOC,istart,istop
+      CHARACTER(LEN=200)::LINE
+      REAL TTIME,TRATE
 C     ------------------------------------------------------------------
 C
 C-------SET POINTERS FOR CURRENT GRID.
