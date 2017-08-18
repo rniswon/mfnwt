@@ -2031,8 +2031,14 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             numval = ISFRLIST(2,i)
             iunitnum = ISFRLIST(3,i)
             DO j = 1, numval
-              READ(iunitnum,*)TABTIME(j,ISFRLIST(1,i)),
-     +                     TABFLOW(j,ISFRLIST(1,i))
+              LLOC = 1
+              CALL URDCOM(iunitnum,IOUT,LINE)
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,II,TTIME,IOUT,
+     +                    iunitnum)
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,II,TRATE,IOUT,
+     +                    iunitnum)
+              TABTIME(j,ISFRLIST(1,i)) = TTIME
+              TABFLOW(j,ISFRLIST(1,i)) = TRATE
               IF ( TABFLOW(j,ISFRLIST(1,i)).LT.0.0 ) THEN
                 TABFLOW(j,ISFRLIST(1,i)) = 0.0
                 WRITE(IOUT,9029)
