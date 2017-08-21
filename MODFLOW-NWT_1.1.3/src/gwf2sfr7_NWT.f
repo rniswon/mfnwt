@@ -8526,9 +8526,13 @@ C
           END IF
           IF ( SGNM > 0 ) THEN
             BACKSPACE(UNITIRR)
+     !!       READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
+     !!+                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     !!+                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+! No KCROP for Wes
             READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
-     +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+     +                    (DVEFF(K,SGNM),DVRPERC(K,SGNM),IRRROW(K,SGNM),
+     +                    IRRCOL(K,SGNM),K=1,NMCL)
             totdum  = 0.0
             DO K = 1, NMCL
               IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
