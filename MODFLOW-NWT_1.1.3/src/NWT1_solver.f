@@ -1438,8 +1438,8 @@ C--Update heads.
       term2 = (-Cvm1-Ccm1-Crm1-Crr-Ccc-Cvv+Hcoff)*H
       term3 = Crr*Hcp1 + Ccc*Hrp1 + Cvv*Hvp1 - Rhss
       GW_func = term1 + term2 + term3
-  !    if(ic==130.and.ir==239.and.il==3)then
-  !    write(iout,222)ic,ir,il,cvm1*(Hvm1-h),ccm1*(hrm1-h),crm1*(hcm1-h),
+  !    if(ic==298.and.ir==329.and.il==2)then
+  !    write(333,222)ic,ir,il,cvm1*(Hvm1-h),ccm1*(hrm1-h),crm1*(hcm1-h),
   !   +cvv*(hvp1-h),ccc*(hrp1-h),crr*(hcp1-h),hcoff,h,rhss,gw_func
   !    end if
   !222 format(3i5,10e20.10)
