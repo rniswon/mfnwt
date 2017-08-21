@@ -2260,9 +2260,9 @@ C-------------SFR AND SWR REACHES
                   SEG(26, irun) = SEG(26, irun) + seepout1
                 END IF
               END IF
-              IF ( Iunitswr.GT.0 ) THEN
-                CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
-              END IF
+              !IF ( Iunitswr.GT.0 ) THEN
+              !  CALL GWF2SWR7EX_V(Igrid,1,irun,seepout1)  !FILL QUZFLOW IN SWR SUBROUTINE
+              !END IF
 C-------------LAK REACHES
             ELSE IF ( irun.LT.0 ) THEN
               IF ( Iunitlak.GT.0 ) THEN
