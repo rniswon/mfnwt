@@ -3232,7 +3232,7 @@ C    for vertical interface, "K" is layer below bottom of lake
         VK = 0.0
         IF(LAYVKA(K).EQ.0) THEN
            VK=VKA(I,J,K)
-        ELSE IF ( VKAUPW(I,J,K) > 0.0 ) THEN    !RGN 8/21/17 CHECK DIVIDE BY ZERO
+        ELSE IF ( VKA(I,J,K) > 0.0 ) THEN    !RGN 8/21/17 CHECK DIVIDE BY ZERO
            VK=HK(I,J,K)/VKA(I,J,K)
         END IF
 c   skip if zero vk
