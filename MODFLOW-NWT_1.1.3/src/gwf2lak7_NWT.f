@@ -3229,9 +3229,10 @@ C    for vertical interface, "K" is layer below bottom of lake
         IF(K.EQ.NLAY.AND.LKARR1(I,J,K).GT.0) GO TO 315
         IF(BEDLAK(II).LE.0.0) GO TO 315
         CNDFC1 = BEDLAK(II)*DELR(I)*DELC(J)
+        VK = 0.0
         IF(LAYVKA(K).EQ.0) THEN
            VK=VKA(I,J,K)
-        ELSE
+        ELSE IF ( VKA(I,J,K) > 0.0 ) THEN    !RGN 8/21/17 CHECK DIVIDE BY ZERO
            VK=HK(I,J,K)/VKA(I,J,K)
         END IF
 c   skip if zero vk
@@ -4037,43 +4038,7 @@ C
 C6E------COMPUTE LAKE SEEPAGE (FLOBOT) AS A FRACTION OF FLOBO1 AND 
 C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.   
       RETURN
-      END SUBROUTINE GET_FLOBOT   
-C
-C-------SUBROUTINE LAK2MODSIM
-      SUBROUTINE LAK2MODSIM()
-C     *******************************************************************
-C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
-!--------MARCH 8, 2017
-C     *******************************************************************
-      USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL
-      USE GWFBASMODULE, ONLY: DELT
-      IMPLICIT NONE
-C     -------------------------------------------------------------------
-C     SPECIFICATIONS:
-C     -------------------------------------------------------------------
-C     ARGUMENTS
-C     -------------------------------------------------------------------
-!      INTEGER 
-!      DOUBLE PRECISION 
-C     -------------------------------------------------------------------
-C     LOCAL VARIABLES
-C     -------------------------------------------------------------------
-      INTEGER LAKE
-      DOUBLE PRECISION DELTAVOL, DELTAQ
-C     -------------------------------------------------------------------
-C
-C
-C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
-C
-        DO LAKE=1,NLAKES
-          DELTAQ = SURFIN(LAKE) - SURFOT(LAKE)
-          DELTAVOL = VOL(LAKE) - VOLOLDD(LAKE) 
-          DELTAVOL = DELTAVOL - DELTAQ
-        END DO
-C
-C5------RETURN.
-      RETURN
-      END SUBROUTINE LAK2MODSIM
+      END SUBROUTINE GET_FLOBOT
 C   
 C
       SUBROUTINE GWF2LAK7DA(IUNITLAK, IGRID)
