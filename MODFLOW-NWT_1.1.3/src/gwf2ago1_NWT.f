@@ -18,6 +18,7 @@
         INTEGER,          SAVE,                 POINTER     ::MAXCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
+        INTEGER,          SAVE,              POINTER   ::ETDEMANDFLAG
 ! from SFR
         INTEGER, SAVE, POINTER :: NUMIRRSFR,UNITIRRSFR
         INTEGER, SAVE, POINTER :: MAXCELLSSFR,NUMIRRSFRSP
@@ -35,7 +36,7 @@
       END MODULE GWFAGOMODULE
 
 
-      SUBROUTINE GWF2AGO7AR(IN,IOUT)
+      SUBROUTINE GWF2AGO7AR(IN)
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR AGO PACKAGE
 C     ******************************************************************
@@ -49,7 +50,7 @@ C     ------------------------------------------------------------------
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C        ARGUMENTS
-      integer,intent(inout) :: IN, IOUT
+      integer,intent(inout) :: IN
 C     ------------------------------------------------------------------
 C        VARIABLES
       CHARACTER(len=200) :: LINE
@@ -158,6 +159,8 @@ C-------allocate for SFR agoptions
       DEMAND = 0.0
       SUPACT = 0.0
       ACTUAL = 0.0
+      ALLOCATE(ETDEMANDFLAG)
+      ETDEMANDFLAG = 0
 C
 C6------RETURN
       RETURN
@@ -203,7 +206,6 @@ C
 ! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
         case('SUPPLEMENTAL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
             IF(NUMSUP.LT.0) NUMSUP=0
             IF ( IUNIT(44) < 1 ) NUMSUP=0
@@ -212,7 +214,6 @@ C
 ! Pumped water will be added as irrigation
         case('IRRIGATEWEL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWEL,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
             IF( NUMIRRWEL.LT.0 ) NUMIRRWEL = 0
             IF ( MAXCELLS < 1 ) MAXCELLS = 1 
@@ -222,7 +223,6 @@ C
 ! Pumped water will be added as irrigation
           case('IRRIGATESFR')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRRSFR,R,IOUT,IN)    !FILE UNIT
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
             IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
             IF ( MAXCELLS < 1 ) MAXCELLS = 1 
@@ -284,25 +284,25 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C        ARGUMENTS:
 C     ------------------------------------------------------------------
-      INTEGER, INTENT(IN):IN, KPER
+      INTEGER, INTENT(IN):: IN, KPER
 C     ------------------------------------------------------------------
 C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
-      INTEGER I, NUMSUPSP
+      INTEGER I, NUMSUPSP, ITMP
 C     ------------------------------------------------------------------
 C
 C1----READ NUMBER OF AG OPTIONS (OR FLAG SAYING REUSE AGO DATA).
        IF(IFREFM.EQ.0) THEN
-         READ(IN,'(2I10)') ITMP,NP
+         READ(IN,'(2I10)') ITMP
        ELSE
-         READ(IN,*) ITMP,NP
+         READ(IN,*) ITMP
        END IF
 C
 C
 C2-----READ AND SET AG-OPTIONS VARIABLES
-      CALL SFRAGOPTIONS(IN,IOUT)
-      CALL WELAGOPTIONS(IN,IOUT)
+      CALL SFRAGOPTIONS(IN)
+      CALL WELAGOPTIONS(IN)
 C
 C6------RETURN
       RETURN
@@ -316,9 +316,12 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      IMPLICIT NONE
       USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY: NSS, SEG
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C        ARGUMENTS:
+      INTEGER, INTENT(IN)::IN, KPER
 C
       CHARACTER(LEN=200)::LINE
       INTEGER I, NUMSUPSP, ISEG
@@ -334,33 +337,49 @@ C6------RETURN
       RETURN
       END
 !
-      SUBROUTINE WELAGOPTIONS(IN,IOUT,ITMP)
+      SUBROUTINE WELAGOPTIONS(IN,ITMP)
 C     ******************************************************************
 C     READ SUP WELL DATA FOR EACH STRESS PERIOD
 C     ******************************************************************
 C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      IMPLICIT NONE
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
       USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY: NSS
+      IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS:
-      INTEGER, INTENT(IN)::IN,IOUT,ITMP
+      INTEGER, INTENT(IN)::IN,ITMP
 C     ------------------------------------------------------------------
 C     VARIABLES:
       CHARACTER(LEN=200)::LINE
-      INTEGER I, NUMSUPSP
+      INTEGER :: I, NUMSUPSP, IERR, LLOC, ISTART, ISTOP, J, ISPWL
+      INTEGER :: NMSG, K, NUMIRRWELSP, IRWL, NMCL
+      REAL :: R
 C     ------------------------------------------------------------------
 C
 C
-C READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
+C1------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
+C
+      IF(ITMP.LT.0) THEN
+         WRITE(IOUT,6)
+    6    FORMAT(1X,/
+     1    1X,'REUSING SUPPLEMENTAL WELL DATA ',
+     2       'FROM LAST STRESS PERIOD')
+        RETURN
+      END IF
+      IF ( IUNIT(44) < 1 ) THEN
+          WRITE(IOUT,99) 
+          CALL USTOP(' ')
+      END IF
+C
+C2------READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
 C
       NUMSUPSP = 0
       IERR = 0
-      IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
-      CALL URDCOM(UNITSUP,IOUT,LINE)
+      IF ( NUMSUP > 0 ) THEN
+      CALL URDCOM(IN,IOUT,LINE)
       LLOC = 1
       CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUPSP,R,IOUT,IN)
       IF ( NUMSUPSP > NUMSUP )THEN
@@ -371,7 +390,7 @@ C
         IERR = 0
         DO J = 1, NUMSUPSP
           LLOC = 1
-          CALL URDCOM(UNITSUP,IOUT,LINE)
+          CALL URDCOM(IN,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
           IF ( NMSG > MAXSEGS )THEN
@@ -379,8 +398,8 @@ C
             WRITE(IOUT,103)MAXSEGS,NMSG
             CALL USTOP('')
           END IF
-          BACKSPACE(UNITSUP)
-          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
+          BACKSPACE(IN)
+          READ(IN,*)SUPWEL(J),NUMSEGS(ISPWL),
      +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
           DO K = 1, NUMSEGS(SUPWEL(J))
             IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
@@ -398,7 +417,7 @@ C
 !
       IF ( NUMIRRWEL > 0 .AND. IUNIT(44) > 0 ) THEN
         LLOC = 1
-        CALL URDCOM(UNITIRR,IOUT,LINE)
+        CALL URDCOM(IN,IOUT,LINE)
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWELSP,R,IOUT,IN)
         IF ( NUMIRRWELSP > NUMIRRWEL )THEN
           WRITE(IOUT,*)
@@ -407,7 +426,7 @@ C
         END IF
         DO J = 1, NUMIRRWELSP
           LLOC = 1
-          CALL URDCOM(UNITIRR,IOUT,LINE)
+          CALL URDCOM(IN,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
           IF ( NMCL > MAXCELLS )THEN
@@ -415,8 +434,8 @@ C
             WRITE(IOUT,105)MAXCELLS,NMCL
             CALL USTOP('')
           END IF
-          BACKSPACE(UNITIRR)
-          READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
+          BACKSPACE(IN)
+          READ(IN,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
      +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
           DO K = 1, NUMCELLS(IRRWEL(J))
           IF ( UZFROW(K,IRRWEL(J))==0 .OR. UZFCOL(K,IRRWEL(J))==0 ) THEN
@@ -427,6 +446,9 @@ C
         END DO
       END IF
 C
+   99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
+     +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
+     +        'FROM SEGEMENTS')
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
   102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
@@ -450,7 +472,7 @@ C
      +       'Maximum cells and the number specified for stress '
      +       'period are: ',2i6)
   106 FORMAT('***Error in SUP WEL*** cell row or column number for '
-     +        ,'supplemental well specified as zero. Model stopping'
+     +        ,'supplemental well specified as zero. Model stopping')
 C
 C6------RETURN
       RETURN
@@ -461,8 +483,8 @@ C
 C-------SUBROUTINE SFRAGOPTIONS
       SUBROUTINE SFRAGOPTIONS(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
-      USE GWFSFRMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
-     +                          NUMIRRSFR, UNITIRR, IRRSEG, MAXCELLS, 
+      USE GWFAGOMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
+     +                          NUMIRRSFR, IRRSEG, MAXCELLS, 
      +                          KCROP, NUMIRRSFRSP
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -488,8 +510,7 @@ C
     6    FORMAT(1X,/
      1    1X,'REUSING IRRIGATION DIVERSION SEGEMENTS ',
      2       'FROM LAST STRESS PERIOD')
-      ELSE
-         NNPWEL=ITMP
+        RETURN
       END IF
 C
 C1
@@ -498,7 +519,7 @@ C
       IF ( NUMIRRSFR > 0 ) THEN
         NUMIRRSFRSP = 0
         LLOC = 1
-        CALL URDCOM(UNITIRR,IOUT,LINE)
+        CALL URDCOM(IN,IOUT,LINE)
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
         IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
             WRITE(IOUT,*)
@@ -507,7 +528,7 @@ C
         END IF
         DO J = 1, NUMIRRSFRSP
           LLOC = 1
-          CALL URDCOM(UNITIRR,IOUT,LINE)
+          CALL URDCOM(IN,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
           IF ( NMCL > MAXCELLS ) THEN
@@ -516,8 +537,8 @@ C
             CALL USTOP('')
           END IF
           IF ( SGNM > 0 ) THEN
-            BACKSPACE(UNITIRR)
-            READ(UNITIRR,*)IRRSEG(J),DVRCH(SGNM), 
+            BACKSPACE(IN)
+            READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
      +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
      +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
             totdum  = 0.0
@@ -561,8 +582,8 @@ C     ------------------------------------------------------------------
      1                       DELC,issflg
       USE GWFWELMODULE, ONLY:NWELLS,WELL,NUMTAB,WELL,NWELVL
       USE GWFAGOMODULE, ONLY:NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,UZFCOL,
-     1                       UZFROW,NUMSUP,NUMIRR,IRRFACT,IRRPCT,
-     2                       PCTSUP,WELLFLOW
+     1                       UZFROW,NUMSUP,NUMIRRWEL,IRRFACT,IRRPCT,
+     2                       PCTSUP,SUPFLOW,ACTUAL,SFRIRR,SUPACT
      3                       
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
       INTEGER NWELLSTEMP
@@ -573,7 +594,7 @@ C     ------------------------------------------------------------------
       ACTUAL = 0.0
       SUP = 0.0
       SFRIRR = 0.0   
-      WELLFLOW = 0.0
+      SUPFLOW = 0.0
 C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
@@ -658,8 +679,10 @@ C     ------------------------------------------------------------------
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
      2                      NUMTAB
       USE GWFAGOMODULE,ONLY:NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,UZFCOL,
-     3                      UZFROW,NUMIRR,IRRFACT,IRRPCT,NUMSUP,PCTSUP
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL,SUPACT
+     1                      UZFROW,NUMIRRWEL,IRRFACT,IRRPCT,NUMSUP,
+     2                      PCTSUP,NUMIRRSFR,DEMAND,ACTUAL,SUPACT,
+     3                      SFRIRR
+      USE GWFSFRMODULE, ONLY: SGOTFLW,NSS
       CHARACTER*16 TEXT
       CHARACTER*20 TEXT1
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
@@ -720,7 +743,7 @@ C5------LOOP THROUGH EACH WELL CALCULATING FLOW.
           END IF
         END IF
 ! CALCULATE IRRIGATION FROM WELLS
-        IF ( NUMIRR > 0 ) THEN
+        IF ( NUMIRRWEL > 0 ) THEN
           IF ( NUMCELLS(L) > 0 ) THEN
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
@@ -757,9 +780,9 @@ C9------RETURN
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk,ROOTDPTH
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,SUPACT,
-     +                        NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND,SGOTFLW
-      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR 
+      USE GWFSFRMODULE, ONLY: NSS,SGOTFLW,SEG
+      USE GWFAGOMODULE, ONLY: WELLIRR,DVRCH,KCROP,IRRROW,IRRCOL,
+     +                        SUPACT,NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND 
       USE GLOBAL,     ONLY: DELR, DELC, IUNIT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -819,8 +842,9 @@ C9------RETURN
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
-     +                        IRRSEG,KCROP
+      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG,
+     +                        KCROP
+      USE GWFSFRMODULE, ONLY: SEG
       USE GLOBAL,     ONLY: DELR, DELC
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
@@ -847,8 +871,9 @@ C
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
+      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,
      +                        IRRSEG,KCROP
+      USE GWFSFRMODULE, ONLY: NSS,SEG
       USE GLOBAL,     ONLY: DELR, DELC
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
@@ -868,34 +893,15 @@ C
       END subroutine APPLYKCROP
 C
 C
-      SUBROUTINE GWF2WEL7DA(IGRID)
+      SUBROUTINE GWF2AGO7DA()
 C  Deallocate AGO MEMORY
       USE GWFAGOMODULE
 C
-        DEALLOCATE(PSIRAMP) 
-        DEALLOCATE(IUNITRAMP) 
-        DEALLOCATE(NWELLS)
-        DEALLOCATE(MXWELL)
-        DEALLOCATE(NWELVL)
-        DEALLOCATE(IWELCB)
-        DEALLOCATE(IPRWEL)
-        DEALLOCATE(NPWEL)
-        DEALLOCATE(IWELPB)
-        DEALLOCATE(NNPWEL)
-        DEALLOCATE(WELAUX)
-        DEALLOCATE(WELL)
-        DEALLOCATE(NUMTAB)
-        DEALLOCATE(MAXVAL)
-        DEALLOCATE(TABTIME)
-        DEALLOCATE(TABRATE)
-        DEALLOCATE(TABVAL)
         DEALLOCATE(NUMSUP)
-        DEALLOCATE(NUMIRR)
+        DEALLOCATE(NUMIRRWEL)
         DEALLOCATE(SFRSEG)
         DEALLOCATE(UZFROW)
         DEALLOCATE(UZFCOL)
-        DEALLOCATE(UNITSUP)
-        DEALLOCATE(UNITIRR)
         DEALLOCATE(SUPWEL)
         DEALLOCATE(IRRWEL)
         DEALLOCATE(NUMSEGS)
@@ -915,7 +921,6 @@ C
       DEALLOCATE (IDVFLG) 
       DEALLOCATE (NUMIRRSFR)
       DEALLOCATE (NUMIRRSFRSP)
-      DEALLOCATE (UNITIRR)
       DEALLOCATE (MAXCELLS)
       DEALLOCATE (DEMAND)
       DEALLOCATE (ACTUAL)
