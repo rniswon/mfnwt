@@ -244,48 +244,6 @@ C5B-----READ INSTANCES.
           END IF
   120   CONTINUE
           END IF
-! ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
-      NUMSUPHOLD = NUMSUP
-      MXACTWSUP = MXACTW
-      MXACTWIRR = MXACTW
-      NUMSUPHOLD = NUMSUP
-      NUMIRRHOLD = NUMIRR
-      MAXSEGSHOLD = MAXSEGS
-      NUMCOLS = NCOL
-      NUMROWS = NROW
-      MAXCELLSHOLD = MAXCELLS
-      IF ( NUMSUPHOLD.EQ.0 ) THEN
-          NUMSUPHOLD = 1
-          MXACTWSUP = 1
-          MAXSEGSHOLD = 1
-      END IF     
-      IF ( NUMIRRHOLD.EQ.0 ) THEN
-        MAXCELLSHOLD = 1
-        NUMIRRHOLD = 1
-        MXACTWIRR = 1
-        NUMCELLSHOLD = 1
-        NUMCOLS = 1
-        NUMROWS = 1
-        MAXCELLS = 1
-      END IF 
-      ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWEL(NUMSUPHOLD),
-     +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
-      ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
-     +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
-     +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
-      ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
-     +           IRRPCT(MAXCELLSHOLD,MXACTWIRR))
-      SFRSEG = 0
-      UZFROW = 0
-      UZFCOL = 0
-      SUPWEL = 0
-      IRRWEL = 0
-      WELLIRR = 0.0
-      NUMCELLS = 0
-      IRRFACT = 0.0
-      IRRPCT = 0.0
-      NUMSEGS = 0
-      PCTSUP = 0.0
 C
 C6------RETURN
       CALL SGWF2WEL7PSV(IGRID)
@@ -364,7 +322,7 @@ C
             END IF
             WRITE(IOUT,31) MAXVAL
             found = .true.
-! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
+! Designate wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
         case('SUPPLEMENTAL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
@@ -654,13 +612,11 @@ C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT,DELR,
      1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
-     1                       NUMTAB,NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,
-     2                       UZFCOL,UZFROW,NUMSUP,NUMIRR,IRRFACT,IRRPCT,
-     3                       PCTSUP
+     1                       NUMTAB,NWELVL
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL,SUPACT
+      USE GWFAGOMODULE, ONLY: SUPFLOW, NUMSUP
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -691,6 +647,7 @@ C     ------------------------------------------------------------------
       TIME = TOTIM
       ACTUAL = 0.0
       SUP = 0.0
+!
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C1------IF NUMBER OF WELLS <= 0 THEN RETURN.
@@ -709,22 +666,8 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
         IL = TABLAY(L)
         Q = RATETERP(TIME,L)
       END IF
-! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
-      IF ( NUMSUP > 0 ) THEN
-        IF ( NUMSEGS(L) > 0 ) THEN
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L)
-            FMIN = PCTSUP(I,L)*SUPACT(J)
-            FMIN = FMIN - SGOTFLW(J)
-            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
-            SUP = SUP + FMIN
-            SUP = SUP - ACTUAL(J)
-          END DO
-          IF ( SUP < 0.0 ) SUP = 0.0
-          Q = Q - SUP
-        END IF
-      END IF
+C------ADDED SUPPLEMENTARY PUMPING; NEED TO CHECK THAT AGO IS ACTIVE
+      IF ( NUMSUP > 0 ) Q = Q + SUPFLOW(L)
 C
 C2A-----IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
       IF(IBOUND(IC,IR,IL).LE.0) GO TO 100
@@ -749,28 +692,7 @@ C       THE RHS ACCUMULATOR.
         RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
         Qp = Q
       END IF
-!
-! calculate actual supplemental pumping
-      IF ( NUMSUP > 0 ) THEN
-        IF ( NUMSEGS(L) > 0 ) THEN
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L) 
-            IF ( Q < 0.0 ) SUP = SUP - Qp
-            ACTUAL(J)  = ACTUAL(J) + SUP
-          END DO
-        END IF
-      END IF
-! CALCULATE IRRIGATION FROM WELLS
-       IF ( NUMIRR > 0 ) THEN
-        IF ( NUMCELLS(L) > 0 ) THEN
-          DO I = 1, NUMCELLS(L)
-            SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
-            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
-          END DO
-        END IF
-      END IF
+      WELL(NWELVL,L)=QQ
   100 CONTINUE
 C
 C3------RETURN
@@ -789,11 +711,9 @@ C     ------------------------------------------------------------------
      1                      VBVL,VBNM
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
-     2                      NUMTAB,NUMTAB,NUMSEGS,WELLIRR,SFRSEG,
-     3                      NUMCELLS,UZFCOL,UZFROW,NUMIRR,IRRFACT,
-     4                      IRRPCT,NUMSUP,PCTSUP
+     2                      NUMTAB
+      USE GWFAGOMODULE, ONLY: SUPFLOW, NUMSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
-      USE GWFSFRMODULE, ONLY: SGOTFLW,DEMAND,NSS,ACTUAL,SUPACT
 !External function interface
       INTERFACE 
         FUNCTION SMOOTH3(H,T,B,dQ)
@@ -832,9 +752,6 @@ C1------BUDGET FLAG.
       TIME = TOTIM
       Qp = 1.0
       NWELLSTEMP = NWELLS
-      WELLIRR = 0.0
-      ACTUAL  = 0.0
-      SUP = 0.0
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
       
       IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
@@ -879,22 +796,8 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           IL = TABLAY(L)
           QSAVE = RATETERP(TIME,L)
         END IF
-! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
-       IF ( NUMSUP > 0 ) THEN
-        IF ( NUMSEGS(L) > 0 ) THEN
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L)
-            FMIN = PCTSUP(I,L)*SUPACT(J)
-            FMIN = FMIN - SGOTFLW(J)
-            IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
-            SUP = SUP + FMIN
-            SUP = SUP - ACTUAL(J)
-          END DO
-          IF ( SUP < 0.0 ) SUP = 0.0
-          QSAVE = QSAVE - SUP
-        END IF
-      END IF
+C------ADDED SUPPLEMENTARY PUMPING; NEED TO CHECK THAT AGO IS ACTIVE
+        IF ( NUMSUP > 0 ) Q = Q + SUPFLOW(L)
 C
       bbot = Botm(IC, IR, Lbotm(IL))
       ttop = Botm(IC, IR, Lbotm(IL)-1)
@@ -915,38 +818,6 @@ C
         Q = Qsave
       END IF
       QQ=Q
-!
-! calculate actual supplemental pumping
-      IF ( NUMSUP > 0 ) THEN
-        IF ( NUMSEGS(L) > 0 ) THEN
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L) 
-            IF ( Q < 0.0 ) SUP = SUP - Q
-            ACTUAL(J)  = ACTUAL(J) + SUP
-          END DO
-        END IF
-      END IF
-! CALCULATE IRRIGATION FROM WELLS
-      IF ( NUMIRR > 0 ) THEN
-        IF ( NUMCELLS(L) > 0 ) THEN
-          DO I = 1, NUMCELLS(L)
-            SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
-            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
-          END DO
-        END IF
-      END IF
-C
-      
-   !   IF ( NUMSUP > 0 ) THEN
-   !     IF ( NUMSEGS(L) > 0 ) THEN
-   !      IF(IBDLBL.EQ.0) WRITE(IOUT,61) TEXT,KPER,KSTP
-   !61    FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-   !      WRITE(IOUT,62) L,IL,IR,IC,Q
-   !62    FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
-   !  1       '   RATE ',1PG15.6)
-   !      IBDLBL=1
 ! write wells with reduced pumping
       IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
      +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
