@@ -1,8 +1,4 @@
 #Well Package input for test simulation 2      
-options
-supplemental 1 60 2 #numSUPwells,unitseg,MAXSEGS
-irrigate 1 59 2       #NUMIRRWELLS,UNITIRR,MAXCELLS
-end
 10        0                 MXACTW IWELCB
 10         0                 ITMP NP -- Stress Period   1
          1         6         4     0.00

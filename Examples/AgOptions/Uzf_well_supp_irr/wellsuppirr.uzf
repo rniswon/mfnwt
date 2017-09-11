@@ -6,7 +6,6 @@ netflux 100 101
 etsquare    0.1
 rejectsurfk
 specifysurfk
-ETDEMAND
 end
 1  1  1  1   0  61 15 100 4  1.0   NUZTOP IUZFOPT IRUNFLG IETFLG IUZFCB1 IUZFCB2 NTRAIL NSETS NUZGAGES surfdep
 INTERNAL          1 (20I4)    6         UZFBND

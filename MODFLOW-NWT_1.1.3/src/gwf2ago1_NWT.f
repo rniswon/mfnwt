@@ -16,6 +16,7 @@
         INTEGER,          SAVE,                 POINTER     ::UNITIRRWEL
         INTEGER,          SAVE,                 POINTER     ::MAXSEGS
         INTEGER,          SAVE,                 POINTER     ::MAXCELLS
+        INTEGER,          SAVE,               POINTER     ::NUMIRRWELSP
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
         INTEGER,          SAVE,              POINTER   ::ETDEMANDFLAG
@@ -43,7 +44,7 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
+      USE GLOBAL,       ONLY:IOUT,NCOL,NROW
       USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY:NSEGDIM
       USE GWFWELMODULE, ONLY:MXWELL
@@ -53,15 +54,12 @@ C        ARGUMENTS
       integer,intent(inout) :: IN
 C     ------------------------------------------------------------------
 C        VARIABLES
-      CHARACTER(len=200) :: LINE
-      CHARACTER(len=16) :: text        = ' AGO PACKAGE '
-      LOGICAL :: found
-      INTEGER :: intchk, Iostat
+!      CHARACTER(len=16) :: text        = ' AGO PACKAGE '
       INTEGER :: MXACTWSUP,MXACTWIRR,NUMSUPHOLD,NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD,NUMCOLS,NUMROWS,MAXCELLSHOLD,NUMCELLSHOLD
 C     ------------------------------------------------------------------
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,UNITIRRWEL)
-      ALLOCATE(MAXSEGS,MAXCELLS)
+      ALLOCATE(MAXSEGS,MAXCELLS,NUMIRRWELSP)
       MAXVAL = 1
       NUMSUP = 0
       NUMIRRWEL = 0
@@ -69,6 +67,7 @@ C     ------------------------------------------------------------------
       UNITIRRWEL = 0
       MAXSEGS = 0
       MAXCELLS = 0
+      NUMIRRWELSP = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
@@ -175,7 +174,6 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IUNIT
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: NSS
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS
@@ -183,7 +181,7 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
-      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,IHEADER
+      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I
       logical :: found,option
       real :: R
       character(len=16)  :: text        = 'AGO'
@@ -277,9 +275,8 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
+      USE GLOBAL,       ONLY:IOUT
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: NSS
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C        ARGUMENTS:
@@ -289,45 +286,55 @@ C     ------------------------------------------------------------------
 C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
-      INTEGER I, NUMSUPSP, ITMP
-      character(len=16)  :: text1        = 'SFR AGOPTIONS'
-      character(len=16)  :: text2        = 'WEL AGOPTIONS'
+      INTEGER I, ITMP
+      character(len=16)  :: text1        = 'IRRIGATE STREAM'
+      character(len=16)  :: text2        = 'IRRIGATE WELL'
+      character(len=16)  :: text3        = 'SUPPLEMENTAL WELL'
       INTEGER LLOC,ISTART,ISTOP
-      logical :: FOUND1, FOUND2
+      logical :: FOUND1, FOUND2, FOUND3
       REAL :: R
 C     ------------------------------------------------------------------
 C
 C1----READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
       FOUND1 = .FALSE.
       FOUND2 = .FALSE.
+      FOUND3 = .FALSE.
       LLOC=1
       CALL URDCOM(In, IOUT, line)
         DO
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         select case (LINE(ISTART:ISTOP))
-        case('SFRAGOPTIONS')
+        case('IRRIGATESTREAM')
             found1 = .true.
-            write(iout,'(/1x,a)') 'PROCESSING '//
-     +            trim(adjustl(text1)) //' OPTIONS'
+            write(iout,'(/1x,a)') 'READING '//
+     +            trim(adjustl(text1)) //' IRRIGATION STREAM INPUT'
             CALL URDCOM(In, IOUT, line)
             LLOC=1
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
-            CALL SFRAGOPTIONS(IN,ITMP)
-        case('WELAGOPTIONS')
+            CALL SFRIRS(IN,IOUT,ITMP)
+        case('IRRIGATEWELL')
             found2 = .true.
-            write(iout,'(/1x,a)') 'PROCESSING '//
-     +            trim(adjustl(text2)) //' OPTIONS'
+            write(iout,'(/1x,a)') 'READING '//
+     +            trim(adjustl(text2)) //' IRRIGATION WELL INPUT'
             CALL URDCOM(In, IOUT, line)
             LLOC=1
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
-            CALL WELAGOPTIONS(IN,ITMP)
+            CALL WELIRS(IN,ITMP)
+       case('SUPPLEMENTALWELL')
+            found3 = .true.
+            write(iout,'(/1x,a)') 'READING '//
+     +            trim(adjustl(text3)) //' SUPPLEMENTAL WELL INPUT'
+            CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
+            CALL WELSUP(IN,ITMP)
         case default
-          if ( found1 .or. found2 ) then
+          if ( found1 .or. found2 .or. found3 ) then
               exit
           else
-              ! Likely misspelled or unsupported 
-              ! so terminate here.
+C
+C-------- NO KEYWORDS FOUND SO TERMINATE
                 WRITE(IOUT,*) 'Invalid '//trim(adjustl(text1))
      +                   //' Option: '//LINE(ISTART:ISTOP)
                 CALL USTOP('Invalid '//trim(adjustl(text1))
@@ -355,8 +362,7 @@ C     ------------------------------------------------------------------
 C        ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
 C
-      CHARACTER(LEN=200)::LINE
-      INTEGER I, NUMSUPSP, ISEG
+      INTEGER ISEG
 C     ------------------------------------------------------------------
 C
 C1-------RESET DEMAND IF IT CHANGES
@@ -369,16 +375,15 @@ C6------RETURN
       RETURN
       END
 !
-      SUBROUTINE WELAGOPTIONS(IN,ITMP)
+      SUBROUTINE WELSUP(IN,ITMP)
 C     ******************************************************************
 C     READ SUP WELL DATA FOR EACH STRESS PERIOD
 C     ******************************************************************
 C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
+      USE GLOBAL,       ONLY:IOUT,IUNIT
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: NSS
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS:
@@ -386,8 +391,8 @@ C     ARGUMENTS:
 C     ------------------------------------------------------------------
 C     VARIABLES:
       CHARACTER(LEN=200)::LINE
-      INTEGER :: I, NUMSUPSP, IERR, LLOC, ISTART, ISTOP, J, ISPWL
-      INTEGER :: NMSG, K, NUMIRRWELSP, IRWL, NMCL
+      INTEGER :: NUMSUPSP, IERR, LLOC, ISTART, ISTOP, J, ISPWL
+      INTEGER :: NMSG, K, IRWL, NMCL
       REAL :: R
 C     ------------------------------------------------------------------
 C
@@ -440,6 +445,62 @@ C
      +               'SPECIFIED AS ZERO. MODEL STOPPING'
         CALL USTOP('')
       END IF
+C
+   99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
+     +       'WELL PACKAGE MUST BE ACTIVE TO SIMULATE SUPPLEMENTAL ',
+     +        'WELLS')
+  102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
+     +       'wells is less than the number specified in ',
+     +       'stress period. ',/
+     +       'Maximum wells and the number specified for stress ',
+     +       'period are: ',2i6)
+  103 FORMAT('***Error in WELL*** maximum number of segments ',
+     +       'for a supplementary well is less than the number  ',
+     +       'specified in stress period. ',/
+     +       'Maximum segments and the number specified for stress '
+     +       'period are: ',2i6)
+  106 FORMAT('***Error in SUP WEL*** cell row or column number for '
+     +        ,'supplemental well specified as zero. Model stopping')
+C
+C6------RETURN
+      RETURN
+      END
+!
+      SUBROUTINE WELIRS(IN,ITMP)
+C     ******************************************************************
+C     READ WELL IRRIGATION DATA FOR EACH STRESS PERIOD
+C     ******************************************************************
+C
+C     SPECIFICATIONS:
+C     ------------------------------------------------------------------
+      USE GLOBAL,       ONLY:IOUT,IUNIT
+      USE GWFAGOMODULE
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C     ARGUMENTS:
+      INTEGER, INTENT(IN)::IN,ITMP
+C     ------------------------------------------------------------------
+C     VARIABLES:
+      CHARACTER(LEN=200)::LINE
+      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
+      INTEGER :: NMSG, K, IRWL, NMCL
+      REAL :: R
+C     ------------------------------------------------------------------
+C
+C
+C1------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
+C
+      IF(ITMP.LT.0) THEN
+         WRITE(IOUT,6)
+    6    FORMAT(1X,/
+     1    1X,'REUSING IRRIGATION WELL DATA ',
+     2       'FROM LAST STRESS PERIOD')
+        RETURN
+      END IF
+      IF ( IUNIT(2) < 1 ) THEN
+          WRITE(IOUT,99) 
+          CALL USTOP(' ')
+      END IF
       IERR = 0
       NUMIRRWELSP = 0
 ! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
@@ -476,20 +537,8 @@ C
       END IF
 C
    99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
-     +       'WELL PACKAGE MUST BE ACTIVE TO SIMULATE SUPPLEMENTAL ',
-     +        'OR WELL IRRIGATION')
-  100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
-     +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
-  102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
-     +       'wells is less than the number specified in ',
-     +       'stress period. ',/
-     +       'Maximum wells and the number specified for stress ',
-     +       'period are: ',2i6)
-  103 FORMAT('***Error in WELL*** maximum number of segments ',
-     +       'for a supplementary well is less than the number  ',
-     +       'specified in stress period. ',/
-     +       'Maximum number of irrigation wells and the number '
-     +       'specified for stress period are: ',2i6)
+     +       'WELL PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
+     +        'WELLS')
   104 FORMAT('***Error in IRR WEL*** maximum number of irrigation ',
      +       'wells is less than the number specified in stress ',
      +       'period. ',/
@@ -500,8 +549,8 @@ C
      +       'specified in stress period. ',/
      +       'Maximum cells and the number specified for stress '
      +       'period are: ',2i6)
-  106 FORMAT('***Error in SUP WEL*** cell row or column number for '
-     +        ,'supplemental well specified as zero. Model stopping')
+  106 FORMAT('***ERROR IN AGO PACKAGE*** cell row or column for ',
+     +       'irrigation well specified as zero. Model stopping.')
 C
 C6------RETURN
       RETURN
@@ -510,7 +559,7 @@ C6------RETURN
 ! ----------------------------------------------------------------------
 C
 C-------SUBROUTINE SFRAGOPTIONS
-      SUBROUTINE SFRAGOPTIONS(IN,IOUT,ITMP)
+      SUBROUTINE SFRIRS(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
       USE GWFAGOMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
      +                          NUMIRRSFR, IRRSEG, MAXCELLS, 
@@ -523,7 +572,7 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
-      INTEGER NSEG,LLOC,ISTART,ISTOP,J,SGNM,NMCL,K
+      INTEGER LLOC,ISTART,ISTOP,J,SGNM,NMCL,K
       REAL R 
       DOUBLE PRECISION :: totdum
       CHARACTER(LEN=200)::LINE
@@ -589,8 +638,8 @@ C
      +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
      +        'FROM SEGEMENTS')
  9006 FORMAT(' ***Warning in SFR2*** ',/
-     1       'Fraction of diversion for each cell in group sums '/,
-     1       'to a value greater than one. Sum = ',E10.5)
+     +       'Fraction of diversion for each cell in group sums '/,
+     +       'to a value greater than one. Sum = ',E10.5)
  9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
      +       'cell specified as zero. Model stopping.')
  9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
@@ -612,16 +661,21 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT,DELR,
-     1                       DELC,issflg
+      USE GLOBAL,       ONLY:DELR,DELC,issflg
+      USE GWFBASMODULE, ONLY:TOTIM
       USE GWFWELMODULE, ONLY:NWELLS,WELL,NUMTAB,WELL,NWELVL
-      USE GWFAGOMODULE, ONLY:NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,UZFCOL,
-     1                       UZFROW,NUMSUP,NUMIRRWEL,IRRFACT,IRRPCT,
-     2                       PCTSUP,SUPFLOW,ACTUAL,SFRIRR,SUPACT,
-     3                       NUMIRRWEL,NUMIRRSFRSP,NUMIRRWELSP
+      USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
       IMPLICIT NONE
-      INTEGER NWELLSTEMP
+C
+C        ARGUMENTS:
+C     ------------------------------------------------------------------
+      INTEGER, INTENT(IN) :: KKPER, KKSTP, KKITER
+C
+C        VARIABLES:
+C     ------------------------------------------------------------------
+      INTEGER NWELLSTEMP,l,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR
+      DOUBLE PRECISION :: ZERO, TIME, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       WELLIRR = 0.0
@@ -644,6 +698,7 @@ C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
 C
 C3------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
+        Q = WELL(NWELVL,L)
         IF ( NUMSUP > 0 ) THEN
           IF ( NUMSEGS(L) > 0 ) THEN
             SUP = 0.0
@@ -658,9 +713,8 @@ C3------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
             IF ( SUP < 0.0 ) SUP = 0.0
             SUPFLOW(L) = SUPFLOW(L) - SUP
 C
-C3------SET SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
+C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             SUP = 0.0
-            Q = WELL(NWELVL,L)
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L) 
               IF ( Q < 0.0 ) SUP = SUP - Q
@@ -699,76 +753,71 @@ C
 C3------RETURN
       RETURN
       END
-      SUBROUTINE GWF2AGO7BD(KSTP,KPER)
+      SUBROUTINE GWF2AGO7BD(KKSTP,KKPER)
 C     ******************************************************************
 C     CALCULATE VOLUMETRIC FOR AG OPTIONS (DIVERSIONS AND PUMPING)
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GLOBAL,      ONLY:IOUT,NCOL,NROW,NLAY,IBOUND,BUFF,BOTM,LBOTM,
-     1                      HNEW,DELR,DELC
-      USE GWFBASMODULE,ONLY:MSUM,ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
-     1                      VBVL,VBNM
-      USE GWFWELMODULE,ONLY:NWELLS,WELL,NWELVL,WELAUX,PSIRAMP,
-     1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
-     2                      NUMTAB
-      USE GWFAGOMODULE,ONLY:NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,UZFCOL,
-     1                      UZFROW,NUMIRRWEL,IRRFACT,IRRPCT,NUMSUP,
-     2                      PCTSUP,NUMIRRSFR,DEMAND,ACTUAL,SUPACT,
-     3                      SFRIRR
-      USE GWFSFRMODULE, ONLY: SGOTFLW,NSS
+      USE GLOBAL,      ONLY:IOUT,DELR,DELC,issflg
+      USE GWFWELMODULE,ONLY:NWELLS,WELL,NUMTAB,NWELVL
+      USE GWFBASMODULE,ONLY:TOTIM
+      USE GWFAGOMODULE
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
+      IMPLICIT NONE
+C        ARGUMENTS:
+C     ------------------------------------------------------------------
+      INTEGER, INTENT(IN):: KKSTP,KKPER
+C        VARIABLES:
+C     ------------------------------------------------------------------
       CHARACTER*16 TEXT
       CHARACTER*20 TEXT1
-      DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
-      double precision Qp,Hh,Ttop,Bbot,dQp
+      DOUBLE PRECISION RATIN,RATOUT,FMIN,ZERO,DVT
+      double precision TIME,SUP,SUBVOL,SUBRATE
       real Q
-      INTEGER Iunitnwt, iw1, NWELLSTEMP
+      INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT
+      INTEGER IRR,ICC,IC,IR
       DATA TEXT /'           WELLS'/
       DATA TEXT1 /'SUPPLEMENTARY WELLS'/
 C     ------------------------------------------------------------------
-      CALL SGWF2WEL7PNT(IGRID)
-C
-C1------CLEAR RATIN AND RATOUT ACCUMULATORS, AND SET CELL-BY-CELL
-C1------BUDGET FLAG.
-      ZERO=0.
-      RATIN=ZERO
-      RATOUT=ZERO
-      IBD=0
-      TIME = TOTIM
-      Qp = 1.0
+      ZERO=0.0D0
       WELLIRR = 0.0
-      ACTUAL  = 0.0
+      TIME = TOTIM
+      ACTUAL = 0.0
       SUP = 0.0
+      SFRIRR = 0.0   
+      SUPFLOW = 0.0
+C
+C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
+      IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
+        CALL UZFIRRDEMANDSET()
+        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, 1)
+      END IF
+            
+C
+C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
-      IF (NWELLSTEMP.LE.0) RETURN
 C
-C5------LOOP THROUGH EACH WELL CALCULATING FLOW.
-      DO L=1,NWELLSTEMP
-        Q=ZERO
-        QQ=ZERO
-        QSAVE = ZERO
-! Add additional pumping based on diversion shortfall (SUPPLEMENTARY WELL)
+C3------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
+      DO L=1,NWELLSTEMP 
+        Q = WELL(NWELVL,L)
         IF ( NUMSUP > 0 ) THEN
           IF ( NUMSEGS(L) > 0 ) THEN
             SUP = 0.0
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L)
-              FMIN = PCTSUP(I,L)*SUPACT(J)
-              FMIN = FMIN - SGOTFLW(J)
-              IF ( FMIN < 0.0D0 ) FMIN  = 0.0D0
+              FMIN = SUPACT(J)
+              FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
+              IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
               SUP = SUP + FMIN
               SUP = SUP - ACTUAL(J)
             END DO
             IF ( SUP < 0.0 ) SUP = 0.0
-            QSAVE = QSAVE - SUP
-          END IF
-        END IF
-!
-! set supplemental pumping
-        IF ( NUMSUP > 0 ) THEN
-          IF ( NUMSEGS(L) > 0 ) THEN
+            SUPFLOW(L) = SUPFLOW(L) - SUP
+C
+C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             SUP = 0.0
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L) 
@@ -777,21 +826,21 @@ C5------LOOP THROUGH EACH WELL CALCULATING FLOW.
             END DO
           END IF
         END IF
-! CALCULATE IRRIGATION FROM WELLS
-        IF ( NUMIRRWEL > 0 ) THEN
-          IF ( NUMCELLS(L) > 0 ) THEN
+! APPLY IRRIGATION FROM WELLS
+        IF ( NUMIRRWELSP > 0 ) THEN
+         IF ( NUMCELLS(L) > 0 ) THEN
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
               SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
               WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
-            END DO
+           END DO
           END IF
         END IF
       END DO
-C-------STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE
+C APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
         istsg = ISTRM(4, l)
-        IF ( istsg.GT.1  .AND. NUMIRRSFR > 0 ) THEN
+        IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
           IF ( DVRCH(istsg) .GT. 0) THEN
             DO icount = 1, DVRCH(istsg)
               irr = IRRROW(icount,istsg)
@@ -799,26 +848,28 @@ C-------STORE OUTFLOW FROM PREVIOUS SEGMENT FOR RECHARGE
               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
               dvt = dvt/(DELR(IC)*DELC(IR))
               SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
-     +                          dvt*(1.0-DVEFF(ICOUNT,istsg))
+     +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
             END DO
           END IF
         END IF
       END DO
 C
-C9------RETURN
+C3------RETURN
       RETURN
       END
+! ----------------------------------------------------------------------
+C
       subroutine UZFIRRDEMANDCALC(Kkper, Kkstp, Kkiter)
 !     ******************************************************************
 !     irrdemand---- sums up irrigation demand based on actual ET
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
-     +                        surfk,ROOTDPTH
-      USE GWFSFRMODULE, ONLY: NSS,SGOTFLW,SEG
-      USE GWFAGOMODULE, ONLY: WELLIRR,DVRCH,KCROP,IRRROW,IRRCOL,
-     +                        SUPACT,NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND 
-      USE GLOBAL,     ONLY: DELR, DELC, IUNIT
+     +                        surfk
+      USE GWFSFRMODULE, ONLY: SEG
+      USE GWFAGOMODULE, ONLY: DVRCH,KCROP,IRRROW,IRRCOL,
+     +                        SUPACT,NUMIRRSFRSP,IRRSEG,DEMAND 
+      USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
@@ -876,14 +927,13 @@ C9------RETURN
 !     irrdemand---- sets initial crop demand to PET
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG,
-     +                        KCROP
+!      USE GWFUZFMODULE, ONLY: PETRATE
+      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG
       USE GWFSFRMODULE, ONLY: SEG
       USE GLOBAL,     ONLY: DELR, DELC
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
-      DOUBLE PRECISION :: factor, area, uzet, pet
+      DOUBLE PRECISION :: area
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
@@ -908,11 +958,8 @@ C
       USE GWFUZFMODULE, ONLY: PETRATE
       USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,
      +                        IRRSEG,KCROP
-      USE GWFSFRMODULE, ONLY: NSS,SEG
-      USE GLOBAL,     ONLY: DELR, DELC
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
-      DOUBLE PRECISION :: factor, area, uzet, pet
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
@@ -960,6 +1007,7 @@ C
       DEALLOCATE (DEMAND)
       DEALLOCATE (ACTUAL)
       DEALLOCATE (SUPACT)
+      DEALLOCATE (NUMIRRWELSP)
 C
       RETURN
       END

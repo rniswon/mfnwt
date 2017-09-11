@@ -11,8 +11,7 @@ UZF                  19 wellsuppirr.uzf
 GAGE                 32 wellsuppirr.gag
 data                 55 seg1.tab
 data                 56 seg9.tab
-DATA                 58 wellsuppirr.irs
-data                 59 wellsuppirr.irr
+AGO                  57 wellsuppirr.ago
 data                 60 wellsuppirr.sup
 data                 62 wellsuppirr.hed
 DATA(BINARY)         61 wellsuppirr.uzfot

@@ -2,7 +2,6 @@
 options
 lossfactor 0.1
 tabfiles 2 759
-irrigate 1 58 2
 end
 37   9  0  0  1.486  0.000001 -1  81
     1    1    1    1    1   4500. 
