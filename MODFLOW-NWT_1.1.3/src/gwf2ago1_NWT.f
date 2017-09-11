@@ -186,7 +186,7 @@ C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,IHEADER
       logical :: found,option
       real :: R
-      character(len=16)  :: text
+      character(len=16)  :: text        = 'AGO'
       character(len=200) :: line
 C     ------------------------------------------------------------------
 C
@@ -290,19 +290,51 @@ C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
       INTEGER I, NUMSUPSP, ITMP
+      character(len=16)  :: text1        = 'SFR AGOPTIONS'
+      character(len=16)  :: text2        = 'WEL AGOPTIONS'
+      INTEGER LLOC,ISTART,ISTOP
+      logical :: FOUND1, FOUND2
+      REAL :: R
 C     ------------------------------------------------------------------
 C
-C1----READ NUMBER OF AG OPTIONS (OR FLAG SAYING REUSE AGO DATA).
-       IF(IFREFM.EQ.0) THEN
-         READ(IN,'(2I10)') ITMP
-       ELSE
-         READ(IN,*) ITMP
-       END IF
-C
-C
-C2-----READ AND SET AG-OPTIONS VARIABLES
-      CALL SFRAGOPTIONS(IN)
-      CALL WELAGOPTIONS(IN)
+C1----READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
+      FOUND1 = .FALSE.
+      FOUND2 = .FALSE.
+      LLOC=1
+      CALL URDCOM(In, IOUT, line)
+        DO
+        LLOC=1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        select case (LINE(ISTART:ISTOP))
+        case('SFRAGOPTIONS')
+            found1 = .true.
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text1)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
+            CALL SFRAGOPTIONS(IN,ITMP)
+        case('WELAGOPTIONS')
+            found2 = .true.
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text2)) //' OPTIONS'
+            CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
+            CALL WELAGOPTIONS(IN,ITMP)
+        case default
+          if ( found1 .or. found2 ) then
+              exit
+          else
+              ! Likely misspelled or unsupported 
+              ! so terminate here.
+                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text1))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+                CALL USTOP('Invalid '//trim(adjustl(text1))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+          end if
+        end select
+      end do  
 C
 C6------RETURN
       RETURN
@@ -369,19 +401,16 @@ C
      2       'FROM LAST STRESS PERIOD')
         RETURN
       END IF
-      IF ( IUNIT(44) < 1 ) THEN
+      IF ( IUNIT(2) < 1 ) THEN
           WRITE(IOUT,99) 
           CALL USTOP(' ')
       END IF
 C
 C2------READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
 C
-      NUMSUPSP = 0
       IERR = 0
       IF ( NUMSUP > 0 ) THEN
-      CALL URDCOM(IN,IOUT,LINE)
-      LLOC = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUPSP,R,IOUT,IN)
+      NUMSUPSP = ITMP
       IF ( NUMSUPSP > NUMSUP )THEN
         WRITE(IOUT,*)
         WRITE(IOUT,102)NUMSUP,NUMSUPSP
@@ -447,8 +476,8 @@ C
       END IF
 C
    99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
-     +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
-     +        'FROM SEGEMENTS')
+     +       'WELL PACKAGE MUST BE ACTIVE TO SIMULATE SUPPLEMENTAL ',
+     +        'OR WELL IRRIGATION')
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
   102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
@@ -486,6 +515,7 @@ C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
       USE GWFAGOMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
      +                          NUMIRRSFR, IRRSEG, MAXCELLS, 
      +                          KCROP, NUMIRRSFRSP
+      USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS
@@ -505,22 +535,23 @@ C2--- INITIALIZE AG VARIABLES TO ZERO
 C
 C2------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
 C
-      IF(ITMP.LT.0) THEN
+      IF(ITMP < 1 ) THEN
          WRITE(IOUT,6)
     6    FORMAT(1X,/
      1    1X,'REUSING IRRIGATION DIVERSION SEGEMENTS ',
      2       'FROM LAST STRESS PERIOD')
         RETURN
       END IF
+      IF ( IUNIT(44) < 1 ) THEN
+          WRITE(IOUT,9005) 
+          CALL USTOP(' ')
+      END IF
 C
 C1
 C----READ IRRIGATION SEGEMENT INFORMATION.
 C
       IF ( NUMIRRSFR > 0 ) THEN
-        NUMIRRSFRSP = 0
-        LLOC = 1
-        CALL URDCOM(IN,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFRSP,R,IOUT,IN)  !SEGMENT
+        NUMIRRSFRSP = ITMP
         IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
             WRITE(IOUT,*)
             WRITE(IOUT,9008)NUMIRRSFR,NUMIRRSFRSP
@@ -554,6 +585,9 @@ C
         END DO
       END IF
 !
+ 9005 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
+     +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
+     +        'FROM SEGEMENTS')
  9006 FORMAT(' ***Warning in SFR2*** ',/
      1       'Fraction of diversion for each cell in group sums '/,
      1       'to a value greater than one. Sum = ',E10.5)
@@ -583,9 +617,10 @@ C     ------------------------------------------------------------------
       USE GWFWELMODULE, ONLY:NWELLS,WELL,NUMTAB,WELL,NWELVL
       USE GWFAGOMODULE, ONLY:NUMSEGS,WELLIRR,SFRSEG,NUMCELLS,UZFCOL,
      1                       UZFROW,NUMSUP,NUMIRRWEL,IRRFACT,IRRPCT,
-     2                       PCTSUP,SUPFLOW,ACTUAL,SFRIRR,SUPACT
-     3                       
+     2                       PCTSUP,SUPFLOW,ACTUAL,SFRIRR,SUPACT,
+     3                       NUMIRRWEL,NUMIRRSFRSP,NUMIRRWELSP
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
+      IMPLICIT NONE
       INTEGER NWELLSTEMP
 C     ------------------------------------------------------------------
       ZERO=0.0D0
@@ -634,7 +669,7 @@ C3------SET SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           END IF
         END IF
 ! APPLY IRRIGATION FROM WELLS
-        IF ( NUMIRR > 0 ) THEN
+        IF ( NUMIRRWELSP > 0 ) THEN
          IF ( NUMCELLS(L) > 0 ) THEN
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
@@ -647,7 +682,7 @@ C3------SET SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
 C APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
         istsg = ISTRM(4, l)
-        IF ( istsg.GT.1 .AND. NUMIRRSFR > 0 ) THEN
+        IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
           IF ( DVRCH(istsg) .GT. 0) THEN
             DO icount = 1, DVRCH(istsg)
               irr = IRRROW(icount,istsg)
