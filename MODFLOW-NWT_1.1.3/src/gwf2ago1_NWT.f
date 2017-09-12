@@ -5,9 +5,9 @@
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWELVAR
         REAL,             SAVE, DIMENSION(:),   POINTER     ::SUPFLOW
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWELVAR
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         INTEGER,          SAVE,                 POINTER     ::MAXVAL
         INTEGER,          SAVE,                 POINTER     ::NUMSUP
@@ -60,6 +60,7 @@ C        VARIABLES
 C     ------------------------------------------------------------------
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,UNITIRRWEL)
       ALLOCATE(MAXSEGS,MAXCELLS,NUMIRRWELSP)
+      ALLOCATE(ETDEMANDFLAG,NUMIRRSFR,NUMIRRSFRSP)
       MAXVAL = 1
       NUMSUP = 0
       NUMIRRWEL = 0
@@ -68,6 +69,9 @@ C     ------------------------------------------------------------------
       MAXSEGS = 0
       MAXCELLS = 0
       NUMIRRWELSP = 0
+      ETDEMANDFLAG = 0
+      NUMIRRSFR = 0
+      NUMIRRSFRSP = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
@@ -82,8 +86,6 @@ C
 C        
 C3-------ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS.
 C
-      NUMIRRSFR = 0
-      NUMIRRSFRSP = 0
       NUMSUPHOLD = NUMSUP
       MXACTWSUP = MXWELL
       MXACTWIRR = MXWELL
@@ -110,18 +112,18 @@ C
         NUMROWS = 1
         MAXCELLS = 1
       END IF 
-      ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWEL(NUMSUPHOLD),
+      ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWELVAR(NUMSUPHOLD),
      +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
-     +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWEL(NUMIRRHOLD),
+     +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWELVAR(NUMIRRHOLD),
      +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
       ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
      +           IRRPCT(MAXCELLSHOLD,MXACTWIRR),SUPFLOW(MXACTWSUP))
       SFRSEG = 0
       UZFROW = 0
       UZFCOL = 0
-      SUPWEL = 0
-      IRRWEL = 0
+      SUPWELVAR = 0
+      IRRWELVAR = 0
       WELLIRR = 0.0
       NUMCELLS = 0
       IRRFACT = 0.0
@@ -158,8 +160,6 @@ C-------allocate for SFR agoptions
       DEMAND = 0.0
       SUPACT = 0.0
       ACTUAL = 0.0
-      ALLOCATE(ETDEMANDFLAG)
-      ETDEMANDFLAG = 0
 C
 C6------RETURN
       RETURN
@@ -202,7 +202,7 @@ C
             found = .true.
             option = .true.
 ! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
-        case('SUPPLEMENTAL')
+        case('SUPPLEMENTALWELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
             IF(NUMSUP.LT.0) NUMSUP=0
@@ -210,21 +210,21 @@ C
             WRITE(IOUT,33) NUMSUP
             found = .true.
 ! Pumped water will be added as irrigation
-        case('IRRIGATEWEL')
+        case('IRRIGATIONWELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWEL,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
             IF( NUMIRRWEL.LT.0 ) NUMIRRWEL = 0
             IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(55) < 1 ) NUMIRRWEL = 0
+            IF ( IUNIT(2) < 1 ) NUMIRRWEL = 0
             WRITE(IOUT,34) NUMIRRWEL
             found = .true.
 ! Pumped water will be added as irrigation
-          case('IRRIGATESFR')
+          case('IRRIGATIONSTREAM')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
             IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
             IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(55) < 1 ) NUMIRRSFR = 0
+            IF ( IUNIT(2) < 1 ) NUMIRRSFR = 0
             WRITE(IOUT,34) NUMIRRSFR
             found = .true.
         case('ETDEMAND')
@@ -233,6 +233,7 @@ C
               WRITE(IOUT,'(A)')'AGRICULTURAL DEMANDS WILL BE '
      +                        ,'CALCULATED USING ET DEFICIT'
               WRITE(iout,*)
+              IF ( IUNIT(55) < 1 ) ETDEMANDFLAG = 0   ! ALSO NEED TO CHECK THAT UNSAT FLOW AND UZET IS ACTIVE!!!!!
         case ('END')
          write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
@@ -290,6 +291,10 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text1        = 'IRRIGATE STREAM'
       character(len=16)  :: text2        = 'IRRIGATE WELL'
       character(len=16)  :: text3        = 'SUPPLEMENTAL WELL'
+      character(len=16)  :: text4        = 'IRRSFR'
+      character(len=16)  :: text5        = 'IRRWEL'
+      character(len=16)  :: text6        = 'SUPWEL'
+
       INTEGER LLOC,ISTART,ISTOP
       logical :: FOUND1, FOUND2, FOUND3
       REAL :: R
@@ -305,41 +310,67 @@ C1----READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         select case (LINE(ISTART:ISTOP))
-        case('IRRIGATESTREAM')
+        case('IRRSFR')
             found1 = .true.
             write(iout,'(/1x,a)') 'READING '//
-     +            trim(adjustl(text1)) //' IRRIGATION STREAM INPUT'
+     +      trim(adjustl(text1)) //' IRRIGATION STREAM INPUT'
             CALL URDCOM(In, IOUT, line)
             LLOC=1
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
-            CALL SFRIRS(IN,IOUT,ITMP)
-        case('IRRIGATEWELL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
+            IF ( ITMP > 0 ) THEN
+              CALL IRRSFR(IN,IOUT,ITMP)
+            ELSE
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text4))
+     +                 //' specified with no additional input.'
+               CALL USTOP('Keyvword '//trim(adjustl(text4))
+     +                //'  specified with no additional input.') 
+            END IF
+        case('IRRWEL')
             found2 = .true.
             write(iout,'(/1x,a)') 'READING '//
      +            trim(adjustl(text2)) //' IRRIGATION WELL INPUT'
             CALL URDCOM(In, IOUT, line)
             LLOC=1
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
-            CALL WELIRS(IN,ITMP)
-       case('SUPPLEMENTALWELL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
+            IF ( ITMP > 0 ) THEN
+              CALL IRRWEL(IN,ITMP)
+            ELSE
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text5))
+     +                 //' specified with no additional input.'
+               CALL USTOP('Keyvword '//trim(adjustl(text5))
+     +                //'  specified with no additional input.') 
+            END IF
+       case('SUPWEL')
             found3 = .true.
             write(iout,'(/1x,a)') 'READING '//
      +            trim(adjustl(text3)) //' SUPPLEMENTAL WELL INPUT'
-            CALL URDCOM(In, IOUT, line)
+                        CALL URDCOM(In, IOUT, line)
             LLOC=1
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,ITMP,R,IOUT,IN)
-            CALL WELSUP(IN,ITMP)
-        case default
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
+            IF ( ITMP > 0 ) THEN
+              CALL SUPWEL(IN,ITMP)
+            ELSE
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text6))
+     +                 //' specified with no additional input.'
+               CALL USTOP('Keyvword '//trim(adjustl(text6))
+     +                //'  specified with no additional input.') 
+            END IF
+       case default
           if ( found1 .or. found2 .or. found3 ) then
-              exit
-          else
+          else if ( kper == 1 ) then
 C
-C-------- NO KEYWORDS FOUND SO TERMINATE
+C-------- NO KEYWORDS FOUND  DURING FIRST STRESS PERIOD SO TERMINATE
                 WRITE(IOUT,*) 'Invalid '//trim(adjustl(text1))
      +                   //' Option: '//LINE(ISTART:ISTOP)
                 CALL USTOP('Invalid '//trim(adjustl(text1))
      +                   //' Option: '//LINE(ISTART:ISTOP))
+          else
+            WRITE(IOUT,6)
+    6       FORMAT(1X,/
+     1      1X,'REUSING ALL AGO DATA ',
+     2       'FROM LAST STRESS PERIOD')
           end if
+          exit
         end select
       end do  
 C
@@ -375,7 +406,7 @@ C6------RETURN
       RETURN
       END
 !
-      SUBROUTINE WELSUP(IN,ITMP)
+      SUBROUTINE SUPWEL(IN,ITMP)
 C     ******************************************************************
 C     READ SUP WELL DATA FOR EACH STRESS PERIOD
 C     ******************************************************************
@@ -397,24 +428,9 @@ C     VARIABLES:
 C     ------------------------------------------------------------------
 C
 C
-C1------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
-C
-      IF(ITMP.LT.0) THEN
-         WRITE(IOUT,6)
-    6    FORMAT(1X,/
-     1    1X,'REUSING SUPPLEMENTAL WELL DATA ',
-     2       'FROM LAST STRESS PERIOD')
-        RETURN
-      END IF
-      IF ( IUNIT(2) < 1 ) THEN
-          WRITE(IOUT,99) 
-          CALL USTOP(' ')
-      END IF
-C
 C2------READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
 C
       IERR = 0
-      IF ( NUMSUP > 0 ) THEN
       NUMSUPSP = ITMP
       IF ( NUMSUPSP > NUMSUP )THEN
         WRITE(IOUT,*)
@@ -433,13 +449,12 @@ C
             CALL USTOP('')
           END IF
           BACKSPACE(IN)
-          READ(IN,*)SUPWEL(J),NUMSEGS(ISPWL),
+          READ(IN,*)SUPWELVAR(J),NUMSEGS(ISPWL),
      +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
-          DO K = 1, NUMSEGS(SUPWEL(J))
-            IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
+          DO K = 1, NUMSEGS(SUPWELVAR(J))
+            IF ( SFRSEG(K,SUPWELVAR(J)) == 0 ) IERR = 1
           END DO
         END DO
-      END IF
       IF ( IERR == 1 ) THEN
         WRITE(IOUT,*)'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
      +               'SPECIFIED AS ZERO. MODEL STOPPING'
@@ -466,7 +481,7 @@ C6------RETURN
       RETURN
       END
 !
-      SUBROUTINE WELIRS(IN,ITMP)
+      SUBROUTINE IRRWEL(IN,ITMP)
 C     ******************************************************************
 C     READ WELL IRRIGATION DATA FOR EACH STRESS PERIOD
 C     ******************************************************************
@@ -490,22 +505,10 @@ C
 C
 C1------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
 C
-      IF(ITMP.LT.0) THEN
-         WRITE(IOUT,6)
-    6    FORMAT(1X,/
-     1    1X,'REUSING IRRIGATION WELL DATA ',
-     2       'FROM LAST STRESS PERIOD')
-        RETURN
-      END IF
-      IF ( IUNIT(2) < 1 ) THEN
-          WRITE(IOUT,99) 
-          CALL USTOP(' ')
-      END IF
       IERR = 0
-      NUMIRRWELSP = 0
+      NUMIRRWELSP = ITMP
 ! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
 !
-      IF ( NUMIRRWEL > 0 .AND. IUNIT(44) > 0 ) THEN
         LLOC = 1
         CALL URDCOM(IN,IOUT,LINE)
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWELSP,R,IOUT,IN)
@@ -525,16 +528,16 @@ C
             CALL USTOP('')
           END IF
           BACKSPACE(IN)
-          READ(IN,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
+          READ(IN,*)IRRWELVAR(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
      +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
-          DO K = 1, NUMCELLS(IRRWEL(J))
-          IF ( UZFROW(K,IRRWEL(J))==0 .OR. UZFCOL(K,IRRWEL(J))==0 ) THEN
+          DO K = 1, NUMCELLS(IRRWELVAR(J))
+          IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
+     +                                UZFCOL(K,IRRWELVAR(J))==0 ) THEN
             WRITE(IOUT,106) 
             CALL USTOP('')   
           END IF
           END DO
         END DO
-      END IF
 C
    99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'WELL PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
@@ -559,7 +562,7 @@ C6------RETURN
 ! ----------------------------------------------------------------------
 C
 C-------SUBROUTINE SFRAGOPTIONS
-      SUBROUTINE SFRIRS(IN,IOUT,ITMP)
+      SUBROUTINE IRRSFR(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
       USE GWFAGOMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
      +                          NUMIRRSFR, IRRSEG, MAXCELLS, 
@@ -582,24 +585,9 @@ C2--- INITIALIZE AG VARIABLES TO ZERO
       DVRCH = 0.0 
       KCROP = 0.0
 C
-C2------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
-C
-      IF(ITMP < 1 ) THEN
-         WRITE(IOUT,6)
-    6    FORMAT(1X,/
-     1    1X,'REUSING IRRIGATION DIVERSION SEGEMENTS ',
-     2       'FROM LAST STRESS PERIOD')
-        RETURN
-      END IF
-      IF ( IUNIT(44) < 1 ) THEN
-          WRITE(IOUT,9005) 
-          CALL USTOP(' ')
-      END IF
-C
 C1
 C----READ IRRIGATION SEGEMENT INFORMATION.
 C
-      IF ( NUMIRRSFR > 0 ) THEN
         NUMIRRSFRSP = ITMP
         IF ( NUMIRRSFRSP > NUMIRRSFR ) THEN
             WRITE(IOUT,*)
@@ -632,7 +620,6 @@ C
             END DO
           END IF
         END DO
-      END IF
 !
  9005 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
@@ -984,8 +971,8 @@ C
         DEALLOCATE(SFRSEG)
         DEALLOCATE(UZFROW)
         DEALLOCATE(UZFCOL)
-        DEALLOCATE(SUPWEL)
-        DEALLOCATE(IRRWEL)
+        DEALLOCATE(SUPWELVAR)
+        DEALLOCATE(IRRWELVAR)
         DEALLOCATE(NUMSEGS)
         DEALLOCATE(MAXSEGS)
         DEALLOCATE(MAXCELLS)
