@@ -4885,7 +4885,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
       DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom, etoutold
-      double precision zerod2, zerod4, zerod5, zerod10, done
+      double precision zerod2, zerod4, zerod5, zerod10, done, zerod30
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
      +        kjm1, itest, k
@@ -4898,15 +4898,16 @@ C1------INITIALIZE VARIABLES.
       zerod2 = 1.0d-2
       zerod4 = 1.0d-4
       zerod5 = 1.0d-5
+      zerod30 = 1.0d-30
       zerod10 = 1.0d-10
       FACTOR = DONE+ZEROD2
       etoutold = DZERO
       if ( Rootdepth < zerod7 ) return
       if ( Thetas-Thetar < zerod7 ) return
       pet = Rateud*Rootdepth
-      eps_m1 = DBLE(Eps) - 1.0D0
-      HA = 0.0
-      HROOT = 0.0
+      eps_m1 = DBLE(Eps) - done
+      HA = dzero
+      HROOT = dzero
       IF ( ETOFH_FLAG.GT.0 ) THEN
         HA = AIR_ENTRY(ic,ir)
         HROOT = H_ROOT(ic,ir)
@@ -5329,13 +5330,16 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           Etout = 0.0D0
           itest = 1
       END IF
-          if( abs((etout-etoutold)/etout) < zerod5 ) itest = 1
-          etoutold = etout
-          if ( abs(fmp/pet - done) > zerod2 ) then
-            factor = factor/(fmp/pet)
+          if ( etout > zerod30 ) then
+             if( abs((etout-etoutold)/etout) < zerod5 ) then
+               itest = 1
+             elseif ( abs(fmp/pet - done) > zerod2 ) then
+              factor = factor/(fmp/pet)
+             end if
           else
             itest = 1
           end if
+        etoutold = etout
 !        FMP = FM
         IF ( K.GT.20 ) THEN
           write(iout,222)'PET DIFF ERROR ', ir,ic,FMP-PET,PET

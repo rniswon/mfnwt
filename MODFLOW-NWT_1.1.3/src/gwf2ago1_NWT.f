@@ -15,7 +15,7 @@
         INTEGER,          SAVE,                 POINTER     ::NUMIRRWEL
         INTEGER,          SAVE,                 POINTER     ::UNITIRRWEL
         INTEGER,          SAVE,                 POINTER     ::MAXSEGS
-        INTEGER,          SAVE,                 POINTER     ::MAXCELLS
+        INTEGER,          SAVE,               POINTER     ::MAXCELLSWEL
         INTEGER,          SAVE,               POINTER     ::NUMIRRWELSP
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
@@ -58,16 +58,17 @@ C        VARIABLES
       INTEGER :: MXACTWSUP,MXACTWIRR,NUMSUPHOLD,NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD,NUMCOLS,NUMROWS,MAXCELLSHOLD,NUMCELLSHOLD
 C     ------------------------------------------------------------------
-      ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,UNITIRRWEL)
-      ALLOCATE(MAXSEGS,MAXCELLS,NUMIRRWELSP)
+      ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
+      ALLOCATE(MAXSEGS,NUMIRRWELSP)
       ALLOCATE(ETDEMANDFLAG,NUMIRRSFR,NUMIRRSFRSP)
+      ALLOCATE (MAXCELLSSFR)
       MAXVAL = 1
       NUMSUP = 0
       NUMIRRWEL = 0
       UNITSUP = 0
-      UNITIRRWEL = 0
       MAXSEGS = 0
-      MAXCELLS = 0
+      MAXCELLSWEL = 0
+      MAXCELLSSFR = 0
       NUMIRRWELSP = 0
       ETDEMANDFLAG = 0
       NUMIRRSFR = 0
@@ -94,14 +95,14 @@ C
       MAXSEGSHOLD = MAXSEGS
       NUMCOLS = NCOL
       NUMROWS = NROW
-      MAXCELLSHOLD = MAXCELLS
+      MAXCELLSHOLD = MAXCELLSWEL
       IF ( NUMSUPHOLD.EQ.0 ) THEN
           NUMSUPHOLD = 1
           MXACTWSUP = 1
           MAXSEGSHOLD = 1
-          ALLOCATE (DEMAND(NSEGDIM),ACTUAL(NSEGDIM),SUPACT(NSEGDIM))
-      ELSE
           ALLOCATE (DEMAND(1),ACTUAL(1),SUPACT(1))
+      ELSE
+          ALLOCATE (DEMAND(NSEGDIM),ACTUAL(NSEGDIM),SUPACT(NSEGDIM))
       END IF     
       IF ( NUMIRRHOLD.EQ.0 ) THEN
         MAXCELLSHOLD = 1
@@ -110,7 +111,7 @@ C
         NUMCELLSHOLD = 1
         NUMCOLS = 1
         NUMROWS = 1
-        MAXCELLS = 1
+        MAXCELLSWEL = 1
       END IF 
       ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWELVAR(NUMSUPHOLD),
      +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
@@ -133,12 +134,12 @@ C
       SUPFLOW = 0.0
 C
 C-------allocate for SFR agoptions
-      ALLOCATE (NUMIRRSFR,UNITIRRSFR,MAXCELLS,NUMIRRSFRSP)
       IF ( NUMIRRSFR > 0 ) THEN
-        ALLOCATE (DVRCH(NSEGDIM),DVEFF(MAXCELLS,NSEGDIM))
-        ALLOCATE (KCROP(MAXCELLS,NSEGDIM))
-        ALLOCATE (IRRROW(MAXCELLS,NSEGDIM),IRRCOL(MAXCELLS,NSEGDIM)) 
-        ALLOCATE (DVRPERC(MAXCELLS,NSEGDIM))  
+        ALLOCATE (DVRCH(NSEGDIM),DVEFF(MAXCELLSSFR,NSEGDIM))
+        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIM))
+        ALLOCATE (IRRROW(MAXCELLSSFR,NSEGDIM))
+        ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
+        ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
         ALLOCATE (SFRIRR(NCOL,NROW))  
         ALLOCATE (IRRSEG(NSEGDIM))
       ELSE
@@ -212,19 +213,19 @@ C
 ! Pumped water will be added as irrigation
         case('IRRIGATIONWELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWEL,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLSWEL,R,IOUT,IN)
             IF( NUMIRRWEL.LT.0 ) NUMIRRWEL = 0
-            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
+            IF ( MAXCELLSWEL < 1 ) MAXCELLSWEL = 1 
             IF ( IUNIT(2) < 1 ) NUMIRRWEL = 0
             WRITE(IOUT,34) NUMIRRWEL
             found = .true.
 ! Pumped water will be added as irrigation
           case('IRRIGATIONSTREAM')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSFR,R,IOUT,IN)  !#SEGMENTS
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)   !MAX NUMBER OF CELLS
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLSSFR,R,IOUT,IN)   !MAX NUMBER OF CELLS
             IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
-            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(2) < 1 ) NUMIRRSFR = 0
+            IF ( MAXCELLSSFR < 1 ) MAXCELLSSFR = 1 
+            IF ( IUNIT(44) < 1 ) NUMIRRSFR = 0
             WRITE(IOUT,34) NUMIRRSFR
             found = .true.
         case('ETDEMAND')
@@ -260,7 +261,8 @@ C
             endif
         end select
         if ( found ) CALL URDCOM(In, IOUT, line)
-      ENDDO
+        ENDDO
+        if ( found ) backspace(in)
    33 FORMAT(1X,' Option to pump supplmental water ',
      +          'for surface diversion shortfall is activted. '
      +          ' A total of ',I10, 'supplemental wells are active')
@@ -288,91 +290,153 @@ C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
       INTEGER I, ITMP
-      character(len=16)  :: text1        = 'IRRIGATE STREAM'
-      character(len=16)  :: text2        = 'IRRIGATE WELL'
-      character(len=16)  :: text3        = 'SUPPLEMENTAL WELL'
-      character(len=16)  :: text4        = 'IRRSFR'
-      character(len=16)  :: text5        = 'IRRWEL'
-      character(len=16)  :: text6        = 'SUPWEL'
+      character(len=22)  :: text      = 'AGO STRESS PERIOD DATA'
+      character(len=17)  :: text1     = 'IRRIGATION STREAM'
+      character(len=16)  :: text2     = 'IRRIGATION WELL'
+      character(len=16)  :: text3     = 'SUPPLEMENTAL WELL'
+      character(len=16)  :: text4     = 'IRRSFR'
+      character(len=16)  :: text5     = 'IRRWEL'
+      character(len=16)  :: text6     = 'SUPWEL'
+      character(len=16)  :: text7     = 'STRESSPERIOD'
+      character(len=16)  :: text8     = 'END'
 
       INTEGER LLOC,ISTART,ISTOP
-      logical :: FOUND1, FOUND2, FOUND3
+      logical :: FOUND
+      logical :: found1,found2,found3
       REAL :: R
 C     ------------------------------------------------------------------
 C
 C1----READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
-      FOUND1 = .FALSE.
-      FOUND2 = .FALSE.
-      FOUND3 = .FALSE.
-      LLOC=1
-      CALL URDCOM(In, IOUT, line)
+      FOUND = .FALSE.
+      found1 = .FALSE.
+      found2 = .FALSE.
+      found3 = .FALSE.
+      if ( NUMIRRSFR == 0 ) found1 = .true.
+      if ( NUMIRRWEL == 0 ) found2 = .true.
+      if ( NUMSUP == 0 ) found3 = .true.
+      write(iout,'(/1x,a)') 'PROCESSING '//
+     +            trim(adjustl(text))
         DO
-        LLOC=1
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-        select case (LINE(ISTART:ISTOP))
-        case('IRRSFR')
+          CALL URDCOM(In, IOUT, line)
+          LLOC=1
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+          select case (LINE(ISTART:ISTOP))
+          case('STRESSPERIOD')
+            write(iout,'(/1x,a)') 'READING '// trim(adjustl(text)) //''
+            found = .true.
+          case('IRRSFR')
             found1 = .true.
             write(iout,'(/1x,a)') 'READING '//
-     +      trim(adjustl(text1)) //' IRRIGATION STREAM INPUT'
+     +      trim(adjustl(text1)) //''
             CALL URDCOM(In, IOUT, line)
             LLOC=1
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL IRRSFR(IN,IOUT,ITMP)
-            ELSE
+            ELSE IF ( KPER == 1 ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text4))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text4))
      +                //'  specified with no additional input.') 
             END IF
-        case('IRRWEL')
+            IF ( .NOT. FOUND ) THEN
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text4))
+     +             //' found without key word '// trim(adjustl(text7))
+               CALL USTOP('Key word '//trim(adjustl(text4))
+     +             //'  found without key word '// trim(adjustl(text7)))
+            END IF
+          case('IRRWEL')
             found2 = .true.
             write(iout,'(/1x,a)') 'READING '//
-     +            trim(adjustl(text2)) //' IRRIGATION WELL INPUT'
+     +            trim(adjustl(text2)) //''
             CALL URDCOM(In, IOUT, line)
             LLOC=1
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL IRRWEL(IN,ITMP)
-            ELSE
+            ELSE IF ( KPER == 1 ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text5))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text5))
      +                //'  specified with no additional input.') 
             END IF
-       case('SUPWEL')
+            IF ( .NOT. FOUND ) THEN
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text5))
+     +             //' found without key word '// trim(adjustl(text7))
+               CALL USTOP('Key word '//trim(adjustl(text5))
+     +             //'  found without key word '// trim(adjustl(text7)))
+            END IF
+         case('SUPWEL')
             found3 = .true.
             write(iout,'(/1x,a)') 'READING '//
-     +            trim(adjustl(text3)) //' SUPPLEMENTAL WELL INPUT'
+     +            trim(adjustl(text3)) //''
                         CALL URDCOM(In, IOUT, line)
             LLOC=1
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL SUPWEL(IN,ITMP)
-            ELSE
+            ELSE IF ( KPER == 1 ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text6))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text6))
      +                //'  specified with no additional input.') 
             END IF
-       case default
-          if ( found1 .or. found2 .or. found3 ) then
-          else if ( kper == 1 ) then
+             IF ( .NOT. FOUND ) THEN
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text6))
+     +             //' found without key word '// trim(adjustl(text7))
+               CALL USTOP('Key word '//trim(adjustl(text6))
+     +             //'  found without key word '// trim(adjustl(text7)))
+            END IF
+         case default
 C
-C-------- NO KEYWORDS FOUND  DURING FIRST STRESS PERIOD SO TERMINATE
-                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text1))
+C-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
+                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP)
-                CALL USTOP('Invalid '//trim(adjustl(text1))
+                CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
-          else
-            WRITE(IOUT,6)
-    6       FORMAT(1X,/
-     1      1X,'REUSING ALL AGO DATA ',
-     2       'FROM LAST STRESS PERIOD')
-          end if
-          exit
+         case ('END')
+            IF ( .NOT. FOUND ) THEN
+               WRITE(IOUT,*)
+               WRITE(IOUT,*) 'Key word '//trim(adjustl(text8))
+     +             //' found without key word '// trim(adjustl(text7))
+               CALL USTOP('Key word '//trim(adjustl(text8))
+     +             //'  found without key word '// trim(adjustl(text7)))
+            END IF
+           if ( kper == 1 ) then
+             if(.not. found1 .or. .not. found2 .or. .not. found3) then
+C
+C-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
+                WRITE(IOUT,*)
+                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+                CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP))
+             end if
+           else
+             if ( .not. found1 ) then
+                WRITE(IOUT,6)
+             end if
+             if ( .not. found2 ) then
+                WRITE(IOUT,7)
+             end if
+             if ( .not. found3 ) then
+                WRITE(IOUT,8)
+             end if
+           end if
+           write(iout,'(/1x,a)') 'END PROCESSING '//
+     +            trim(adjustl(text)) //' OPTIONS'
+           exit
         end select
       end do  
+    6    FORMAT(1X,/
+     1      1X,'REUSING IRRSFR DATA ',
+     2       'FROM LAST STRESS PERIOD')
+    7 FORMAT(1X,/
+     1      1X,'REUSING IRRWEL DATA ',
+     2       'FROM LAST STRESS PERIOD')
+    8           FORMAT(1X,/
+     1      1X,'REUSING SUPWEL DATA ',
+     2       'FROM LAST STRESS PERIOD')
 C
 C6------RETURN
       RETURN
@@ -509,33 +573,30 @@ C
       NUMIRRWELSP = ITMP
 ! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
 !
-        LLOC = 1
-        CALL URDCOM(IN,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRWELSP,R,IOUT,IN)
         IF ( NUMIRRWELSP > NUMIRRWEL )THEN
           WRITE(IOUT,*)
           WRITE(IOUT,104)NUMIRRWEL,NUMIRRWELSP
           CALL USTOP('')
         END IF
         DO J = 1, NUMIRRWELSP
-          LLOC = 1
           CALL URDCOM(IN,IOUT,LINE)
+          LLOC = 1
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
-          IF ( NMCL > MAXCELLS )THEN
+          IF ( NMCL > MAXCELLSWEL )THEN
             WRITE(IOUT,*)
-            WRITE(IOUT,105)MAXCELLS,NMCL
+            WRITE(IOUT,105)MAXCELLSWEL,NMCL
             CALL USTOP('')
           END IF
           BACKSPACE(IN)
           READ(IN,*)IRRWELVAR(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
      +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
           DO K = 1, NUMCELLS(IRRWELVAR(J))
-          IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
+            IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
      +                                UZFCOL(K,IRRWELVAR(J))==0 ) THEN
-            WRITE(IOUT,106) 
-            CALL USTOP('')   
-          END IF
+              WRITE(IOUT,106) 
+              CALL USTOP('')   
+            END IF
           END DO
         END DO
 C
@@ -564,9 +625,7 @@ C
 C-------SUBROUTINE SFRAGOPTIONS
       SUBROUTINE IRRSFR(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
-      USE GWFAGOMODULE, ONLY: DVRCH, IRRROW, IRRCOL, DVEFF, DVRPERC, 
-     +                          NUMIRRSFR, IRRSEG, MAXCELLS, 
-     +                          KCROP, NUMIRRSFRSP
+      USE GWFAGOMODULE
       USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -599,9 +658,9 @@ C
           CALL URDCOM(IN,IOUT,LINE)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)  !SEGMENT
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)  !NUMCELL
-          IF ( NMCL > MAXCELLS ) THEN
+          IF ( NMCL > MAXCELLSSFR ) THEN
             WRITE(IOUT,*)
-            WRITE(IOUT,9009)MAXCELLS,NMCL
+            WRITE(IOUT,9009)MAXCELLSSFR,NMCL
             CALL USTOP('')
           END IF
           IF ( SGNM > 0 ) THEN
@@ -729,7 +788,7 @@ C APPLY IRRIGATION FROM DIVERSIONS
               irr = IRRROW(icount,istsg)
               icc = IRRCOL(icount,istsg)
               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-              dvt = dvt/(DELR(IC)*DELC(IR))
+              dvt = dvt/(DELR(icc)*DELC(irr))
               SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
             END DO
@@ -833,7 +892,7 @@ C APPLY IRRIGATION FROM DIVERSIONS
               irr = IRRROW(icount,istsg)
               icc = IRRCOL(icount,istsg)
               dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-              dvt = dvt/(DELR(IC)*DELC(IR))
+              dvt = dvt/(DELR(icc)*DELC(irr))
               SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
             END DO
@@ -853,9 +912,8 @@ C
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk
-      USE GWFSFRMODULE, ONLY: SEG
-      USE GWFAGOMODULE, ONLY: DVRCH,KCROP,IRRROW,IRRCOL,
-     +                        SUPACT,NUMIRRSFRSP,IRRSEG,DEMAND 
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFAGOMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -894,11 +952,11 @@ C
            if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
            pettotal = pettotal + pet
            aettotal = aettotal + aet
- !     if(k==2)then
- !     write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
- !    +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
- !333  format(6i6,5e20.10)
- !     end if
+      if(k==2)then
+      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
+     +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
+ 333  format(6i6,5e20.10)
+      end if
         end do
         if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
         if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
@@ -975,7 +1033,7 @@ C
         DEALLOCATE(IRRWELVAR)
         DEALLOCATE(NUMSEGS)
         DEALLOCATE(MAXSEGS)
-        DEALLOCATE(MAXCELLS)
+        DEALLOCATE(MAXCELLSWEL)
         DEALLOCATE(NUMCELLS)
         DEALLOCATE(WELLIRR)
         DEALLOCATE(IRRFACT)
@@ -990,7 +1048,7 @@ C
       DEALLOCATE (IDVFLG) 
       DEALLOCATE (NUMIRRSFR)
       DEALLOCATE (NUMIRRSFRSP)
-      DEALLOCATE (MAXCELLS)
+      DEALLOCATE (MAXCELLSSFR)
       DEALLOCATE (DEMAND)
       DEALLOCATE (ACTUAL)
       DEALLOCATE (SUPACT)

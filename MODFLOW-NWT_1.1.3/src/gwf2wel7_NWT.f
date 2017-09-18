@@ -9,27 +9,10 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABROW
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABCOL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABVAL
-        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::SFRSEG
-        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
-        INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
-        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
-        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
-        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWEL
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWEL
-        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
         INTEGER,          SAVE,                 POINTER     ::MAXVAL
-        INTEGER,          SAVE,                 POINTER     ::NUMSUP
-        INTEGER,          SAVE,                 POINTER     ::UNITSUP
-        INTEGER,          SAVE,                 POINTER     ::NUMIRR
-        INTEGER,          SAVE,                 POINTER     ::UNITIRR
-        INTEGER,          SAVE,                 POINTER     ::MAXSEGS
-        INTEGER,          SAVE,                 POINTER     ::MAXCELLS
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
       TYPE GWFWELTYPE
         INTEGER,POINTER  ::NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL
         INTEGER,POINTER  ::NPWEL,IWELPB,NNPWEL,IRDPSI
@@ -41,27 +24,10 @@
         INTEGER,           DIMENSION(:),   POINTER     ::TABROW
         INTEGER,           DIMENSION(:),   POINTER     ::TABCOL
         INTEGER,           DIMENSION(:),   POINTER     ::TABVAL
-        INTEGER,           DIMENSION(:,:),   POINTER     ::SFRSEG
-        INTEGER,           DIMENSION(:,:),   POINTER     ::UZFROW
-        INTEGER,           DIMENSION(:,:),   POINTER     ::UZFCOL
-        REAL,              DIMENSION(:,:),   POINTER     ::WELLIRR
-        REAL,              DIMENSION(:,:),   POINTER     ::IRRFACT
-        REAL,              DIMENSION(:,:),   POINTER     ::IRRPCT
-        INTEGER,           DIMENSION(:),   POINTER     ::SUPWEL
-        INTEGER,           DIMENSION(:),   POINTER     ::IRRWEL
-        REAL,              DIMENSION(:,:),   POINTER     ::PCTSUP
         REAL,                              POINTER     ::PSIRAMP
         INTEGER,                           POINTER     ::IUNITRAMP
         INTEGER,                           POINTER     ::NUMTAB
         INTEGER,                           POINTER     ::MAXVAL
-        INTEGER,                           POINTER     ::NUMSUP
-        INTEGER,                           POINTER     ::NUMIRR
-        INTEGER,                           POINTER     ::UNITSUP
-        INTEGER,                           POINTER     ::UNITIRR
-        INTEGER,                           POINTER     ::MAXSEGS
-        INTEGER,                           POINTER     ::MAXCELLS
-        INTEGER,            DIMENSION(:),  POINTER     ::NUMCELLS
-        INTEGER,            DIMENSION(:),  POINTER     ::NUMSEGS
       END TYPE
       TYPE(GWFWELTYPE), SAVE:: GWFWELDAT(10)
       END MODULE GWFWELMODULE
@@ -87,17 +53,10 @@ C
 C     ------------------------------------------------------------------
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,IPRWEL)
       ALLOCATE(NPWEL,IWELPB,NNPWEL,PSIRAMP,IUNITRAMP)
-      ALLOCATE(NUMTAB,MAXVAL,NUMSUP,NUMIRR,UNITSUP,UNITIRR)
-      ALLOCATE(MAXSEGS,MAXCELLS)
+      ALLOCATE(NUMTAB,MAXVAL)
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
-      NUMSUP = 0
-      NUMIRR = 0
-      UNITSUP = 0
-      UNITIRR = 0
-      MAXSEGS = 0
-      MAXCELLS = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
@@ -322,25 +281,6 @@ C
             END IF
             WRITE(IOUT,31) MAXVAL
             found = .true.
-! Designate wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
-        case('SUPPLEMENTAL')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITSUP,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
-            IF(NUMSUP.LT.0) NUMSUP=0
-            IF ( IUNIT(44) < 1 ) NUMSUP=0
-            WRITE(IOUT,33) NUMSUP
-            found = .true.
-! Pumped water will be added as irrigation
-        case('IRRIGATE')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRR,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNITIRR,R,IOUT,IN)
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLS,R,IOUT,IN)
-            IF( NUMIRR.LT.0 ) NUMIRR = 0
-            IF ( MAXCELLS < 1 ) MAXCELLS = 1 
-            IF ( IUNIT(55) < 1 ) NUMIRR = 0
-            WRITE(IOUT,34) NUMIRR
-            found = .true.
         case ('END')
          write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
@@ -399,12 +339,7 @@ C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM,IUNIT
       USE GWFWELMODULE, ONLY:NWELLS,MXWELL,NWELVL,IPRWEL,NPWEL,IWELPB,
      1                       NNPWEL,WELAUX,WELL,NUMTAB,MAXVAL,TABTIME,
-     2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL,SFRSEG,
-     3                       UNITSUP,UNITIRR,IRRWEL,SUPWEL,UZFROW,
-     4                       UZFCOL,NUMCELLS,NUMSEGS,NUMIRR,
-     5                       IRRFACT,IRRPCT,PCTSUP,NUMSUP,MAXSEGS,
-     6                       MAXCELLS
-      USE GWFSFRMODULE, ONLY: NSS
+     2                       TABRATE,TABVAL,TABLAY,TABROW,TABCOL
 C
       CHARACTER*6 CWELL
       CHARACTER(LEN=200)::LINE
@@ -498,78 +433,6 @@ C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
      3            WELAUX,20,NAUX)
    30    CONTINUE
       END IF
-! READ LIST OF SEGEMENTS AND REACHES FOR CALCALATING SUPLEMENTAL PUMPING
-!      IF ( KPER == 1) THEN
-      NUMSUPSP = 0
-      IERR = 0
-      IF ( NUMSUP > 0 .AND. IUNIT(44) > 0 ) THEN
-      CALL URDCOM(UNITSUP,IOUT,LINE)
-      LLOC = 1
-      CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUPSP,R,IOUT,IN)
-      IF ( NUMSUPSP > NUMSUP )THEN
-        WRITE(IOUT,*)
-        WRITE(IOUT,102)NUMSUP,NUMSUPSP
-        CALL USTOP('')
-      END IF
-        IERR = 0
-        DO J = 1, NUMSUPSP
-          LLOC = 1
-          CALL URDCOM(UNITSUP,IOUT,LINE)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISPWL,R,IOUT,IN)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMSG,R,IOUT,IN)
-          IF ( NMSG > MAXSEGS )THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,103)MAXSEGS,NMSG
-            CALL USTOP('')
-          END IF
-          BACKSPACE(UNITSUP)
-          READ(UNITSUP,*)SUPWEL(J),NUMSEGS(ISPWL),
-     +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
-          DO K = 1, NUMSEGS(SUPWEL(J))
-            IF ( SFRSEG(K,SUPWEL(J)) == 0 ) IERR = 1
-          END DO
-        END DO
-      END IF
-      IF ( IERR == 1 ) THEN
-        WRITE(IOUT,*)'SEGMENT NUMBER FOR SUPPLEMENTAL WELL ',
-     +               'SPECIFIED AS ZERO. MODEL STOPPING'
-        CALL USTOP('')
-      END IF
-      IERR = 0
-      NUMIRRSP = 0
-! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
-!
-      IF ( NUMIRR > 0 .AND. IUNIT(44) > 0 ) THEN
-        LLOC = 1
-        CALL URDCOM(UNITIRR,IOUT,LINE)
-        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRSP,R,IOUT,IN)
-        IF ( NUMIRRSP > NUMIRR )THEN
-          WRITE(IOUT,*)
-          WRITE(IOUT,104)NUMIRR,NUMIRRSP
-          CALL USTOP('')
-        END IF
-        DO J = 1, NUMIRRSP
-          LLOC = 1
-          CALL URDCOM(UNITIRR,IOUT,LINE)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
-          IF ( NMCL > MAXCELLS )THEN
-            WRITE(IOUT,*)
-            WRITE(IOUT,105)MAXCELLS,NMCL
-            CALL USTOP('')
-          END IF
-          BACKSPACE(UNITIRR)
-          READ(UNITIRR,*)IRRWEL(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
-     +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
-          DO K = 1, NUMCELLS(IRRWEL(J))
-          IF ( UZFROW(K,IRRWEL(J))==0 .OR. UZFCOL(K,IRRWEL(J))==0 ) THEN
-            WRITE(IOUT,*)'CELL ROW OR COLUMN NUMBER FOR SUPPLEMENTAL ',
-     +                 'WELL SPECIFIED AS ZERO. MODEL STOPPING'
-            CALL USTOP('')   
-          END IF
-          END DO
-        END DO
-      END IF
 C
 C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
       CWELL=' WELLS'
@@ -578,26 +441,6 @@ C3------PRINT NUMBER OF WELLS IN CURRENT STRESS PERIOD.
   101 FORMAT(1X,/1X,I6,A)
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
-  102 FORMAT('***Error in WELL*** maximum number of supplimentary ',
-     +       'wells is less than the number specified in ',
-     +       'stress period. ',/
-     +       'Maximum wells and the number specified for stress ',
-     +       'period are: ',2i6)
-  103 FORMAT('***Error in WELL*** maximum number of segments ',
-     +       'for a supplementary well is less than the number  ',
-     +       'specified in stress period. ',/
-     +       'Maximum number of irrigation wells and the number '
-     +       'specified for stress period are: ',2i6)
-  104 FORMAT('***Error in WELL*** maximum number of irrigation ',
-     +       'wells is less than the number specified in stress ',
-     +       'period. ',/
-     +       'Maximum segments and the number specified for stress '
-     +       'period are: ',2i6)
-  105 FORMAT('***Error in WELL*** maximum number of cells ',
-     +       'irrigated by a well is less than the number ',
-     +       'specified in stress period. ',/
-     +       'Maximum cells and the number specified for stress '
-     +       'period are: ',2i6)
 C
 C6------RETURN
       RETURN
@@ -733,13 +576,11 @@ C     ------------------------------------------------------------------
       END FUNCTION RATETERP
       END INTERFACE
       CHARACTER*16 TEXT
-      CHARACTER*20 TEXT1
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
       INTEGER Iunitnwt, iw1, NWELLSTEMP
       DATA TEXT /'           WELLS'/
-      DATA TEXT1 /'SUPPLEMENTARY WELLS'/
 C     ------------------------------------------------------------------
       CALL SGWF2WEL7PNT(IGRID)
 C
@@ -1021,22 +862,6 @@ C
         DEALLOCATE(TABTIME)
         DEALLOCATE(TABRATE)
         DEALLOCATE(TABVAL)
-        DEALLOCATE(NUMSUP)
-        DEALLOCATE(NUMIRR)
-        DEALLOCATE(SFRSEG)
-        DEALLOCATE(UZFROW)
-        DEALLOCATE(UZFCOL)
-        DEALLOCATE(UNITSUP)
-        DEALLOCATE(UNITIRR)
-        DEALLOCATE(SUPWEL)
-        DEALLOCATE(IRRWEL)
-        DEALLOCATE(NUMSEGS)
-        DEALLOCATE(MAXSEGS)
-        DEALLOCATE(MAXCELLS)
-        DEALLOCATE(NUMCELLS)
-        DEALLOCATE(WELLIRR)
-        DEALLOCATE(IRRFACT)
-        DEALLOCATE(IRRPCT)
 C
       RETURN
       END
@@ -1061,22 +886,6 @@ C
         TABTIME=>GWFWELDAT(IGRID)%TABTIME
         TABRATE=>GWFWELDAT(IGRID)%TABRATE
         TABVAL=>GWFWELDAT(IGRID)%TABVAL
-        NUMSUP=>GWFWELDAT(IGRID)%NUMSUP
-        NUMIRR=>GWFWELDAT(IGRID)%NUMIRR
-        SFRSEG=>GWFWELDAT(IGRID)%SFRSEG
-        UZFROW=>GWFWELDAT(IGRID)%UZFROW
-        UZFCOL=>GWFWELDAT(IGRID)%UZFCOL
-        UNITSUP=>GWFWELDAT(IGRID)%UNITSUP
-        UNITIRR=>GWFWELDAT(IGRID)%UNITIRR
-        SUPWEL=>GWFWELDAT(IGRID)%SUPWEL
-        IRRWEL=>GWFWELDAT(IGRID)%IRRWEL
-        NUMSEGS=>GWFWELDAT(IGRID)%NUMSEGS
-        MAXSEGS=>GWFWELDAT(IGRID)%MAXSEGS
-        MAXCELLS=>GWFWELDAT(IGRID)%MAXCELLS
-        NUMCELLS=>GWFWELDAT(IGRID)%NUMCELLS
-        WELLIRR=>GWFWELDAT(IGRID)%WELLIRR
-        IRRFACT=>GWFWELDAT(IGRID)%IRRFACT
-        IRRPCT=>GWFWELDAT(IGRID)%IRRPCT
 C
       RETURN
       END
@@ -1101,22 +910,6 @@ C
         GWFWELDAT(IGRID)%TABTIME=>TABTIME
         GWFWELDAT(IGRID)%TABRATE=>TABRATE
         GWFWELDAT(IGRID)%TABVAL=>TABVAL
-        GWFWELDAT(IGRID)%NUMSUP=>NUMSUP
-        GWFWELDAT(IGRID)%NUMIRR=>NUMIRR
-        GWFWELDAT(IGRID)%SFRSEG=>SFRSEG
-        GWFWELDAT(IGRID)%UZFROW=>UZFROW
-        GWFWELDAT(IGRID)%UZFCOL=>UZFCOL
-        GWFWELDAT(IGRID)%UNITSUP=>UNITSUP
-        GWFWELDAT(IGRID)%UNITIRR=>UNITIRR
-        GWFWELDAT(IGRID)%SUPWEL=>SUPWEL
-        GWFWELDAT(IGRID)%IRRWEL=>IRRWEL
-        GWFWELDAT(IGRID)%NUMSEGS=>NUMSEGS
-        GWFWELDAT(IGRID)%MAXSEGS=>MAXSEGS
-        GWFWELDAT(IGRID)%MAXCELLS=>MAXCELLS
-        GWFWELDAT(IGRID)%NUMCELLS=>NUMCELLS
-        GWFWELDAT(IGRID)%WELLIRR=>WELLIRR
-        GWFWELDAT(IGRID)%IRRFACT=>IRRFACT
-        GWFWELDAT(IGRID)%IRRPCT=>IRRPCT
 C
       RETURN
       END
