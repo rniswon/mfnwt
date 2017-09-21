@@ -4077,6 +4077,47 @@ C
 C5------RETURN.
       RETURN
       END SUBROUTINE LAK2MODSIM
+C
+C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
+      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL) 
+     &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
+      
+      !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
+      
+C     *******************************************************************
+C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
+     +                        STGNEW
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
+     +                                   LAKEVOL(NLAKES)
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER LAKE
+C     -------------------------------------------------------------------
+C
+C
+C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
+C
+        DO LAKE=1,NLAKES
+          DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) 
+          LAKEVOL(LAKE) = VOL(LAKE)
+        END DO
+C
+C5------RETURN.
+      RETURN
+      END SUBROUTINE LAK2MODSIM_InitLakes
 C   
 C
       SUBROUTINE GWF2LAK7DA(IUNITLAK, IGRID)
