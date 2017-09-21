@@ -459,7 +459,6 @@ C     ------------------------------------------------------------------
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFAGOMODULE, ONLY: SUPFLOW, NUMSUP
 !External function interface
       INTERFACE 
       FUNCTION SMOOTH3(H,T,B,dQ)
@@ -486,10 +485,7 @@ C     ------------------------------------------------------------------
       ZERO=0.0D0
       Qp = 0.0
       NWELLSTEMP = NWELLS
-      WELLIRR = 0.0
       TIME = TOTIM
-      ACTUAL = 0.0
-      SUP = 0.0
 !
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
@@ -509,8 +505,6 @@ C2------PROCESS EACH WELL IN THE WELL LIST.
         IL = TABLAY(L)
         Q = RATETERP(TIME,L)
       END IF
-C------ADDED SUPPLEMENTARY PUMPING; NEED TO CHECK THAT AGO IS ACTIVE
-      IF ( NUMSUP > 0 ) Q = Q + SUPFLOW(L)
 C
 C2A-----IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
       IF(IBOUND(IC,IR,IL).LE.0) GO TO 100
@@ -535,7 +529,6 @@ C       THE RHS ACCUMULATOR.
         RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
         Qp = Q
       END IF
-      WELL(NWELVL,L)=QQ
   100 CONTINUE
 C
 C3------RETURN
@@ -555,7 +548,6 @@ C     ------------------------------------------------------------------
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
      2                      NUMTAB
-      USE GWFAGOMODULE, ONLY: SUPFLOW, NUMSUP
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
 !External function interface
       INTERFACE 
@@ -637,8 +629,6 @@ C5C-----GET FLOW RATE FROM WELL LIST.
           IL = TABLAY(L)
           QSAVE = RATETERP(TIME,L)
         END IF
-C------ADDED SUPPLEMENTARY PUMPING; NEED TO CHECK THAT AGO IS ACTIVE
-        IF ( NUMSUP > 0 ) Q = Q + SUPFLOW(L)
 C
       bbot = Botm(IC, IR, Lbotm(IL))
       ttop = Botm(IC, IR, Lbotm(IL)-1)
