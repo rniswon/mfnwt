@@ -1051,12 +1051,6 @@ C     ------------------------------------------------------------------
               WRITE(IOUT,'(A)')'INFILTRATION WILL BE REJECTED USING '
      +                    ,'LAND SURFACE K'
               WRITE(iout,*)
-          case('ETDEMAND')
-              ETDEMANDFLAG = 1
-              WRITE(iout,*)
-              WRITE(IOUT,'(A)')'AGRICULTURAL DEMANDS WILL BE '
-     +                        ,'CALCULATED USING ET DEFICIT'
-              WRITE(iout,*)
           case('SEEPSURFK')
               Iseepreject = 1
               WRITE(iout,*)
@@ -1755,14 +1749,6 @@ C27-----IF NO UNSATURATED ZONE, SET ARRAYS VALUES TO ZERO.
         END DO
       END IF
 C
-C28-----INITIALIZE SURFACE WATER DEMANDS USING PET.
-      !if ( ETDEMANDFLAG > 0 ) then
-      !    if ( kkper == 1 .and. issflg(kkper)==0 ) then
-      !      CALL IRRDEMANDRP()
-      !    else if ( kkper > 1 ) then
-      !      if ( issflg(kkper-1)==1 ) CALL IRRDEMANDRP()
-      !    end if
-      !end if
 C
 C29-----RETURN.
       RETURN
@@ -1788,8 +1774,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFSFRMODULE, ONLY: SFRIRR, NUMIRRSFR
-      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR
+      USE GWFAGOMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1832,7 +1817,6 @@ C2------LOOP THROUGH UNSATURATED ZONE FLOW CELLS.
       idelt = 1
       finfhold = 0.0
       nlayp1 = NLAY + 1
-      if (kkiter==1 .and. issflg(kkper)==0 ) CALL IRRDEMANDRP()
       IF ( IETFLG.GT.0 ) THEN                      
         IF ( ITMUNI.EQ.1 ) THEN
           fact = 86400.0D0          
@@ -1899,7 +1883,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
         IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -2182,10 +2166,6 @@ C8------ADD OVERLAND FLOW TO STREAMS, LAKES AND CONDUITS.
       IF ( IRUNFLG.GT.0 .AND. (Iunitsfr.GT.0.OR.
      +     Iunitlak.GT.0.OR.Iunitswr.GT.0) )
      +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )      
-C
-C28-----CALCULATE SURFACE WATER DEMANDS USING PET.
-      if ( ETDEMANDFLAG > 0 .AND. ISS == 0 ) 
-     +      CALL IRRDEMANDFM(Kkper, Kkstp, Kkiter)
 
 C9------RETURN.
       RETURN
@@ -2322,8 +2302,9 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFSFRMODULE, ONLY: FNETSEEP, SFRIRR, NUMIRRSFR
-      USE GWFWELMODULE, ONLY: WELLIRR, NUMIRR
+      USE GWFAGOMODULE, ONLY: SFRIRR, NUMIRRSFR, 
+     +                        WELLIRR, NUMIRRWEL
+      USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -2464,7 +2445,7 @@ CDEP 05/05/2006
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
         IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -2475,17 +2456,6 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         ELSE
           EXCESPP(ic, ir) = 0.0
         ENDIF
-! EDM
-        finfhold = FINF(ic, ir)
-        IF ( IUNIT(44) > 0 .AND. NUMIRRSFR > 0 ) THEN
-            IF ( SFRIRR(IC,IR) .NE. 0 ) THEN
-                finfhold = FINF(ic, ir)
-            END IF
-            finfhold = finfhold + SFRIRR(IC,IR)
-        END IF
-        IF ( IUNIT(2) > 0 ) THEN
-          IF ( NUMIRR > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
-        END IF
         IF ( IUZFBND(ic, ir).EQ.0 ) finfhold = 0.0D0
         flength = DELC(ir)
         width = DELR(ic)
@@ -3935,7 +3905,7 @@ C60----LOOP OVER GAGING STATIONS.
      +                  DELC(iuzrow)*DELR(iuzcol)
                 gaplinfltr = FINF(iuzcol, iuzrow)
                 if ( IUNIT(2) > 0 ) then
-                  if ( NUMIRR > 0 ) gaplinfltr = gaplinfltr + 
+                  if ( NUMIRRWEL > 0 ) gaplinfltr = gaplinfltr + 
      +                                           WELLIRR(iuzcol, iuzrow)
                 end if
                 if ( IUNIT(44) > 0 ) then
@@ -4915,7 +4885,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
       DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom, etoutold
-      double precision zerod2, zerod4, zerod5, zerod10, done
+      double precision zerod2, zerod4, zerod5, zerod10, done, zerod30
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
      +        kjm1, itest, k
@@ -4928,15 +4898,16 @@ C1------INITIALIZE VARIABLES.
       zerod2 = 1.0d-2
       zerod4 = 1.0d-4
       zerod5 = 1.0d-5
+      zerod30 = 1.0d-30
       zerod10 = 1.0d-10
       FACTOR = DONE+ZEROD2
       etoutold = DZERO
       if ( Rootdepth < zerod7 ) return
       if ( Thetas-Thetar < zerod7 ) return
       pet = Rateud*Rootdepth
-      eps_m1 = DBLE(Eps) - 1.0D0
-      HA = 0.0
-      HROOT = 0.0
+      eps_m1 = DBLE(Eps) - done
+      HA = dzero
+      HROOT = dzero
       IF ( ETOFH_FLAG.GT.0 ) THEN
         HA = AIR_ENTRY(ic,ir)
         HROOT = H_ROOT(ic,ir)
@@ -5359,13 +5330,16 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           Etout = 0.0D0
           itest = 1
       END IF
-          if( abs((etout-etoutold)/etout) < zerod5 ) itest = 1
-          etoutold = etout
-          if ( abs(fmp/pet - done) > zerod2 ) then
-            factor = factor/(fmp/pet)
+          if ( etout > zerod30 ) then
+             if( abs((etout-etoutold)/etout) < zerod5 ) then
+               itest = 1
+             elseif ( abs(fmp/pet - done) > zerod2 ) then
+              factor = factor/(fmp/pet)
+             end if
           else
             itest = 1
           end if
+        etoutold = etout
 !        FMP = FM
         IF ( K.GT.20 ) THEN
           write(iout,222)'PET DIFF ERROR ', ir,ic,FMP-PET,PET
@@ -5659,123 +5633,6 @@ C
       unsat_stor = fm
       end function unsat_stor
 !
-      subroutine IRRDEMANDFM(Kkper, Kkstp, Kkiter)
-!     ******************************************************************
-!     irrdemand---- sums up irrigation demand based on actual ET
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
-     +                        surfk,ROOTDPTH
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,KCROP,IRRROW,IRRCOL,SEG,SUPACT,
-     +                        NUMIRRSFRSP,IRRSEG,SFRIRR,DEMAND,SGOTFLW
-      USE GWFWELMODULE, ONLY: WELLIRR,NUMIRR 
-      USE GLOBAL,     ONLY: DELR, DELC, IUNIT
-      USE GWFBASMODULE, ONLY: DELT
-      IMPLICIT NONE
-! ----------------------------------------------------------------------
-      !modules
-      !arguments
-      ! -- dummy
-      DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal
-      integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
-! ----------------------------------------------------------------------
-!
-      zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
-      done = 1.0d0
-      dzero = 0.0d0
-      do i = 1, NUMIRRSFRSP   !this won't work for GW only
-        iseg = IRRSEG(i)
-        finfsum = dzero
-        do k = 1, DVRCH(iseg)
-           ic = IRRCOL(k,iseg)
-           ir = IRRROW(k,iseg)
-           fks = VKS(ic, ir)
-           IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
-           area = delr(ic)*delc(ir)
-           finfsum = finfsum + fks*area
-           pet = PETRATE(ic,ir)
-           uzet = uzfetout(ic,ir)/DELT
-           aet = (gwet(ic,ir)+uzet)/area
-           if ( aet < zerod30 ) aet = zerod30
-           factor = pet/aet - done
-           SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
-           if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
-           dum = pet
-           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
-           pettotal = pettotal + pet
-           aettotal = aettotal + aet
-      if(k==2)then
-      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
-     +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
- 333  format(6i6,5e20.10)
-      end if
-        end do
-        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
-        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-        SUPACT(iseg) = DEMAND(iseg)
-        if ( pettotal-aettotal < zerod2*pettotal ) SUPACT(iseg) = 
-     +                                             SEG(2,iseg)
-      end do
-      return
-      end subroutine IRRDEMANDFM
-!
-      subroutine IRRDEMANDRP()
-!     ******************************************************************
-!     irrdemand---- sets initial crop demand to PET
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
-     +                        IRRSEG,KCROP
-      USE GLOBAL,     ONLY: DELR, DELC
-      IMPLICIT NONE
-! ----------------------------------------------------------------------
-      DOUBLE PRECISION :: factor, area, uzet, pet
-      integer :: k,iseg,ic,ir,i
-! ----------------------------------------------------------------------
-!
-      do i = 1, NUMIRRSFRSP
-        iseg = IRRSEG(i)
-        do k = 1, DVRCH(iseg)
-           ic = IRRCOL(k,iseg)
-           ir = IRRROW(k,iseg)
-           area = delr(ic)*delc(ir)
-           SEG(2,iseg) = 0.0d0
-        end do
-      end do
-      return
-      end subroutine IRRDEMANDRP
-! ----------------------------------------------------------------------
-C
-      subroutine APPLYKCROP()
-!     ******************************************************************
-!     APPLYKCROP---- Apply crop ceofficient to ETo
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFSFRMODULE, ONLY: NSS,DVRCH,IRRROW,IRRCOL,SEG,NUMIRRSFRSP,
-     +                        IRRSEG,KCROP
-      USE GLOBAL,     ONLY: DELR, DELC
-      IMPLICIT NONE
-! ----------------------------------------------------------------------
-      DOUBLE PRECISION :: factor, area, uzet, pet
-      integer :: k,iseg,ic,ir,i
-! ----------------------------------------------------------------------
-!
-      do i = 1, NUMIRRSFRSP
-        iseg = IRRSEG(i)
-        do k = 1, DVRCH(iseg)
-           ic = IRRCOL(k,iseg)
-           ir = IRRROW(k,iseg)
-           PETRATE(ic,ir) = KCROP(K,ISEG)*PETRATE(IC,IR)
-        end do
-      end do
-      return
-      END subroutine APPLYKCROP
-C
 C
 ! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
