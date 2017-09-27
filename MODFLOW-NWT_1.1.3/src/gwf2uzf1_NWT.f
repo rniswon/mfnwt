@@ -1878,7 +1878,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
@@ -2441,7 +2441,7 @@ CDEP 05/05/2006
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
         IF ( IUNIT(2) > 0 ) THEN
@@ -3908,7 +3908,7 @@ C60----LOOP OVER GAGING STATIONS.
                   if ( NUMIRRWEL > 0 ) gaplinfltr = gaplinfltr + 
      +                                           WELLIRR(iuzcol, iuzrow)
                 end if
-                if ( IUNIT(44) > 0 ) then
+                if ( IUNIT(66) > 0 ) then
                   if ( NUMIRRSFR > 0 ) gaplinfltr = gaplinfltr + 
      +                                            SFRIRR(iuzcol, iuzrow)
                 end if
