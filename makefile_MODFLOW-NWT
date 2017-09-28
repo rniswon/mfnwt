@@ -1,0 +1,112 @@
+# Makefile for MODFLOW-NWT-1.0.7
+# Steps: 1) Build module files outside of this makefile (note this is
+#                different from compiling MF2005)       
+#        2) run: "make -f makefile_MODFLOW-NWT"
+#
+# NOTE:  1) gfortran can be used to suppress error messages.
+#        2) If "unformatted" output is needed, replace "binary" in
+#           gwf2bas7_NWT.f, openspec.inc, and utl7.f.
+
+PROGRAM = mf_NWT
+# Define the Fortran compile flags
+F90FLAGS=
+F90= ifort
+# 
+# Define the C compile flags
+# -D_UF defines UNIX naming conventions for mixed language compilation.
+# 
+CFLAGS= -D_UF -O3
+CC= gcc
+
+# Define the libraries
+SYSLIBS= -lc
+USRLIB  = 
+
+# Define all Fortran object files which make up MODFLOW
+OBJECTS = \
+        gwf2bas7_NWT.o \
+        de47_NWT.o \
+        pcg7_NWT.o \
+        sip7_NWT.o \
+        mhc7.o\
+        gwf2bcf7.o \
+        gwf2lpf7.o \
+        gwf2huf7.o \
+        gwf2rch7.o \
+        gwfuzfmodule_NWT.o \
+        gwfsfrmodule_NWT.o \
+        gwflakmodule_NWT.o \
+        gwf2sfr7_NWT.o \
+        gwf2uzf1_NWT.o \
+        gwf2gag7.o \
+        gwf2chd7.o \
+        gwf2drn7_NWT.o \
+        gwf2drt7.o \
+        gwf2ets7.o \
+        gwf2evt7.o \
+        gwf2fhb7.o \
+        gwf2ghb7_NWT.o \
+        gwf2hfb7_NWT.o \
+        gwf2ibs7.o \
+        gwf2res7.o \
+        gwf2riv7_NWT.o \
+        gwf2str7.o \
+        gwf2sub7.o \
+        gwf2swt7.o\
+        gwf2wel7_NWT.o \
+        hufutl7.o \
+        obs2bas7.o \
+        obs2drn7.o \
+        obs2ghb7.o \
+        obs2riv7.o \
+        obs2chd7.o \
+        obs2str7.o \
+        parutl7.o \
+        gwf2mnw17_NWT.o \
+        gwf2mnw27_NWT.o \
+        gwf2mnw2i7.o \
+        utl7.o \
+        lmt7_NWT.o \
+        gwf2hydmod7.o \
+        MF_NWT.o \
+        gsol7.o \
+        gwf2swr7_NWT.o \
+        mach_mod.o \
+        modules.o \
+        nogmg.o \
+        NWT1_gmres.o \
+        NWT1_ilupc_mod.o \
+        NWT1_module.o \
+        NWT1_solver.o \
+        NWT1_xmd.o \
+        NWT1_xmdlib.o \
+        gwf2upw1.o \
+        gsol7.o \
+        gwf2swr7_NWT.o \
+        mach_mod.o \
+        modules.o \
+        nogmg.o \
+        NWT1_gmres.o \
+        NWT1_ilupc_mod.o \
+        NWT1_module.o \
+        NWT1_solver.o \
+        NWT1_xmd.o \
+        NWT1_xmdlib.o \
+        gwf2lak7_NWT.o
+
+# Define Task Function
+all: mf_NWT
+
+# Define what mf_NWT
+mf_NWT: $(OBJECTS)
+	-$(F90) $(F90FLAGS) -o mf_NWT $(OBJECTS) $(USRLIB) $(SYSLIBS)
+
+# Object codes
+.f.o:
+	$(F90) $(F90FLAGS) -c $<
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+# make clean if you want.
+# end

@@ -1,8 +1,9 @@
       MODULE GWFAGOMODULE
 ! from well package
         INTEGER,SAVE,POINTER  :: NWELLS,MXWELL,NWELVL,NPWEL,IPRWEL
-        INTEGER,SAVE,POINTER  :: IWELCB,IRDPSI,IWELPB,NNPWEL
+        INTEGER,SAVE,POINTER  :: IWELCB,IRDPSI,NNPWEL,NAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
+        CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SEGAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABTIME
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABRATE
@@ -72,15 +73,17 @@ C        VARIABLES
       CHARACTER(len=200) :: LINE
       INTEGER :: MXACTWSUP,MXACTWIRR,NUMSUPHOLD,NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD,NUMCOLS,NUMROWS,MAXCELLSHOLD,NUMCELLSHOLD
-      INTEGER :: NUMTABHOLD,MXACTW,LLOC,ISTART,ISTOP,I,NAUX,N
+      INTEGER :: NUMTABHOLD,LLOC,ISTART,ISTOP,I,N
       REAL :: R
 C     ------------------------------------------------------------------
-      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB)
-      ALLOCATE(IWELPB,PSIRAMP,IUNITRAMP)
-      ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL)
+      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,NAUX)
+      ALLOCATE(PSIRAMP,IUNITRAMP)
+      ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
+      IPRWEL = 0
+      NAUX = 0
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(MAXSEGS,NUMIRRWELSP)
       ALLOCATE(ETDEMANDFLAG,NUMIRRSFR,NUMIRRSFRSP)
@@ -112,6 +115,7 @@ C
 C2-------CHECK FOR KEYWORDS.  
 C
       CALL PARSEAGO7OPTIONS(In, Iout, Iunitnwt)
+      NNPWEL = MXWELL
 C
 C3-------ALLOCATE VARIABLES FOR TIME SERIES WELL RATES
       NUMTABHOLD = NUMTAB
@@ -126,56 +130,16 @@ C3-------ALLOCATE VARIABLES FOR TIME SERIES WELL RATES
       TABCOL = 0
       TABVAL = 0
 C
-C4-------READ MAX WELLS AND CBC FILE UNIT NUMBER
-      IF(IFREFM.EQ.0) THEN
-         READ(LINE,'(2I10)') MXACTW,IWELCB
-         LLOC=21
-      ELSE
-         LLOC=1
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MXACTW,R,IOUT,IN)
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELCB,R,IOUT,IN)
-      END IF
-      i = 0
-      WRITE(IOUT,3) MXACTW
-    3 FORMAT(1X,'MAXIMUM OF ',I6,' ACTIVE WELLS AT ONE TIME')
-      IF(IWELCB.LT.0) WRITE(IOUT,7)
-    7 FORMAT(1X,'CELL-BY-CELL FLOWS WILL BE PRINTED WHEN ICBCFL NOT 0')
-      IF(IWELCB.GT.0) WRITE(IOUT,8) IWELCB
-    8 FORMAT(1X,'CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT ',I4)
-C
-C5------READ AUXILIARY VARIABLES AND PRINT FLAG.
-      ALLOCATE(WELAUX(20))
-      NAUX=0
-      IPRWEL=1
-   10 CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,N,R,IOUT,IN)
-      IF(LINE(ISTART:ISTOP).EQ.'AUXILIARY' .OR.
-     1        LINE(ISTART:ISTOP).EQ.'AUX') THEN
-         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,N,R,IOUT,IN)
-         IF(NAUX.LT.20) THEN
-            NAUX=NAUX+1
-            WELAUX(NAUX)=LINE(ISTART:ISTOP)
-            WRITE(IOUT,12) WELAUX(NAUX)
-   12       FORMAT(1X,'AUXILIARY WELL VARIABLE: ',A)
-         END IF
-         GO TO 10
-      ELSE IF(LINE(ISTART:ISTOP).EQ.'NOPRINT') THEN
-         WRITE(IOUT,13)
-   13    FORMAT(1X,'LISTS OF WELL CELLS WILL NOT BE PRINTED')
-         IPRWEL = 0
-         GO TO 10
-      END IF
-C
 C6------THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
 C6------CELL-BY-CELL FLOW.
       NWELVL=5+NAUX
 C
 C7------ALLOCATE SPACE FOR THE WELL DATA.
-      IWELPB=MXACTW+1
-      MXWELL=MXACTW
-      IF(MXACTW.LT.1) THEN
+      IF(MXWELL.LT.1) THEN
          WRITE(IOUT,17)
    17    FORMAT(1X,
      1'No wells active in the AGO Package')
+         MXWELL = 1
       END IF
       ALLOCATE (WELL(NWELVL,MXWELL))
 C        
@@ -316,6 +280,16 @@ C
             WRITE(IOUT,34) NUMIRRWEL
             found = .true.
             found1 = .true.
+! Max number of SUP and IRR wells
+        case('MAXWELLS')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MXWELL,R,IOUT,IN)
+            IF( MXWELL.LT.0 ) MXWELL = 0
+            WRITE(IOUT,36) MXWELL
+! Option to output CBC results to unformatted file
+        case('CBCWELLS')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELCB,R,IOUT,IN)
+            IF( IWELCB.LT.0 ) IWELCB = abs(IWELCB)
+            WRITE(IOUT,37) IWELCB
 ! REDUCING PUMPING FOR DRY CELLS
         case('PHIRAMP')
 ! CHECK THAT THERE ARE SUP OR IRR WELLS FIRST
@@ -367,7 +341,7 @@ C
             IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
             IF ( MAXCELLSSFR < 1 ) MAXCELLSSFR = 1 
             IF ( IUNIT(44) < 1 ) NUMIRRSFR = 0
-            WRITE(IOUT,34) NUMIRRSFR
+            WRITE(IOUT,35) NUMIRRSFR
             found = .true.
         case('ETDEMAND')
               ETDEMANDFLAG = 1
@@ -404,6 +378,17 @@ C
         if ( found ) CALL URDCOM(In, IOUT, line)
         ENDDO
         if ( found ) backspace(in)
+      IF ( NUMIRRWEL > MXWELL) THEN
+        WRITE(IOUT,*) 'THE VALUE SPECIFIED FOR NUMIRRWEL: ',NUMIRRWEL,
+     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AGO WELLS: ',MXWELL
+        CALL USTOP('NUMIRRWEL IS GREATER THAN MAX AGO WELLS')
+      END IF
+      IF ( NUMSUP > MXWELL) THEN
+        WRITE(IOUT,*) 'THE VALUE SPECIFIED FOR NUMSUP: ',NUMSUP,
+     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AGO WELLS: ',MXWELL
+        CALL USTOP(' NUMSUP IS GREATER THAN MAX AGO WELLS')
+      END IF
+C
    29 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
      +       ' FALLS WITHIN THE INTERVAL PHIRAMP TIMES THE CELL '/
      +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
@@ -421,7 +406,13 @@ C
      +          'for surface diversion shortfall is activted. '
      +          ' A total of ',I10, 'supplemental wells are active')
    34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
-     +'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
+     +,'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
+   35 FORMAT(1X,' Option to apply surface water as irrigtion is active.'
+     +,' Pumped irrigation water will be applied to ',I10,' UZF Cells.')
+   36 FORMAT(1X,' The maximum number of wells for supplementing'
+     +,' diversions or for applying irrigation is ',I10,' wells.')
+   37 FORMAT(1X,' Unformatted cell by cell rates for SUP and IRR wells'
+     +,' will be saved to file unit number ',I10)
       END SUBROUTINE     
 C
 C
@@ -453,41 +444,75 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text6     = 'SUPWEL'
       character(len=16)  :: text7     = 'STRESSPERIOD'
       character(len=16)  :: text8     = 'END'
+      character(len=16)  :: char1     = 'WELL LIST'
 
-      INTEGER LLOC,ISTART,ISTOP
-      INTEGER NAUX,J,TABUNIT,II
+      INTEGER LLOC,ISTART,ISTOP,ISTARTSAVE
+      INTEGER J,TABUNIT,II,KPER2
       logical :: FOUND
-      logical :: found1,found2,found3
+      logical :: found1,found2,found3,found4
       REAL :: R,TTIME,TRATE
       CHARACTER*6 CWELL
 C     ------------------------------------------------------------------
+      found4 = .false.
 C
 C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
       IF ( KPER.EQ.1 ) THEN
-        IF ( NUMTAB.EQ.0 ) THEN
-          CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
-     1             'WELL NO.  LAYER   ROW   COL   STRESS RATE',
+        CALL URDCOM(In, IOUT, line)
+        LLOC=1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        ISTARTSAVE = ISTART
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        do 
+          select case (LINE(ISTARTSAVE:ISTOP))
+          case('WELL LIST')
+            found4 = .true.
+            write(iout,'(/1x,a)') 'PROCESSING '//
+     +                    trim(adjustl(CHAR1)) //''
+            IF ( NUMTAB.EQ.0 ) THEN
+              CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
+     1             'AGO WELL NO.  LAYER   ROW   COL   MAX STRESS RATE',
      2              WELAUX,20,NAUX,IFREFM,NCOL,NROW,NLAY,4,4,IPRWEL)
-        ELSE
-          DO J = 1, NUMTAB
-            READ(IN,*)TABUNIT,TABVAL(J),TABLAY(J),TABROW(J),TABCOL(J)
-            IF ( TABUNIT.LE.0 ) THEN
-              WRITE(IOUT,100)
-              CALL USTOP('')
+            ELSE
+              DO J = 1, NUMTAB
+                READ(IN,*)TABUNIT,TABVAL(J),TABLAY(J),TABROW(J),
+     +                    TABCOL(J)
+                IF ( TABUNIT.LE.0 ) THEN
+                  WRITE(IOUT,100)
+                  CALL USTOP('')
+                END IF
+                REWIND(TABUNIT)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
+                DO II = 1, TABVAL(J)
+                  LLOC = 1
+                  CALL URDCOM(TABUNIT,IOUT,LINE)
+                  CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,
+     +                      TABUNIT)
+                  CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,
+     +                      TABUNIT)
+                  TABTIME(II,J) = TTIME
+                  TABRATE(II,J) = TRATE
+                END DO
+              END DO
             END IF
-            REWIND(TABUNIT)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
-            DO II = 1, TABVAL(J)
-              LLOC = 1
-              CALL URDCOM(TABUNIT,IOUT,LINE)
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,TABUNIT)
-              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,TABUNIT)
-              TABTIME(II,J) = TTIME
-              TABRATE(II,J) = TRATE
-            END DO
-          END DO
-        END IF
+          case ('END')
+            found4 = .false.
+            write(iout,'(/1x,a)') 'FINISHED READING '//
+     +                            trim(adjustl(char1))
+            exit
+          case default
+            WRITE(IOUT,*) 'Invalid AGO Input: '//LINE(ISTART:ISTOP)
+     +                 //' Should be: '// trim(adjustl(CHAR1))
+            CALL USTOP('Invalid AGO Input: '//LINE(ISTART:ISTOP)
+     +                 //' Should be: '// trim(adjustl(CHAR1)))
+          end select
+          if ( found4 ) then
+            CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+          end if
+        end do
 C
 C3------PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
+        NWELLS = MXWELL
         CWELL=' WELLS'
         IF(NWELLS.EQ.1) CWELL=' WELL '
         WRITE(IOUT,101) NWELLS,CWELL
@@ -513,6 +538,13 @@ C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
           select case (LINE(ISTART:ISTOP))
           case('STRESSPERIOD')
             write(iout,'(/1x,a)') 'READING '// trim(adjustl(text)) //''
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,KPER2,R,IOUT,IN)
+            IF ( KPER /= KPER2 ) THEN
+              WRITE(IOUT,*) 'INCORRECT PERIOD FOR '//trim(adjustl(text))
+     +                 //' SPECIFIED. CHECK INPUT.'
+              CALL USTOP('INCORRECT PERIOD FOR  '//trim(adjustl(text))
+     +                //'  SPECIFIED. CHECK INPUT.') 
+            END IF
             found = .true.
           case('IRRSFR')
             found1 = .true.
@@ -914,20 +946,19 @@ C        VARIABLES:
 C     ------------------------------------------------------------------
       INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ
       DOUBLE PRECISION :: ZERO, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
-      DOUBLE PRECISION :: H,T,B,dQ
       EXTERNAL :: SMOOTH3, RATETERP
       REAL :: RATETERP,TIME
       DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTH3
 C      
 C     ------------------------------------------------------------------
       ZERO=0.0D0
-      WELLIRR = 0.0
+      WELLIRR = ZERO
       TIME = TOTIM
-      ACTUAL = 0.0
-      SUP = 0.0
-      SFRIRR = 0.0   
-      SUPFLOW = 0.0
-      Qp = 0.0
+      ACTUAL = ZERO
+      SUP = ZERO
+      SFRIRR = ZERO 
+      SUPFLOW = ZERO
+      Qp = ZERO
       TIME = TOTIM
 C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
@@ -943,7 +974,17 @@ C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
 C
 C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
-        Q = WELL(NWELVL,L)
+        IF ( NUMTAB.LE.0 ) THEN
+          IR=WELL(2,L)
+          IC=WELL(3,L)
+          IL=WELL(1,L)
+          Q=WELL(4,L)
+        ELSE
+          IR = TABROW(L)
+          IC = TABCOL(L)
+          IL = TABLAY(L)
+          Q = RATETERP(TIME,L)
+        END IF
         IF ( NUMSUP > 0 ) THEN
           IF ( NUMSEGS(L) > 0 ) THEN
             SUP = 0.0
@@ -955,59 +996,48 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
               SUP = SUP + FMIN
               SUP = SUP - ACTUAL(J)
             END DO
-            IF ( SUP < 0.0 ) SUP = 0.0
+            IF ( SUP < ZERO ) SUP = ZERO
             SUPFLOW(L) = SUPFLOW(L) - SUP
-            IF ( NUMTAB.LE.0 ) THEN
-              IR=WELL(2,L)
-              IC=WELL(3,L)
-              IL=WELL(1,L)
-              Q=WELL(4,L)
-            ELSE
-              IR = TABROW(L)
-              IC = TABCOL(L)
-              IL = TABLAY(L)
-              Q = RATETERP(TIME,L)
-            END IF
+          END IF
 C
 C5------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE
-            IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
-            Q = SUPFLOW(L)
+          IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
+          Q = SUPFLOW(L)
+        END IF
 C
 C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
-            IF(IBOUND(IC,IR,IL).LE.0) GO TO 100
+        IF(IBOUND(IC,IR,IL) > 0) THEN
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
-            IF ( Q .LT. ZERO .AND. IUNITNWT.NE.0 ) THEN
-              IF ( LAYTYPUPW(il).GT.0 ) THEN
-                Hh = HNEW(ic,ir,il)
-                bbot = Botm(IC, IR, Lbotm(IL))
-                ttop = Botm(IC, IR, Lbotm(IL)-1)
-                Qp = Q*smooth3(Hh,Ttop,Bbot,dQp)
-                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
+          IF ( Q .LT. ZERO .AND. IUNITNWT.NE.0 ) THEN
+            IF ( LAYTYPUPW(il).GT.0 ) THEN
+              Hh = HNEW(ic,ir,il)
+              bbot = Botm(IC, IR, Lbotm(IL))
+              ttop = Botm(IC, IR, Lbotm(IL)-1)
+              Qp = Q*smooth3(Hh,Ttop,Bbot,dQp)
+              RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
 C
 C8------Derivative for RHS
-                ij = Icell(IC,IR,IL)
-                A(IA(ij)) = A(IA(ij)) + dQp*Q
-              ELSE
-                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
-                Qp = Q
-              END IF
+              ij = Icell(IC,IR,IL)
+              A(IA(ij)) = A(IA(ij)) + dQp*Q
             ELSE
               RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
               Qp = Q
             END IF
-  100 CONTINUE
-C
-C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-      SUP = 0.0
-            DO I = 1, NUMSEGS(L)
-              J = SFRSEG(I,L) 
-              SUP = SUP - Qp
-              ACTUAL(J)  = ACTUAL(J) + SUP
-            END DO
+          ELSE
+            RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
+            Qp = Q
           END IF
         END IF
+C
+C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
+        SUP = 0.0
+        DO I = 1, NUMSEGS(L)
+          J = SFRSEG(I,L) 
+          SUP = SUP - Qp
+          ACTUAL(J)  = ACTUAL(J) + SUP
+        END DO
 ! APPLY IRRIGATION FROM WELLS
         IF ( NUMIRRWELSP > 0 ) THEN
           IF ( NUMCELLS(L) > 0 ) THEN
@@ -1041,7 +1071,7 @@ C3------RETURN
       END
       SUBROUTINE GWF2AGO7BD(KKSTP,KKPER,Iunitnwt)
 C     ******************************************************************
-C     CALCULATE VOLUMETRIC FOR AG OPTIONS (DIVERSIONS AND PUMPING)
+C     CALCULATE FLOWS FOR AG OPTIONS (DIVERSIONS AND PUMPING)
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
@@ -1049,7 +1079,7 @@ C     ------------------------------------------------------------------
       USE GLOBAL,      ONLY:IOUT,DELR,DELC,issflg,NCOL,NROW,NLAY,
      1                      IBOUND,HNEW,BUFF,BOTM,LBOTM
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
-     1                      VBNM,VBVL
+     1                      VBNM,VBVL,MSUM
       USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
@@ -1059,27 +1089,29 @@ C     ------------------------------------------------------------------
       INTEGER, INTENT(IN):: KKSTP,KKPER,Iunitnwt
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      CHARACTER*16 TEXT
+      CHARACTER*20 TEXT,TEXT1,TEXT2
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
       double precision :: SUP,SUBVOL,SUBRATE
       real :: Q,TIME,RATETERP
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
-      INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1,NAUX,MSUM
+      INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1
       EXTERNAL :: SMOOTH3, RATETERP
       DOUBLE PRECISION :: SMOOTH3,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DATA TEXT /'SUPPLEMENTARY WELLS'/
+      DATA TEXT1 /'SFR DIVERSION IRRIGATION'/
+      DATA TEXT2 /'AGO WELL IRRIGATION'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       RATIN=ZERO
       RATOUT=ZERO
       IBD=0
-      WELLIRR = 0.0
+      WELLIRR = ZERO
       TIME = TOTIM
-      ACTUAL = 0.0
-      SUP = 0.0
-      SFRIRR = 0.0   
-      SUPFLOW = 0.0
+      ACTUAL = ZERO
+      SUP = ZERO
+      SFRIRR = ZERO
+      SUPFLOW = ZERO
       Qp = 1.0
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
@@ -1089,14 +1121,14 @@ C     ------------------------------------------------------------------
       IBDLBL=0
       iw1 = 1
 C
-C3------CLEAR THE BUFFER.
+C1------CLEAR THE BUFFER.
       DO 50 IL=1,NLAY
       DO 50 IR=1,NROW
       DO 50 IC=1,NCOL
       BUFF(IC,IR,IL)=ZERO
 50    CONTINUE
 C
-C2-----IF CELL-BY-CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
+C2-----IF CELL-BY-CELL SUPPLEMENTARY PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
       IF(IBD.EQ.2) THEN
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
@@ -1104,19 +1136,38 @@ C2-----IF CELL-BY-CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
      1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 C
-C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
+C2-----IF CELL-BY-CELL DIVERSION IRRIGATION FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
+      IF(IBD.EQ.2) THEN
+         NAUX=NWELVL-5
+         IF(IAUXSV.EQ.0) NAUX=0
+         CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,SEGAUX,IWELCB,NCOL,NROW,
+     1          NLAY,NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
+
+C
+C3------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
         CALL UZFIRRDEMANDCALC(Kkper, Kkstp, 1)
       END IF
             
 C
-C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
+C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
-C3------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
+C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
-        Q = WELL(NWELVL,L)
+        IF ( NUMTAB.LE.0 ) THEN
+          IR=WELL(2,L)
+          IC=WELL(3,L)
+          IL=WELL(1,L)
+          Q=WELL(4,L)
+        ELSE
+          IR = TABROW(L)
+          IC = TABCOL(L)
+          IL = TABLAY(L)
+          Q = RATETERP(TIME,L)
+        END IF
         IF ( NUMSUP > 0 ) THEN
           IF ( NUMSEGS(L) > 0 ) THEN
             SUP = 0.0
@@ -1128,40 +1179,28 @@ C3------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
               SUP = SUP + FMIN
               SUP = SUP - ACTUAL(J)
             END DO
-            IF ( SUP < 0.0 ) SUP = 0.0
+            IF ( SUP < ZERO ) SUP = ZERO
             SUPFLOW(L) = SUPFLOW(L) - SUP
-            Q=ZERO
-            QQ=ZERO
           END IF
-        END IF
-        IF ( NUMTAB.LE.0 ) THEN
 C
-C5A-----GET LAYER, ROW & COLUMN OF CELL CONTAINING WELL.
-          IR=WELL(2,L)
-          IC=WELL(3,L)
-          IL=WELL(1,L)
-C
-C5C-----GET FLOW RATE FROM WELL LIST.
-          QSAVE=WELL(4,L)
-        ELSE
-          IR = TABROW(L)
-          IC = TABCOL(L)
-          IL = TABLAY(L)
-          QSAVE = RATETERP(TIME,L)
+C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE
+          IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
+          Q = SUPFLOW(L)
         END IF
+        QSAVE = Q
 C
         bbot = Botm(IC, IR, Lbotm(IL))
         ttop = Botm(IC, IR, Lbotm(IL)-1)
         Hh = HNEW(ic,ir,il)
 C
-C5B-----IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
+C7------IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
 C-------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
 C
         IF(IBOUND(IC,IR,IL) > 0 ) THEN
           IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               Qp = smooth3(Hh,Ttop,Bbot,dQp)
-              Q = Qsave*Qp
+              Q = Q*Qp
             ELSE
               Q = Qsave
             END IF
@@ -1170,14 +1209,15 @@ C
           END IF
           QQ=Q
 C
-C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
+C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L) 
             IF ( Q < 0.0 ) SUP = SUP - Q
             ACTUAL(J)  = ACTUAL(J) + SUP
           END DO
-! APPLY IRRIGATION FROM WELLS
+C
+C9------APPLY IRRIGATION FROM WELLS
           IF ( NUMIRRWELSP > 0 ) THEN
             IF ( NUMCELLS(L) > 0 ) THEN
               DO I = 1, NUMCELLS(L)
@@ -1188,7 +1228,8 @@ C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             END IF
           END IF
         END IF
-        ! write wells with reduced pumping
+C
+C10------WRITE WELLS WITH REDUCED PUMPING
         IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
      +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
           IF ( iw1.EQ.1 ) THEN
@@ -1200,72 +1241,28 @@ C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           iw1 = iw1 + 1 
         END IF
 C
-C5E-----ADD FLOW RATE TO BUFFER.
+C11A-----ADD FLOW RATE TO BUFFER.
         BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
 C
-C5F-----SEE IF FLOW IS POSITIVE OR NEGATIVE.
+C11B-----SEE IF FLOW IS POSITIVE OR NEGATIVE.
         IF(QQ.GE.ZERO) THEN
 C
-C5G-----FLOW RATE IS POSITIVE (RECHARGE). ADD IT TO RATIN.
+C11C-----FLOW RATE IS POSITIVE (RECHARGE). ADD IT TO RATIN.
           RATIN=RATIN+QQ
         ELSE
 C
-C5H-----FLOW RATE IS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
+C11D-----FLOW RATE IS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
           RATOUT=RATOUT-QQ
         END IF
 C
-C5I-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
-C5I-----COPY FLOW TO WELL LIST.
-   99 IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
+C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
+C--------COPY FLOW TO WELL LIST.
+   99   IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-      WELL(NWELVL,L)=QQ
+        WELL(NWELVL,L)=QQ
       END DO
-      
-   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
-     1      '   RATE ',1PG15.6)
-  300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
-     1      ' TIME STEP ',I5)
-  400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
-     1       '        GW-HEAD       CELL-BOT')
-  500 FORMAT(3I6,4E15.6)
-!
-C5D-----PRINT FLOW RATE IF REQUESTED.
-       IF(IBDLBL.EQ.0.AND.IBD.LT.0) WRITE(IOUT,61) TEXT,KKPER,KKSTP
-       DO L=1,NWELLSTEMP
-         IF ( NUMTAB.LE.0 ) THEN
-           IR=WELL(2,L)
-           IC=WELL(3,L)
-           IL=WELL(1,L)
-         ELSE
-           IR = TABROW(L)
-           IC = TABCOL(L)
-           IL = TABLAY(L)  
-         END IF
-         IF(IBD.LT.0) THEN
-              WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
-         END IF
-       END DO
 C
-      IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
-C
-C6------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
-C6------CALL UBUDSV TO SAVE THEM.
-      IF(IBD.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT,IWELCB,BUFF,NCOL,NROW,
-     1                          NLAY,IOUT)
-C
-C7------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING.
-  200 RIN=RATIN
-      ROUT=RATOUT
-      VBVL(3,MSUM)=RIN
-      VBVL(4,MSUM)=ROUT
-      VBVL(1,MSUM)=VBVL(1,MSUM)+RIN*DELT
-      VBVL(2,MSUM)=VBVL(2,MSUM)+ROUT*DELT
-      VBNM(MSUM)=TEXT
-C
-C8------INCREMENT BUDGET TERM COUNTER(MSUM).
-      MSUM=MSUM+1
-C APPLY IRRIGATION FROM DIVERSIONS
+C12-------APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
         istsg = ISTRM(4, l)
         IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
@@ -1281,8 +1278,53 @@ C APPLY IRRIGATION FROM DIVERSIONS
           END IF
         END IF
       END DO
+      
+   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
+  300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
+     1      ' TIME STEP ',I5)
+  400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
+     1       '        GW-HEAD       CELL-BOT')
+  500 FORMAT(3I6,4E15.6)
+!
+C13-----PRINT FLOW RATE IF REQUESTED.
+      IF(IBDLBL.EQ.0.AND.IBD.LT.0) WRITE(IOUT,61) TEXT,KKPER,KKSTP
+      DO L=1,NWELLSTEMP
+        IF ( NUMTAB.LE.0 ) THEN
+          IR=WELL(2,L)
+          IC=WELL(3,L)
+          IL=WELL(1,L)
+        ELSE
+          IR = TABROW(L)
+          IC = TABCOL(L)
+          IL = TABLAY(L)  
+        END IF
+        IF(IBD.LT.0) THEN
+          WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
+        END IF
+      END DO
 C
-C3------RETURN
+      IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
+C
+C14------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
+C-------CALL UBUDSV TO SAVE THEM.
+      IF(IBD.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT,IWELCB,BUFF,NCOL,NROW,
+     1                          NLAY,IOUT)
+C
+C15------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING.
+  200 RIN=RATIN
+      ROUT=RATOUT
+      VBVL(3,MSUM)=RIN
+      VBVL(4,MSUM)=ROUT
+      VBVL(1,MSUM)=VBVL(1,MSUM)+RIN*DELT
+      VBVL(2,MSUM)=VBVL(2,MSUM)+ROUT*DELT
+      VBNM(MSUM)=TEXT
+C
+C16------INCREMENT BUDGET TERM COUNTER(MSUM).
+      MSUM=MSUM+1
+C
+C17------RETURN
       RETURN
       END
 ! ----------------------------------------------------------------------
@@ -1420,7 +1462,7 @@ C
         DEALLOCATE(WELLIRR)
         DEALLOCATE(IRRFACT)
         DEALLOCATE(IRRPCT)
-       DEALLOCATE(PSIRAMP) 
+        DEALLOCATE(PSIRAMP) 
         DEALLOCATE(IUNITRAMP) 
         DEALLOCATE(NWELLS)
         DEALLOCATE(MXWELL)
@@ -1428,9 +1470,7 @@ C
         DEALLOCATE(IWELCB)
         DEALLOCATE(IPRWEL)
         DEALLOCATE(NPWEL)
-        DEALLOCATE(IWELPB)
         DEALLOCATE(NNPWEL)
-        DEALLOCATE(WELAUX)
         DEALLOCATE(WELL)
         DEALLOCATE(NUMTAB)
         DEALLOCATE(MAXVAL)
@@ -1452,6 +1492,7 @@ C
       DEALLOCATE (ACTUAL)
       DEALLOCATE (SUPACT)
       DEALLOCATE (NUMIRRWELSP)
+      DEALLOCATE (SEGAUX)
 C
       RETURN
       END
