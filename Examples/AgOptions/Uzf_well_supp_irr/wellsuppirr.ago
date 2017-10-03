@@ -17,10 +17,10 @@ well list
          1        10         4     0.00
          1        10         5     0.00
 end
-stressperiod 1
+stress period 1
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 1
 2 2 0.0 1.0 6 8 0.0 1.0 6 7
@@ -28,226 +28,226 @@ SUPWEL
 1
 2 1 0.8 9
 end
-stressperiod 2
+stress period 2
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 3
+stress period 3
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 4
+stress period 4
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 5
+stress period 5
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 6          
+stress period 6          
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 7
+stress period 7
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 8
+stress period 8
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 9
+stress period 9
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 10
+stress period 10
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 11
+stress period 11
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 12
+stress period 12
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 13
+stress period 13
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END 
-stressperiod 14
+stress period 14
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 15
+stress period 15
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 16
+stress period 16
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 17
+stress period 17
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 18
+stress period 18
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 19
+stress period 19
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 20
+stress period 20
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 21
+stress period 21
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 22
+stress period 22
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 23
+stress period 23
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 24
+stress period 24
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 25
+stress period 25
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL
 -1
 END
-stressperiod 26
+stress period 26
 IRRSFR
 1           
-9 2 0 0.5 1 6 8 0 0.5 1 6 7
+9 2 0 0.5 6 8 0 0.5 6 7
 IRRWEL
 -1
 SUPWEL

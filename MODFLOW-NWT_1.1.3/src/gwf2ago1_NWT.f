@@ -27,6 +27,7 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWELVAR
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         INTEGER,          SAVE,                 POINTER     ::NUMSUP
+        INTEGER,          SAVE,                 POINTER     ::NUMSUPSP
         INTEGER,          SAVE,                 POINTER     ::UNITSUP
         INTEGER,          SAVE,                 POINTER     ::NUMIRRWEL
         INTEGER,          SAVE,                 POINTER     ::UNITIRRWEL
@@ -47,7 +48,7 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRR  !(store original recharge values)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
-        REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROP  !(crop coefficient)
+!        REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROP  !(crop coefficient)
         REAL,   SAVE,  DIMENSION(:),  POINTER:: DEMAND,SUPACT
         REAL,   SAVE,  DIMENSION(:),  POINTER:: ACTUAL
       END MODULE GWFAGOMODULE
@@ -85,7 +86,7 @@ C     ------------------------------------------------------------------
       IPRWEL = 0
       NAUX = 0
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
-      ALLOCATE(MAXSEGS,NUMIRRWELSP)
+      ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
       ALLOCATE(ETDEMANDFLAG,NUMIRRSFR,NUMIRRSFRSP)
       ALLOCATE (MAXCELLSSFR)
       NWELLS=0
@@ -96,6 +97,7 @@ C     ------------------------------------------------------------------
       IUNITRAMP=IOUT
       MAXVAL = 1
       NUMSUP = 0
+      NUMSUPSP = 0
       NUMIRRWEL = 0
       UNITSUP = 0
       MAXSEGS = 0
@@ -194,14 +196,14 @@ C
 C-------allocate for SFR agoptions
       IF ( NUMIRRSFR > 0 ) THEN
         ALLOCATE (DVRCH(NSEGDIM),DVEFF(MAXCELLSSFR,NSEGDIM))
-        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIM))
+!        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (IRRROW(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
         ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
         ALLOCATE (SFRIRR(NCOL,NROW))  
         ALLOCATE (IRRSEG(NSEGDIM))
       ELSE
-        ALLOCATE (DVRCH(1),DVEFF(1,1),KCROP(1,1))      
+        ALLOCATE (DVRCH(1),DVEFF(1,1)) !  ,KCROP(1,1))      
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
         ALLOCATE (DVRPERC(1,1))  
         ALLOCATE (SFRIRR(1,1))  
@@ -209,7 +211,7 @@ C-------allocate for SFR agoptions
       END IF
       DVRCH = 0    
       DVEFF = 0.0
-      KCROP = 0.0
+!      KCROP = 0.0
       IRRROW = 0  
       IRRCOL = 0
       SFRIRR = 0.0      
@@ -442,7 +444,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text4     = 'IRRSFR'
       character(len=16)  :: text5     = 'IRRWEL'
       character(len=16)  :: text6     = 'SUPWEL'
-      character(len=16)  :: text7     = 'STRESSPERIOD'
+      character(len=16)  :: text7     = 'STRESS PERIOD'
       character(len=16)  :: text8     = 'END'
       character(len=16)  :: char1     = 'WELL LIST'
 
@@ -526,17 +528,21 @@ C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
       found1 = .FALSE.
       found2 = .FALSE.
       found3 = .FALSE.
+      found4 = .false.
       if ( NUMIRRSFR == 0 ) found1 = .true.
       if ( NUMIRRWEL == 0 ) found2 = .true.
       if ( NUMSUP == 0 ) found3 = .true.
       write(iout,'(/1x,a)') 'PROCESSING '//
      +            trim(adjustl(text))
+        CALL URDCOM(In, IOUT, line)
+        LLOC=1
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        ISTARTSAVE = ISTART
+        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         DO
-          CALL URDCOM(In, IOUT, line)
-          LLOC=1
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
-          select case (LINE(ISTART:ISTOP))
-          case('STRESSPERIOD')
+          select case (LINE(ISTARTSAVE:ISTOP))
+          case('STRESS PERIOD')
+            found4 = .true.
             write(iout,'(/1x,a)') 'READING '// trim(adjustl(text)) //''
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,KPER2,R,IOUT,IN)
             IF ( KPER /= KPER2 ) THEN
@@ -617,6 +623,7 @@ C5-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
                 CALL USTOP('Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP))
          case ('END')
+            found4 = .false.
             IF ( .NOT. FOUND ) THEN
                WRITE(IOUT,*)
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text8))
@@ -649,6 +656,11 @@ C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
      +            trim(adjustl(text)) //' OPTIONS'
            exit
         end select
+        if ( found4 ) then
+          CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+          end if
       end do  
     6    FORMAT(1X,/
      1      1X,'REUSING IRRSFR DATA ',
@@ -708,11 +720,22 @@ C     ARGUMENTS:
 C     ------------------------------------------------------------------
 C     VARIABLES:
       CHARACTER(LEN=200)::LINE
-      INTEGER :: NUMSUPSP, IERR, LLOC, ISTART, ISTOP, J, ISPWL
+      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
       INTEGER :: NMSG, K, IRWL, NMCL
       REAL :: R
 C     ------------------------------------------------------------------
 C
+C
+C1----REUSE VALUES FROM PREVIOUS STRESS PERIOD.
+      IF (ITMP < 0 ) RETURN
+C
+C1----INACTIVATE ALL IRRIGATION WELLS.
+      IF (ITMP == 0 ) THEN
+        NUMSUPSP = 0
+        RETURN
+      END IF
+C
+C2--- INITIALIZE AG VARIABLES TO ZERO.
 C
 C2------READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
 C
@@ -789,8 +812,24 @@ C     VARIABLES:
 C     ------------------------------------------------------------------
 C
 C
-C1------IF ITMP LESS THAN ZERO REUSE DATA FROM PREVIOUS STRESS PERIOD. PRINT MESSAGE.
+C1----REUSE VALUES FROM PREVIOUS STRESS PERIOD.
+      IF (ITMP < 0 ) RETURN
 C
+C1----INACTIVATE ALL IRRIGATION WELLS.
+      IF (ITMP == 0 ) THEN
+        NUMIRRWELSP = 0
+        RETURN
+      END IF
+C
+C2--- INITIALIZE AG VARIABLES TO ZERO.
+      IRRWELVAR = 0
+      NUMCELLS = 0
+      IRRFACT = 0.0
+      IRRPCT = 0.0
+      UZFROW = 0
+      UZFCOL = 0
+C
+C---READ NEW IRRIGATION WELL DATA
       IERR = 0
       NUMIRRWELSP = ITMP
 ! READ LIST OF IRRIGATION CELLS FOR EACH WELL        
@@ -860,11 +899,23 @@ C     ------------------------------------------------------------------
       REAL R 
       DOUBLE PRECISION :: totdum
       CHARACTER(LEN=200)::LINE
-C     ------------------------------------------------------------------
-C2--- INITIALIZE AG VARIABLES TO ZERO
-      DVRPERC = 0.0  
-      DVRCH = 0.0 
-      KCROP = 0.0
+C     ------------------------------------------------------------------  
+C
+C1----REUSE VALUES FROM PREVIOUS STRESS PERIOD.
+      IF (ITMP < 0 ) RETURN
+C
+C1----INACTIVATE ALL IRRIGATION SEGMENTS.
+      IF (ITMP == 0 ) THEN
+        NUMIRRSFRSP = 0
+        RETURN
+      END IF
+C
+C2--- INITIALIZE AG VARIABLES TO ZERO.
+      DVRPERC = 0.0
+      DVEFF = 0.0
+      IRRSEG = 0
+      IRRROW = 0
+      IRRCOL = 0
 C
 C1
 C----READ IRRIGATION SEGEMENT INFORMATION.
@@ -888,7 +939,7 @@ C
           IF ( SGNM > 0 ) THEN
             BACKSPACE(IN)
             READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),KCROP(K,SGNM),
+     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),
      +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
             totdum  = 0.0
             DO K = 1, NMCL
@@ -985,7 +1036,7 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IL = TABLAY(L)
           Q = RATETERP(TIME,L)
         END IF
-        IF ( NUMSUP > 0 ) THEN
+        IF ( NUMSUPSP > 0 ) THEN
           IF ( NUMSEGS(L) > 0 ) THEN
             SUP = 0.0
             DO I = 1, NUMSEGS(L)
@@ -1355,7 +1406,7 @@ C
       zerod2 = 1.0d-2
       done = 1.0d0
       dzero = 0.0d0
-      do i = 1, NUMIRRSFRSP   !this won't work for GW only
+      do i = 1, NUMIRRSFRSP   !NEED TO LOOP ON IRR WELLS THAT ARE NOT SUP WELLS
         iseg = IRRSEG(i)
         finfsum = dzero
         do k = 1, DVRCH(iseg)
@@ -1364,7 +1415,7 @@ C
            fks = VKS(ic, ir)
            IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
            area = delr(ic)*delc(ir)
-           finfsum = finfsum + fks*area
+           finfsum = finfsum + fks*area     !LIMIT APPLIED IRRIGATION TO MAX INFILTRATION. CHANGE THIS
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
@@ -1373,7 +1424,7 @@ C
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
            dum = pet
-           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
+!           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
            pettotal = pettotal + pet
            aettotal = aettotal + aet
       if(k==2)then
@@ -1419,29 +1470,29 @@ C
       end subroutine UZFIRRDEMANDSET
 ! ----------------------------------------------------------------------
 C
-      subroutine APPLYKCROP()
-!     ******************************************************************
-!     APPLYKCROP---- Apply crop ceofficient to ETo
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,
-     +                        IRRSEG,KCROP
-      IMPLICIT NONE
-! ----------------------------------------------------------------------
-      integer :: k,iseg,ic,ir,i
-! ----------------------------------------------------------------------
-!
-      do i = 1, NUMIRRSFRSP
-        iseg = IRRSEG(i)
-        do k = 1, DVRCH(iseg)
-           ic = IRRCOL(k,iseg)
-           ir = IRRROW(k,iseg)
-           PETRATE(ic,ir) = KCROP(K,ISEG)*PETRATE(IC,IR)
-        end do
-      end do
-      return
-      END subroutine APPLYKCROP
+!      subroutine APPLYKCROP()
+!!     ******************************************************************
+!!     APPLYKCROP---- Apply crop ceofficient to ETo
+!!     ******************************************************************
+!!     SPECIFICATIONS:
+!      USE GWFUZFMODULE, ONLY: PETRATE
+!      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,
+!     +                        IRRSEG
+!      IMPLICIT NONE
+!! ----------------------------------------------------------------------
+!      integer :: k,iseg,ic,ir,i
+!! ----------------------------------------------------------------------
+!!
+!      do i = 1, NUMIRRSFRSP
+!        iseg = IRRSEG(i)
+!        do k = 1, DVRCH(iseg)
+!           ic = IRRCOL(k,iseg)
+!           ir = IRRROW(k,iseg)
+!           PETRATE(ic,ir) = PETRATE(IC,IR)
+!        end do
+!      end do
+!      return
+!      END subroutine APPLYKCROP
 C
 C
       SUBROUTINE GWF2AGO7DA()
@@ -1449,6 +1500,7 @@ C  Deallocate AGO MEMORY
       USE GWFAGOMODULE
 C
         DEALLOCATE(NUMSUP)
+        DEALLOCATE(NUMSUPSP)
         DEALLOCATE(NUMIRRWEL)
         DEALLOCATE(SFRSEG)
         DEALLOCATE(UZFROW)
