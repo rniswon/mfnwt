@@ -4040,7 +4040,7 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
       END SUBROUTINE GET_FLOBOT   
 C
 C-------SUBROUTINE LAK2MODSIM
-      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL,KITER,KSTP,KPER)
+      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL) !, KITER, KSTP, KPER)
 C     *******************************************************************
 C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
@@ -4056,7 +4056,7 @@ C     -------------------------------------------------------------------
 C     ARGUMENTS
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
      +                                   LAKEVOL(NLAKES)
-      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
+C      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4070,15 +4070,15 @@ C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-      WRITE(222,*)'KITER,KSTP,KPER,LAKE,PPT,E,RUNF1,RUNF2,WITHDRW,',
-     1             'SRFIN,SRFOT,SEEP,VOL,VOLOLD'
+C      WRITE(222,*)'KITER,KSTP,KPER,LAKE,PPT,E,RUNF1,RUNF2,WITHDRW,',
+C     1             'SRFIN,SRFOT,SEEP,VOL,VOLOLD'
         DO LAKE=1,NLAKES
           DELTAQ = SURFIN(LAKE) - SURFOT(LAKE)
           DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
           LAKEVOL(LAKE) = VOL(LAKE)
-      WRITE(222,333)KITER,KSTP,KPER,LAKE,PRECIP(LAKE),EVAP(LAKE),
-     1              RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
-     2                SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE)
+C      WRITE(222,333)KITER,KSTP,KPER,LAKE,PRECIP(LAKE),EVAP(LAKE),
+C     1              RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
+C     2                SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE)
         END DO
   333 FORMAT(4I5,10E15.7)
 C
@@ -4087,8 +4087,7 @@ C5------RETURN.
       END SUBROUTINE LAK2MODSIM
 C
 C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
-      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL,KITER,KSTP,
-     &                                KPER) 
+      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL) 
      &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
@@ -4107,7 +4106,7 @@ C     -------------------------------------------------------------------
 C     ARGUMENTS
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
      +                                   LAKEVOL(NLAKES)
-      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
+C      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4120,7 +4119,7 @@ C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-      CALL LAK2MODSIM(DELTAVOL,LAKEVOL,KITER,KSTP,KPER)
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL) !,KITER,KSTP,KPER)
 C
 C5------RETURN.
       RETURN

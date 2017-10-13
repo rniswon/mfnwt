@@ -8498,7 +8498,7 @@ C
             SEG(2,iseg) = DIVS(ISEG)
           END IF
         END DO
-C
+C  
 C8------RETURN.
       RETURN
       END SUBROUTINE MODSIM2SFR
