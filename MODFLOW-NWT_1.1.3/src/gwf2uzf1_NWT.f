@@ -1113,6 +1113,11 @@ C     ------------------------------------------------------------------
           WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
           WRITE(iout,*)
           found = .true.
+        case('#')              !IN CASE A COMMENT IS ADDED TO THE END OF THE LINE. 10/19/2017
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' COMMENT "#" ENCOUNTERED. EXITING OPTIONS'
+          WRITE(iout,*)
+          EXIT
         case default
           !Likely misspelled or unsupported 
           ! so terminate here.
