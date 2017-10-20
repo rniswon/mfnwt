@@ -1,37 +1,42 @@
 options
 etdemand
-irrigationstream 1 2
-supplementalwell 1 2 
-irrigationwell 1 2 
-maxwells 10     
+irrigationstream 1 6
+supplementalwell 6 1 
+irrigationwell 6 1 
+maxwells 6   
 end
 well list
-         1         6         4     0.00
-         1         6         7    -100.00
-         1         7         4     0.00
-         1         7         5     0.00
-         1         8         4     0.00
-         1         8         5     0.00
-         1         9         4     0.00
-         1         9         5     0.00
-         1        10         4     0.00
-         1        10         5     0.00
+         1         6         4    -100.00
+         1         6         5    -100.00
+         1         7         4    -100.00
+         1         7         5    -100.00
+         1         8         4    -100.00
+         1         8         5    -100.00
 end
 stress period 1
 IRRSFR
 1           
-9 2 0 0.5 6 8 0 0.5 6 7
+9 6 0 0.16667 6 4 0 0.16667 6 5 0 0.16667 7 4 0 0.16667 7 5 0 0.16667 8 4 0 0.16667 8 5
 IRRWEL
-1
-2 2 0.0 1.0 6 8 0.0 1.0 6 7
+6
+1 1 0.0 1.0 6 4              Item 6:IRRWELLID NUMCELLWELL EFF_FACT FIELD_FACT IRRROW IRRCOL
+2 1 0.0 1.0 6 5
+3 1 0.0 1.0 7 4
+4 1 0.0 1.0 7 5
+5 1 0.0 1.0 8 4
+5 1 0.0 1.0 8 5
 SUPWEL
-1
+6
+1 1 0.8 9
 2 1 0.8 9
+3 1 0.8 9
+4 1 0.8 9
+5 1 0.8 9
+6 1 0.8 9
 end
 stress period 2
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -39,8 +44,7 @@ SUPWEL
 END
 stress period 3
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -48,8 +52,7 @@ SUPWEL
 END
 stress period 4
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -57,8 +60,7 @@ SUPWEL
 END
 stress period 5
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -66,8 +68,7 @@ SUPWEL
 END
 stress period 6          
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -75,8 +76,7 @@ SUPWEL
 END
 stress period 7
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -84,8 +84,7 @@ SUPWEL
 END
 stress period 8
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -93,8 +92,7 @@ SUPWEL
 END
 stress period 9
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -102,8 +100,7 @@ SUPWEL
 END
 stress period 10
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -111,8 +108,7 @@ SUPWEL
 END
 stress period 11
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -120,8 +116,7 @@ SUPWEL
 END
 stress period 12
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -129,8 +124,7 @@ SUPWEL
 END
 stress period 13
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -138,8 +132,7 @@ SUPWEL
 END 
 stress period 14
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -147,8 +140,7 @@ SUPWEL
 END
 stress period 15
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -156,8 +148,7 @@ SUPWEL
 END
 stress period 16
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -165,8 +156,7 @@ SUPWEL
 END
 stress period 17
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -174,8 +164,7 @@ SUPWEL
 END
 stress period 18
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -183,8 +172,7 @@ SUPWEL
 END
 stress period 19
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -192,8 +180,7 @@ SUPWEL
 END
 stress period 20
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -201,8 +188,7 @@ SUPWEL
 END
 stress period 21
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -210,8 +196,7 @@ SUPWEL
 END
 stress period 22
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -219,8 +204,7 @@ SUPWEL
 END
 stress period 23
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -228,8 +212,7 @@ SUPWEL
 END
 stress period 24
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -237,8 +220,7 @@ SUPWEL
 END
 stress period 25
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
@@ -246,8 +228,7 @@ SUPWEL
 END
 stress period 26
 IRRSFR
-1           
-9 2 0 0.5 6 8 0 0.5 6 7
+-1
 IRRWEL
 -1
 SUPWEL
