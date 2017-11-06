@@ -3765,7 +3765,7 @@ C5b------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
           gwflow = 0.0D0
           dvrsn = 0.0D0
           flowin = 0.0D0  
-          depthtr = 0.0
+          depthtr = STRM(7, l)
           IF ( irt.EQ.1 ) THEN
             SUMLEAK(l) = 0.0D0
             SUMRCH(l) = 0.0
