@@ -36,28 +36,28 @@ INTERNAL   1.000E+00 (10F7.0)    0  BOT layer  1
   900.0  810.0  750.0  700.0  650.0  700.0  750.0  800.0  900.0    0.0
     0.0  950.0  850.0  850.0  850.0  850.0  850.0  850.0  850.0    0.0
     0.0    0.0  950.0  950.0  950.0  950.0    0.0  000.0  000.0    0.0
-    86400.        1     1.00  SS            STRESS PERIOD  1
+    86400.            1    1.00  SS            STRESS PERIOD  1
     2.628E+06        30    1.00  TR            STRESS PERIOD  2  January
-    2.628E+06        30    1.00  TR            STRESS PERIOD  3
-    2.628E+06        30    1.00  TR            STRESS PERIOD  4
-    2.628E+06        30    1.00  TR            STRESS PERIOD  5
-    2.628E+06        30    1.00  TR            STRESS PERIOD  6
-    2.628E+06        30    1.00  TR            STRESS PERIOD  7
-    2.628E+06        30    1.00  TR            STRESS PERIOD  8
-    2.628E+06        30    1.00  TR            STRESS PERIOD  9
-    2.628E+06        30    1.00  TR            STRESS PERIOD 10
-    2.628E+06        30    1.00  TR            STRESS PERIOD 11
-    2.628E+06        30    1.00  TR            STRESS PERIOD 12   
-    2.628E+06        30    1.00  TR            STRESS PERIOD 13   
+    2.628E+06        30    1.00  TR            STRESS PERIOD  3  Feb
+    2.628E+06        30    1.00  TR            STRESS PERIOD  4  March
+    2.628E+06        30    1.00  TR            STRESS PERIOD  5  April
+    2.628E+06        30    1.00  TR            STRESS PERIOD  6  May
+    2.628E+06        30    1.00  TR            STRESS PERIOD  7  June
+    2.628E+06        30    1.00  TR            STRESS PERIOD  8  July
+    2.628E+06        30    1.00  TR            STRESS PERIOD  9  Aug
+    2.628E+06        30    1.00  TR            STRESS PERIOD 10  Sept
+    2.628E+06        30    1.00  TR            STRESS PERIOD 11  Oct
+    2.628E+06        30    1.00  TR            STRESS PERIOD 12  Nov  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 13  Dec   
     2.628E+06        30    1.00  TR            STRESS PERIOD 14  January
-    2.628E+06        30    1.00  TR            STRESS PERIOD 15
-    2.628E+06        30    1.00  TR            STRESS PERIOD 16
-    2.628E+06        30    1.00  TR            STRESS PERIOD 17
-    2.628E+06        30    1.00  TR            STRESS PERIOD 18
-    2.628E+06        30    1.00  TR            STRESS PERIOD 19
-    2.628E+06        30    1.00  TR            STRESS PERIOD 20
-    2.628E+06        30    1.00  TR            STRESS PERIOD 21
-    2.628E+06        30    1.00  TR            STRESS PERIOD 22
-    2.628E+06        30    1.00  TR            STRESS PERIOD 23
-    2.628E+06        30    1.00  TR            STRESS PERIOD 24   
-    2.628E+06        30    1.00  TR            STRESS PERIOD 25   
+    2.628E+06        30    1.00  TR            STRESS PERIOD 15  Feb  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 16  March
+    2.628E+06        30    1.00  TR            STRESS PERIOD 17  April
+    2.628E+06        30    1.00  TR            STRESS PERIOD 18  May  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 19  June 
+    2.628E+06        30    1.00  TR            STRESS PERIOD 20  July 
+    2.628E+06        30    1.00  TR            STRESS PERIOD 21  Aug  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 22  Sept 
+    2.628E+06        30    1.00  TR            STRESS PERIOD 23  Oct  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 24  Nov  
+    2.628E+06        30    1.00  TR            STRESS PERIOD 25  Dec   

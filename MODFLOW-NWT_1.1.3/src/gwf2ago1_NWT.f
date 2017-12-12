@@ -83,7 +83,7 @@ C     ------------------------------------------------------------------
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
-      IPRWEL = 0
+      IPRWEL = 1
       NAUX = 0
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
@@ -269,7 +269,9 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
             IF(NUMSUP.LT.0) NUMSUP=0
             IF ( IUNIT(44) < 1 ) NUMSUP=0
+            WRITE(IOUT,*)
             WRITE(IOUT,33) NUMSUP
+            WRITE(IOUT,*)
             found1 = .true.
             found = .true.
 ! Pumped water will be added as irrigation
@@ -279,19 +281,31 @@ C
             IF( NUMIRRWEL.LT.0 ) NUMIRRWEL = 0
             IF ( MAXCELLSWEL < 1 ) MAXCELLSWEL = 1 
             IF ( IUNIT(2) < 1 ) NUMIRRWEL = 0
+            WRITE(IOUT,*)
             WRITE(IOUT,34) NUMIRRWEL
+            WRITE(IOUT,*)
             found = .true.
             found1 = .true.
 ! Max number of SUP and IRR wells
         case('MAXWELLS')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MXWELL,R,IOUT,IN)
             IF( MXWELL.LT.0 ) MXWELL = 0
+            WRITE(IOUT,*)
             WRITE(IOUT,36) MXWELL
+            WRITE(IOUT,*)
 ! Option to output CBC results to unformatted file
         case('CBCWELLS')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELCB,R,IOUT,IN)
             IF( IWELCB.LT.0 ) IWELCB = abs(IWELCB)
+            WRITE(IOUT,*)
             WRITE(IOUT,37) IWELCB
+            WRITE(IOUT,*)
+! Option to turn off writing list of wells to LST file
+        case('NOPRINT')
+            IPRWEL = 0
+            WRITE(IOUT,*)
+            WRITE(IOUT,38)
+            WRITE(IOUT,*)
 ! REDUCING PUMPING FOR DRY CELLS
         case('PHIRAMP')
 ! CHECK THAT THERE ARE SUP OR IRR WELLS FIRST
@@ -299,12 +313,15 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,PSIRAMP,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IUNITRAMP,R,IOUT,IN)
             IF ( IUNITNWT.EQ.0 ) THEN
+              WRITE(IOUT,*)
               write(IOUT,32)
+              WRITE(IOUT,*)
             ELSE
               IF(PSIRAMP.LT.1.0E-5) PSIRAMP=1.0E-5
               IF ( IUNITRAMP.EQ.0 ) IUNITRAMP = IOUT
               WRITE(IOUT,*)
               WRITE(IOUT,29) PSIRAMP,IUNITRAMP
+              WRITE(IOUT,*)
             END IF
           else
             WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
@@ -320,13 +337,17 @@ C
           if ( found1 ) then
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMTAB,R,IOUT,IN)
             IF(NUMTAB.LT.0) NUMTAB=0
+            WRITE(IOUT,*)
             WRITE(IOUT,30) NUMTAB
+            WRITE(IOUT,*)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXVAL,R,IOUT,IN)
             IF(MAXVAL.LT.0) THEN
                 MAXVAL=1
                 NUMTAB=0
             END IF
+            WRITE(IOUT,*)
             WRITE(IOUT,31) MAXVAL
+            WRITE(IOUT,*)
                  else
             WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
      +                   //' Option: '//LINE(ISTART:ISTOP)
@@ -343,13 +364,15 @@ C
             IF( NUMIRRSFR.LT.0 ) NUMIRRSFR = 0
             IF ( MAXCELLSSFR < 1 ) MAXCELLSSFR = 1 
             IF ( IUNIT(44) < 1 ) NUMIRRSFR = 0
+            WRITE(IOUT,*)
             WRITE(IOUT,35) NUMIRRSFR
+            WRITE(IOUT,*)
             found = .true.
         case('ETDEMAND')
               ETDEMANDFLAG = 1
               WRITE(iout,*)
-              WRITE(IOUT,'(A)')'AGRICULTURAL DEMANDS WILL BE '
-     +                        ,'CALCULATED USING ET DEFICIT'
+              WRITE(IOUT,'(A)')' AGRICULTURAL DEMANDS WILL BE '//
+     +        'CALCULATED USING ET DEFICIT'
               WRITE(iout,*)
               IF ( IUNIT(55) < 1 ) ETDEMANDFLAG = 0   ! ALSO NEED TO CHECK THAT UNSAT FLOW AND UZET IS ACTIVE!!!!!
         case ('END')
@@ -396,25 +419,26 @@ C
      +       ' THICKNESS. THE VALUE SPECIFIED FOR PHIRAMP IS ',E12.5,/
      +       ' WELLS WITH REDUCED PUMPING WILL BE '
      +       'REPORTED TO FILE UNIT NUMBER',I5)
-   30 FORMAT(1X,' Pumping rates will be read from time ',
-     +                 'series input files. ',I10,' files will be read')
-   31 FORMAT(1X,' Pumping rates will be read from time ',
-     +                 'series input files. A maximum of ',I10,
-     +                 ' row entries will be read per file')
-   32 FORMAT(1X,' Option to reduce pumping during cell ',
-     +                 'dewatering is activated and NWT solver ',I10,
-     +                 ' is not being used. Option deactivated')
-   33 FORMAT(1X,' Option to pump supplmental water ',
-     +          'for surface diversion shortfall is activted. '
-     +          ' A total of ',I10, 'supplemental wells are active')
-   34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
-     +,'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
-   35 FORMAT(1X,' Option to apply surface water as irrigtion is active.'
-     +,' Pumped irrigation water will be applied to ',I10,' UZF Cells.')
-   36 FORMAT(1X,' The maximum number of wells for supplementing'
-     +,' diversions or for applying irrigation is ',I10,' wells.')
-   37 FORMAT(1X,' Unformatted cell by cell rates for SUP and IRR wells'
-     +,' will be saved to file unit number ',I10)
+   30 FORMAT(1X,' PUMPING RATES WILL BE READ FROM TIME ',
+     +                 'SERIES INPUT FILE. ',I10,' FILES WILL BE READ')
+   31 FORMAT(1X,' PUMPING RATES WILL BE READ FROM TIME ',
+     +                 'SERIES INPUT FILE. A MAXIMUM OF ',I10,
+     +                 ' ROW ENTRIES WILL BE READ FROM EACH FILE')
+   32 FORMAT(1X,' OPTION TO REDUCE PUMPING DURING CELL ',
+     +                 'DEWATERING IS ACTIVATED AND NWT SOLVER ',I10,
+     +                 ' IS NOT BEING USED. OPTION DEACTIVATED')
+   33 FORMAT(1X,'OPTION TO PUMP SUPPLEMENTARY WATER ',
+     +          'FOR SURFACE DIVERSION SHORTFALL IS ACTIVATED. '
+     +          ' A TOTAL OF    ',I10, ' SUPPLEMENTAL WELLS ARE ACTIVE')
+   34 FORMAT(1X,'OPTION TO APPLY PUMPED WATER AS IRRIGATION IS ACTIVE. '
+     +,'PUMPED IRRIGATION WATER WILL BE APPLIED TO ',I10,' CELLS/RHUS.')
+   35 FORMAT(1X,'OPTION TO APPLY SURFACE WATER AS IRRIGATION IS ACTIVE.'
+     +,' DIVERTED SURFACE WATER WILL BE APPLIED TO ',I10,' CELLS/RHUS.')
+   36 FORMAT(1X,'THE MAXIMUM NUMBER OF WELLS FOR SUPPLEMENTING'
+     +,' DIVERSIONS OR APPLYING IRRIGATION IS ',I10,' WELLS.')
+   37 FORMAT(1X,' UNFORMATTED CELL BY CELL RATES FOR SUP AND IRR WELLS'
+     +,' WILL BE SAVED TO FILE UNIT NUMBER ',I10)
+   38 FORMAT(1X,' PRINTING OF WELL LISTS IS SUPPRESSED')
       END SUBROUTINE     
 C
 C
@@ -472,7 +496,7 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DAT
      +                    trim(adjustl(CHAR1)) //''
             IF ( NUMTAB.EQ.0 ) THEN
               CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
-     1             'AGO WELL NO.  LAYER   ROW   COL   MAX STRESS RATE',
+     1             'LAYER   ROW   COL   MAX STRESS RATE',
      2              WELAUX,20,NAUX,IFREFM,NCOL,NROW,NLAY,4,4,IPRWEL)
             ELSE
               DO J = 1, NUMTAB
@@ -631,17 +655,18 @@ C5-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
                CALL USTOP('Key word '//trim(adjustl(text8))
      +             //'  found without key word '// trim(adjustl(text7)))
             END IF
-           if ( kper == 1 ) then
-             if(.not. found1 .or. .not. found2 .or. .not. found3) then
-C
-C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
-                WRITE(IOUT,*)
-                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP)
-                CALL USTOP('Invalid '//trim(adjustl(text))
-     +                   //' Option: '//LINE(ISTART:ISTOP))
-             end if
-           else
+! rgn don't need the following code because farms may not be active during first period.
+!           if ( kper == 1 ) then
+!             if(.not. found1 .or. .not. found2 .or. .not. found3) then
+!C
+!C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
+!                WRITE(IOUT,*)
+!                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+!     +                   //' Option: '//LINE(ISTART:ISTOP)
+!                CALL USTOP('Invalid '//trim(adjustl(text))
+!     +                   //' Option: '//LINE(ISTART:ISTOP))
+!             end if
+!           else
              if ( .not. found1 ) then
                 WRITE(IOUT,6)
              end if
@@ -651,7 +676,7 @@ C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
              if ( .not. found3 ) then
                 WRITE(IOUT,8)
              end if
-           end if
+!           end if
            write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
            exit
@@ -663,13 +688,13 @@ C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
           end if
       end do  
     6    FORMAT(1X,/
-     1      1X,'REUSING IRRSFR DATA ',
-     2       'FROM LAST STRESS PERIOD')
+     1      1X,'NO IRRSFR DATA OR REUSING IRRSFR DATA ',
+     2       'FROM LAST STRESS PERIOD ')
     7 FORMAT(1X,/
-     1      1X,'REUSING IRRWEL DATA ',
+     1      1X,'NO IRRWEL DATA OR REUSING IRRWEL DATA ',
      2       'FROM LAST STRESS PERIOD')
     8           FORMAT(1X,/
-     1      1X,'REUSING SUPWEL DATA ',
+     1      1X,'NO SUPWEL OR REUSING SUPWEL DATA ',
      2       'FROM LAST STRESS PERIOD')
 C
 C7------RETURN
@@ -937,10 +962,15 @@ C
             CALL USTOP('')
           END IF
           IF ( SGNM > 0 ) THEN
-            BACKSPACE(IN)
-            READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
-     +                   (DVEFF(K,SGNM),DVRPERC(K,SGNM),
-     +                    IRRROW(K,SGNM),IRRCOL(K,SGNM),K=1,NMCL)
+!            BACKSPACE(IN)
+     !!       READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
+     !!+                   (IRRROW(K,SGNM),IRRCOL(K,SGNM),
+     !!+                    DVEFF(K,SGNM),DVRPERC(K,SGNM),K=1,NMCL)
+            READ(IN,*)IRRSEG(J),DVRCH(SGNM)
+            DO K=1,NMCL                
+              READ(IN,*)IRRROW(K,SGNM),IRRCOL(K,SGNM),
+     +                    DVEFF(K,SGNM),DVRPERC(K,SGNM)
+            END DO
             totdum  = 0.0
             DO K = 1, NMCL
               IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
