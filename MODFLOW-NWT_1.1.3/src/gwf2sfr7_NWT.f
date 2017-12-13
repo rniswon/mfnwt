@@ -3861,7 +3861,7 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
               END DO
               flowin = flowin + SEG(2, istsg)  !SEG(2,istsg) stores specified inflow, and should have a spot in "Headwaters" flows
               IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-                IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow. if the latter exist, count it next
+                IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow (or outflow, hence ABS()). If non specified FLOW, tally
                   NINTOT = NINTOT + 1   !EDM
                 ENDIF
               END IF
