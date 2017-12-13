@@ -473,7 +473,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: char1     = 'WELL LIST'
 
       INTEGER LLOC,ISTART,ISTOP,ISTARTSAVE
-      INTEGER J,TABUNIT,II,KPER2
+      INTEGER J,TABUNIT,II,KPER2,L
       logical :: FOUND
       logical :: found1,found2,found3,found4
       REAL :: R,TTIME,TRATE
@@ -498,6 +498,17 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DAT
               CALL ULSTRD(NNPWEL,WELL,1,NWELVL,MXWELL,1,IN,IOUT,
      1             'LAYER   ROW   COL   MAX STRESS RATE',
      2              WELAUX,20,NAUX,IFREFM,NCOL,NROW,NLAY,4,4,IPRWEL)
+              DO L=1,NNPWEL
+                IF ( WELL(4,L) > 0.0 ) THEN
+                  WRITE(IOUT,*)
+                  WRITE(IOUT,*) 'ERROR: MAX AWU PUMPING RATE IN LIST',
+     +                        ' IS POSITIVE AND SHOULD BE NEGATIVE.',
+     +                        ' MODEL STOPPING'
+                  WRITE(IOUT,*)
+                  CALL USTOP('ERROR: MAX AWU PUMPING RATE IN LIST IS POS
+     +ITIVE AND SHOULD BE NEGATIVE. MODEL STOPPING')
+                END IF
+              END DO
             ELSE
               DO J = 1, NUMTAB
                 READ(IN,*)TABUNIT,TABVAL(J),TABLAY(J),TABROW(J),
@@ -782,9 +793,11 @@ C
             WRITE(IOUT,103)MAXSEGS,NMSG
             CALL USTOP('')
           END IF
-          BACKSPACE(IN)
-          READ(IN,*)SUPWELVAR(J),NUMSEGS(ISPWL),
-     +                    (PCTSUP(K,ISPWL),SFRSEG(K,ISPWL),K=1,NMSG)
+          SUPWELVAR(J) = ISPWL
+          NUMSEGS(ISPWL) = NMSG
+          DO K=1,NMSG
+            READ(IN,*) SFRSEG(K,ISPWL),PCTSUP(K,ISPWL)
+          END DO
           DO K = 1, NUMSEGS(SUPWELVAR(J))
             IF ( SFRSEG(K,SUPWELVAR(J)) == 0 ) IERR = 1
           END DO
@@ -874,9 +887,12 @@ C---READ NEW IRRIGATION WELL DATA
             WRITE(IOUT,105)MAXCELLSWEL,NMCL
             CALL USTOP('')
           END IF
-          BACKSPACE(IN)
-          READ(IN,*)IRRWELVAR(J),NUMCELLS(IRWL),(IRRFACT(K,IRWL),
-     +        IRRPCT(K,IRWL),UZFROW(K,IRWL),UZFCOL(K,IRWL),K=1,NMCL)
+          IRRWELVAR(J) = IRWL
+          NUMCELLS(IRWL) = NMCL
+          DO K = 1, NMCL
+            READ(IN,*)UZFROW(K,IRWL),UZFCOL(K,IRWL),IRRFACT(K,IRWL),
+     +                IRRPCT(K,IRWL)
+          END DO
           DO K = 1, NUMCELLS(IRRWELVAR(J))
             IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
      +                                UZFCOL(K,IRRWELVAR(J))==0 ) THEN
@@ -962,11 +978,12 @@ C
             CALL USTOP('')
           END IF
           IF ( SGNM > 0 ) THEN
+            IRRSEG(J) = SGNM
+            DVRCH(SGNM) = NMCL
 !            BACKSPACE(IN)
      !!       READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
      !!+                   (IRRROW(K,SGNM),IRRCOL(K,SGNM),
      !!+                    DVEFF(K,SGNM),DVRPERC(K,SGNM),K=1,NMCL)
-            READ(IN,*)IRRSEG(J),DVRCH(SGNM)
             DO K=1,NMCL                
               READ(IN,*)IRRROW(K,SGNM),IRRCOL(K,SGNM),
      +                    DVEFF(K,SGNM),DVRPERC(K,SGNM)
@@ -1059,7 +1076,7 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IR=WELL(2,L)
           IC=WELL(3,L)
           IL=WELL(1,L)
-          Q=WELL(4,L)
+!          Q=WELL(4,L)   !This is just a limit for sup
         ELSE
           IR = TABROW(L)
           IC = TABCOL(L)
@@ -1081,9 +1098,14 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
             SUPFLOW(L) = SUPFLOW(L) - SUP
           END IF
 C
-C5------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE
+C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
           IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
           Q = SUPFLOW(L)
+        END IF
+C
+C5B------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN LIST
+        IF( Q < 0.0 ) THEN
+          IF ( Q < WELL(4,L) ) Q = WELL(4,L)
         END IF
 C
 C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
@@ -1242,7 +1264,7 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IR=WELL(2,L)
           IC=WELL(3,L)
           IL=WELL(1,L)
-          Q=WELL(4,L)
+!          Q=WELL(4,L)  !THIS IS JUST A MAX RATE
         ELSE
           IR = TABROW(L)
           IC = TABCOL(L)
@@ -1264,9 +1286,14 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
             SUPFLOW(L) = SUPFLOW(L) - SUP
           END IF
 C
-C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE
+C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
           IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
           Q = SUPFLOW(L)
+C
+C6B------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN LIST
+          IF( Q < 0.0 ) THEN
+            IF ( Q < WELL(4,L) ) Q = WELL(4,L)
+          END IF
         END IF
         QSAVE = Q
 C
@@ -1428,13 +1455,14 @@ C
       ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
       double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal
+     +                    aettotal,dhundred
       integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
       zerod2 = 1.0d-2
       done = 1.0d0
+      dhundred = 100.0d0
       dzero = 0.0d0
       do i = 1, NUMIRRSFRSP   !NEED TO LOOP ON IRR WELLS THAT ARE NOT SUP WELLS
         iseg = IRRSEG(i)
@@ -1451,13 +1479,14 @@ C
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
+           IF ( FACTOR > dhundred ) FACTOR = dhundred
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
            dum = pet
 !           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
            pettotal = pettotal + pet
            aettotal = aettotal + aet
-      if(k==2)then
+      if(k==6)then
       write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
      +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
  333  format(6i6,5e20.10)

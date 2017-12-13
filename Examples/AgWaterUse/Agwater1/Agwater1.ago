@@ -41,9 +41,9 @@ SUPWEL
 END
 stress period 5
 IRRSFR
-1           
-9 6 
-6 4 0.0 0.16667 
+1                         NUMIRRSEGSP       
+9 6                       SEGID NUMCELLSEG 
+6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
 6 5 0.0 0.16667 
 7 4 0.0 0.16667 
 7 5 0.0 0.16667 
@@ -51,22 +51,40 @@ IRRSFR
 8 5 0.0 0.16667 
 IRRWEL
 6
-1 1 0.0 1.0 6 4              Item 6:IRRWELLID NUMCELLWELL EFF_FACT FIELD_FACT IRRROW IRRCOL
-2 1 0.0 1.0 6 5
-3 1 0.0 1.0 7 4
-4 1 0.0 1.0 7 5
-5 1 0.0 1.0 8 4
-5 1 0.0 1.0 8 5
+1 1                       IRRWELLID NUMCELLWELL 
+6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
+2 1
+6 5 0.0 1.0 
+3 1
+7 4 0.0 1.0 
+4 1
+7 5 0.0 1.0 
+5 1
+8 4 0.0 1.0 
+5 1
+8 5 0.0 1.0 
 SUPWEL
-6
-1 1 0.8 9
-2 1 0.8 9
-3 1 0.8 9
-4 1 0.8 9
-5 1 0.8 9
-6 1 0.8 9
+6                        NUMSUPWELLSP
+1 1                      SUPWELLNUM   NUMSEGWELL
+9 0.8                    SEGWELLID    PCTSUP             
+2 1 
+9 0.8 
+3 1 
+9 0.8 
+4 1 
+9 0.8 
+5 1 
+9 0.8 
+6 1 
+9 0.8 
 end
-stress period 6          
+stress period 6     
+IRRSFR
+-1
+IRRWEL
+-1
+SUPWEL
+-1     
 END
 stress period 7
 IRRSFR
@@ -150,9 +168,9 @@ SUPWEL
 END
 stress period 17
 IRRSFR
-1           
-9 6 
-6 4 0.0 0.16667 
+1                         NUMIRRSEGSP       
+9 6                       SEGID NUMCELLSEG 
+6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
 6 5 0.0 0.16667 
 7 4 0.0 0.16667 
 7 5 0.0 0.16667 
@@ -160,20 +178,32 @@ IRRSFR
 8 5 0.0 0.16667 
 IRRWEL
 6
-1 1 0.0 1.0 6 4              Item 6:IRRWELLID NUMCELLWELL EFF_FACT FIELD_FACT IRRROW IRRCOL
-2 1 0.0 1.0 6 5
-3 1 0.0 1.0 7 4
-4 1 0.0 1.0 7 5
-5 1 0.0 1.0 8 4
-5 1 0.0 1.0 8 5
+1 1                       IRRWELLID NUMCELLWELL 
+6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
+2 1
+6 5 0.0 1.0 
+3 1
+7 4 0.0 1.0 
+4 1
+7 5 0.0 1.0 
+5 1
+8 4 0.0 1.0 
+5 1
+8 5 0.0 1.0 
 SUPWEL
-6
-1 1 0.8 9
-2 1 0.8 9
-3 1 0.8 9
-4 1 0.8 9
-5 1 0.8 9
-6 1 0.8 9
+6                        NUMSUPWELLSP
+1 1                      SUPWELLNUM   NUMSEGWELL
+9 0.8                    SEGWELLID    PCTSUP             
+2 1 
+9 0.8 
+3 1 
+9 0.8 
+4 1 
+9 0.8 
+5 1 
+9 0.8 
+6 1 
+9 0.8
 end
 stress period 18
 IRRSFR
