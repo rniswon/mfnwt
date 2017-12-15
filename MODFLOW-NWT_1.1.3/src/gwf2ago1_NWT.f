@@ -1486,11 +1486,11 @@ C
 !           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
            pettotal = pettotal + pet
            aettotal = aettotal + aet
- !     if(k==6)then
- !     write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
- !    +              aet,SFRIRR(ic,ir),ACTUAL(iseg),SGOTFLW(iseg)
- !333  format(6i6,5e20.10)
- !     end if
+      if(k==6)then
+      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
+     +              aet,SFRIRR(ic,ir),ACTUAL(iseg),SGOTFLW(iseg)
+ 333  format(6i6,5e20.10)
+      end if
         end do
 !        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
 !        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
