@@ -1052,10 +1052,10 @@ C     ------------------------------------------------------------------
       ZERO=0.0D0
       WELLIRR = ZERO
       TIME = TOTIM
-      ACTUAL = ZERO
       SUP = ZERO
       SFRIRR = ZERO 
       SUPFLOW = ZERO
+      ACTUAL = ZERO
       Qp = ZERO
       TIME = TOTIM
 C
@@ -1084,28 +1084,25 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           Q = RATETERP(TIME,L)
         END IF
         IF ( NUMSUPSP > 0 ) THEN
-          IF ( NUMSEGS(L) > 0 ) THEN
-            SUP = 0.0
-            DO I = 1, NUMSEGS(L)
-              J = SFRSEG(I,L)
-              FMIN = SUPACT(J)
-              FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
-              IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
-              SUP = SUP + FMIN
-              SUP = SUP - ACTUAL(J)
-            END DO
-            IF ( SUP < ZERO ) SUP = ZERO
-            SUPFLOW(L) = SUPFLOW(L) - SUP
-          END IF
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L)
+            FMIN = SUPACT(J)
+            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
+            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
+            SUP = SUP + FMIN
+!            SUP = SUP - ACTUAL(J)
+          END DO
+!          IF ( SUP < ZERO ) SUP = ZERO
+          SUPFLOW(L) = SUPFLOW(L) - SUP
 C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-          IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
-          Q = SUPFLOW(L)
-        END IF
-C
-C5B------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN LIST
-        IF( Q < 0.0 ) THEN
-          IF ( Q < WELL(4,L) ) Q = WELL(4,L)
+          IF ( WELL(4,L) < 0.0 ) THEN
+            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
+            Q = SUPFLOW(L)
+          ELSE
+            SUPFLOW(L) = 0.0
+          END IF
         END IF
 C
 C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
@@ -1143,20 +1140,17 @@ C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
         END DO
 ! APPLY IRRIGATION FROM WELLS
         IF ( NUMIRRWELSP > 0 ) THEN
-          IF ( NUMCELLS(L) > 0 ) THEN
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
               SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
               WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
             END DO
-          END IF
         END IF
       END DO
 C APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
         istsg = ISTRM(4, l)
         IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
-          IF ( DVRCH(istsg) .GT. 0) THEN
             DO icount = 1, DVRCH(istsg)
               irr = IRRROW(icount,istsg)
               icc = IRRCOL(icount,istsg)
@@ -1165,7 +1159,6 @@ C APPLY IRRIGATION FROM DIVERSIONS
               SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
             END DO
-          END IF
         END IF
       END DO
 C
@@ -1271,28 +1264,25 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IL = TABLAY(L)
           Q = RATETERP(TIME,L)
         END IF
-        IF ( NUMSUP > 0 ) THEN
-          IF ( NUMSEGS(L) > 0 ) THEN
-            SUP = 0.0
-            DO I = 1, NUMSEGS(L)
-              J = SFRSEG(I,L)
-              FMIN = SUPACT(J)
-              FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
-              IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
-              SUP = SUP + FMIN
-              SUP = SUP - ACTUAL(J)
-            END DO
-            IF ( SUP < ZERO ) SUP = ZERO
-            SUPFLOW(L) = SUPFLOW(L) - SUP
-          END IF
+        IF ( NUMSUPSP > 0 ) THEN
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L)
+            FMIN = SUPACT(J)
+            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
+            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
+            SUP = SUP + FMIN
+!            SUP = SUP - ACTUAL(J)
+          END DO
+!          IF ( SUP < ZERO ) SUP = ZERO
+          SUPFLOW(L) = SUPFLOW(L) - SUP
 C
 C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-          IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
-          Q = SUPFLOW(L)
-C
-C6B------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN LIST
-          IF( Q < 0.0 ) THEN
-            IF ( Q < WELL(4,L) ) Q = WELL(4,L)
+          IF ( WELL(4,L) < 0.0 ) THEN
+            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
+            Q = SUPFLOW(L)
+          ELSE
+            SUPFLOW(L) = 0.0
           END IF
         END IF
         QSAVE = Q
@@ -1327,13 +1317,11 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
 C
 C9------APPLY IRRIGATION FROM WELLS
           IF ( NUMIRRWELSP > 0 ) THEN
-            IF ( NUMCELLS(L) > 0 ) THEN
               DO I = 1, NUMCELLS(L)
                 SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
                 SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
                 WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
               END DO
-            END IF
           END IF
         END IF
 C
@@ -1369,12 +1357,12 @@ C--------COPY FLOW TO WELL LIST.
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
         WELL(NWELVL,L)=QQ
       END DO
+      write(333,*)totim,RATOUT,SGOTFLW(9)
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
         istsg = ISTRM(4, l)
         IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
-          IF ( DVRCH(istsg) .GT. 0) THEN
             DO icount = 1, DVRCH(istsg)
               irr = IRRROW(icount,istsg)
               icc = IRRCOL(icount,istsg)
@@ -1383,7 +1371,6 @@ C12-------APPLY IRRIGATION FROM DIVERSIONS
               SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
             END DO
-          END IF
         END IF
       END DO
       
@@ -1454,13 +1441,13 @@ C
       !arguments
       ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+      double precision :: zerod3,zerod30,done,dzero,dum,pettotal, 
      +                    aettotal,dhundred
       integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod3 = 1.0d-3
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -1473,7 +1460,7 @@ C
            fks = VKS(ic, ir)
            IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
            area = delr(ic)*delc(ir)
-           finfsum = finfsum + fks*area     !LIMIT APPLIED IRRIGATION TO MAX INFILTRATION. CHANGE THIS
+!           finfsum = finfsum + fks*area     !LIMIT APPLIED IRRIGATION TO MAX INFILTRATION. CHANGE THIS
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
@@ -1486,17 +1473,18 @@ C
 !           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
            pettotal = pettotal + pet
            aettotal = aettotal + aet
-      if(k==6)then
-      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
-     +              aet,SFRIRR(ic,ir),WELLIRR(ic,ir),SGOTFLW(iseg)
- 333  format(6i6,5e20.10)
-      end if
+ !     if(k==6)then
+ !     write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
+ !    +              aet,SFRIRR(ic,ir),ACTUAL(iseg),SGOTFLW(iseg)
+ !333  format(6i6,5e20.10)
+ !     end if
         end do
-        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
+!        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
         if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
         SUPACT(iseg) = DEMAND(iseg)
-        if ( pettotal-aettotal < zerod2*pettotal ) SUPACT(iseg) = 
-     +                                             SEG(2,iseg)
+     !!   if ( pettotal-aettotal < zerod3*pettotal ) SUPACT(iseg) = 
+     !!+                                             SEG(2,iseg)
+      SUPACT(iseg) = SEG(2,iseg)
       end do
       return
       end subroutine UZFIRRDEMANDCALC

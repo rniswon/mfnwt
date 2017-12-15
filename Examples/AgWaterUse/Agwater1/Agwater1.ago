@@ -6,12 +6,12 @@ irrigationwell 6 1
 maxwells 6   
 end
 well list
-         1         6         4    -100.00
-         1         6         5    -100.00
-         1         7         4    -100.00
-         1         7         5    -100.00
-         1         8         4    -100.00
-         1         8         5    -100.00
+         1         6         4    -10.00
+         1         6         5    -10.00
+         1         7         4    -10.00
+         1         7         5    -10.00
+         1         8         4    -10.00
+         1         8         5    -10.00
 end
 stress period 1
 END
@@ -61,22 +61,22 @@ IRRWEL
 7 5 0.0 1.0 
 5 1
 8 4 0.0 1.0 
-5 1
+6 1
 8 5 0.0 1.0 
 SUPWEL
 6                        NUMSUPWELLSP
 1 1                      SUPWELLNUM   NUMSEGWELL
-9 0.8                    SEGWELLID    PCTSUP             
+9 1.0                    SEGWELLID    PCTSUP             
 2 1 
-9 0.8 
+9 1.0 
 3 1 
-9 0.8 
+9 1.0 
 4 1 
-9 0.8 
+9 1.0 
 5 1 
-9 0.8 
+9 1.0 
 6 1 
-9 0.8 
+9 1.0 
 end
 stress period 6     
 IRRSFR
@@ -188,22 +188,22 @@ IRRWEL
 7 5 0.0 1.0 
 5 1
 8 4 0.0 1.0 
-5 1
+6 1
 8 5 0.0 1.0 
 SUPWEL
 6                        NUMSUPWELLSP
 1 1                      SUPWELLNUM   NUMSEGWELL
-9 0.8                    SEGWELLID    PCTSUP             
+9 1.0                    SEGWELLID    PCTSUP             
 2 1 
-9 0.8 
+9 1.0 
 3 1 
-9 0.8 
+9 1.0 
 4 1 
-9 0.8 
+9 1.0 
 5 1 
-9 0.8 
+9 1.0 
 6 1 
-9 0.8
+9 1.0
 end
 stress period 18
 IRRSFR
