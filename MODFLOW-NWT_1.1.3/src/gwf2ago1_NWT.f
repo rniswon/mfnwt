@@ -1031,7 +1031,7 @@ C     ------------------------------------------------------------------
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       IMPLICIT NONE
@@ -1042,7 +1042,8 @@ C     ------------------------------------------------------------------
 C
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ
+      INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
+      INTEGER :: NUMSEPWELLSEG
       DOUBLE PRECISION :: ZERO, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
       EXTERNAL :: SMOOTH3, RATETERP
       REAL :: RATETERP,TIME
@@ -1062,7 +1063,7 @@ C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
         IF ( KKITER==1 ) CALL UZFIRRDEMANDSET()
-        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, Kkiter)
+        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, Kkiter)    !this should be called only if numIRRWELLSP>0
       END IF
             
 C
@@ -1072,6 +1073,17 @@ C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
 C
 C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
+! Move this to RP
+        NUMSEPWELLSEG = 1
+        DO LL=L+1,NWELLSTEMP
+          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
+     +                        NUMSEPWELLSEG = NUMSEPWELLSEG + 1
+        END DO
+        DO LL=1,L-1
+          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
+     +                        NUMSEPWELLSEG = NUMSEPWELLSEG + 1
+        END DO
+! to here
         IF ( NUMTAB.LE.0 ) THEN
           IR=WELL(2,L)
           IC=WELL(3,L)
@@ -1088,13 +1100,13 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             FMIN = SUPACT(J)
-            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
+            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(IDIVAR(1, J)))  !This assumes that the diversion gets all the flow from the upstream segment
             IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
             SUP = SUP + FMIN
 !            SUP = SUP - ACTUAL(J)
           END DO
 !          IF ( SUP < ZERO ) SUP = ZERO
-          SUPFLOW(L) = SUPFLOW(L) - SUP
+          SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSEPWELLSEG)
 C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
           IF ( WELL(4,L) < 0.0 ) THEN
@@ -1177,7 +1189,7 @@ C     ------------------------------------------------------------------
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBNM,VBVL,MSUM
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       IMPLICIT NONE
 C        ARGUMENTS:
@@ -1207,7 +1219,6 @@ C     ------------------------------------------------------------------
       ACTUAL = ZERO
       SUP = ZERO
       SFRIRR = ZERO
-      SUPFLOW = ZERO
       Qp = 1.0
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
@@ -1242,9 +1253,9 @@ C2-----IF CELL-BY-CELL DIVERSION IRRIGATION FLOWS WILL BE SAVED AS A LIST, WRITE
 
 C
 C3------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
-      IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
-        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, 1)
-      END IF
+      !IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
+      !  CALL UZFIRRDEMANDCALC(Kkper, Kkstp, 1)
+      !END IF
             
 C
 C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
@@ -1264,27 +1275,28 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IL = TABLAY(L)
           Q = RATETERP(TIME,L)
         END IF
-        IF ( NUMSUPSP > 0 ) THEN
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L)
-            FMIN = SUPACT(J)
-            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
-            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
-            SUP = SUP + FMIN
-!            SUP = SUP - ACTUAL(J)
-          END DO
-!          IF ( SUP < ZERO ) SUP = ZERO
-          SUPFLOW(L) = SUPFLOW(L) - SUP
-C
-C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-          IF ( WELL(4,L) < 0.0 ) THEN
-            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
-            Q = SUPFLOW(L)
-          ELSE
-            SUPFLOW(L) = 0.0
-          END IF
-        END IF
+!        IF ( NUMSUPSP > 0 ) THEN
+!!          SUP = 0.0
+!!          DO I = 1, NUMSEGS(L)
+!!            J = SFRSEG(I,L)
+!!            FMIN = SEG(2,J)
+!!            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
+!!            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
+!!            SUP = SUP + FMIN
+!!!            SUP = SUP - ACTUAL(J)
+!!          END DO
+!!!          IF ( SUP < ZERO ) SUP = ZERO
+!!          SUPFLOW(L) = SUPFLOW(L) - SUP
+!C
+!C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
+!          IF ( WELL(4,L) < 0.0 ) THEN
+!            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
+!            Q = SUPFLOW(L)
+!          ELSE
+!            SUPFLOW(L) = 0.0
+!          END IF
+!        END IF
+        Q = SUPFLOW(L)
         QSAVE = Q
 C
         bbot = Botm(IC, IR, Lbotm(IL))
@@ -1357,7 +1369,7 @@ C--------COPY FLOW TO WELL LIST.
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
         WELL(NWELVL,L)=QQ
       END DO
-      write(333,*)totim,RATOUT,SGOTFLW(9)
+      write(333,*)kkper,kkstp,totim,RATOUT,SGOTFLW(9)
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
       DO l = 1, NSTRM
@@ -1465,8 +1477,9 @@ C
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
-           factor = pet/aet - done
-           IF ( FACTOR > dhundred ) FACTOR = dhundred
+           factor = pet/aet - done                        !Question, what if pet/aet is not changing?
+!           IF ( FACTOR > dhundred ) FACTOR = dhundred
+           IF ( FACTOR > 1000. ) FACTOR = 1000.
            SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
            dum = pet
@@ -1480,11 +1493,11 @@ C
  !     end if
         end do
 !        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
-        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-        SUPACT(iseg) = DEMAND(iseg)
+!        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
      !!   if ( pettotal-aettotal < zerod3*pettotal ) SUPACT(iseg) = 
      !!+                                             SEG(2,iseg)
       SUPACT(iseg) = SEG(2,iseg)
+      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
       end do
       return
       end subroutine UZFIRRDEMANDCALC
