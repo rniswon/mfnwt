@@ -5739,6 +5739,7 @@ C     ------------------------------------------------------------------
       INETFLUX=>GWFUZFDAT(Igrid)%INETFLUX
       Ireadsurfk=>GWFUZFDAT(Igrid)%Ireadsurfk
       Isurfkreject=>GWFUZFDAT(Igrid)%Isurfkreject
+      UNITRECH=>GWFUZFDAT(Igrid)%UNITRECH
       UNITDIS=>GWFUZFDAT(Igrid)%UNITDIS
       ISEEPREJECT=>GWFUZFDAT(Igrid)%ISEEPREJECT
       SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
