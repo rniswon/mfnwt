@@ -1637,7 +1637,7 @@ C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
       RETURN
       END FUNCTION RATETERPQ
 C
-      SUBROUTINE SGWF2BAS7V(MSUM,VBNMAG,VBVLAG,KSTP,KPER,IOUT,BUDPERC)
+      SUBROUTINE SGWF2AGO7V(MSUM,VBNMAG,VBVLAG,KSTP,KPER,IOUT,BUDPERC)
 C     ******************************************************************
 C     PRINT VOLUMETRIC BUDGET
 C     ******************************************************************
