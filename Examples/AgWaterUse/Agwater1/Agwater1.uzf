@@ -75,7 +75,7 @@ INTERNAL   1.0E-5 (10F4.0)    0         surfk
 CONSTANT   5.5                           BROOK-COREY EPSILON
 CONSTANT   0.22                          THTS
 CONSTANT   0.05                          THTR
-CONSTANT   0.089                         THTI
+CONSTANT   0.083                         THTI     CONSTANT   0.089 (k=0.64)                        THTI
  6  4 65  1
  6  5 66  2
  8  4 67  3

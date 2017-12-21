@@ -15,6 +15,9 @@
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
         INTEGER,          SAVE,                 POINTER     ::MAXVAL
+        REAL,              SAVE, DIMENSION(:,:), POINTER ::VBVLAG
+        CHARACTER(LEN=20), SAVE, DIMENSION(:),   POINTER ::VBNMAG
+        INTEGER, SAVE, POINTER  ::MSUMAG
 ! AGO orig
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::SFRSEG
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
@@ -31,6 +34,7 @@
         INTEGER,          SAVE,                 POINTER     ::UNITSUP
         INTEGER,          SAVE,                 POINTER     ::NUMIRRWEL
         INTEGER,          SAVE,                 POINTER     ::UNITIRRWEL
+        INTEGER,          SAVE, DIMENSION(:), POINTER  :: NUMSUPWELLSEG
         INTEGER,          SAVE,                 POINTER     ::MAXSEGS
         INTEGER,          SAVE,               POINTER     ::MAXCELLSWEL
         INTEGER,          SAVE,               POINTER     ::NUMIRRWELSP
@@ -77,9 +81,12 @@ C        VARIABLES
       INTEGER :: NUMTABHOLD,LLOC,ISTART,ISTOP,I,N
       REAL :: R
 C     ------------------------------------------------------------------
+      ALLOCATE(VBVLAG(4,10),VBNMAG(10),MSUMAG)
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,NAUX)
       ALLOCATE(PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
+      VBVLAG = 0.0
+      MSUMAG = 0
       PSIRAMP = 0.10
       NUMTAB = 0
       MAXVAL = 1
@@ -107,6 +114,7 @@ C     ------------------------------------------------------------------
       ETDEMANDFLAG = 0
       NUMIRRSFR = 0
       NUMIRRSFRSP = 0
+      NUMSUPWELLSEG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
@@ -180,6 +188,7 @@ C
      +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
       ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
      +           IRRPCT(MAXCELLSHOLD,MXACTWIRR),SUPFLOW(MXACTWSUP))
+      ALLOCATE (NUMSUPWELLSEG(NUMSUPHOLD))
       SFRSEG = 0
       UZFROW = 0
       UZFCOL = 0
@@ -280,7 +289,6 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLSWEL,R,IOUT,IN)
             IF( NUMIRRWEL.LT.0 ) NUMIRRWEL = 0
             IF ( MAXCELLSWEL < 1 ) MAXCELLSWEL = 1 
-            IF ( IUNIT(2) < 1 ) NUMIRRWEL = 0
             WRITE(IOUT,*)
             WRITE(IOUT,34) NUMIRRWEL
             WRITE(IOUT,*)
@@ -733,8 +741,9 @@ C
 C1-------RESET DEMAND IF IT CHANGES
       DO ISEG=1, NSS
         DEMAND(ISEG) = SEG(2, ISEG)
-        SUPACT(ISEG) = DEMAND(ISEG)
+        SUPACT(ISEG) = 0.0
       END DO
+!      CALL UZFIRRDEMANDSET()
 C
 C6------RETURN
       RETURN
@@ -757,7 +766,7 @@ C     ------------------------------------------------------------------
 C     VARIABLES:
       CHARACTER(LEN=200)::LINE
       INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
-      INTEGER :: NMSG, K, IRWL, NMCL
+      INTEGER :: NMSG, K, IRWL, NMCL, L, LL
       REAL :: R
 C     ------------------------------------------------------------------
 C
@@ -824,7 +833,22 @@ C
   106 FORMAT('***Error in SUP WEL*** cell row or column number for '
      +        ,'supplemental well specified as zero. Model stopping')
 C
-C6------RETURN
+C3---------CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
+C
+      NUMSUPWELLSEG = 1
+      DO L=1, NUMSUPSP
+        DO LL=L+1,NUMSUPSP
+          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
+     +                        NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
+        END DO
+        DO LL=1,L-1
+          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
+     +                        NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
+        END DO
+      END DO
+      
+C
+C4------RETURN
       RETURN
       END
 !
@@ -1043,14 +1067,14 @@ C
 C        VARIABLES:
 C     ------------------------------------------------------------------
       INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
-      INTEGER :: NUMSEPWELLSEG
       DOUBLE PRECISION :: ZERO, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
-      EXTERNAL :: SMOOTH3, RATETERP
-      REAL :: RATETERP,TIME
-      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTH3
+      EXTERNAL :: SMOOTHQ, RATETERPQ
+      REAL :: RATETERPQ,TIME
+      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO
 C      
 C     ------------------------------------------------------------------
       ZERO=0.0D0
+      NEARZERO = 1.0D-17
       WELLIRR = ZERO
       TIME = TOTIM
       SUP = ZERO
@@ -1058,12 +1082,12 @@ C     ------------------------------------------------------------------
       SUPFLOW = ZERO
       ACTUAL = ZERO
       Qp = ZERO
+      QSW = ZERO
       TIME = TOTIM
 C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
-        IF ( KKITER==1 ) CALL UZFIRRDEMANDSET()
-        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, Kkiter)    !this should be called only if numIRRWELLSP>0
+        CALL UZFIRRDEMANDCALC(Kkper, Kkstp, Kkiter)
       END IF
             
 C
@@ -1073,17 +1097,6 @@ C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
 C
 C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
-! Move this to RP
-        NUMSEPWELLSEG = 1
-        DO LL=L+1,NWELLSTEMP
-          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
-     +                        NUMSEPWELLSEG = NUMSEPWELLSEG + 1
-        END DO
-        DO LL=1,L-1
-          IF ( SFRSEG(1,LL) == SFRSEG(1,L) ) 
-     +                        NUMSEPWELLSEG = NUMSEPWELLSEG + 1
-        END DO
-! to here
         IF ( NUMTAB.LE.0 ) THEN
           IR=WELL(2,L)
           IC=WELL(3,L)
@@ -1093,20 +1106,22 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IR = TABROW(L)
           IC = TABCOL(L)
           IL = TABLAY(L)
-          Q = RATETERP(TIME,L)
+          Q = RATETERPQ(TIME,L)  !For IRRWELLS that are not SUPWELLS
         END IF
         IF ( NUMSUPSP > 0 ) THEN
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             FMIN = SUPACT(J)
-            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(IDIVAR(1, J)))  !This assumes that the diversion gets all the flow from the upstream segment
-            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
+            QSW = SGOTFLW(IDIVAR(1, J))
+            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J)
+            FMIN = PCTSUP(I,L)*(FMIN - QSW)
+            IF ( FMIN < ZERO ) FMIN = ZERO
             SUP = SUP + FMIN
 !            SUP = SUP - ACTUAL(J)
           END DO
 !          IF ( SUP < ZERO ) SUP = ZERO
-          SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSEPWELLSEG)
+          SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
 C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
           IF ( WELL(4,L) < 0.0 ) THEN
@@ -1127,7 +1142,7 @@ C       THE RHS ACCUMULATOR.
               Hh = HNEW(ic,ir,il)
               bbot = Botm(IC, IR, Lbotm(IL))
               ttop = Botm(IC, IR, Lbotm(IL)-1)
-              Qp = Q*smooth3(Hh,Ttop,Bbot,dQp)
+              Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
               RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
 C
 C8------Derivative for RHS
@@ -1155,7 +1170,8 @@ C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
               SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
+              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
+     +                    WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
             END DO
         END IF
       END DO
@@ -1200,11 +1216,11 @@ C     ------------------------------------------------------------------
       CHARACTER*20 TEXT,TEXT1,TEXT2
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
       double precision :: SUP,SUBVOL,SUBRATE
-      real :: Q,TIME,RATETERP
+      real :: Q,TIME,RATETERPQ
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1
-      EXTERNAL :: SMOOTH3, RATETERP
-      DOUBLE PRECISION :: SMOOTH3,bbot,ttop,hh
+      EXTERNAL :: SMOOTHQ, RATETERPQ
+      DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DATA TEXT /'SUPPLEMENTARY WELLS'/
       DATA TEXT1 /'SFR DIVERSION IRRIGATION'/
@@ -1273,29 +1289,8 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IR = TABROW(L)
           IC = TABCOL(L)
           IL = TABLAY(L)
-          Q = RATETERP(TIME,L)
+          Q = RATETERPQ(TIME,L)
         END IF
-!        IF ( NUMSUPSP > 0 ) THEN
-!!          SUP = 0.0
-!!          DO I = 1, NUMSEGS(L)
-!!            J = SFRSEG(I,L)
-!!            FMIN = SEG(2,J)
-!!            FMIN = PCTSUP(I,L)*(FMIN - SGOTFLW(J))              
-!!            IF ( FMIN < 0.0D0 ) FMIN = 0.0D0
-!!            SUP = SUP + FMIN
-!!!            SUP = SUP - ACTUAL(J)
-!!          END DO
-!!!          IF ( SUP < ZERO ) SUP = ZERO
-!!          SUPFLOW(L) = SUPFLOW(L) - SUP
-!C
-!C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-!          IF ( WELL(4,L) < 0.0 ) THEN
-!            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
-!            Q = SUPFLOW(L)
-!          ELSE
-!            SUPFLOW(L) = 0.0
-!          END IF
-!        END IF
         Q = SUPFLOW(L)
         QSAVE = Q
 C
@@ -1309,7 +1304,7 @@ C
         IF(IBOUND(IC,IR,IL) > 0 ) THEN
           IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
-              Qp = smooth3(Hh,Ttop,Bbot,dQp)
+              Qp = smoothQ(Hh,Ttop,Bbot,dQp)
               Q = Q*Qp
             ELSE
               Q = Qsave
@@ -1332,7 +1327,8 @@ C9------APPLY IRRIGATION FROM WELLS
               DO I = 1, NUMCELLS(L)
                 SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
                 SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-                WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = SUBRATE
+                WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
+     +                  WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
               END DO
           END IF
         END IF
@@ -1431,7 +1427,11 @@ C
 C16------INCREMENT BUDGET TERM COUNTER(MSUM).
       MSUM=MSUM+1
 C
-C17------RETURN
+C18------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING 
+C        AG WATER BALANCE.      
+!      VBVLAG(10),VBNMAG(10),MSUMAG
+C
+C19------RETURN
       RETURN
       END
 ! ----------------------------------------------------------------------
@@ -1463,71 +1463,59 @@ C
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
-      do i = 1, NUMIRRSFRSP   !NEED TO LOOP ON IRR WELLS THAT ARE NOT SUP WELLS
+      do 300 i = 1, NUMIRRSFRSP
         iseg = IRRSEG(i)
+        IF ( DEMAND(iseg) < zerod30 ) goto 300
         finfsum = dzero
         do k = 1, DVRCH(iseg)
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
-           fks = VKS(ic, ir)
-           IF ( Isurfkreject > 0 ) fks = SURFK(ic, ir)
            area = delr(ic)*delc(ir)
-!           finfsum = finfsum + fks*area     !LIMIT APPLIED IRRIGATION TO MAX INFILTRATION. CHANGE THIS
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
-           factor = pet/aet - done                        !Question, what if pet/aet is not changing?
-!           IF ( FACTOR > dhundred ) FACTOR = dhundred
-           IF ( FACTOR > 1000. ) FACTOR = 1000.
-           SEG(2,iseg) = SEG(2,iseg) + factor*pet*area
+           factor = pet/aet - done
+           IF ( FACTOR > dhundred ) FACTOR = dhundred
+           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
            if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
            dum = pet
-!           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)
+!           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
            pettotal = pettotal + pet
            aettotal = aettotal + aet
-      if(k==6)then
-      write(222,333)Kkper, Kkstp, Kkiter,ic,ir,iseg,dum,
-     +              aet,SFRIRR(ic,ir),ACTUAL(iseg),SGOTFLW(iseg)
- 333  format(6i6,5e20.10)
-      end if
         end do
-!        if ( SEG(2,iseg) > finfsum ) SEG(2,iseg) = finfsum
-!        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-     !!   if ( pettotal-aettotal < zerod3*pettotal ) SUPACT(iseg) = 
-     !!+                                             SEG(2,iseg)
-      SUPACT(iseg) = SEG(2,iseg)
+      SEG(2,iseg) = SUPACT(iseg)
       if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-      end do
+300   continue
       return
       end subroutine UZFIRRDEMANDCALC
 !
-      subroutine UZFIRRDEMANDSET()
-!     ******************************************************************
-!     irrdemand---- sets initial crop demand to PET
-!     ******************************************************************
-!     SPECIFICATIONS:
-!      USE GWFUZFMODULE, ONLY: PETRATE
-      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG
-      USE GWFSFRMODULE, ONLY: SEG
-      USE GLOBAL,     ONLY: DELR, DELC
-      IMPLICIT NONE
-! ----------------------------------------------------------------------
-      DOUBLE PRECISION :: area
-      integer :: k,iseg,ic,ir,i
-! ----------------------------------------------------------------------
-!
-      do i = 1, NUMIRRSFRSP
-        iseg = IRRSEG(i)
-        do k = 1, DVRCH(iseg)
-           ic = IRRCOL(k,iseg)
-           ir = IRRROW(k,iseg)
-           area = delr(ic)*delc(ir)
-           SEG(2,iseg) = 0.0d0
-        end do
-      end do
-      return
-      end subroutine UZFIRRDEMANDSET
+!      subroutine UZFIRRDEMANDSET()
+!!     ******************************************************************
+!!     irrdemand---- sets initial crop demand to PET
+!!     ******************************************************************
+!!     SPECIFICATIONS:
+!!      USE GWFUZFMODULE, ONLY: PETRATE
+!      USE GWFAGOMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG
+!      USE GWFSFRMODULE, ONLY: SEG
+!      USE GLOBAL,     ONLY: DELR, DELC
+!      IMPLICIT NONE
+!! ----------------------------------------------------------------------
+!      DOUBLE PRECISION :: area
+!      integer :: k,iseg,ic,ir,i
+!! ----------------------------------------------------------------------
+!!
+!      do i = 1, NUMIRRSFRSP
+!        iseg = IRRSEG(i)
+!        do k = 1, DVRCH(iseg)
+!           ic = IRRCOL(k,iseg)
+!           ir = IRRROW(k,iseg)
+!           area = delr(ic)*delc(ir)
+!           SEG(2,iseg) = 0.0d0
+!        end do
+!      end do
+!      return
+!      end subroutine UZFIRRDEMANDSET
 ! ----------------------------------------------------------------------
 C
 !      subroutine APPLYKCROP()
@@ -1554,6 +1542,260 @@ C
 !      return
 !      END subroutine APPLYKCROP
 C
+      DOUBLE PRECISION FUNCTION smoothQ(H,T,B,dQ)
+C     ******************************************************************
+C     SMOOTHLY REDUCES PUMPING TO ZERO FOR DEWATERED CONDITIONS
+C     ******************************************************************
+! h is the depth 
+      USE GWFAGOMODULE,ONLY:PSIRAMP
+      IMPLICIT NONE
+      DOUBLE PRECISION s, aa, bb, x
+      DOUBLE PRECISION cof1, cof2, cof3, Qp
+      DOUBLE PRECISION, INTENT(IN) :: H
+      DOUBLE PRECISION, INTENT(IN) :: T
+      DOUBLE PRECISION, INTENT(IN) :: B
+      DOUBLE PRECISION, INTENT(OUT) :: dQ
+      smoothQ = 0.0D0
+      s = PSIRAMP
+      s = s*(T-B)   ! puming rate begins to be ramped down.
+      x = (H-B)
+      aa = -6.0d0/(s**3.0d0)
+      bb = -6.0d0/(s**2.0d0)
+      cof1 = x**2.0D0
+      cof2 = -(2.0D0*x)/(s**3.0D0)
+      cof3 = 3.0D0/(s**2.0D0)
+      Qp = cof1*(cof2+cof3)
+      dQ = (aa*x**2.0D0-bb*x)
+      IF ( x.LT.0.0D0 ) THEN
+        Qp = 0.0D0
+        dQ = 0.0D0
+      ELSEIF ( x-s.GT.-1.0e-14 ) THEN
+        Qp = 1.0D0
+        dQ = 0.0D0
+      END IF
+      smoothQ = Qp
+      END FUNCTION smoothQ
+C
+      REAL FUNCTION RATETERPQ (TIME,INUM)
+C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
+C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
+      USE GWFWELMODULE, ONLY: TABRATE, TABTIME, TABVAL
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+!ARGUMENTS
+      INTEGER, INTENT(IN):: INUM
+      REAL, INTENT(IN):: TIME
+!
+      REAL CLOSEZERO
+      REAL FLOW, TIMEBEG, TIMEND, TIMESTART, SUMFLOW, TOLF2
+      INTEGER IEND, ISTM1, ISTART, iflg, NVAL, I
+      TOLF2=1.0E-4
+      CLOSEZERO=1.0E-15
+      FLOW = 0.0
+      NVAL = TABVAL(INUM)
+      IFLG = 0
+      SUMFLOW = 0.0
+      I = 1
+      TIMEBEG = TIME - DELT
+      IF ( TIMEBEG-TABTIME(1,INUM).LT.0.0 ) THEN
+        RATETERPQ = TABRATE(1,INUM)
+      ELSEIF ( TIMEBEG-TABTIME(NVAL,INUM).GE.0.0 ) THEN
+        RATETERPQ = TABRATE(NVAL,INUM)
+      ELSE
+! Find table value before beginning of time step.
+        DO WHILE ( I.LE.NVAL-1 )
+          IF ( TIMEBEG-TABTIME(I,INUM).LE.CLOSEZERO ) THEN
+            EXIT
+          ELSEIF ( TIMEBEG-TABTIME(I+1,INUM).LE.CLOSEZERO ) THEN
+            EXIT
+          ELSE
+            I = I + 1
+          END IF
+        END DO
+        ISTART = I
+        ISTM1 = I
+        IF ( I.GT.1 ) ISTM1 = ISTM1 - 1
+! Find table value after end of time step
+        DO WHILE ( I.LE.NVAL ) 
+          IF ( TIME-TABTIME(I,INUM).LE.0.0 ) THEN
+            EXIT
+          ELSE
+            I = I + 1
+          END IF
+        END DO
+        IEND = I
+        IF ( IEND.GT.NVAL ) IEND = NVAL
+        DO I = ISTART, IEND - 1
+          TIMESTART = TABTIME(I,INUM)
+          TIMEND = TABTIME(I+1,INUM)
+          IF ( TIMEBEG-TIMESTART.GT.0.0 ) TIMESTART = TIMEBEG
+          IF ( TIME-TIMEND.LT.0.0 ) TIMEND = TIME
+          SUMFLOW = SUMFLOW + (TIMEND-TIMESTART)*TABRATE(I,INUM)
+        END DO
+        RATETERPQ = SUMFLOW/DELT
+      END IF
+      RETURN
+      END FUNCTION RATETERPQ
+C
+      SUBROUTINE SGWF2BAS7V(MSUM,VBNMAG,VBVLAG,KSTP,KPER,IOUT,BUDPERC)
+C     ******************************************************************
+C     PRINT VOLUMETRIC BUDGET
+C     ******************************************************************
+C
+C     SPECIFICATIONS:
+C     ------------------------------------------------------------------
+      CHARACTER*20 VBNMAG(MSUM)
+      DIMENSION VBVLAG(4,MSUM)
+      CHARACTER*17 VAL1,VAL2
+C     ------------------------------------------------------------------
+C
+C1------DETERMINE NUMBER OF INDIVIDUAL BUDGET ENTRIES.
+      BUDPERC=0.
+      MSUM1=MSUM-1
+      IF(MSUM1.LE.0) RETURN
+C
+C2------CLEAR RATE AND VOLUME ACCUMULATORS.
+      ZERO=0.
+      TWO=2.
+      HUND=100.
+      BIGVL1=9.99999E11
+      BIGVL2=9.99999E10
+      SMALL=0.1
+      TOTRIN=ZERO
+      TOTROT=ZERO
+      TOTVIN=ZERO
+      TOTVOT=ZERO
+C
+C3------ADD RATES AND VOLUMES (IN AND OUT) TO ACCUMULATORS.
+      DO 100 L=1,MSUM1
+      TOTRIN=TOTRIN+VBVLAG(3,L)
+      TOTROT=TOTROT+VBVLAG(4,L)
+      TOTVIN=TOTVIN+VBVLAG(1,L)
+      TOTVOT=TOTVOT+VBVLAG(2,L)
+  100 CONTINUE
+C
+C4------PRINT TIME STEP NUMBER AND STRESS PERIOD NUMBER.
+      WRITE(IOUT,260) KSTP,KPER
+      WRITE(IOUT,265)
+C
+C5------PRINT INDIVIDUAL INFLOW RATES AND VOLUMES AND THEIR TOTALS.
+      DO 200 L=1,MSUM1
+      IF(VBVLAG(1,L).NE.ZERO .AND.
+     1       (VBVLAG(1,L).GE.BIGVL1 .OR. VBVLAG(1,L).LT.SMALL)) THEN
+         WRITE(VAL1,'(1PE17.4)') VBVLAG(1,L)
+      ELSE
+         WRITE(VAL1,'(F17.4)') VBVLAG(1,L)
+      END IF
+      IF(VBVLAG(3,L).NE.ZERO .AND.
+     1       (VBVLAG(3,L).GE.BIGVL1 .OR. VBVLAG(3,L).LT.SMALL)) THEN
+         WRITE(VAL2,'(1PE17.4)') VBVLAG(3,L)
+      ELSE
+         WRITE(VAL2,'(F17.4)') VBVLAG(3,L)
+      END IF
+      WRITE(IOUT,275) VBNMAG(L),VAL1,VBNMAG(L),VAL2
+  200 CONTINUE
+      IF(TOTVIN.NE.ZERO .AND.
+     1      (TOTVIN.GE.BIGVL1 .OR. TOTVIN.LT.SMALL)) THEN
+         WRITE(VAL1,'(1PE17.4)') TOTVIN
+      ELSE
+         WRITE(VAL1,'(F17.4)') TOTVIN
+      END IF
+      IF(TOTRIN.NE.ZERO .AND.
+     1      (TOTRIN.GE.BIGVL1 .OR. TOTRIN.LT.SMALL)) THEN
+         WRITE(VAL2,'(1PE17.4)') TOTRIN
+      ELSE
+         WRITE(VAL2,'(F17.4)') TOTRIN
+      END IF
+      WRITE(IOUT,286) VAL1,VAL2
+C
+C6------PRINT INDIVIDUAL OUTFLOW RATES AND VOLUMES AND THEIR TOTALS.
+      WRITE(IOUT,287)
+      DO 250 L=1,MSUM1
+      IF(VBVLAG(2,L).NE.ZERO .AND.
+     1       (VBVLAG(2,L).GE.BIGVL1 .OR. VBVLAG(2,L).LT.SMALL)) THEN
+         WRITE(VAL1,'(1PE17.4)') VBVLAG(2,L)
+      ELSE
+         WRITE(VAL1,'(F17.4)') VBVLAG(2,L)
+      END IF
+      IF(VBVLAG(4,L).NE.ZERO .AND.
+     1       (VBVLAG(4,L).GE.BIGVL1 .OR. VBVLAG(4,L).LT.SMALL)) THEN
+         WRITE(VAL2,'(1PE17.4)') VBVLAG(4,L)
+      ELSE
+         WRITE(VAL2,'(F17.4)') VBVLAG(4,L)
+      END IF
+      WRITE(IOUT,275) VBNMAG(L),VAL1,VBNMAG(L),VAL2
+  250 CONTINUE
+      IF(TOTVOT.NE.ZERO .AND.
+     1      (TOTVOT.GE.BIGVL1 .OR. TOTVOT.LT.SMALL)) THEN
+         WRITE(VAL1,'(1PE17.4)') TOTVOT
+      ELSE
+         WRITE(VAL1,'(F17.4)') TOTVOT
+      END IF
+      IF(TOTROT.NE.ZERO .AND.
+     1      (TOTROT.GE.BIGVL1 .OR. TOTROT.LT.SMALL)) THEN
+         WRITE(VAL2,'(1PE17.4)') TOTROT
+      ELSE
+         WRITE(VAL2,'(F17.4)') TOTROT
+      END IF
+      WRITE(IOUT,298) VAL1,VAL2
+C
+C7------CALCULATE THE DIFFERENCE BETWEEN INFLOW AND OUTFLOW.
+C
+C7A-----CALCULATE DIFFERENCE BETWEEN RATE IN AND RATE OUT.
+      DIFFR=TOTRIN-TOTROT
+      ADIFFR=ABS(DIFFR)
+C
+C7B-----CALCULATE PERCENT DIFFERENCE BETWEEN RATE IN AND RATE OUT.
+      PDIFFR=ZERO
+      AVGRAT=(TOTRIN+TOTROT)/TWO
+      IF(AVGRAT.NE.ZERO) PDIFFR=HUND*DIFFR/AVGRAT
+      BUDPERC=PDIFFR
+C
+C7C-----CALCULATE DIFFERENCE BETWEEN VOLUME IN AND VOLUME OUT.
+      DIFFV=TOTVIN-TOTVOT
+      ADIFFV=ABS(DIFFV)
+C
+C7D-----GET PERCENT DIFFERENCE BETWEEN VOLUME IN AND VOLUME OUT.
+      PDIFFV=ZERO
+      AVGVOL=(TOTVIN+TOTVOT)/TWO
+      IF(AVGVOL.NE.ZERO) PDIFFV=HUND*DIFFV/AVGVOL
+C
+C8------PRINT DIFFERENCES AND PERCENT DIFFERENCES BETWEEN INPUT
+C8------AND OUTPUT RATES AND VOLUMES.
+      IF(ADIFFV.NE.ZERO .AND.
+     1      (ADIFFV.GE.BIGVL2 .OR. ADIFFV.LT.SMALL)) THEN
+         WRITE(VAL1,'(1PE17.4)') DIFFV
+      ELSE
+         WRITE(VAL1,'(F17.4)') DIFFV
+      END IF
+      IF(ADIFFR.NE.ZERO .AND.
+     1      (ADIFFR.GE.BIGVL2 .OR. ADIFFR.LT.SMALL)) THEN
+         WRITE(VAL2,'(1PE17.4)') DIFFR
+      ELSE
+         WRITE(VAL2,'(F17.4)') DIFFR
+      END IF
+      WRITE(IOUT,299) VAL1,VAL2
+      WRITE(IOUT,300) PDIFFV,PDIFFR
+C
+C9------RETURN.
+      RETURN
+C
+C    ---FORMATS
+C
+  260 FORMAT('1',/2X,'VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF'
+     1,' TIME STEP',I5,', STRESS PERIOD',I4/2X,78('-'))
+  265 FORMAT(1X,/5X,'CUMULATIVE VOLUMES',6X,'L**3',7X
+     1,'RATES FOR THIS TIME STEP',6X,'L**3/T'/5X,18('-'),17X,24('-')
+     2//11X,'IN:',38X,'IN:'/11X,'---',38X,'---')
+  275 FORMAT(1X,3X,A20,' =',A17,6X,A20,' =',A17)
+  286 FORMAT(1X,/16X,'TOTAL IN =',A,18X,'TOTAL IN =',A)
+  287 FORMAT(1X,/10X,'OUT:',37X,'OUT:'/10X,4('-'),37X,4('-'))
+  298 FORMAT(1X,/15X,'TOTAL OUT =',A,17X,'TOTAL OUT =',A)
+  299 FORMAT(1X,/16X,'IN - OUT =',A,18X,'IN - OUT =',A)
+  300 FORMAT(1X,/5X,'PERCENT DISCREPANCY =',F15.2
+     1,9X,'PERCENT DISCREPANCY =',F15.2,///)
+C
+      END
 C
       SUBROUTINE GWF2AGO7DA()
 C  Deallocate AGO MEMORY
@@ -1561,6 +1803,7 @@ C  Deallocate AGO MEMORY
 C
         DEALLOCATE(NUMSUP)
         DEALLOCATE(NUMSUPSP)
+        DEALLOCATE(NUMSUPWELLSEG)
         DEALLOCATE(NUMIRRWEL)
         DEALLOCATE(SFRSEG)
         DEALLOCATE(UZFROW)

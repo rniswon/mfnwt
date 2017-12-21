@@ -1881,7 +1881,7 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
@@ -2443,7 +2443,7 @@ CDEP 05/05/2006
         IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
-        IF ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
