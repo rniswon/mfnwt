@@ -18,3 +18,5 @@
 *.lst~HEAD
 *.lst~develop
 MF_NWT/MF_NWT/MF_NWT.u2d
+MF_NWT/MF_NWT/x64/Release/BuildLog.htm
+MF_NWT/MF_NWT/x64/Debug/BuildLog.htm
