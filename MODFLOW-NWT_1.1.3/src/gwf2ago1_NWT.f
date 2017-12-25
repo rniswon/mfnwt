@@ -777,6 +777,7 @@ C
 C1----INACTIVATE ALL IRRIGATION WELLS.
       IF (ITMP == 0 ) THEN
         NUMSUPSP = 0
+        NUMSEGS = 0
         RETURN
       END IF
 C
@@ -880,6 +881,7 @@ C
 C1----INACTIVATE ALL IRRIGATION WELLS.
       IF (ITMP == 0 ) THEN
         NUMIRRWELSP = 0
+        NUMCELLS = 0
         RETURN
       END IF
 C
@@ -1108,13 +1110,15 @@ C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IL = TABLAY(L)
           Q = RATETERPQ(TIME,L)  !For IRRWELLS that are not SUPWELLS
         END IF
-        IF ( NUMSUPSP > 0 ) THEN
+C
+C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
+        IF(IBOUND(IC,IR,IL) > 0) THEN
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             FMIN = SUPACT(J)
             QSW = SGOTFLW(IDIVAR(1, J))
-            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J)
+!            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J) 
             FMIN = PCTSUP(I,L)*(FMIN - QSW)
             IF ( FMIN < ZERO ) FMIN = ZERO
             SUP = SUP + FMIN
@@ -1130,10 +1134,6 @@ C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFI
           ELSE
             SUPFLOW(L) = 0.0
           END IF
-        END IF
-C
-C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
-        IF(IBOUND(IC,IR,IL) > 0) THEN
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
@@ -1156,38 +1156,34 @@ C8------Derivative for RHS
             RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
             Qp = Q
           END IF
-        END IF
 C
 C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-        SUP = 0.0
-        DO I = 1, NUMSEGS(L)
-          J = SFRSEG(I,L) 
-          SUP = SUP - Qp
-          ACTUAL(J)  = ACTUAL(J) + SUP
-        END DO
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)
+            J = SFRSEG(I,L) 
+            SUP = SUP - Qp
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
 ! APPLY IRRIGATION FROM WELLS
-        IF ( NUMIRRWELSP > 0 ) THEN
-            DO I = 1, NUMCELLS(L)
+          DO I = 1, NUMCELLS(L)
               SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
               SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
               WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
      +                    WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
-            END DO
+          END DO
         END IF
       END DO
-C APPLY IRRIGATION FROM DIVERSIONS
-      DO l = 1, NSTRM
-        istsg = ISTRM(4, l)
-        IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
-            DO icount = 1, DVRCH(istsg)
-              irr = IRRROW(icount,istsg)
-              icc = IRRCOL(icount,istsg)
-              dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-              dvt = dvt/(DELR(icc)*DELC(irr))
-              SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
+C APPLY IRRIGATION FROM SW DIVERSIONS
+      DO L = 1, NUMIRRSFRSP
+        istsg = IRRSEG(L)
+        DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRSFR TO SAVE MEMORY
+          irr = IRRROW(icount,istsg)
+          icc = IRRCOL(icount,istsg)
+          dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+          dvt = dvt/(DELR(icc)*DELC(irr))
+          SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
-            END DO
-        END IF
+        END DO
       END DO
 C
 C3------RETURN
@@ -1205,7 +1201,7 @@ C     ------------------------------------------------------------------
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBNM,VBVL,MSUM
       USE GWFAGOMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       IMPLICIT NONE
 C        ARGUMENTS:
@@ -1213,22 +1209,40 @@ C     ------------------------------------------------------------------
       INTEGER, INTENT(IN):: KKSTP,KKPER,Iunitnwt
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      CHARACTER*20 TEXT,TEXT1,TEXT2
+      CHARACTER*20 TEXT,TEXT1,TEXT2,TEXT3,TEXT4,TEXT5,TEXT6,TEXT7
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
-      double precision :: SUP,SUBVOL,SUBRATE
+      DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG
+      DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWET,DONE
       real :: Q,TIME,RATETERPQ
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
-      INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1
+      INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1,ISEG
+      INTEGER :: TOTWELLCELLS,TOTSFRCELLS
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
+      DATA TEXT /'GW IRRIGATION'/
       DATA TEXT /'SUPPLEMENTARY WELLS'/
-      DATA TEXT1 /'SFR DIVERSION IRRIGATION'/
-      DATA TEXT2 /'AGO WELL IRRIGATION'/
+      DATA TEXT2 /'SW IRRIGATION'/
+      DATA TEXT3 /'GW IRRIGATION'/
+      DATA TEXT4 /'SW RETURN FLOW'/
+      DATA TEXT5 /'GW RETURN FLOW'/
+      DATA TEXT6 /'EFFICIENCY FACTOR SWET'/
+      DATA TEXT7 /'EFFICIENCY FACTOR GWET'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
+      DONE=1.0D0
       RATIN=ZERO
       RATOUT=ZERO
+      RATINAG=ZERO
+      RATOUTAG=ZERO
+      QSW=ZERO
+      QSWIRR=ZERO
+      QSWET=ZERO
+      QWELLIRR=ZERO
+      QWELLET=ZERO
+      QWELL=ZERO
+      TOTWELLCELLS=0
+      TOTSFRCELLS=0
       IBD=0
       WELLIRR = ZERO
       TIME = TOTIM
@@ -1237,12 +1251,22 @@ C     ------------------------------------------------------------------
       SFRIRR = ZERO
       Qp = 1.0
       NWELLSTEMP = NWELLS
-      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
-      
+      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    
       IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
       IF(IWELCB.GT.0) IBD=ICBCFL
       IBDLBL=0
       iw1 = 1
+C
+C1------ADD UP TOTAL NUMBER OF WELL IRRIGATION CELLS DURING STRESS PERIOD.
+      DO L=1,NWELLSTEMP 
+        TOTWELLCELLS = TOTWELLCELLS + NUMCELLS(L)
+      END DO
+C
+C1------ADD UP TOTAL NUMBER OF SFR IRRIGATION CELLS DURING STRESS PERIOD.   
+      DO L = 1, NUMIRRSFRSP
+        J = IRRSEG(L)
+        TOTSFRCELLS = TOTSFRCELLS + DVRCH(J)
+      END DO
 C
 C1------CLEAR THE BUFFER.
       DO 50 IL=1,NLAY
@@ -1251,7 +1275,7 @@ C1------CLEAR THE BUFFER.
       BUFF(IC,IR,IL)=ZERO
 50    CONTINUE
 C
-C2-----IF CELL-BY-CELL SUPPLEMENTARY PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
+C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
       IF(IBD.EQ.2) THEN
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
@@ -1259,20 +1283,27 @@ C2-----IF CELL-BY-CELL SUPPLEMENTARY PUMPING WILL BE SAVED AS A LIST, WRITE HEAD
      1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 C
-C2-----IF CELL-BY-CELL DIVERSION IRRIGATION FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
+C2-----IF CELL-BY-CELL GW IRRIGATION WILL BE SAVED AS A LIST, WRITE HEADER.
       IF(IBD.EQ.2) THEN
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
-         CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,SEGAUX,IWELCB,NCOL,NROW,
-     1          NLAY,NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+         CALL UBDSV4(KKSTP,KKPER,TEXT,NAUX,WELAUX,IWELCB,NCOL,NROW,NLAY,
+     1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
-
 C
-C3------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
-      !IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
-      !  CALL UZFIRRDEMANDCALC(Kkper, Kkstp, 1)
-      !END IF
-            
+C2-----IF CELL-BY-CELL SW IRRIGATION WILL BE SAVED AS A LIST, WRITE HEADER.
+     !! IF(IBD.EQ.2) THEN
+     !!    NAUX=NWELVL-5
+     !!    IF(IAUXSV.EQ.0) NAUX=0
+     !!    CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,SEGAUX,ISEGCB,NCOL,NROW,
+     !!1          NLAY,NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+     !! END IF
+C
+C3-----SUM UP SW DIVERSIONS APPLIED AS IRRIGATION
+      DO I = 1, NUMIRRSFRSP
+        ISEG = IRRSEG(I)
+        QSW = QSW + SGOTFLW(IDIVAR(1, ISEG))   
+      END DO
 C
 C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
@@ -1291,17 +1322,17 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IL = TABLAY(L)
           Q = RATETERPQ(TIME,L)
         END IF
-        Q = SUPFLOW(L)
-        QSAVE = Q
-C
-        bbot = Botm(IC, IR, Lbotm(IL))
-        ttop = Botm(IC, IR, Lbotm(IL)-1)
-        Hh = HNEW(ic,ir,il)
 C
 C7------IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
 C-------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
 C
         IF(IBOUND(IC,IR,IL) > 0 ) THEN
+          Q = SUPFLOW(L)
+          QSAVE = Q
+C
+          bbot = Botm(IC, IR, Lbotm(IL))
+          ttop = Botm(IC, IR, Lbotm(IL)-1)
+          Hh = HNEW(ic,ir,il)
           IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               Qp = smoothQ(Hh,Ttop,Bbot,dQp)
@@ -1313,6 +1344,7 @@ C
             Q = Qsave
           END IF
           QQ=Q
+          QWELL = QWELL + QQ
 C
 C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           SUP = 0.0
@@ -1323,63 +1355,62 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           END DO
 C
 C9------APPLY IRRIGATION FROM WELLS
-          IF ( NUMIRRWELSP > 0 ) THEN
-              DO I = 1, NUMCELLS(L)
-                SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
-                SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-                WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
-     +                  WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
-              END DO
-          END IF
-        END IF
+          DO I = 1, NUMCELLS(L)
+            SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
+            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
+            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
+     +              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
+            QWELLIRR=QWELLIRR-SUBVOL
+            QWELLET=QWELLET+IRRFACT(I,L)*Q*IRRPCT(I,L)
+          END DO
 C
 C10------WRITE WELLS WITH REDUCED PUMPING
-        IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
-     +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
-          IF ( iw1.EQ.1 ) THEN
-            WRITE(IUNITRAMP,*)
-            WRITE(IUNITRAMP,300)KKPER,KKSTP
-            WRITE(IUNITRAMP,400)
+          IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
+     +       IPRWEL.NE.0 .and. Qsave < ZERO ) THEN
+            IF ( iw1.EQ.1 ) THEN
+              WRITE(IUNITRAMP,*)
+              WRITE(IUNITRAMP,300)KKPER,KKSTP
+              WRITE(IUNITRAMP,400)
+            END IF
+            WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
+            iw1 = iw1 + 1 
           END IF
-          WRITE(IUNITRAMP,500)IL,IR,IC,QSAVE,Q,hh,bbot
-          iw1 = iw1 + 1 
-        END IF
 C
 C11A-----ADD FLOW RATE TO BUFFER.
-        BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
+          BUFF(IC,IR,IL)=BUFF(IC,IR,IL)+QQ
 C
 C11B-----SEE IF FLOW IS POSITIVE OR NEGATIVE.
-        IF(QQ.GE.ZERO) THEN
+          IF(QQ.GE.ZERO) THEN
 C
 C11C-----FLOW RATE IS POSITIVE (RECHARGE). ADD IT TO RATIN.
-          RATIN=RATIN+QQ
-        ELSE
+           RATIN=RATIN+QQ
+          ELSE
 C
 C11D-----FLOW RATE IS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
-          RATOUT=RATOUT-QQ
-        END IF
+            RATOUT=RATOUT-QQ
+          END IF
 C
 C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
 C--------COPY FLOW TO WELL LIST.
-   99   IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
+   99     IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-        WELL(NWELVL,L)=QQ
+          WELL(NWELVL,L)=QQ
+        END IF
       END DO
-      write(333,*)kkper,kkstp,totim,RATOUT,SGOTFLW(9)
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
-      DO l = 1, NSTRM
-        istsg = ISTRM(4, l)
-        IF ( istsg.GT.1 .AND. NUMIRRSFRSP > 0 ) THEN
-            DO icount = 1, DVRCH(istsg)
-              irr = IRRROW(icount,istsg)
-              icc = IRRCOL(icount,istsg)
-              dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-              dvt = dvt/(DELR(icc)*DELC(irr))
-              SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
-     +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
-            END DO
-        END IF
+      DO L = 1, NUMIRRSFRSP
+        istsg = IRRSEG(L)
+        DO icount = 1, DVRCH(istsg)
+          irr = IRRROW(icount,istsg)
+          icc = IRRCOL(icount,istsg)
+          dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+          dvt = dvt/(DELR(icc)*DELC(irr))
+          SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
+     +                       dvt*(1.0-DVEFF(ICOUNT,istsg))
+          QSW=QSW+DVT
+          QSWET=QSWET+SGOTFLW(istsg)*(DONE-DVRPERC(ICOUNT,istsg))
+        END DO
       END DO
       
    61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
