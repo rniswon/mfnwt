@@ -3,7 +3,8 @@ etdemand
 irrigationstream 1 6
 supplementalwell 6 1 
 irrigationwell 6 1 
-maxwells 6   
+maxwells 6  
+welllist -2 
 end
 well list
          1         6         4    -10.00
