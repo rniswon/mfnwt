@@ -1,7 +1,8 @@
       MODULE GWFAGOMODULE
 ! from well package
         INTEGER,SAVE,POINTER  :: NWELLS,MXWELL,NWELVL,NPWEL,IPRWEL
-        INTEGER,SAVE,POINTER  :: IWELCB,IRDPSI,NNPWEL,NAUX
+        INTEGER,SAVE,POINTER  :: IWELLCB,IRDPSI,NNPWEL,NAUX,ISFRCB
+        INTEGER,SAVE,POINTER  :: IRRWELLCB,IRRSFRCB
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SEGAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -82,7 +83,8 @@ C        VARIABLES
       REAL :: R
 C     ------------------------------------------------------------------
       ALLOCATE(VBVLAG(4,10),VBNMAG(10),MSUMAG)
-      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELCB,NAUX)
+      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELLCB,ISFRCB,NAUX)
+      ALLOCATE(IRRWELLCB,IRRSFRCB)
       ALLOCATE(PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       VBVLAG = 0.0
@@ -100,7 +102,10 @@ C     ------------------------------------------------------------------
       NNPWEL=0
       MXWELL=0
       NWELVL=0
-      IWELCB=0
+      IWELLCB=0
+      ISFRCB=0
+      IRRWELLCB=0
+      IRRSFRCB=0
       IUNITRAMP=IOUT
       MAXVAL = 1
       NUMSUP = 0
@@ -301,14 +306,35 @@ C
             WRITE(IOUT,*)
             WRITE(IOUT,36) MXWELL
             WRITE(IOUT,*)
-! Option to output CBC results to unformatted file
-        case('CBCWELLS')
-            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELCB,R,IOUT,IN)
-            IF( IWELCB.LT.0 ) IWELCB = abs(IWELCB)
+! Option to output list for wells  
+        case('WELLLIST')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELLCB,R,IOUT,IN)
+!            IF( IWELLCB.LT.0 ) IWELLCB = abs(IWELLCB)
             WRITE(IOUT,*)
-            WRITE(IOUT,37) IWELCB
+            WRITE(IOUT,37) IWELLCB
             WRITE(IOUT,*)
-! Option to turn off writing list of wells to LST file
+! Option to output list for segments
+        case('SFRLIST')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISFRCB,R,IOUT,IN)
+!            IF( ISFRCB.LT.0 ) ISFRCB = abs(ISFRCB)
+            WRITE(IOUT,*)
+            WRITE(IOUT,37) ISFRCB
+            WRITE(IOUT,*)
+! Option to output list for irrigation segments   
+        case('SFRIRRLIST')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRRSFRCB,R,IOUT,IN)
+!            IF( IRRSFRCB.LT.0 ) IRRSFRCB = abs(IRRSFRCB)
+            WRITE(IOUT,*)
+            WRITE(IOUT,37) IRRSFRCB
+            WRITE(IOUT,*)
+! Option to output list for irrigation wells
+        case('WELLIRRLIST')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRRWELLCB,R,IOUT,IN)
+!            IF( IRRWELLCB.LT.0 ) IRRWELLCB = abs(IRRWELLCB)
+            WRITE(IOUT,*)
+            WRITE(IOUT,37) IRRWELLCB
+            WRITE(IOUT,*)
+! Option to turn off writing to LST file
         case('NOPRINT')
             IPRWEL = 0
             WRITE(IOUT,*)
@@ -1209,25 +1235,27 @@ C     ------------------------------------------------------------------
       INTEGER, INTENT(IN):: KKSTP,KKPER,Iunitnwt
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      CHARACTER*20 TEXT,TEXT1,TEXT2,TEXT3,TEXT4,TEXT5,TEXT6,TEXT7
+      CHARACTER*20 TEXT1,TEXT3,TEXT4,TEXT5
+      CHARACTER*20 TEXT2 !,TEXT6,TEXT7,TEXT8
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
       DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG
       DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWET,DONE
       real :: Q,TIME,RATETERPQ
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
-      INTEGER :: IRR,ICC,IC,IR,IBD,IBDLBL,IW1,ISEG
+      INTEGER :: IC,IR,IBDLBL,IW1,ISEG
+      INTEGER :: IBD1,IBD2,IBD3,IBD4
       INTEGER :: TOTWELLCELLS,TOTSFRCELLS
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
-      DATA TEXT /'GW IRRIGATION'/
-      DATA TEXT /'SUPPLEMENTARY WELLS'/
-      DATA TEXT2 /'SW IRRIGATION'/
-      DATA TEXT3 /'GW IRRIGATION'/
-      DATA TEXT4 /'SW RETURN FLOW'/
-      DATA TEXT5 /'GW RETURN FLOW'/
-      DATA TEXT6 /'EFFICIENCY FACTOR SWET'/
-      DATA TEXT7 /'EFFICIENCY FACTOR GWET'/
+      DATA TEXT1 /'       AWU WELLS    '/
+      DATA TEXT2 /'DIVERSION SEGMENTS'/
+      DATA TEXT3 /'SW IRRIGATION'/
+      DATA TEXT4 /'GW IRRIGATION'/
+!      DATA TEXT5 /'SW RETURN FLOW'/
+!      DATA TEXT6 /'GW RETURN FLOW'/
+!      DATA TEXT7 /'EFFICIENCY FACTOR SWET'/
+!      DATA TEXT8 /'EFFICIENCY FACTOR GWET'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       DONE=1.0D0
@@ -1243,19 +1271,32 @@ C     ------------------------------------------------------------------
       QWELL=ZERO
       TOTWELLCELLS=0
       TOTSFRCELLS=0
-      IBD=0
       WELLIRR = ZERO
       TIME = TOTIM
       ACTUAL = ZERO
       SUP = ZERO
       SFRIRR = ZERO
+      IBD1=0
+      IBD2=0
+      IBD3=0
+      IBD4=0
       Qp = 1.0
       NWELLSTEMP = NWELLS
-      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    
-      IF(IWELCB.LT.0 .AND. ICBCFL.NE.0) IBD=-1
-      IF(IWELCB.GT.0) IBD=ICBCFL
+      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB 
       IBDLBL=0
       iw1 = 1
+! Budget output for wells
+      IF(IWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD1=-1
+      IF(IWELLCB.GT.0) IBD1=ICBCFL 
+! Budeget output for segments    
+      IF(ISFRCB.LT.0 .AND. ICBCFL.NE.0) IBD2=-1
+      IF(ISFRCB.GT.0) IBD2=ISFRCB
+! Budeget output for irrigation segments    
+      IF(IRRSFRCB.LT.0 .AND. ICBCFL.NE.0) IBD3=-1
+      IF(IRRSFRCB.GT.0) IBD3=IRRSFRCB
+! Budeget output for irrigation wells    
+      IF(IRRWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD4=-1
+      IF(IRRWELLCB.GT.0) IBD4=IRRWELLCB
 C
 C1------ADD UP TOTAL NUMBER OF WELL IRRIGATION CELLS DURING STRESS PERIOD.
       DO L=1,NWELLSTEMP 
@@ -1275,29 +1316,6 @@ C1------CLEAR THE BUFFER.
       BUFF(IC,IR,IL)=ZERO
 50    CONTINUE
 C
-C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF(IBD.EQ.2) THEN
-         NAUX=NWELVL-5
-         IF(IAUXSV.EQ.0) NAUX=0
-         CALL UBDSV4(KKSTP,KKPER,TEXT,NAUX,WELAUX,IWELCB,NCOL,NROW,NLAY,
-     1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
-C
-C2-----IF CELL-BY-CELL GW IRRIGATION WILL BE SAVED AS A LIST, WRITE HEADER.
-      IF(IBD.EQ.2) THEN
-         NAUX=NWELVL-5
-         IF(IAUXSV.EQ.0) NAUX=0
-         CALL UBDSV4(KKSTP,KKPER,TEXT,NAUX,WELAUX,IWELCB,NCOL,NROW,NLAY,
-     1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
-C
-C2-----IF CELL-BY-CELL SW IRRIGATION WILL BE SAVED AS A LIST, WRITE HEADER.
-     !! IF(IBD.EQ.2) THEN
-     !!    NAUX=NWELVL-5
-     !!    IF(IAUXSV.EQ.0) NAUX=0
-     !!    CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,SEGAUX,ISEGCB,NCOL,NROW,
-     !!1          NLAY,NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-     !! END IF
 C
 C3-----SUM UP SW DIVERSIONS APPLIED AS IRRIGATION
       DO I = 1, NUMIRRSFRSP
@@ -1308,6 +1326,30 @@ C
 C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
+C
+C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
+         NAUX=NWELVL-5
+         IF(IAUXSV.EQ.0) NAUX=0
+! FOR WELLS
+      IF(IBD1.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,WELAUX,IWELLCB,NCOL,NROW,NLAY,
+     1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
+! FOR SEGMENTS (DIVERSIONS)
+      IF(IBD2.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SEGAUX,ISFRCB,NCOL,NROW,NLAY,
+     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
+! SW IRRIGATION
+      IF(IBD3.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT3,0,SEGAUX,IRRSFRCB,NCOL,NROW,NLAY,
+     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
+! GW IRRIGATION
+      IF(IBD4.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT4,NAUX,WELAUX,IRRWELLCB,NCOL,NROW,
+     1          NLAY,NUMIRRWEL,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
 C
 C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
       DO L=1,NWELLSTEMP 
@@ -1392,7 +1434,7 @@ C11D-----FLOW RATE IS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
 C
 C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
 C--------COPY FLOW TO WELL LIST.
-   99     IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
+   99 IF(IBD1.EQ.2) CALL UBDSVB(IWELLCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
           WELL(NWELVL,L)=QQ
         END IF
@@ -1402,58 +1444,84 @@ C12-------APPLY IRRIGATION FROM DIVERSIONS
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
         DO icount = 1, DVRCH(istsg)
-          irr = IRRROW(icount,istsg)
-          icc = IRRCOL(icount,istsg)
+          ir = IRRROW(icount,istsg)
+          ic = IRRCOL(icount,istsg)
           dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-          dvt = dvt/(DELR(icc)*DELC(irr))
-          SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
+          dvt = dvt/(DELR(ic)*DELC(ir))
+          SFRIRR(ic,ir) = SFRIRR(ic,ir) + 
      +                       dvt*(1.0-DVEFF(ICOUNT,istsg))
           QSW=QSW+DVT
           QSWET=QSWET+SGOTFLW(istsg)*(DONE-DVRPERC(ICOUNT,istsg))
         END DO
       END DO
-      
-   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
-     1      '   RATE ',1PG15.6)
-  300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
-     1      ' TIME STEP ',I5)
-  400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
-     1       '        GW-HEAD       CELL-BOT')
-  500 FORMAT(3I6,4E15.6)
 !
-C13-----PRINT FLOW RATE IF REQUESTED.
-      IF(IBDLBL.EQ.0.AND.IBD.LT.0) WRITE(IOUT,61) TEXT,KKPER,KKSTP
-      DO L=1,NWELLSTEMP
-        IF ( NUMTAB.LE.0 ) THEN
-          IR=WELL(2,L)
-          IC=WELL(3,L)
-          IL=WELL(1,L)
-        ELSE
-          IR = TABROW(L)
-          IC = TABCOL(L)
-          IL = TABLAY(L)  
-        END IF
-        IF(IBD.LT.0) THEN
+C13-----PRINT PUMPING RATE IF REQUESTED.
+      IF(IBD1.LT.0) THEN
+        WRITE(IOUT,61) TEXT1,KKPER,KKSTP
+        DO L=1,NWELLSTEMP
+          IF ( NUMTAB.LE.0 ) THEN
+            IR=WELL(2,L)
+            IC=WELL(3,L)
+            IL=WELL(1,L)
+          ELSE
+            IR = TABROW(L)
+            IC = TABCOL(L)
+            IL = TABLAY(L)
+          END IF
           WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
-        END IF
-      END DO
+        END DO
+      END IF
+!
+C13-----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
+      IF(IBD2.LT.0) THEN
+        WRITE(IOUT,61) TEXT2,KKPER,KKSTP
+        DO L = 1, NUMIRRSFRSP
+          istsg = IRRSEG(L)
+          WRITE(IOUT,63) istsg,SGOTFLW(istsg)
+        END DO
+      END IF
+!
+C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL      
+      IF(IBD3.LT.0) THEN
+        WRITE(IOUT,61) TEXT3,KKPER,KKSTP
+        DO L = 1, NUMIRRSFR
+          ISTSG = IRRSEG(L)
+          DO icount = 1, DVRCH(istsg)
+            ir = IRRROW(icount,istsg)
+            ic = IRRCOL(icount,istsg)
+            WRITE(IOUT,65) ISTSG,IR,IC,SFRIRR(IC,IR) 
+          END DO
+        END DO
+      END IF
+C   
+!
+C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
+      IF(IBD4.LT.0) THEN
+        WRITE(IOUT,61) TEXT4,KKPER,KKSTP
+        DO L=1,NWELLSTEMP 
+          DO I = 1, NUMCELLS(L)
+            IC = UZFCOL(I,L)
+            IR = UZFROW(I,L)
+            WRITE(IOUT,64) L,IR,IC,WELLIRR(IC,IR)
+          END DO
+        END DO
+      END IF
 C
       IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
 C
 C14------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
 C-------CALL UBUDSV TO SAVE THEM.
-      IF(IBD.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT,IWELCB,BUFF,NCOL,NROW,
-     1                          NLAY,IOUT)
+      IF(IBD1.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCB,BUFF,NCOL,
+     1                          NROW,NLAY,IOUT)
 C
 C15------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING.
-  200 RIN=RATIN
+      RIN=RATIN
       ROUT=RATOUT
       VBVL(3,MSUM)=RIN
       VBVL(4,MSUM)=ROUT
       VBVL(1,MSUM)=VBVL(1,MSUM)+RIN*DELT
       VBVL(2,MSUM)=VBVL(2,MSUM)+ROUT*DELT
-      VBNM(MSUM)=TEXT
+      VBNM(MSUM)=TEXT1
 C
 C16------INCREMENT BUDGET TERM COUNTER(MSUM).
       MSUM=MSUM+1
@@ -1462,6 +1530,19 @@ C18------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING
 C        AG WATER BALANCE.      
 !      VBVLAG(10),VBNMAG(10),MSUMAG
 C
+   61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
+   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
+   63 FORMAT(1X,'SEGMENT ',I6,'   RATE ',1PG15.6)
+   64 FORMAT(1X,'WELL ',I6,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
+   65 FORMAT(1X,'SEGMENT ',I6,'   ROW ',I5,'   COL ',I5,
+     1      '   RATE ',1PG15.6)
+  300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
+     1      ' TIME STEP ',I5)
+  400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
+     1       '        GW-HEAD       CELL-BOT')
+  500 FORMAT(3I6,4E15.6)
 C19------RETURN
       RETURN
       END
@@ -1608,6 +1689,9 @@ C     ******************************************************************
       END FUNCTION smoothQ
 C
       REAL FUNCTION RATETERPQ (TIME,INUM)
+C     ******************************************************************
+C     LINEARLY INTERPOLATE PUMPING RATE FROM TABFILE
+C     ******************************************************************
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
       USE GWFWELMODULE, ONLY: TABRATE, TABTIME, TABVAL
@@ -1853,7 +1937,10 @@ C
         DEALLOCATE(NWELLS)
         DEALLOCATE(MXWELL)
         DEALLOCATE(NWELVL)
-        DEALLOCATE(IWELCB)
+        DEALLOCATE(IWELLCB)
+        DEALLOCATE(ISFRCB)
+        DEALLOCATE(IRRWELLCB)
+        DEALLOCATE(IRRSFRCB)
         DEALLOCATE(IPRWEL)
         DEALLOCATE(NPWEL)
         DEALLOCATE(NNPWEL)
