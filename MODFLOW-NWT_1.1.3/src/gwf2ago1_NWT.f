@@ -4,7 +4,7 @@
         INTEGER,SAVE,POINTER  :: IWELLCB,IRDPSI,NNPWEL,NAUX,ISFRCB
         INTEGER,SAVE,POINTER  :: IRRWELLCB,IRRSFRCB
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
-        CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SEGAUX
+        CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABTIME
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABRATE
@@ -23,6 +23,7 @@
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::SFRSEG
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
+        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::AETITER
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
@@ -213,6 +214,7 @@ C-------allocate for SFR agoptions
 !        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (IRRROW(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
+        ALLOCATE(AETITER(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
         ALLOCATE (SFRIRR(NCOL,NROW))  
         ALLOCATE (IRRSEG(NSEGDIM))
@@ -221,13 +223,14 @@ C-------allocate for SFR agoptions
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
         ALLOCATE (DVRPERC(1,1))  
         ALLOCATE (SFRIRR(1,1))  
-        ALLOCATE (IRRSEG(1))
+        ALLOCATE (IRRSEG(1),AETITER(1,1))
       END IF
       DVRCH = 0    
       DVEFF = 0.0
 !      KCROP = 0.0
       IRRROW = 0  
       IRRCOL = 0
+      AETITER = 0.0
       SFRIRR = 0.0      
       DVRPERC = 0.0   
       ALLOCATE (IDVFLG)  
@@ -769,6 +772,8 @@ C1-------RESET DEMAND IF IT CHANGES
         DEMAND(ISEG) = SEG(2, ISEG)
         SUPACT(ISEG) = 0.0
       END DO
+C2------RESET SAVED AET FROM LAST ITERATION
+      AETITER = 0.0
 !      CALL UZFIRRDEMANDSET()
 C
 C6------RETURN
@@ -1143,7 +1148,7 @@ C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
           DO I = 1, NUMSEGS(L)
             J = SFRSEG(I,L)
             FMIN = SUPACT(J)
-            QSW = SGOTFLW(IDIVAR(1, J))
+            QSW = DEMAND(J)   !SGOTFLW(IDIVAR(1, J))
 !            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J) 
             FMIN = PCTSUP(I,L)*(FMIN - QSW)
             IF ( FMIN < ZERO ) FMIN = ZERO
@@ -1225,7 +1230,7 @@ C     ------------------------------------------------------------------
       USE GLOBAL,      ONLY:IOUT,DELR,DELC,issflg,NCOL,NROW,NLAY,
      1                      IBOUND,HNEW,BUFF,BOTM,LBOTM
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
-     1                      VBNM,VBVL,MSUM
+     1                      VBNM,VBVL,MSUM,IBUDFL
       USE GWFAGOMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
@@ -1235,12 +1240,12 @@ C     ------------------------------------------------------------------
       INTEGER, INTENT(IN):: KKSTP,KKPER,Iunitnwt
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      CHARACTER*20 TEXT1,TEXT3,TEXT4,TEXT5
-      CHARACTER*20 TEXT2 !,TEXT6,TEXT7,TEXT8
+      CHARACTER*20 TEXT1,TEXT11,TEXT3,TEXT4,TEXT5
+      CHARACTER*20 TEXT2,TEXT6,TEXT7,TEXT8
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
-      DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG
+      DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG,AREA
       DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWET,DONE
-      real :: Q,TIME,RATETERPQ
+      REAL :: Q,TIME,RATETERPQ,QIRR,BUDPERC
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
       INTEGER :: IBD1,IBD2,IBD3,IBD4
@@ -1249,13 +1254,14 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DATA TEXT1 /'       AWU WELLS    '/
+      DATA TEXT11 /'AWU WELLS'/
       DATA TEXT2 /'DIVERSION SEGMENTS'/
       DATA TEXT3 /'SW IRRIGATION'/
       DATA TEXT4 /'GW IRRIGATION'/
-!      DATA TEXT5 /'SW RETURN FLOW'/
-!      DATA TEXT6 /'GW RETURN FLOW'/
-!      DATA TEXT7 /'EFFICIENCY FACTOR SWET'/
-!      DATA TEXT8 /'EFFICIENCY FACTOR GWET'/
+      DATA TEXT5 /'SW RETURN FLOW'/
+      DATA TEXT6 /'GW RETURN FLOW'/
+      DATA TEXT7 /'EFFICIENCY FACTOR SWET'/
+      DATA TEXT8 /'EFFICIENCY FACTOR GWET'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       DONE=1.0D0
@@ -1269,6 +1275,7 @@ C     ------------------------------------------------------------------
       QWELLIRR=ZERO
       QWELLET=ZERO
       QWELL=ZERO
+      QIRR=ZERO
       TOTWELLCELLS=0
       TOTSFRCELLS=0
       WELLIRR = ZERO
@@ -1276,6 +1283,7 @@ C     ------------------------------------------------------------------
       ACTUAL = ZERO
       SUP = ZERO
       SFRIRR = ZERO
+      MSUMAG = 1
       IBD1=0
       IBD2=0
       IBD3=0
@@ -1286,17 +1294,21 @@ C     ------------------------------------------------------------------
       IBDLBL=0
       iw1 = 1
 ! Budget output for wells
-      IF(IWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD1=-1
-      IF(IWELLCB.GT.0) IBD1=ICBCFL 
+      IF(IWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD1=-1  
+      IF(IWELLCB.LT.0 .AND. IBUDFL.NE.0) IBD1=-1
+      IF(IWELLCB.GT.0) IBD1=ICBCFL
 ! Budeget output for segments    
       IF(ISFRCB.LT.0 .AND. ICBCFL.NE.0) IBD2=-1
-      IF(ISFRCB.GT.0) IBD2=ISFRCB
+      IF(ISFRCB.LT.0 .AND. IBUDFL.NE.0) IBD2=-1
+      IF(ISFRCB.GT.0) IBD2=ICBCFL
 ! Budeget output for irrigation segments    
       IF(IRRSFRCB.LT.0 .AND. ICBCFL.NE.0) IBD3=-1
-      IF(IRRSFRCB.GT.0) IBD3=IRRSFRCB
+      IF(IRRSFRCB.LT.0 .AND. IBUDFL.NE.0) IBD3=-1
+      IF(IRRSFRCB.GT.0) IBD3=ICBCFL
 ! Budeget output for irrigation wells    
       IF(IRRWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD4=-1
-      IF(IRRWELLCB.GT.0) IBD4=IRRWELLCB
+      IF(IRRWELLCB.LT.0 .AND. IBUDFL.NE.0) IBD4=-1
+      IF(IRRWELLCB.GT.0) IBD4=ICBCFL
 C
 C1------ADD UP TOTAL NUMBER OF WELL IRRIGATION CELLS DURING STRESS PERIOD.
       DO L=1,NWELLSTEMP 
@@ -1327,7 +1339,8 @@ C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
-C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
+C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST(COMPACT BUDGET), 
+C       WRITE HEADER.
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
 ! FOR WELLS
@@ -1336,13 +1349,13 @@ C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST, WRITE HEADER.
      1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 ! FOR SEGMENTS (DIVERSIONS)
-      IF(IBD2.EQ.2) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SEGAUX,ISFRCB,NCOL,NROW,NLAY,
-     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
+     !! IF(IBD2.EQ.2) THEN
+     !! CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SFRAUX,ISFRCB,NCOL,NROW,NLAY,
+     !!1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+     !! END IF
 ! SW IRRIGATION
       IF(IBD3.EQ.2) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT3,0,SEGAUX,IRRSFRCB,NCOL,NROW,NLAY,
+      CALL UBDSV4(KKSTP,KKPER,TEXT3,0,SFRAUX,IRRSFRCB,NCOL,NROW,NLAY,
      1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 ! GW IRRIGATION
@@ -1402,7 +1415,7 @@ C9------APPLY IRRIGATION FROM WELLS
             SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
             WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
      +              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
-            QWELLIRR=QWELLIRR-SUBVOL
+            QWELLIRR=QWELLIRR+SUBVOL
             QWELLET=QWELLET+IRRFACT(I,L)*Q*IRRPCT(I,L)
           END DO
 C
@@ -1432,32 +1445,60 @@ C11D-----FLOW RATE IS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
             RATOUT=RATOUT-QQ
           END IF
 C
-C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  ALSO
-C--------COPY FLOW TO WELL LIST.
-   99 IF(IBD1.EQ.2) CALL UBDSVB(IWELLCB,NCOL,NROW,IC,IR,IL,Q,
+C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  
+C
+          IF(IBD1.EQ.2) CALL UBDSVB(IWELLCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
+C
+C12------IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE GW IRRIGATION.
+C
+          IF(IBD4.EQ.2) THEN
+            DO I = 1, MAXCELLSWEL     !NUMCELLS(L) same number of values each write 
+              IC = UZFCOL(I,L)
+              IR = UZFROW(I,L)
+              QIRR = WELLIRR(IC,IR)
+              CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
+     1                WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
+            END DO
+          END IF
+C
+C--------COPY FLOW TO WELL LIST.
           WELL(NWELVL,L)=QQ
         END IF
       END DO
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
+C         IF SAVING CELL-BY-CELL FLOWS IN A LIST (COMPACT BUDGET), WRITE SW IRRIGATION
+C         AND DIVERTED SW.  
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
         DO icount = 1, DVRCH(istsg)
           ir = IRRROW(icount,istsg)
           ic = IRRCOL(icount,istsg)
-          dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-          dvt = dvt/(DELR(ic)*DELC(ir))
-          SFRIRR(ic,ir) = SFRIRR(ic,ir) + 
-     +                       dvt*(1.0-DVEFF(ICOUNT,istsg))
+          AREA = DELR(ic)*DELC(ir)
+          DVT = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
           QSW=QSW+DVT
-          QSWET=QSWET+SGOTFLW(istsg)*(DONE-DVRPERC(ICOUNT,istsg))
+          SFRIRR(ic,ir) = SFRIRR(ic,ir) + 
+     1                    DVT*(DONE-DVEFF(ICOUNT,istsg))/AREA
+          QSWET=QSWET+DVT*(DVEFF(ICOUNT,istsg))
+          QSWIRR = QSWIRR + DVT*(DONE-DVEFF(ICOUNT,istsg))
         END DO
+        IF(IBD3.EQ.2) THEN
+          QIRR = 0.0
+          DO icount = 1, MAXCELLSSFR        !VRCH(istsg) WRITE THE SAME NUMBER OF CELLS EACH TIME
+            ir = IRRROW(icount,istsg)
+            ic = IRRCOL(icount,istsg)
+            IF ( IR*IC > 0 ) QIRR = SFRIRR(IC,IR)
+            CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
+     1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
+          END DO
+        END IF
       END DO
 !
 C13-----PRINT PUMPING RATE IF REQUESTED.
       IF(IBD1.LT.0) THEN
-        WRITE(IOUT,61) TEXT1,KKPER,KKSTP
+        WRITE(IOUT,*)
+        WRITE(IOUT,61) TEXT11,KKPER,KKSTP
         DO L=1,NWELLSTEMP
           IF ( NUMTAB.LE.0 ) THEN
             IR=WELL(2,L)
@@ -1470,21 +1511,25 @@ C13-----PRINT PUMPING RATE IF REQUESTED.
           END IF
           WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
         END DO
+        WRITE(IOUT,*)
       END IF
 !
 C13-----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
       IF(IBD2.LT.0) THEN
+        WRITE(IOUT,*)
         WRITE(IOUT,61) TEXT2,KKPER,KKSTP
         DO L = 1, NUMIRRSFRSP
           istsg = IRRSEG(L)
           WRITE(IOUT,63) istsg,SGOTFLW(istsg)
         END DO
+        WRITE(IOUT,*)
       END IF
 !
 C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL      
       IF(IBD3.LT.0) THEN
+        WRITE(IOUT,*)
         WRITE(IOUT,61) TEXT3,KKPER,KKSTP
-        DO L = 1, NUMIRRSFR
+        DO L = 1, NUMIRRSFRSP
           ISTSG = IRRSEG(L)
           DO icount = 1, DVRCH(istsg)
             ir = IRRROW(icount,istsg)
@@ -1492,11 +1537,13 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
             WRITE(IOUT,65) ISTSG,IR,IC,SFRIRR(IC,IR) 
           END DO
         END DO
+        WRITE(IOUT,*)
       END IF
 C   
 !
 C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
       IF(IBD4.LT.0) THEN
+        WRITE(IOUT,*)
         WRITE(IOUT,61) TEXT4,KKPER,KKSTP
         DO L=1,NWELLSTEMP 
           DO I = 1, NUMCELLS(L)
@@ -1505,6 +1552,7 @@ C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
             WRITE(IOUT,64) L,IR,IC,WELLIRR(IC,IR)
           END DO
         END DO
+        WRITE(IOUT,*)
       END IF
 C
       IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
@@ -1527,8 +1575,68 @@ C16------INCREMENT BUDGET TERM COUNTER(MSUM).
       MSUM=MSUM+1
 C
 C18------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING 
-C        AG WATER BALANCE.      
-!      VBVLAG(10),VBNMAG(10),MSUMAG
+C        GW PUMPING   
+      IF (ICBCFL.NE.0) THEN
+      RIN = QWELL
+      ROUT = 0.0
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT1
+      MSUMAG = MSUMAG + 1
+C
+C18-------SW DIVERSIONS
+      RIN = QSW
+      ROUT = 0.0
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT2
+      MSUMAG = MSUMAG + 1
+C
+C18-------GW IRRIGATION
+      RIN = 0.0
+      ROUT = QWELLIRR
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT4
+      MSUMAG = MSUMAG + 1
+C
+C18-------SW IRRIGATION
+      RIN = 0.0
+      ROUT = QSWIRR
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT3
+      MSUMAG = MSUMAG + 1
+C
+C18-------GW EFFICIENCY ET
+      RIN = 0.0
+      ROUT = QWELLET
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT8
+      MSUMAG = MSUMAG + 1
+C
+C18-------SW EFFICIENCY ET
+      RIN = 0.0
+      ROUT = QSWET
+      VBVLAG(3,MSUMAG)=RIN
+      VBVLAG(4,MSUMAG)=ROUT
+      VBVLAG(1,MSUMAG)=VBVL(1,MSUMAG)+RIN*DELT
+      VBVLAG(2,MSUMAG)=VBVL(2,MSUMAG)+ROUT*DELT
+      VBNMAG(MSUMAG)=TEXT7
+      MSUMAG = MSUMAG + 1
+      CALL SGWF2AGO7V(MSUMAG,VBNMAG,VBVLAG,KKSTP,KKPER,IOUT,BUDPERC)
+      END IF
 C
    61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
    62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
@@ -1565,13 +1673,13 @@ C
       !arguments
       ! -- dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod3,zerod30,done,dzero,dum,pettotal, 
+      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
      +                    aettotal,dhundred
       integer :: k,iseg,ic,ir,i,Kkper, Kkstp, Kkiter
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod3 = 1.0d-3
+      zerod2 = 1.0d-2
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -1588,13 +1696,15 @@ C
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
+           if( abs(AETITER(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
-           if ( SEG(2,iseg) < dzero ) SEG(2,iseg) = dzero
+           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
            dum = pet
 !           if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
            pettotal = pettotal + pet
            aettotal = aettotal + aet
+           AETITER(K,ISEG) = AET
         end do
       SEG(2,iseg) = SUPACT(iseg)
       if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)

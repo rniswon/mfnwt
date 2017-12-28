@@ -16,6 +16,8 @@ DATA(BINARY)         61 Agwater1.uzfot
 DATA(BINARY)         100 netfluxin.unf
 DATA(BINARY)         101 netfluxout.unf
 DATA(BINARY)         102 Agwater1cbc.unf
+DATA(BINARY)         103 welllist.unf
+DATA(BINARY)         104 wellirrlist.unf
 DATA                 65 Agwater1.uzf1
 DATA                 66 Agwater1.uzf2 
 DATA                 67 Agwater1.uzf3 
