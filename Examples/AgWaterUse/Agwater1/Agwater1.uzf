@@ -2,8 +2,7 @@
 options
 specifythti
 specifythtr
-netflux 100 101 
-etsquare    0.1
+#etsquare    0.1
 rejectsurfk
 specifysurfk
 end
