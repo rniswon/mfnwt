@@ -1,15 +1,10 @@
 # AWU options
 options
 etdemand
-irrigationstream 1 6
-supplementalwell 6 1 
 irrigationwell 6 1 
 maxwells 6  
-sfrlist -2 
 welllist -2
 wellirrlist -2
-sfrirrlist -2
-timeseriessw
 timeseriesgw
 end
 # AWU time series
@@ -28,47 +23,22 @@ well list
 end
 # AWU stress period
 stress period 1
-IRRSFR
-0
 IRRWEL
-0
-SUPWEL
 0
 END
 stress period 2
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 3
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 4
-IRRSFR
--1
 IRRWEL
 -1
-SUPWEL
--1
 END
-stress period 5
-IRRSFR
-1                         NUMIRRSEGSP       
-9 6                       SEGID NUMCELLSEG 
-6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
-6 5 0.0 0.16667 
-7 4 0.0 0.16667 
-7 5 0.0 0.16667 
-8 4 0.0 0.16667 
-8 5 0.0 0.16667 
+stress period 5 
 IRRWEL
 6
 1 1                       IRRWELLID NUMCELLWELL 
@@ -83,119 +53,52 @@ IRRWEL
 8 4 0.0 1.0 
 6 1
 8 5 0.0 1.0 
-SUPWEL
-6                        NUMSUPWELLSP
-1 1                      SUPWELLNUM   NUMSEGWELL
-9 1.0                    SEGWELLID    PCTSUP             
-2 1 
-9 1.0 
-3 1 
-9 1.0 
-4 1 
-9 1.0 
-5 1 
-9 1.0 
-6 1 
-9 1.0 
 end
 stress period 6     
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
--1     
+-1 
 END
 stress period 7
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 8
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 9
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 10
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 11
-IRRSFR
-0
 IRRWEL
-0
-SUPWEL
 0
 END
 stress period 12
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 13
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END 
 stress period 14
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 15
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 16
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 17
-IRRSFR
-1                         NUMIRRSEGSP       
-9 6                       SEGID NUMCELLSEG 
-6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
-6 5 0.0 0.16667 
-7 4 0.0 0.16667 
-7 5 0.0 0.16667 
-8 4 0.0 0.16667 
-8 5 0.0 0.16667 
 IRRWEL
 6
 1 1                       IRRWELLID NUMCELLWELL 
@@ -210,60 +113,30 @@ IRRWEL
 8 4 0.0 1.0 
 6 1
 8 5 0.0 1.0 
-SUPWEL
-6                        NUMSUPWELLSP
-1 1                      SUPWELLNUM   NUMSEGWELL
-9 1.0                    SEGWELLID    PCTSUP             
-2 1 
-9 1.0 
-3 1 
-9 1.0 
-4 1 
-9 1.0 
-5 1 
-9 1.0 
-6 1 
-9 1.0
 end
 stress period 18
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 19
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 20
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 21
-IRRSFR
--1
 IRRWEL
--1
-SUPWEL
 -1
 END
 stress period 22
 IRRSFR
 -1
 IRRWEL
--1
+0
 SUPWEL
--1
+0
 END
 stress period 23
 IRRSFR
@@ -275,25 +148,25 @@ SUPWEL
 END
 stress period 24
 IRRSFR
--1
+0
 IRRWEL
 -1
 SUPWEL
--1
+0
 END
 stress period 25
 IRRSFR
--1
+0
 IRRWEL
--1
+0
 SUPWEL
--1
+0
 END
 stress period 26
 IRRSFR
--1
+0
 IRRWEL
--1
+0
 SUPWEL
--1
+0
 END

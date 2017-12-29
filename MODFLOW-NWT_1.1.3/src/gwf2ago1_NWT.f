@@ -205,7 +205,7 @@ C
         MAXCELLSWEL = 1
       END IF 
       ALLOCATE(SFRSEG(MAXSEGSHOLD,MXACTWSUP),SUPWELVAR(NUMSUPHOLD),
-     +         NUMSEGS(MXACTWSUP),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
+     +         NUMSEGS(MXWELL),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWELVAR(NUMIRRHOLD),
      +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
@@ -685,7 +685,7 @@ C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL IRRSFR(IN,IOUT,ITMP)
-            ELSE IF ( KPER == 1 ) THEN
+            ELSE IF ( KPER == 1 .AND. ITMP < 0 ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text4))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text4))
@@ -706,7 +706,7 @@ C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL IRRWEL(IN,ITMP)
-            ELSE IF ( KPER == 1 ) THEN
+            ELSE IF ( KPER == 1 .AND. ITMP < 0  ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text5))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text5))
@@ -727,7 +727,7 @@ C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AGO DATA).
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ITMP,R,IOUT,IN)
             IF ( ITMP > 0 ) THEN
               CALL SUPWEL(IN,ITMP)
-            ELSE IF ( KPER == 1 ) THEN
+            ELSE IF ( KPER == 1 .AND. ITMP < 0  ) THEN
                WRITE(IOUT,*) 'Key word '//trim(adjustl(text6))
      +                 //' specified with no additional input.'
                CALL USTOP('Keyvword '//trim(adjustl(text6))
@@ -821,8 +821,10 @@ C     ------------------------------------------------------------------
 C
 C1-------RESET DEMAND IF IT CHANGES
       DO ISEG=1, NSS
-        DEMAND(ISEG) = SEG(2, ISEG)
-        SUPACT(ISEG) = 0.0
+        IF ( NUMSUP>0 ) THEN
+          DEMAND(ISEG) = SEG(2, ISEG)
+          SUPACT(ISEG) = 0.0
+        END IF
       END DO
 C2------RESET SAVED AET FROM LAST ITERATION
       AETITERSW = 0.0
@@ -1239,9 +1241,11 @@ C        VARIABLES:
 C     ------------------------------------------------------------------
       INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
       DOUBLE PRECISION :: ZERO, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
-      EXTERNAL :: SMOOTHQ, RATETERPQ
+      EXTERNAL :: SMOOTHQ, RATETERPQ,demandgw
       REAL :: RATETERPQ,TIME
-      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO
+      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO,QQ
+      DOUBLE PRECISION demandgw
+      
 C      
 C     ------------------------------------------------------------------
       ZERO=0.0D0
@@ -1255,60 +1259,66 @@ C     ------------------------------------------------------------------
       Qp = ZERO
       QSW = ZERO
       TIME = TOTIM
+      QQ=ZERO
 C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0 ) THEN
-        CALL demandconjuntive(Kkper, Kkstp, Kkiter)
+        CALL demandconjuntive()
       END IF
             
 C
-C3------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
+C3------SET MAX NUMBER OF POSSIBLE WELLS.
       NWELLSTEMP = NWELLS
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
-C4------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
+C4------SET MAX PUMPING RATE OR IRR DEMAND FOR GW
       DO L=1,NWELLSTEMP 
         IF ( NUMTAB.LE.0 ) THEN
           IR=WELL(2,L)
           IC=WELL(3,L)
           IL=WELL(1,L)
-!          Q=WELL(4,L)   !This is just a limit for sup
+          Q=WELL(4,L)   !This is just a limit for sup
         ELSE
           IR = TABROW(L)
           IC = TABCOL(L)
           IL = TABLAY(L)
           Q = RATETERPQ(TIME,L)  !For IRRWELLS that are not SUPWELLS
         END IF
+        QQ = Q
 C
 C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
         IF(IBOUND(IC,IR,IL) > 0) THEN
 C
 C7------CALCULATE SUPPLEMENTAL PUMPING FOR THIS WELL
           SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L)
-            FMIN = SUPACT(J)
-            QSW = DEMAND(J)   !SGOTFLW(IDIVAR(1, J))
+          IF ( NUMSEGS(L) > 0 ) THEN
+            DO I = 1, NUMSEGS(L)
+              J = SFRSEG(I,L)
+              FMIN = SUPACT(J)
+              QSW = DEMAND(J)   !SGOTFLW(IDIVAR(1, J))
 !            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J) 
-            FMIN = PCTSUP(I,L)*(FMIN - QSW)
-            IF ( FMIN < ZERO ) FMIN = ZERO
-            SUP = SUP + FMIN
+              FMIN = PCTSUP(I,L)*(FMIN - QSW)
+              IF ( FMIN < ZERO ) FMIN = ZERO
+              SUP = SUP + FMIN
 !            SUP = SUP - ACTUAL(J)
-          END DO
-!          IF ( SUP < ZERO ) SUP = ZERO
-          SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
+            END DO
+!            IF ( SUP < ZERO ) SUP = ZERO
+            SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
 C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-          IF ( WELL(4,L) < 0.0 ) THEN
             IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
             Q = SUPFLOW(L)
           ELSE
-            SUPFLOW(L) = 0.0
+C
+C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
+            IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0)  
+     +                                   Q = demandgw(l)
           END IF
+          IF ( Q < QQ ) Q = QQ   !NO POSITIVE PUMPING
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
-          IF ( Q .LT. ZERO .AND. IUNITNWT.NE.0 ) THEN
+          IF ( IUNITNWT.NE.0 ) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               Hh = HNEW(ic,ir,il)
               bbot = Botm(IC, IR, Lbotm(IL))
@@ -1389,8 +1399,8 @@ C     ------------------------------------------------------------------
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
       INTEGER :: IBD1,IBD2,IBD3,IBD4
       INTEGER :: TOTWELLCELLS,TOTSFRCELLS
-      EXTERNAL :: SMOOTHQ, RATETERPQ
-      DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
+      EXTERNAL :: SMOOTHQ, RATETERPQ, demandgw
+      DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh, demandgw
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DATA TEXT1 /'AWU WELLS'/
       DATA TEXT2 /'DIVERSION SEGMENTS'/
@@ -1502,7 +1512,7 @@ C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
           IR=WELL(2,L)
           IC=WELL(3,L)
           IL=WELL(1,L)
-!          Q=WELL(4,L)  !THIS IS JUST A MAX RATE
+          Q=WELL(4,L) 
         ELSE
           IR = TABROW(L)
           IC = TABCOL(L)
@@ -1514,13 +1524,22 @@ C7------IF THE CELL IS NO-FLOW OR CONSTANT HEAD, IGNORE IT.
 C-------CHECK IF PUMPING IS NEGATIVE AND REDUCE FOR DRYING CONDITIONS.
 C
         IF(IBOUND(IC,IR,IL) > 0 ) THEN
-          Q = SUPFLOW(L)
+C
+C6------SUPPLEMENTAL WELL SET DEMAND.
+          IF ( NUMSEGS(L) > 0 ) THEN
+            Q = SUPFLOW(L)
+          ELSE
+C
+C6------NOT SUPPLEMENTAL WELL CALCULATE DEMAND.
+            IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0)  
+     +                                   Q = demandgw(l)
+          END IF
           QSAVE = Q
 C
           bbot = Botm(IC, IR, Lbotm(IL))
           ttop = Botm(IC, IR, Lbotm(IL)-1)
           Hh = HNEW(ic,ir,il)
-          IF ( Qsave.LT.zero  .AND. Iunitnwt.NE.0) THEN
+          IF ( Iunitnwt.NE.0 ) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
               Qp = smoothQ(Hh,Ttop,Bbot,dQp)
               Q = Q*Qp
@@ -1798,7 +1817,7 @@ C19------RETURN
       END
 ! ----------------------------------------------------------------------
 C
-      subroutine demandconjuntive(Kkper, Kkstp, Kkiter)
+      subroutine demandconjuntive()
 !     ******************************************************************
 !     demandconjuntive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
@@ -1813,7 +1832,6 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: Kkper, Kkstp, Kkiter
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
       double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
@@ -1867,7 +1885,7 @@ C
       return
       end subroutine demandconjuntive
 C
-      subroutine demandgw(Kkper, Kkstp, Kkiter, l)
+      double precision function demandgw(l)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -1880,12 +1898,11 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: Kkper, Kkstp, Kkiter, l
+      integer, intent(in) :: l
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal,dhundred,Q
-      integer :: k,iseg,ic,ir,i
+      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,Q
+      integer :: iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
@@ -1894,6 +1911,7 @@ C
       dhundred = 100.0d0
       dzero = 0.0d0
       Q=DZERO
+      demandgw = DZERO
       DO I = 1, NUMCELLS(L)
         IC = UZFCOL(I,L)
         IR = UZFROW(I,L)
@@ -1903,16 +1921,16 @@ C
         aet = (gwet(ic,ir)+uzet)/area
         if ( aet < zerod30 ) aet = zerod30
         factor = pet/aet - done
-        if( abs(AETITERGW(K,L)-AET) < zerod2*pet ) factor = 0.0
+        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
         IF ( FACTOR > dhundred ) FACTOR = dhundred
         Q = Q + factor*pet*area
         if ( Q < dzero ) Q = dzero
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
-        AETITERGW(K,ISEG) = AET
+        AETITERGW(I,ISEG) = AET
       end do
-      return
-      end subroutine demandgw
+      demandgw = Q
+      end function demandgw
 C
       subroutine timeseries(Kkper, Kkstp, Kkiter,numwells)
 !     ******************************************************************
