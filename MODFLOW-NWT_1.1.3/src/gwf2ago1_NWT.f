@@ -9,6 +9,7 @@
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABTIME
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::TABRATE
+        REAL,             SAVE, DIMENSION(:),   POINTER     ::QONLY
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABLAY
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABROW
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABCOL
@@ -143,9 +144,10 @@ C
 C
 C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
 C
-      ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL))
+      ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
       TSSWUNIT = 0
       TSGWUNIT = 0
+      QONLY = 0.0
 C
 C4------READ TS
       IF ( TSACTIVEGW .OR. TSACTIVESW ) CALL TSREAD(IN,IOUT)
@@ -829,6 +831,7 @@ C1-------RESET DEMAND IF IT CHANGES
 C2------RESET SAVED AET FROM LAST ITERATION
       AETITERSW = 0.0
       AETITERGW = 0.0
+      QONLY = 0.0
 !      CALL UZFIRRDEMANDSET()
 C
 C6------RETURN
@@ -1312,7 +1315,7 @@ C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFI
 C
 C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
             IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0)  
-     +                                   Q = demandgw(l)
+     +                                   Q = -demandgw(l)
           END IF
           IF ( Q < QQ ) Q = QQ   !NO POSITIVE PUMPING
 C
@@ -1399,8 +1402,8 @@ C     ------------------------------------------------------------------
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
       INTEGER :: IBD1,IBD2,IBD3,IBD4
       INTEGER :: TOTWELLCELLS,TOTSFRCELLS
-      EXTERNAL :: SMOOTHQ, RATETERPQ, demandgw
-      DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh, demandgw
+      EXTERNAL :: SMOOTHQ, RATETERPQ
+      DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DATA TEXT1 /'AWU WELLS'/
       DATA TEXT2 /'DIVERSION SEGMENTS'/
@@ -1530,9 +1533,8 @@ C6------SUPPLEMENTAL WELL SET DEMAND.
             Q = SUPFLOW(L)
           ELSE
 C
-C6------NOT SUPPLEMENTAL WELL CALCULATE DEMAND.
-            IF ( ETDEMANDFLAG > 0 .AND. issflg(kkper) == 0)  
-     +                                   Q = demandgw(l)
+C6------NOT SUPPLEMENTAL WELL SET DEMAND
+            Q = -QONLY(L)
           END IF
           QSAVE = Q
 C
@@ -1550,8 +1552,6 @@ C
             Q = Qsave
           END IF
           QQ=Q
-          QWELL = QWELL + QQ
-C
 C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           SUP = 0.0
           DO I = 1, NUMSEGS(L)
@@ -1561,13 +1561,14 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           END DO
 C
 C9------APPLY IRRIGATION FROM WELLS
+          IF ( NUMCELLS(L)>0 ) QWELL = QQ
           DO I = 1, NUMCELLS(L)
-            SUBVOL = -(1.0-IRRFACT(I,L))*Q*IRRPCT(I,L)
+            SUBVOL = -(1.0-IRRFACT(I,L))*QQ*IRRPCT(I,L)
             SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
             WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
      +              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
             QWELLIRR=QWELLIRR+SUBVOL
-            QWELLET=QWELLET+IRRFACT(I,L)*Q*IRRPCT(I,L)
+            QWELLET=QWELLET+IRRFACT(I,L)*QQ*IRRPCT(I,L)
           END DO
 C
 C10------WRITE WELLS WITH REDUCED PUMPING
@@ -1901,7 +1902,7 @@ C
       integer, intent(in) :: l
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,Q
+      double precision :: zerod2,zerod30,done,dzero,dum,dhundred
       integer :: iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
@@ -1910,7 +1911,6 @@ C
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
-      Q=DZERO
       demandgw = DZERO
       DO I = 1, NUMCELLS(L)
         IC = UZFCOL(I,L)
@@ -1923,13 +1923,13 @@ C
         factor = pet/aet - done
         if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
         IF ( FACTOR > dhundred ) FACTOR = dhundred
-        Q = Q + factor*pet*area
-        if ( Q < dzero ) Q = dzero
+        QONLY(L) = QONLY(L) + factor*pet*area
+        if ( QONLY(L) < dzero ) QONLY(L) = dzero
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
-        AETITERGW(I,ISEG) = AET
+        AETITERGW(I,L) = AET
       end do
-      demandgw = Q
+      demandgw = QONLY(L)
       end function demandgw
 C
       subroutine timeseries(Kkper, Kkstp, Kkiter,numwells)
@@ -2334,6 +2334,7 @@ C
       DEALLOCATE (TSGWUNIT)  
       DEALLOCATE (TSACTIVESW)
       DEALLOCATE (TSACTIVEGW)
+      DEALLOCATE (QONLY)
 C
       RETURN
       END
