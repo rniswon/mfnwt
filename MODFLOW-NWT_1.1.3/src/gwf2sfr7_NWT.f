@@ -1298,7 +1298,7 @@ C         SEGMENTS. Moved NSEGCK below ELSE IF 6/9/2005 dep
       ELSE IF ( NSFRPAR.EQ.0 .AND. IUZT.EQ.0 ) THEN
         WRITE (IOUT, 9003)
 !        RETURN
-        GOTO 900     !need to read agoptions for every stress period
+        GOTO 900
       ELSE IF ( NSFRPAR.NE.0 ) THEN
 C
 C5------INITIALIZE NSEGCK TO 0 FOR SEGMENTS THAT ARE DEFINED BY 

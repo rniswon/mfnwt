@@ -1773,7 +1773,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFAGOMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
+      USE GWFAWUMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -2301,7 +2301,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFAGOMODULE, ONLY: SFRIRR, NUMIRRSFR, 
+      USE GWFAWUMODULE, ONLY: SFRIRR, NUMIRRSFR, 
      +                        WELLIRR, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
