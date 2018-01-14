@@ -1,0 +1,167 @@
+# AWU options
+options
+etdemand
+irrigation_well 6 1 
+maxwells 6  
+welllist -2
+wellirrlist -2
+timeseries_well
+end
+# AWU time series
+time series
+well 5 106
+end
+# AWU well list
+well list
+         1         6         4    -20.00
+         1         6         5    -20.00
+         1         7         4    -20.00
+         1         7         5    -20.00
+         1         8         4    -20.00
+         1         8         5    -20.00
+end
+# AWU stress period
+stress period 1
+IRRWELL
+0
+END
+stress period 2
+IRRWELL
+-1
+END
+stress period 3
+IRRWELL
+-1
+END
+stress period 4
+IRRWELL
+-1
+END
+stress period 5 
+IRRWELL
+6
+1 1                       IRRWELLLID NUMCELLWELL 
+6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
+2 1
+6 5 0.0 1.0 
+3 1
+7 4 0.0 1.0 
+4 1
+7 5 0.0 1.0 
+5 1
+8 4 0.0 1.0 
+6 1
+8 5 0.0 1.0 
+end
+stress period 6     
+IRRWELL
+-1 
+END
+stress period 7
+IRRWELL
+-1
+END
+stress period 8
+IRRWELL
+-1
+END
+stress period 9
+IRRWELL
+-1
+END
+stress period 10
+IRRWELL
+-1
+END
+stress period 11
+IRRWELL
+0
+END
+stress period 12
+IRRWELL
+-1
+END
+stress period 13
+IRRWELL
+-1
+END 
+stress period 14
+IRRWELL
+-1
+END
+stress period 15
+IRRWELL
+-1
+END
+stress period 16
+IRRWELL
+-1
+END
+stress period 17
+IRRWELL
+6
+1 1                       IRRWELLLID NUMCELLWELL 
+6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
+2 1
+6 5 0.0 1.0 
+3 1
+7 4 0.0 1.0 
+4 1
+7 5 0.0 1.0 
+5 1
+8 4 0.0 1.0 
+6 1
+8 5 0.0 1.0 
+end
+stress period 18
+IRRWELL
+-1
+END
+stress period 19
+IRRWELL
+-1
+END
+stress period 20
+IRRWELL
+-1
+END
+stress period 21
+IRRWELL
+-1
+END
+stress period 22
+IRRWELL
+0
+END
+stress period 23
+IRRSFR
+0
+IRRWELL
+0
+SUPWEL
+0
+END
+stress period 24
+IRRSFR
+0
+IRRWELL
+-1
+SUPWEL
+0
+END
+stress period 25
+IRRSFR
+0
+IRRWELL
+0
+SUPWEL
+0
+END
+stress period 26
+IRRSFR
+0
+IRRWELL
+0
+SUPWEL
+0
+END
