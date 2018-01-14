@@ -1298,7 +1298,7 @@ C         SEGMENTS. Moved NSEGCK below ELSE IF 6/9/2005 dep
       ELSE IF ( NSFRPAR.EQ.0 .AND. IUZT.EQ.0 ) THEN
         WRITE (IOUT, 9003)
 !        RETURN
-        GOTO 900     !need to read agoptions for every stress period
+        GOTO 900
       ELSE IF ( NSFRPAR.NE.0 ) THEN
 C
 C5------INITIALIZE NSEGCK TO 0 FOR SEGMENTS THAT ARE DEFINED BY 
@@ -3763,7 +3763,7 @@ C5b------DETERMINE LAYER, ROW, COLUMN OF EACH REACH.
           gwflow = 0.0D0
           dvrsn = 0.0D0
           flowin = 0.0D0  
-          depthtr = 0.0
+          depthtr = STRM(7, l)
           IF ( irt.EQ.1 ) THEN
             SUMLEAK(l) = 0.0D0
             SUMRCH(l) = 0.0

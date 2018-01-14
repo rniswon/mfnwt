@@ -169,7 +169,7 @@ C     ------------------------------------------------------------------
       NUMCELLS = NCOL*NROW
       TOTCELLS = NUMCELLS*NLAY
       IPRCNT = 0
-      ETOFH_FLAG = 1
+      ETOFH_FLAG = 0
       ALLOCATE (LAYNUM(NCOL,NROW))
       ALLOCATE (NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM)
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
@@ -1308,7 +1308,6 @@ C       STRESS PERIOD.
         WRITE (IOUT, *) 'USING INFILTRATION RATE FROM PREVIOUS STRESS '
         WRITE (IOUT, *) 'PERIOD.', 'CURRENT PERIOD IS: ', Kkper
       ELSE
-        IF ( ETDEMANDFLAG > 0 ) CALL APPLYKCROP()
 C
 C3------READ IN ARRAY FOR INFILTRATION RATE.
         CALL U2DREL(FINF, aname(1), NROW, NCOL, 0, In, IOUT)
@@ -1774,7 +1773,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFAGOMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
+      USE GWFAWUMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1878,11 +1877,11 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(66) > 0 ) THEN
+        IF ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(2) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
@@ -2302,7 +2301,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFAGOMODULE, ONLY: SFRIRR, NUMIRRSFR, 
+      USE GWFAWUMODULE, ONLY: SFRIRR, NUMIRRSFR, 
      +                        WELLIRR, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
@@ -2441,10 +2440,10 @@ CDEP 05/05/2006
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(66) > 0 ) THEN
+        IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
           IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
         ENDIF
-        IF ( IUNIT(2) > 0 ) THEN
+        IF ( IUNIT(66) > 0 ) THEN
           IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
@@ -3904,13 +3903,13 @@ C60----LOOP OVER GAGING STATIONS.
                 ginfltr = UZOLSFLX(iuzcol, iuzrow)*
      +                  DELC(iuzrow)*DELR(iuzcol)
                 gaplinfltr = FINF(iuzcol, iuzrow)
-                if ( IUNIT(2) > 0 ) then
-                  if ( NUMIRRWEL > 0 ) gaplinfltr = gaplinfltr + 
-     +                                           WELLIRR(iuzcol, iuzrow)
+                if ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) then
+                  if ( NUMIRRWEL > 0 )  
+     +                 gaplinfltr = gaplinfltr +WELLIRR(iuzcol, iuzrow)
                 end if
-                if ( IUNIT(66) > 0 ) then
-                  if ( NUMIRRSFR > 0 ) gaplinfltr = gaplinfltr + 
-     +                                            SFRIRR(iuzcol, iuzrow)
+                if ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) then
+                  if ( NUMIRRSFR > 0 ) gaplinfltr = 
+     +                                gaplinfltr +SFRIRR(iuzcol, iuzrow)
                 end if
                 gaplinfltr = gaplinfltr*(DELC(iuzrow)*DELR(iuzcol))
                 IF ( IUZFOPT.GT.0 ) THEN
@@ -5341,7 +5340,7 @@ C11-----SET ETOUT TO ZERO WHEN ET DEMAND LESS THAN ROUNDOFF ERROR.
           end if
         etoutold = etout
 !        FMP = FM
-        IF ( K.GT.20 ) THEN
+        IF ( K.GT.20 .and. FMP-PET .GT. 0.0 ) THEN
           write(iout,222)'PET DIFF ERROR ', ir,ic,FMP-PET,PET
           itest = 1
         ELSEIF ( ETOFH_FLAG == 0 ) THEN
