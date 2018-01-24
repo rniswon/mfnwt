@@ -1877,12 +1877,14 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
-        ENDIF
+        IF ( IGSFLOW.LT.1 ) THEN
+          IF ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) THEN
+            IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+          ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
-        IF ( IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          IF ( IUNIT(66) > 0 ) THEN
+            IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          END IF
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -2304,7 +2306,6 @@ C     ******************************************************************
       USE GWFAWUMODULE, ONLY: SFRIRR, NUMIRRSFR, 
      +                        WELLIRR, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -2440,11 +2441,13 @@ CDEP 05/05/2006
           finfhold  = finfhold + finfsave(ic,ir)
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
-        IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
-        ENDIF
-        IF ( IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+        IF ( IGSFLOW.LT.1 ) THEN
+          IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
+            IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+          ENDIF
+          IF ( IUNIT(66) > 0 ) THEN
+            IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          END IF
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN

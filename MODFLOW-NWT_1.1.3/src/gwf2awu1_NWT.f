@@ -1274,7 +1274,7 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
 C
 C3------SET MAX NUMBER OF POSSIBLE WELLS.
       NWELLSTEMP = NWELLS
-      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
+!      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB  Now mxwells/=numtab
 C
 C4------SET MAX PUMPING RATE OR IRR DEMAND FOR GW
       DO L=1,NWELLSTEMP 
@@ -1442,7 +1442,7 @@ C     ------------------------------------------------------------------
       IBD4=0
       Qp = 1.0
       NWELLSTEMP = NWELLS
-      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB 
+!      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    Now mxwells/=numtab
       IBDLBL=0
       iw1 = 1
 ! Budget output for wells
@@ -1483,7 +1483,7 @@ C
 C
 C4------SET MAX NUMBER OF POSSIBLE SUPPLEMENTARY WELLS.
       NWELLSTEMP = NWELLS
-      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
+!      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST(COMPACT BUDGET), 
 C       WRITE HEADER.
@@ -1817,6 +1817,10 @@ C
       USE GWFAWUMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,POTET,HRU_ACTET
+      USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
@@ -1846,10 +1850,17 @@ C
         do k = 1, DVRCH(iseg)
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
-           area = delr(ic)*delc(ir)
-           pet = PETRATE(ic,ir)
-           uzet = uzfetout(ic,ir)/DELT
-           aet = (gwet(ic,ir)+uzet)/area
+           if ( GSFLOW_flag == 1 ) then
+             area = delr(ic)*delc(ir)
+             pet = PETRATE(ic,ir)
+             uzet = uzfetout(ic,ir)/DELT
+             aet = (gwet(ic,ir)+uzet)/area    
+           else
+             area = delr(ic)*delc(ir)
+             pet = PETRATE(ic,ir)
+             uzet = uzfetout(ic,ir)/DELT
+             aet = (gwet(ic,ir)+uzet)/area
+           end if
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
            if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
@@ -2047,7 +2058,7 @@ C     LINEARLY INTERPOLATE PUMPING RATE FROM TABFILE
 C     ******************************************************************
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
-      USE GWFWELMODULE, ONLY: TABRATE, TABTIME, TABVAL
+      USE GWFAWUMODULE
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 !ARGUMENTS
