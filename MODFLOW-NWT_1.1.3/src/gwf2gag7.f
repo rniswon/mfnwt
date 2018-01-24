@@ -153,7 +153,7 @@ C                       --DETERMINE & SAVE CROSS-REFERENCE INDEX
 C                       --RECORD INITIAL CONDITIONS FOR LAKE GAGES
 C     ******************************************************************
 
-      USE GLOBAL,       ONLY:IOUT
+      USE GLOBAL,       ONLY:IOUT,IUNIT
       USE GWFGAGMODULE
       USE GWFLAKMODULE, ONLY:NLAKES,STAGES,VOL,CLAKE
       USE GWFSFRMODULE, ONLY:NSTRM,ISTRM,IDIVAR
@@ -195,6 +195,18 @@ C2------LOOP OVER GAGING STATIONS.
          IF (IG.GT.0) THEN
 C
 C3------STREAM GAGE; SAVE STREAM REACH INDEX; WRITE HEADER LINES.
+            IF ( IUNIT(44).LT.1 ) THEN
+              WRITE(IOUT,*)
+              WRITE(IOUT,*)'***ERROR***'
+              WRITE(IOUT,*) 'STREAM GAGE SPECIFIED AND SFR2 PACKAGE IS N
+     +OT ACTIVE'
+              WRITE(IOUT,*)
+              WRITE(*,*)'***ERROR***'
+              WRITE(*,*) 'STREAM GAGE SPECIFIED AND SFR2 PACKAGE IS N
+     +OT ACTIVE'
+              CALL USTOP('')
+            END IF
+              
             IG2=IGGLST(2,IOG)
             DO 20 IRCH=1,NSTRM
                IF (ISTRM(4,IRCH).EQ.IG.AND.ISTRM(5,IRCH).EQ.IG2) THEN
