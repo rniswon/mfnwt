@@ -8251,7 +8251,7 @@ C
 C
 C
 !     -----------------------------------------------------------------
-      SUBROUTINE GWF2SFR7AD(Iunitlak)
+      SUBROUTINE GWF2SFR7AD(Iunitlak,IGRID)
 C     ******************************************************************
 C     DETERMINE SPECIFIED INFLOWS FOR TIME STEP BASED ON TABULAR VALUES
 C     ******************************************************************
@@ -8267,7 +8267,7 @@ C     ------------------------------------------------------------------
       IMPLICIT NONE
       EXTERNAL FLOWTERP
       REAL FLOWTERP
-      INTEGER i, iseg, Iunitlak, istsg, lk
+      INTEGER i, iseg, Iunitlak, istsg, lk, IGRID
 C     ------------------------------------------------------------------
 C
 C

@@ -1833,7 +1833,8 @@ C
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,POTET,HRU_ACTET
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
       USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! ----------------------------------------------------------------------

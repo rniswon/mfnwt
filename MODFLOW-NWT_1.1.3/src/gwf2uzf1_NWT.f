@@ -1775,6 +1775,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE GWFAWUMODULE, ONLY: NUMIRRSFR,NUMIRRWEL,SFRIRR,WELLIRR
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
