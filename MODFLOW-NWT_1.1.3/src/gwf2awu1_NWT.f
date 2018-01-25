@@ -15,6 +15,7 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABCOL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABVAL
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABID
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWUNIT
         REAL,             SAVE,                 POINTER     ::PSIRAMP
@@ -158,7 +159,7 @@ C3-------ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
       IF ( NUMTABHOLD.EQ.0 ) NUMTABHOLD = 1
       ALLOCATE(TABTIME(MAXVAL,NUMTABHOLD),TABRATE(MAXVAL,NUMTABHOLD))
       ALLOCATE(TABLAY(MXWELL),TABROW(MXWELL),TABCOL(MXWELL))
-      ALLOCATE(TABVAL(MXWELL),TABID(MXWELL))
+      ALLOCATE(TABVAL(MXWELL),TABID(MXWELL),TABUNIT(MXWELL))
       TABTIME = 0.0
       TABRATE = 0.0
       TABLAY = 0
@@ -166,6 +167,7 @@ C3-------ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
       TABCOL = 0
       TABVAL = 0
       TABID = 0
+      TABUNIT = 0
 C
 C6------THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
 C6------CELL-BY-CELL FLOW.
@@ -566,7 +568,7 @@ C     ------------------------------------------------------------------
       character(len=16)  :: char1     = 'WELL LIST'
 
       INTEGER LLOC,ISTART,ISTOP,ISTARTSAVE
-      INTEGER J,TABUNIT,II,KPER2,L
+      INTEGER J,II,KPER2,L,MATCH,NUMTABS
       logical :: FOUND
       logical :: found1,found2,found3,found4
       REAL :: R,TTIME,TRATE
@@ -603,19 +605,31 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
                 END IF
               END DO
             ELSE
+              NUMTABS = 0
+              MATCH = 0
               DO J = 1, MXWELL    !RGN 1/22/18 SPECIFY A FILE FOR EACH WELL
-                READ(IN,*)TABUNIT,TABID(J),TABVAL(J),TABLAY(J),
+                READ(IN,*)TABUNIT(J),TABVAL(J),TABLAY(J),
      +                    TABROW(J),TABCOL(J)
-                IF ( TABUNIT.LE.0 ) THEN
+                DO I = 1, J
+                  IF ( TABUNIT(I) == TABUNIT(J) ) THEN
+                    MATCH = 1
+                    TABID(J) = TABID(I)
+                  END IF
+                END DO
+                IF ( MATCH == 0 ) THEN
+                  NUMTABS = NUMTABS + 1
+                  TABID(J) = NUMTABS
+                END IF
+                IF ( TABUNIT(J).LE.0 ) THEN
                   WRITE(IOUT,100)
                   CALL USTOP('')
                 END IF
-                REWIND(TABUNIT)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
+                REWIND(TABUNIT(J))   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
                 DO II = 1, TABVAL(J)
                   LLOC = 1
-                  CALL URDCOM(TABUNIT,IOUT,LINE)
+                  CALL URDCOM(TABUNIT(J),IOUT,LINE)
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,
-     +                      TABUNIT)
+     +                      TABUNIT(J))
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,
      +                      TABUNIT)
                   TABTIME(II,TABID(J)) = TTIME
@@ -2304,6 +2318,7 @@ C
         DEALLOCATE(TABRATE)
         DEALLOCATE(TABVAL)
         DEALLOCATE(TABID)
+        DEALLOCATE(TABUNIT)
 !SFR
       DEALLOCATE (DVRCH)    
       DEALLOCATE (DVEFF)  
