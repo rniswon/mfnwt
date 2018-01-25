@@ -258,7 +258,7 @@ C4------READ UNSATURATED FLOW VARIABLES WHEN ISFROPT GREATER THAN 1.
       IF(line(istart:istop).EQ.'IFACE') THEN
         iface=1
         WRITE ( IOUT, '(1X,A)')
-     +    'IFACE values will be read from reach records'
+     +    'IFACE values will be read from reach record'
       END IF
 C
 C5------CALCULATE SPACE NEEDED FOR TABULATED DISCHARGE VERSUS FLOW
@@ -288,9 +288,7 @@ Cdep  changed DSTROT to FXLKOT
       ISTRM = 0  
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
-      ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
-      ALLOCATE (IDVFLG)  
-      IDVFLG = 0         
+      ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))         
 Cdep  allocate space for stream outflow derivatives for lake package
       ALLOCATE (DLKOTFLW(200,nssar), SLKOTFLW(200,nssar))
       ALLOCATE (DLKSTAGE(200,nssar))
@@ -1299,7 +1297,8 @@ C         SEGMENTS. Moved NSEGCK below ELSE IF 6/9/2005 dep
         CALL USTOP(' ')
       ELSE IF ( NSFRPAR.EQ.0 .AND. IUZT.EQ.0 ) THEN
         WRITE (IOUT, 9003)
-        RETURN
+!        RETURN
+        GOTO 900
       ELSE IF ( NSFRPAR.NE.0 ) THEN
 C
 C5------INITIALIZE NSEGCK TO 0 FOR SEGMENTS THAT ARE DEFINED BY 
@@ -2057,7 +2056,8 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
      +       'FROM FILE UNIT NUMBER ',I6,/)
  9031 FORMAT(10X,'TIMES',20X,'INFLOWS')
  9032 FORMAT(5X,F20.10,1X,F20.10)
-      RETURN
+C
+ 900  RETURN
       END SUBROUTINE GWF2SFR7RP
 C
 C-------SUBROUTINE GWF2SFR7FM
@@ -2127,7 +2127,7 @@ C     -----------------------------------------------------------------
      +        itstr, iwidthcheck, kerp, kss, l, lk, ll, nstrpts, nreach,
      +        maxwav, icalccheck, iskip, iss, lsub, numdelt, irt,
      +        lfold, illake, lakid
-      INTEGER irr, icc, icount  !cjm
+!      INTEGER irr, icc, icount  !cjm
       DOUBLE PRECISION FIVE_THIRDS
       PARAMETER (FIVE_THIRDS=5.0D0/3.0D0)
 C     -----------------------------------------------------------------
@@ -8270,6 +8270,10 @@ C     ------------------------------------------------------------------
       INTEGER i, iseg, Iunitlak, istsg, lk
 C     ------------------------------------------------------------------
 C
+C
+C-------SET POINTERS FOR CURRENT GRID.
+      CALL SGWF2SFR7PNT(Igrid)
+C
 C1------CALL LINEAR INTERPOLATION ROUTINE
       IF ( NUMTAB.GT.0 ) THEN
         DO i = 1, NUMTAB
@@ -8295,9 +8299,10 @@ C3------CHECK IF LAKE OUTFLOW IS SPECIFIED AT A FIXED RATE.
      +                  'CODE WILL ASSUME FLOW = 0.0'/)
              SEG(2, istsg) = 0.0
              FXLKOT(istsg) = 0.0
-           END IF
-         END IF
-       END DO
+          END IF
+        END IF
+      END DO
+C----RETURN
       RETURN
       END
 C
@@ -8428,7 +8433,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%CONST)
       DEALLOCATE (GWFSFRDAT(IGRID)%DLEAK)
       DEALLOCATE (GWFSFRDAT(IGRID)%IOTSG)
-      DEALLOCATE (GWFSFRDAT(IGRID)%IDVFLG) 
       DEALLOCATE (GWFSFRDAT(IGRID)%NSEGCK)
       DEALLOCATE (GWFSFRDAT(IGRID)%ITRLSTH)
       DEALLOCATE (GWFSFRDAT(IGRID)%ISEG)
@@ -8546,7 +8550,6 @@ C     ------------------------------------------------------------------
       FLWTOL=>GWFSFRDAT(IGRID)%FLWTOL
       IRTFLG=>GWFSFRDAT(IGRID)%IRTFLG
       IOTSG=>GWFSFRDAT(IGRID)%IOTSG
-      IDVFLG=>GWFSFRDAT(IGRID)%IDVFLG 
       NSEGCK=>GWFSFRDAT(IGRID)%NSEGCK
       ITRLSTH=>GWFSFRDAT(IGRID)%ITRLSTH
       ISEG=>GWFSFRDAT(IGRID)%ISEG
@@ -8661,7 +8664,6 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%FLWTOL=>FLWTOL
       GWFSFRDAT(IGRID)%IRTFLG=>IRTFLG
       GWFSFRDAT(IGRID)%IOTSG=>IOTSG
-      GWFSFRDAT(IGRID)%IDVFLG=>IDVFLG
       GWFSFRDAT(IGRID)%NSEGCK=>NSEGCK
       GWFSFRDAT(IGRID)%ITRLSTH=>ITRLSTH
       GWFSFRDAT(IGRID)%ISEG=>ISEG

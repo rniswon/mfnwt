@@ -3334,7 +3334,7 @@ C    for vertical interface, "K" is layer below bottom of lake
         CNDFC1 = BEDLAK(II)*DELR(I)*DELC(J)
         IF(LAYVKAUPW(K).EQ.0) THEN
            VK=VKAUPW(I,J,K)
-        ELSE
+        ELSE IF ( VKAUPW(I,J,K) > 0.0 ) THEN    !RGN 8/21/17 CHECK DIVIDE BY ZERO
            VK=HKUPW(I,J,K)/VKAUPW(I,J,K)
         END IF
 c   skip if zero vk
