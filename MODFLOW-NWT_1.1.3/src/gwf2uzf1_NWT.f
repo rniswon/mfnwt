@@ -177,7 +177,6 @@ C     ------------------------------------------------------------------
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
       ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
-      ALLOCATE (ETDEMANDFLAG)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
@@ -190,7 +189,6 @@ C     ------------------------------------------------------------------
       LAYNUM = 0
       SMOOTHET = 0.0D0
       smooth = 0.0
-      ETDEMANDFLAG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
@@ -412,7 +410,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       EXCESPP = 0.0
       REJ_INF = 0.0
       AIR_ENTRY = -16.0
-      H_ROOT = -35000.0
+      H_ROOT = -15000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
       IUZLIST = 0
       ALLOCATE (NWAVST(NUZCL,NUZRW))
@@ -1116,6 +1114,11 @@ C     ------------------------------------------------------------------
           WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
           WRITE(iout,*)
           found = .true.
+        case('#')              !IN CASE A COMMENT IS ADDED TO THE END OF THE LINE. 10/19/2017
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' COMMENT "#" ENCOUNTERED. EXITING OPTIONS'
+          WRITE(iout,*)
+          EXIT
         case default
           !Likely misspelled or unsupported 
           ! so terminate here.
@@ -1440,7 +1443,7 @@ C         IUZFOPT IS ZERO.
      +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
           ELSE
 C
-C12-----READ IN ARRAY FOR ET WATER CONTENT.
+C12-----READ IN ARRAY FOR ET EXTINCTION DEPTH.
             CALL U2DREL(WCWILT, aname(4), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR EXTINCTION WATER CONTENT LESS THAN RESIDUAL WATER
@@ -1748,8 +1751,7 @@ C27-----IF NO UNSATURATED ZONE, SET ARRAYS VALUES TO ZERO.
         END DO
       END IF
 C
-C
-C29-----RETURN.
+C28-----RETURN.
       RETURN
       END SUBROUTINE GWF2UZF1RP
 C
@@ -1773,7 +1775,6 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFAWUMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -2158,7 +2159,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
               ij = Icell(IC,IR,IL)
               A(IA(ij)) = A(IA(ij)) - dET*etgw
             END IF
-          END IF         
+          END IF
         END IF
       END IF
       END DO
@@ -2166,7 +2167,7 @@ C
 C8------ADD OVERLAND FLOW TO STREAMS, LAKES AND CONDUITS. 
       IF ( IRUNFLG.GT.0 .AND. (Iunitsfr.GT.0.OR.
      +     Iunitlak.GT.0.OR.Iunitswr.GT.0) )
-     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )      
+     +     CALL SGWF2UZF1OLF(Iunitsfr, Iunitlak, Iunitswr, Igrid )
 
 C9------RETURN.
       RETURN

@@ -102,7 +102,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NUZST, NSTOTRL, NUMAVE)
       ALLOCATE (ITMP, IRDFLG, IPTFLG, NP)
       ALLOCATE (CONST, DLEAK, IRTFLG, NUMTIM, WEIGHT, FLWTOL)
-      ALLOCATE (NSEGDIM)  
+      ALLOCATE (NSEGDIM)
       ALLOCATE (SFRRATIN, SFRRATOUT)
       ALLOCATE (STRMDELSTOR_CUM, STRMDELSTOR_RATE)
       ALLOCATE (SFRUZINFIL, SFRUZDELSTOR, SFRUZRECH)
@@ -285,10 +285,10 @@ Cdep  changed DSTROT to FXLKOT
       QSTRM = 0.0
       HWDTH = 0.0
       HWTPRM = 0.0
-      ISTRM = 0
+      ISTRM = 0  
       FNETSEEP = 0.0
 !changed to seg(27,nsegdim) to store GW flow to streams by segment.
-      ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))  
+      ALLOCATE (SEG(27,nsegdim), ISEG(4,nsegdim), IDIVAR(2,nsegdim))         
 Cdep  allocate space for stream outflow derivatives for lake package
       ALLOCATE (DLKOTFLW(200,nssar), SLKOTFLW(200,nssar))
       ALLOCATE (DLKSTAGE(200,nssar))
@@ -1047,14 +1047,14 @@ C
               CALL URWORD(line, lloc, istart, istop, 3, i, FACTORKV, 
      +                    IOUT,In)
               WRITE(IOUT,324) FACTORKV
-          case ('END')
+            case ('END')
               write(iout,'(/1x,a)') 'END PROCESSING '//
      +              trim(adjustl(text)) //' OPTIONS'
               write(iout,*)
               CALL URDCOM(In, IOUT, line)
               found = .true.
               exit
-          case default
+            case default
               ! Not an integer.  Likely misspelled or unsupported 
               ! so terminate here.
                 WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
@@ -1250,7 +1250,7 @@ C     ------------------------------------------------------------------
      +        ipt, ir, irch, irp, isoptflg, iss, istep, istsg, iwvcnt,
      +        jj, jk, k5, k6, k7, kk, ksfropt, kss, ktot, l, lstbeg,
      +        nseg, nstrpts,krck,irck,jrck,ireachck, j, numval,iunitnum,
-     +        ierr,IFLG,lloc,istart,istop
+     +        ierr,IFLG,LLOC,istart,istop
       CHARACTER(LEN=200)::LINE
       REAL TTIME,TRATE
 C     ------------------------------------------------------------------
@@ -3861,7 +3861,7 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
               END DO
               flowin = flowin + SEG(2, istsg)  !SEG(2,istsg) stores specified inflow, and should have a spot in "Headwaters" flows
               IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-                IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow. if the latter exist, count it next
+                IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow (or outflow, hence ABS()). If non specified FLOW, tally
                   NINTOT = NINTOT + 1   !EDM
                 ENDIF
               END IF
@@ -4333,8 +4333,8 @@ cDEP   need to fix for unsaturated flow
             SFRQ(2, l) = (qc + qd)/2.0
             SFRQ(3, l) = flobot
             SFRQ(5, l) = qc
-        END IF
-      END DO
+          END IF
+        END DO
 !        IF ( Irtflg.NE.0 )WRITE(IOUT,*)
 !     +         'TRANSIENT FLOW ERROR = ', Transient_bd
 C
@@ -8251,7 +8251,7 @@ C
 C
 C
 !     -----------------------------------------------------------------
-      SUBROUTINE GWF2SFR7AD(In, Iunitlak, kkstp, kkper, Igrid)
+      SUBROUTINE GWF2SFR7AD(Iunitlak)
 C     ******************************************************************
 C     DETERMINE SPECIFIED INFLOWS FOR TIME STEP BASED ON TABULAR VALUES
 C     ******************************************************************
@@ -8259,20 +8259,15 @@ C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GWFBASMODULE, ONLY: TOTIM
-      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST,
-     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
+      USE GWFSFRMODULE, ONLY: NSS, NUMTAB, ISFRLIST,SEG, FXLKOT, 
+     +                        IDIVAR, CLOSEZERO
 !!      USE GWFSFRMODULE, ONLY: NSS, TABFLOW, TABTIME, NUMTAB, ISFRLIST,
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
       USE GLOBAL, ONLY: IOUT
       IMPLICIT NONE
-C        ARGUMENTS
-      INTEGER, INTENT(IN) :: In, Iunitlak, IGRID, KKSTP, KKPER
-C     ------------------------------------------------------------------
-C        VARIABLES
-C     ------------------------------------------------------------------
       EXTERNAL FLOWTERP
       REAL FLOWTERP
-      INTEGER i, iseg, istsg, lk
+      INTEGER i, iseg, Iunitlak, istsg, lk
 C     ------------------------------------------------------------------
 C
 C
@@ -8285,7 +8280,7 @@ C1------CALL LINEAR INTERPOLATION ROUTINE
           iseg = ISFRLIST(1,i)
           SEG(2,iseg) = FLOWTERP(TOTIM,i)  
         END DO
-      END IF
+      END IF 
 C
 C DEP moved the from SFR7FM
 C DEP FXLKOT is now adjusted in LAK7FM for limiting to available lake water.
@@ -8297,7 +8292,7 @@ C2------COMPUTE INFLOW OF A STREAM SEGMENT EMANATING FROM A LAKE.
             lk = IABS(IDIVAR(1, istsg))
 C3------CHECK IF LAKE OUTFLOW IS SPECIFIED AT A FIXED RATE.
              FXLKOT(istsg) = SEG(2, istsg)
-          ELSE IF ( SEG(2, istsg).LE.-CLOSEZERO ) THEN
+           ELSE IF ( SEG(2, istsg).LE.-CLOSEZERO ) THEN
              WRITE (IOUT, 9001) istsg
  9001        FORMAT (/5X, '*** WARNING *** NEGATIVE LAKE OUTFLOW ',
      +                  'NOT ALLOWED; SEG = ', I6, /10X, 
@@ -8401,107 +8396,6 @@ C
       END IF
       smooth = y
       END FUNCTION smooth
-!
-! ----------------------------------------------------------------------
-C
-C-------SUBROUTINE SFR2MODSIM
-C
-      SUBROUTINE SFR2MODSIM(EXCHANGE)
-C     *******************************************************************
-C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
-C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
-C--------MARCH 8, 2017
-C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
-      IMPLICIT NONE
-C     -------------------------------------------------------------------
-C     SPECIFICATIONS:
-C     -------------------------------------------------------------------
-C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
-C     -------------------------------------------------------------------
-!      INTEGER 
-!      DOUBLE PRECISION 
-C     -------------------------------------------------------------------
-C     LOCAL VARIABLES
-C     -------------------------------------------------------------------
-      INTEGER :: ISTSG, IRNUM, L, ISTSGOLD, REACHNUMINSEG
-      DOUBLE PRECISION :: FLOWIN, FLOWOUT
-C     -------------------------------------------------------------------
-C
-        ISTSG = 1
-        ISTSGOLD = ISTSG
-        REACHNUMINSEG = 0
-        EXCHANGE = 0.0D0
-        FLOWIN = 0.0D0
-        FLOWOUT = 0.0D0
-C
-C1------LOOP OVER REACHES TO SET ACCRETIONS/DEPLETIONS
-C
-        DO L = 1, NSTRM
-C
-C2------DETERMINE STREAM SEGMENT NUMBER.
-          REACHNUMINSEG = REACHNUMINSEG + 1
-          ISTSGOLD = ISTSG
-          ISTSG = ISTRM(4, L)
-C
-C3------DIFFERENCE FLOW IN AND FLOW OUT OF SEGEMENT.
-          IF( ISTSG /= ISTSGOLD ) THEN
-            REACHNUMINSEG = 1
-          END IF
-C
-C4------IF FIRST REACH IN SEGMENT THEN SET FLOWIN
-          IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
-C
-C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
-          IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
-            FLOWOUT = STRM(9,L)
-            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + FLOWOUT - FLOWIN 
-          END IF
-        END DO
-C
-C8------RETURN.
-      RETURN
-      END SUBROUTINE SFR2MODSIM
-C
-C-------SUBROUTINE MODSIM2SFR
-C
-      SUBROUTINE MODSIM2SFR(DIVS)
-C     *******************************************************************
-C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION 
-C     SEGMENTS.
-!--------MARCH 8, 2017
-C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR
-      IMPLICIT NONE
-C     -------------------------------------------------------------------
-C     SPECIFICATIONS:
-C     -------------------------------------------------------------------
-C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: DIVS(NSS)
-C     -------------------------------------------------------------------
-!      INTEGER 
-!      DOUBLE PRECISION 
-C     -------------------------------------------------------------------
-C     LOCAL VARIABLES
-C     -------------------------------------------------------------------
-      INTEGER :: ISEG
-C     -------------------------------------------------------------------
-C
-C1------LOOP OVER SEGMETS
-C
-        DO ISEG = 1, NSS
-C
-C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
-C         
-          IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            SEG(2,iseg) = DIVS(ISEG)
-          END IF
-        END DO
-C  
-C8------RETURN.
-      RETURN
-      END SUBROUTINE MODSIM2SFR
 C
 C-------SUBROUTINE GWF2SFR7DA
       SUBROUTINE GWF2SFR7DA(IGRID)

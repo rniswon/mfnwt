@@ -1023,7 +1023,7 @@ c            Maxitr_samg=maximal number of iterations
 c            control=1 no setup reuse
 c            control=2 automatic setup reuse
 !             control=1
-c            iout  Controls print output related to SAMG’s solution phase.
+c            iout  Controls print output related to SAMGs solution phase.
 c                <0 No printout, except for warnings and errors24.
 c                =0 Minimal output on results and timings.
 c                >0 Additional print output specified by the individual digits:
@@ -1181,11 +1181,11 @@ C--Update heads.
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
       INTEGER ic, ir, il
+      REAL HDRYTOL
 !     -----------------------------------------------------------------
-!      DO ir = 1, Nrow
-!        write(iout,222)( Hnew(ic, ir, 1), ic = 1, Ncol)
-!      end do
-! 222  format(113e20.10)
+C
+C-----SET HNEW TO HDRY IF IPHRY>0
+      HDRYTOL = 2.0e-3
       CALL Head_save()   !From Scott B. 9/7/2013
       DO il = 1, Nlay
         IF ( LAYHDT(il).GT.0 ) THEN
@@ -1193,17 +1193,13 @@ C--Update heads.
             DO ic = 1, Ncol
               IF ( IBOUND(ic,ir,il).GT.0 .AND. IPHDRY.GT.0 ) THEN
                 IF ( Hnew(ic, ir, il)-dble(BOTM(ic,ir,LBOTM(il)))
-     +                                                  .LT.2.0e-3 )
+     +                                                  .LT.HDRYTOL )
      +               Hnew(ic, ir, il) = dble(Hdry)
               END IF
             ENDDO
           ENDDO
         END IF
       ENDDO
-!      do ir=1,nrow
-!      write(iout,101)(Hnew(ic, ir, 1),ic=1,ncol)
-!      end do
-!  101 format(80E20.10) 
       END SUBROUTINE GWF2NWT1BD
 !
 !
