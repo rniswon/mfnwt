@@ -4276,7 +4276,8 @@ C
      &        KSTP,KPER,IUMT3D,ISTSG,ILMTFMT,ISSMT3D,IGRID
       INTEGER I,J,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,
      &        LENGTH
-      REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw
+      REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw,
+     &        USERFLOW
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
       REAL, DIMENSION(5,NSTRM)   :: SFRFLOWVAL
@@ -4642,20 +4643,20 @@ C                    NINFLOW = NINFLOW+1
                   END IF
                   ITRIB = ITRIB + 1
                 END DO
-                !FLOWIN = FLOWIN + SEG(2,ISTSG)
-C                NINFLOW = NINFLOW + 1
-C--A STREAM SEGMENT THAT RECEIVES TRIBUTARY FLOW MAY ALSO HAVE SPCIFIED INFLOW AS WELL
-                IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN
-                  FLOWIN = SEG(2,ISTSG)      !Set flowin equal to specified inflow
+C-------A STREAM SEGMENT THAT RECEIVES TRIBUTARY FLOW MAY ALSO HAVE SPCIFIED INFLOW AS WELL
+C         AMEND CONNECTIONS WITH USER-SPECIFIED FLOWS THAT ARE IN ADDITION
+C         TO TRIBUTARY INFLOW (WHICH ARE PRINTED BY CODE ABOVE)
+                IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN
+                  USERFLOW = SEG(2,ISTSG)      !Set flowin equal to specified inflow
                   NINFLOW = 1
                   IDISP = 0
                   III = -ISTSG
                   JJJ = -NREACH
                   XSA = STRM(31,L)
                   IF(ILMTFMT.EQ.0) THEN
-                    WRITE(IUMT3D) -999,L,IDISP,FLOWIN,XSA
+                    WRITE(IUMT3D) -999,L,IDISP,USERFLOW,XSA
                   ELSEIF(ILMTFMT.EQ.1) THEN
-                    WRITE(IUMT3D,*) -999,L,IDISP,FLOWIN,XSA
+                    WRITE(IUMT3D,*) -999,L,IDISP,USERFLOW,XSA
                   ENDIF       
                 ENDIF
               END IF
