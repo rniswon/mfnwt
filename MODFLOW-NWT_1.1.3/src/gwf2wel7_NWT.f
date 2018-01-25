@@ -564,7 +564,7 @@ C     ------------------------------------------------------------------
       CHARACTER*16 TEXT
       CHARACTER*20 TEXT1
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
-      double precision Qp,Hh,Ttop,Bbot,dQp,Qtot !delete Qtot
+      double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
       INTEGER Iunitnwt, iw1, NWELLSTEMP
       DATA TEXT /'           WELLS'/
@@ -573,9 +573,6 @@ C     ------------------------------------------------------------------
 C
 C1------CLEAR RATIN AND RATOUT ACCUMULATORS, AND SET CELL-BY-CELL
 C1------BUDGET FLAG.
-!delete below
-      Qtot = 0.0
-!
       ZERO=0.
       RATIN=ZERO
       RATOUT=ZERO
@@ -679,8 +676,6 @@ C5I-----COPY FLOW TO WELL LIST.
    99 IF(IBD.EQ.2) CALL UBDSVB(IWELCB,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
       WELL(NWELVL,L)=QQ
-! delete below
-      if ( QQ < 0.0 ) Qtot = Qtot + QQ
 !
       
    61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
@@ -692,11 +687,7 @@ C5I-----COPY FLOW TO WELL LIST.
      1       '        GW-HEAD       CELL-BOT')
   500 FORMAT(3I6,4E15.6)
 
-  100 CONTINUE
-!delete below
-      open(222,file='carmel_pumping.out')
-      write(222,*)TOTIM,Qtot
-!
+  100       CONTINUE
 !
 C5D-----PRINT FLOW RATE IF REQUESTED.
        IF(IBDLBL.EQ.0.AND.IBD.LT.0) WRITE(IOUT,61) TEXT,KPER,KSTP
