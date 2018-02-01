@@ -31,7 +31,8 @@
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERSW
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERGW
-        REAL,             SAVE, DIMENSION(:,:),   POINTER     ::WELLIRR
+        REAL,             SAVE, DIMENSION(:,:),   POINTER ::WELLIRRUZF
+        REAL,             SAVE, DIMENSION(:),   POINTER :: WELLIRRPRMS
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWELVAR
@@ -58,7 +59,8 @@
         INTEGER,SAVE,  DIMENSION(:),  POINTER:: IRRSEG ! SEGMENT NUMBER BY NUMBER OF IRRIGATION SEGMENTS
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRROW !(store cells to apply diverted recharge)
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRCOL
-        REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRR  !(store original recharge values)
+        REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRRUZF
+        REAL,   SAVE,  DIMENSION(:),POINTER:: SFRIRRPRMS  !(store IRRIGATION AMOUNTS)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
 !        REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROP  !(crop coefficient)
@@ -214,7 +216,8 @@ C
      +         NUMSEGS(MXWELL),PCTSUP(MAXSEGSHOLD,MXACTWSUP))
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWELVAR(NUMIRRHOLD),
-     +         WELLIRR(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
+     +         WELLIRRUZF(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
+      ALLOCATE(WELLIRRPRMS(MAXCELLSHOLD))
       ALLOCATE(AETITERGW(MAXCELLSHOLD,MXACTWIRR))
       ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
      +           IRRPCT(MAXCELLSHOLD,MXACTWIRR),SUPFLOW(MXACTWSUP))
@@ -224,7 +227,8 @@ C
       UZFCOL = 0
       SUPWELVAR = 0
       IRRWELVAR = 0
-      WELLIRR = 0.0
+      WELLIRRUZF = 0.0
+      WELLIRRPRMS = 0.0
       NUMCELLS = 0
       IRRFACT = 0.0
       IRRPCT = 0.0
@@ -241,13 +245,13 @@ C-------allocate for SFR AWUptions
         ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
         ALLOCATE(AETITERSW(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
-        ALLOCATE (SFRIRR(NCOL,NROW))  
+        ALLOCATE (SFRIRRUZF(NCOL,NROW),SFRIRRPRMS(MAXCELLSSFR))  
         ALLOCATE (IRRSEG(NSEGDIM))
       ELSE
         ALLOCATE (DVRCH(1),DVEFF(1,1)) !  ,KCROP(1,1))      
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
         ALLOCATE (DVRPERC(1,1))  
-        ALLOCATE (SFRIRR(1,1))  
+        ALLOCATE (SFRIRRUZF(1,1),SFRIRRPRMS(1))  
         ALLOCATE (IRRSEG(1),AETITERSW(1,1))
       END IF
       DVRCH = 0    
@@ -256,7 +260,8 @@ C-------allocate for SFR AWUptions
       IRRROW = 0  
       IRRCOL = 0
       AETITERSW = 0.0
-      SFRIRR = 0.0      
+      SFRIRRUZF = 0.0
+      SFRIRRPRMS = 0.0
       DVRPERC = 0.0   
       ALLOCATE (IDVFLG)  
       IDVFLG = 0     
@@ -968,6 +973,7 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,IUNIT
       USE GWFAWUMODULE
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS:
@@ -1020,17 +1026,30 @@ C---READ NEW IRRIGATION WELL DATA
           END IF
           IRRWELVAR(J) = IRWL
           NUMCELLS(IRWL) = NMCL
-          DO K = 1, NMCL
-            READ(IN,*)UZFROW(K,IRWL),UZFCOL(K,IRWL),IRRFACT(K,IRWL),
+          IF ( GSFLOW_flag == 1 ) then   !uzfrow stores hru number for gsflow
+            DO K = 1, NMCL
+              READ(IN,*)UZFROW(K,IRWL),IRRFACT(K,IRWL),
      +                IRRPCT(K,IRWL)
-          END DO
-          DO K = 1, NUMCELLS(IRRWELVAR(J))
-            IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
+            END DO
+            DO K = 1, NUMCELLS(IRRWELVAR(J))
+              IF ( UZFROW(K,IRRWELVAR(J))==0 ) THEN
+                WRITE(IOUT,107) 
+                CALL USTOP('')   
+              END IF
+            END DO
+          ELSE
+            DO K = 1, NMCL
+              READ(IN,*)UZFROW(K,IRWL),UZFCOL(K,IRWL),IRRFACT(K,IRWL),
+     +                IRRPCT(K,IRWL)
+            END DO
+            DO K = 1, NUMCELLS(IRRWELVAR(J))
+              IF ( UZFROW(K,IRRWELVAR(J))==0 .OR. 
      +                                UZFCOL(K,IRRWELVAR(J))==0 ) THEN
-              WRITE(IOUT,106) 
-              CALL USTOP('')   
-            END IF
-          END DO
+                WRITE(IOUT,106) 
+                CALL USTOP('')   
+              END IF
+            END DO
+          END IF
         END DO
 C
    99 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
@@ -1048,6 +1067,8 @@ C
      +       'period are: ',2i6)
   106 FORMAT('***ERROR IN AWU PACKAGE*** cell row or column for ',
      +       'irrigation well specified as zero. Model stopping.')
+  107 FORMAT('***ERROR IN AWU PACKAGE*** HRU ID for ',
+     +       'irrigation well specified as zero. Model stopping.')
 C
 C6------RETURN
       RETURN
@@ -1059,6 +1080,7 @@ C-------SUBROUTINE SFRAWUPTIONS
       SUBROUTINE IRRSFR(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
       USE GWFAWUMODULE
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
       USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -1115,38 +1137,56 @@ C
      !!       READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
      !!+                   (IRRROW(K,SGNM),IRRCOL(K,SGNM),
      !!+                    DVEFF(K,SGNM),DVRPERC(K,SGNM),K=1,NMCL)
-            DO K=1,NMCL                
-              READ(IN,*)IRRROW(K,SGNM),IRRCOL(K,SGNM),
+            IF ( GSFLOW_flag == 1 ) then   !irrrow stores hru number for gsflow
+              DO K=1,NMCL                
+                READ(IN,*)IRRROW(K,SGNM),DVEFF(K,SGNM),
+     +                    DVRPERC(K,SGNM)
+              END DO
+              totdum  = 0.0
+              DO K = 1, NMCL
+                IF ( IRRROW(K,SGNM)==0 ) THEN
+                  totdum = totdum + DVRPERC(NMCL,SGNM)
+                  WRITE(IOUT,9010)
+                  CALL USTOP('')   
+                  IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
+                END IF
+              END DO
+            ELSE
+              DO K=1,NMCL                
+                READ(IN,*)IRRROW(K,SGNM),IRRCOL(K,SGNM),
      +                    DVEFF(K,SGNM),DVRPERC(K,SGNM)
-            END DO
-            totdum  = 0.0
-            DO K = 1, NMCL
-              IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
-                totdum = totdum + DVRPERC(NMCL,SGNM)
-                WRITE(IOUT,9007)
-                CALL USTOP('')   
-                IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
-              END IF
-            END DO
+              END DO
+              totdum  = 0.0
+              DO K = 1, NMCL
+                IF ( IRRROW(K,SGNM)==0 .OR. IRRCOL(K,SGNM)==0 ) THEN
+                  totdum = totdum + DVRPERC(NMCL,SGNM)
+                  WRITE(IOUT,9007)
+                  CALL USTOP('')   
+                  IF ( totdum.GT.1.000001 ) WRITE(Iout,9006)totdum
+                END IF
+              END DO
+            END IF
           END IF
         END DO
 !
  9005 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
      +        'FROM SEGEMENTS')
- 9006 FORMAT(' ***Warning in SFR2*** ',/
+ 9006 FORMAT(' ***Warning in AWU*** ',/
      +       'Fraction of diversion for each cell in group sums '/,
      +       'to a value greater than one. Sum = ',E10.5)
- 9007 FORMAT('***Error in SFR2*** cell row or column for irrigation',
+ 9007 FORMAT('***Error in AWU*** cell row or column for irrigation',
      +       'cell specified as zero. Model stopping.')
- 9008 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+ 9008 FORMAT('***Error in AWU*** maximum number of irrigation ',
      +       'segments is less than the number specified in ',
      +       'stress period. ',/ 
      +       'Maximum segments and the number specified are: ',2i6)
- 9009 FORMAT('***Error in SFR2*** maximum number of irrigation ',
+ 9009 FORMAT('***Error in AWU*** maximum number of irrigation ',
      +       'cells is less than the number specified in ',
      +       'stress period. ',/ 
      +       'Maximum cells and the number specified are: ',2i6)
+ 9010 FORMAT('***Error in AWU*** HRU_ID for irrigation',
+     +       'cell specified as zero. Model stopping.')
 C11-----RETURN.
       RETURN
       END
@@ -1245,11 +1285,14 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:DELR,DELC,IBOUND,HNEW,LBOTM,BOTM,
      +                       RHS
-      USE GWFBASMODULE, ONLY:TOTIM
+      USE GWFBASMODULE, ONLY:TOTIM,DELT
       USE GWFAWUMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE PRMS_BASIN, ONLY: HRU_PERV
       IMPLICIT NONE
 C
 C        ARGUMENTS:
@@ -1258,21 +1301,25 @@ C     ------------------------------------------------------------------
 C
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      INTEGER NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
-      DOUBLE PRECISION :: ZERO, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
-      EXTERNAL :: SMOOTHQ, RATETERPQ,demandgw
+      INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
+      DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
+      EXTERNAL :: SMOOTHQ, RATETERPQ,demandgw_uzf, demandgw_prms
       REAL :: RATETERPQ,TIME
-      DOUBLE PRECISION Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO
-      DOUBLE PRECISION demandgw
+      DOUBLE PRECISION :: Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO
+      DOUBLE PRECISION :: demandgw_uzf, demandgw_prms, mf_q2prms_inch
+      INTEGER :: ihru
       
 C      
 C     ------------------------------------------------------------------
       ZERO=0.0D0
+      DONE=1.0D0
       NEARZERO = 1.0D-17
-      WELLIRR = ZERO
+      WELLIRRUZF = ZERO
+      WELLIRRPRMS = ZERO
       TIME = TOTIM
       SUP = ZERO
-      SFRIRR = ZERO 
+      SFRIRRUZF = ZERO 
+      SFRIRRPRMS = ZERO
       SUPFLOW = ZERO
       ACTUAL = ZERO
       Qp = ZERO
@@ -1282,7 +1329,11 @@ C     ------------------------------------------------------------------
 C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 ) THEN
-        CALL demandconjunctive()
+        IF ( GSFLOW_flag == 0 ) THEN
+          CALL demandconjunctive_uzf()
+        ELSE
+          CALL demandconjunctive_prms()
+        END IF
       END IF
             
 C
@@ -1329,63 +1380,91 @@ C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFI
           ELSE
 C
 C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
-            IF ( ETDEMANDFLAG > 0 ) Q = demandgw(l)
-          END IF
+            IF ( ETDEMANDFLAG > 0 ) THEN
+              IF ( GSFLOW_flag == 0 ) THEN
+                Q = demandgw_uzf(l)
+              ELSE
+                Q = demandgw_prms(l)  
+              END IF
+            END IF
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
-          IF ( IUNITNWT.NE.0 ) THEN
-            IF ( LAYTYPUPW(il).GT.0 ) THEN
-              Hh = HNEW(ic,ir,il)
-              bbot = Botm(IC, IR, Lbotm(IL))
-              ttop = Botm(IC, IR, Lbotm(IL)-1)
-              Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
-              RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
+            IF ( IUNITNWT.NE.0 ) THEN
+              IF ( LAYTYPUPW(il).GT.0 ) THEN
+                Hh = HNEW(ic,ir,il)
+                bbot = Botm(IC, IR, Lbotm(IL))
+                ttop = Botm(IC, IR, Lbotm(IL)-1)
+                Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
+                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
 C
 C8------Derivative for RHS
-              ij = Icell(IC,IR,IL)
-              A(IA(ij)) = A(IA(ij)) + dQp*Q
+                ij = Icell(IC,IR,IL)
+                A(IA(ij)) = A(IA(ij)) + dQp*Q
+              ELSE
+                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
+                Qp = Q
+              END IF
             ELSE
               RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
               Qp = Q
             END IF
-          ELSE
-            RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
-            Qp = Q
-          END IF
 C
 C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-          SUP = 0.0
-          DO I = 1, NUMSEGS(L)
-            J = SFRSEG(I,L) 
-            SUP = SUP - Qp
-            ACTUAL(J)  = ACTUAL(J) + SUP
-          END DO
+            SUP = 0.0
+            DO I = 1, NUMSEGS(L)
+              J = SFRSEG(I,L) 
+              SUP = SUP - Qp
+              ACTUAL(J)  = ACTUAL(J) + SUP
+            END DO
 ! APPLY IRRIGATION FROM WELLS
-          DO I = 1, NUMCELLS(L)
-              SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
-              SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
-     +                    WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
-          END DO
+            IF ( GSFLOW_flag == 0 ) THEN
+              DO I = 1, NUMCELLS(L)
+                SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+                SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
+                WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) = 
+     +                  WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
+              END DO
+            ELSE
+              mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
+              DO I = 1, NUMCELLS(L)
+                IHRU = UZFROW(I,L)
+                SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+                SUBRATE = SUBVOL/HRU_PERV(IHRU)
+                WELLIRRPRMS(IHRU) = WELLIRRPRMS(IHRU) + SUBRATE
+              END DO
+            END IF
+          END IF
         END IF
       END DO
 C APPLY IRRIGATION FROM SW DIVERSIONS
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
-        DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRSFR TO SAVE MEMORY
-          irr = IRRROW(icount,istsg)
-          icc = IRRCOL(icount,istsg)
-          dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-          dvt = dvt/(DELR(icc)*DELC(irr))
-          SFRIRR(icc, irr) = SFRIRR(icc, irr) + 
+        IF ( GSFLOW_flag == 0 ) THEN
+          DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRSFR TO SAVE MEMORY
+            irr = IRRROW(icount,istsg)
+            icc = IRRCOL(icount,istsg)
+            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+            dvt = dvt/(DELR(icc)*DELC(irr))
+            SFRIRRUZF(icc, irr) = SFRIRRUZF(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
-        END DO
+          END DO
+        ELSE
+          mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
+          DO icount = 1, DVRCH(istsg)   
+            IHRU = IRRROW(icount,istsg)
+            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+            dvt = dvt/HRU_PERV(IHRU)
+            SFRIRRPRMS(IHRU) = SFRIRRPRMS(IHRU) + 
+     +           mf_q2prms_inch*dvt*(1.0-DVEFF(ICOUNT,istsg))
+          END DO
+        END IF
       END DO
 C
 C3------RETURN
       RETURN
       END
+C
       SUBROUTINE GWF2AWU7BD(kkstp,kkper,Iunitnwt)
 C     ******************************************************************
 C     CALCULATE FLOWS FOR AG OPTIONS (DIVERSIONS AND PUMPING)
@@ -1400,6 +1479,9 @@ C     ------------------------------------------------------------------
       USE GWFAWUMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
+      USE PRMS_MODULE, ONLY: GSFLOW_flag
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      USE PRMS_BASIN, ONLY: HRU_PERV
       IMPLICIT NONE
 C        ARGUMENTS:
 C     ------------------------------------------------------------------
@@ -1414,11 +1496,11 @@ C     ------------------------------------------------------------------
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
       INTEGER :: IBD1,IBD2,IBD3,IBD4
-      INTEGER :: TOTWELLCELLS,TOTSFRCELLS
+      INTEGER :: TOTWELLCELLS,TOTSFRCELLS,IHRU
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
-      DOUBLE PRECISION :: DONENEG 
+      DOUBLE PRECISION :: DONENEG, prms_inch2mf_q
       DATA TEXT1 /'AWU WELLS'/
       DATA TEXT2 /'DIVERSION SEGMENTS'/
       DATA TEXT3 /'SW IRRIGATION'/
@@ -1444,11 +1526,9 @@ C     ------------------------------------------------------------------
       QIRR=ZERO
       TOTWELLCELLS=0
       TOTSFRCELLS=0
-      WELLIRR = ZERO
       TIME = TOTIM
       ACTUAL = ZERO
       SUP = ZERO
-      SFRIRR = ZERO
       MSUMAG = 1
       IBD1=0
       IBD2=0
@@ -1579,9 +1659,6 @@ C9------APPLY IRRIGATION FROM WELLS
           IF ( NUMCELLS(L)>0 ) QWELL = QWELL + QQ
           DO I = 1, NUMCELLS(L)
             SUBVOL = -(1.0-IRRFACT(I,L))*QQ*IRRPCT(I,L)
-            SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-            WELLIRR(UZFCOL(I,L),UZFROW(I,L)) = 
-     +              WELLIRR(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
             QWELLIRR=QWELLIRR+SUBVOL
             QWELLET=QWELLET+IRRFACT(I,L)*QQ*IRRPCT(I,L)
           END DO
@@ -1612,14 +1689,24 @@ C
 C12------IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE GW IRRIGATION.
 C
           IF(IBD4.EQ.2) THEN
-            DO I = 1, MAXCELLSWEL     !NUMCELLS(L) same number of values each write 
-              IC = UZFCOL(I,L)
-              IR = UZFROW(I,L)
-              AREA = DELR(ic)*DELC(ir)
-              QIRR = WELLIRR(IC,IR)*AREA
-              CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
+            IF ( GSFLOW_flag == 0 ) THEN
+              DO I = 1, NUMCELLS(L)
+                IC = UZFCOL(I,L)
+                IR = UZFROW(I,L)
+                AREA = DELR(ic)*DELC(ir)
+                QIRR = WELLIRRUZF(IC,IR)*AREA
+                CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
      1                WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-            END DO
+              END DO
+              prms_inch2mf_q = DONE/DELT*Mfl2_to_acre*Mfl_to_inch
+              DO I = 1, NUMCELLS(L)
+                IHRU = UZFROW(I,L)
+                AREA = HRU_PERV(IHRU)
+                QIRR = WELLIRRPRMS(IHRU)*AREA*prms_inch2mf_q
+                CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
+     1                   WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
+              END DO
+            END IF
           END IF
 C
 C--------COPY FLOW TO WELL LIST.
@@ -1633,28 +1720,32 @@ C         AND DIVERTED SW.
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
         DO icount = 1, DVRCH(istsg)
-          ir = IRRROW(icount,istsg)
-          ic = IRRCOL(icount,istsg)
-          AREA = DELR(ic)*DELC(ir)
           DVT = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
           QSW=QSW+DVT
-          SFRIRR(ic,ir) = SFRIRR(ic,ir) + 
-     1                    DVT*(DONE-DVEFF(ICOUNT,istsg))/AREA
           QSWET=QSWET+DVT*(DVEFF(ICOUNT,istsg))
           QSWIRR = QSWIRR + DVT*(DONE-DVEFF(ICOUNT,istsg))
         END DO
         IF(IBD3.EQ.2) THEN
-          DO icount = 1, MAXCELLSSFR        !VRCH(istsg) WRITE THE SAME NUMBER OF CELLS EACH TIME
-            QIRR = 0.0
-            ir = IRRROW(icount,istsg)
-            ic = IRRCOL(icount,istsg)
-            IF ( IR*IC > 0 ) THEN
+          IF ( GSFLOW_flag == 0 ) THEN
+            DO icount = 1, DVRCH(istsg)
+              QIRR = 0.0
+              ir = IRRROW(icount,istsg)
+              ic = IRRCOL(icount,istsg)
               AREA = DELR(ic)*DELC(ir)
-              QIRR = SFRIRR(IC,IR)*AREA
-            END IF
-            CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
+              QIRR = SFRIRRUZF(IC,IR)*AREA
+              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
      1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
-          END DO
+            END DO
+          ELSE
+            DO icount = 1, DVRCH(istsg)
+              QIRR = 0.0
+              ihru = IRRROW(icount,istsg)
+              AREA = HRU_PERV(ihru)
+              QIRR = SFRIRRPRMS(IHRU)*AREA
+              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
+     1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
+            END DO
+          END IF
         END IF
       END DO
 !
@@ -1698,7 +1789,7 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
             ir = IRRROW(icount,istsg)
             ic = IRRCOL(icount,istsg)
             AREA = DELR(ic)*DELC(ir)
-            WRITE(IOUT,65) ISTSG,IR,IC,SFRIRR(IC,IR)*AREA
+            WRITE(IOUT,65) ISTSG,IR,IC,SFRIRRUZF(IC,IR)*AREA
           END DO
         END DO
         WRITE(IOUT,*)
@@ -1714,7 +1805,7 @@ C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
             IC = UZFCOL(I,L)
             IR = UZFROW(I,L)
             AREA = DELR(ic)*DELC(ir)
-            WRITE(IOUT,64) L,IR,IC,WELLIRR(IC,IR)*AREA
+            WRITE(IOUT,64) L,IR,IC,WELLIRRUZF(IC,IR)*AREA
           END DO
         END DO
         WRITE(IOUT,*)
@@ -1820,7 +1911,7 @@ C19------RETURN
       END
 ! ----------------------------------------------------------------------
 C
-      subroutine demandconjunctive()
+      subroutine demandconjunctive_uzf()
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
@@ -1865,17 +1956,10 @@ C
         do k = 1, DVRCH(iseg)
            ic = IRRCOL(k,iseg)
            ir = IRRROW(k,iseg)
-           if ( GSFLOW_flag == 1 ) then
-             area = delr(ic)*delc(ir)
-             pet = PETRATE(ic,ir)
-             uzet = uzfetout(ic,ir)/DELT
-             aet = (gwet(ic,ir)+uzet)/area    
-           else
-             area = delr(ic)*delc(ir)
-             pet = PETRATE(ic,ir)
-             uzet = uzfetout(ic,ir)/DELT
-             aet = (gwet(ic,ir)+uzet)/area
-           end if
+           area = delr(ic)*delc(ir)
+           pet = PETRATE(ic,ir)
+           uzet = uzfetout(ic,ir)/DELT
+           aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
            if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
@@ -1898,9 +1982,77 @@ C
       if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
 300   continue
       return
-      end subroutine demandconjunctive
+      end subroutine demandconjunctive_uzf
 C
-      double precision function demandgw(l)
+      subroutine demandconjunctive_prms()
+!     ******************************************************************
+!     demandconjunctive---- sums up irrigation demand using ET deficit
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFAWUMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
+      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+     +                    aettotal,dhundred,prms_inch2mf_q
+      integer :: k,iseg,hru_id,i
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
+      done = 1.0d0
+      dhundred = 100.0d0
+      dzero = 0.0d0
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+C
+C1------loop over diversion segments that supply irrigation
+C
+      do 300 i = 1, NUMIRRSFRSP
+        iseg = IRRSEG(i)
+        IF ( DEMAND(iseg) < zerod30 ) goto 300
+        finfsum = dzero
+C
+C1------loop over hrus irrigated by diversion
+C
+        do k = 1, DVRCH(iseg)
+           hru_id = IRRROW(k,iseg)
+           area = hru_perv(hru_id)
+           pet = potet(hru_id)
+           aet = hru_actet(hru_id)
+           if ( aet < zerod30 ) aet = zerod30
+           factor = pet/aet - done
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           IF ( FACTOR > dhundred ) FACTOR = dhundred
+           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
+           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
+           dum = pet
+!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
+           pettotal = pettotal + pet
+           aettotal = aettotal + aet
+           AETITERSW(K,ISEG) = AET
+        end do
+C
+C1------set diversion to demand
+C
+      SEG(2,iseg) = SUPACT(iseg)
+C
+C1------limit diversion to water right
+C
+      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+300   continue
+      return
+      end subroutine demandconjunctive_prms
+C
+      double precision function demandgw_uzf(l)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -1926,7 +2078,7 @@ C
       doneneg = -1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
-      demandgw = DZERO
+      demandgw_uzf = DZERO
       DO I = 1, NUMCELLS(L)
         IC = UZFCOL(I,L)
         IR = UZFROW(I,L)
@@ -1943,8 +2095,56 @@ C
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
         AETITERGW(I,L) = AET
       end do
-      demandgw = doneneg*QONLY(L)
-      end function demandgw
+      demandgw_uzf = doneneg*QONLY(L)
+      end function demandgw_uzf
+C
+      double precision function demandgw_prms(l)
+!     ******************************************************************
+!     demandgw---- sums up irrigation demand using ET deficit for gw
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFAWUMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      integer, intent(in) :: l
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q
+      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
+      integer :: i,ihru
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
+      done = 1.0d0
+      doneneg = -1.0d0
+      dhundred = 100.0d0
+      dzero = 0.0d0
+      demandgw_prms = DZERO
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+      DO I = 1, NUMCELLS(L)
+        ihru = UZFROW(I,L)
+        pet = potet(ihru)
+        aet = hru_actet(ihru)
+        area = HRU_PERV(ihru)
+        if ( aet < zerod30 ) aet = zerod2*pet
+        factor = pet/aet - done
+        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
+        IF ( FACTOR > dhundred ) FACTOR = dhundred
+!pet is in inches need to convert to mfl3; need to fix time for mf not days
+        QONLY(L) = QONLY(L) + factor*pet*area*prms_inch2mf_q
+        dum = pet
+!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
+        AETITERGW(I,L) = AET
+      end do
+      demandgw_prms = doneneg*QONLY(L)
+      end function demandgw_prms
 C
       subroutine timeseries(Kkper, Kkstp, Kkiter,numwells)
 !     ******************************************************************
@@ -2308,7 +2508,8 @@ C
         DEALLOCATE(MAXSEGS)
         DEALLOCATE(MAXCELLSWEL)
         DEALLOCATE(NUMCELLS)
-        DEALLOCATE(WELLIRR)
+        DEALLOCATE(WELLIRRUZF)
+        DEALLOCATE(WELLIRRPRMS)
         DEALLOCATE(IRRFACT)
         DEALLOCATE(IRRPCT)
         DEALLOCATE(PSIRAMP) 
@@ -2336,7 +2537,8 @@ C
       DEALLOCATE (DVEFF)  
       DEALLOCATE (IRRROW) 
       DEALLOCATE (IRRCOL)
-      DEALLOCATE (SFRIRR) 
+      DEALLOCATE (SFRIRRUZF) 
+      DEALLOCATE (SFRIRRPRMS) 
       DEALLOCATE (DVRPERC) 
       DEALLOCATE (IDVFLG) 
       DEALLOCATE (NUMIRRSFR)
