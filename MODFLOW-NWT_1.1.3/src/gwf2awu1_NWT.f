@@ -1536,6 +1536,8 @@ C     ------------------------------------------------------------------
       IBD4=0
       Qp = 1.0
       NWELLSTEMP = NWELLS
+      IF ( GSFLOW_flag > 0 ) 
+     +     prms_inch2mf_q = DONE/DELT*Mfl2_to_acre*Mfl_to_inch
 !      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    Now mxwells/=numtab
       IBDLBL=0
       iw1 = 1
@@ -1584,22 +1586,22 @@ C       WRITE HEADER.
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
 ! FOR WELLS
-      IF(IBD1.EQ.2) THEN
+      IF(IBD1.LT.0) THEN
       CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,WELAUX,IWELLCB,NCOL,NROW,NLAY,
      1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 ! FOR SEGMENTS (DIVERSIONS)
-     !! IF(IBD2.EQ.2) THEN
-     !! CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SFRAUX,ISFRCB,NCOL,NROW,NLAY,
-     !!1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-     !! END IF
+      IF(IBD2.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SFRAUX,ISFRCB,NCOL,NROW,NLAY,
+     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+      END IF
 ! SW IRRIGATION
-      IF(IBD3.EQ.2) THEN
+      IF(IBD3.LT.0) THEN
       CALL UBDSV4(KKSTP,KKPER,TEXT3,0,SFRAUX,IRRSFRCB,NCOL,NROW,NLAY,
      1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 ! GW IRRIGATION
-      IF(IBD4.EQ.2) THEN
+      IF(IBD4.LT.0) THEN
       CALL UBDSV4(KKSTP,KKPER,TEXT4,NAUX,WELAUX,IRRWELLCB,NCOL,NROW,
      1          NLAY,NUMIRRWEL,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
@@ -1698,12 +1700,12 @@ C
                 CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
      1                WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
               END DO
-              prms_inch2mf_q = DONE/DELT*Mfl2_to_acre*Mfl_to_inch
+            ELSE
               DO I = 1, NUMCELLS(L)
                 IHRU = UZFROW(I,L)
                 AREA = HRU_PERV(IHRU)
                 QIRR = WELLIRRPRMS(IHRU)*AREA*prms_inch2mf_q
-                CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
+                CALL UBDSVB(IRRWELLCB,NCOL,NROW,ihru,0,0,QIRR,
      1                   WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
               END DO
             END IF
@@ -1741,8 +1743,8 @@ C         AND DIVERTED SW.
               QIRR = 0.0
               ihru = IRRROW(icount,istsg)
               AREA = HRU_PERV(ihru)
-              QIRR = SFRIRRPRMS(IHRU)*AREA
-              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
+              QIRR = SFRIRRPRMS(IHRU)*AREA*prms_inch2mf_q
+              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IHRU,0,0,QIRR,
      1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
             END DO
           END IF
@@ -1785,12 +1787,21 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
         WRITE(IOUT,61) TEXT3,KKPER,KKSTP
         DO L = 1, NUMIRRSFRSP
           ISTSG = IRRSEG(L)
-          DO icount = 1, DVRCH(istsg)
-            ir = IRRROW(icount,istsg)
-            ic = IRRCOL(icount,istsg)
-            AREA = DELR(ic)*DELC(ir)
-            WRITE(IOUT,65) ISTSG,IR,IC,SFRIRRUZF(IC,IR)*AREA
-          END DO
+          IF ( GSFLOW_flag == 0 ) THEN
+            DO icount = 1, DVRCH(istsg)
+              ir = IRRROW(icount,istsg)
+              ic = IRRCOL(icount,istsg)
+              AREA = DELR(ic)*DELC(ir)
+              WRITE(IOUT,65) ISTSG,IR,IC,SFRIRRUZF(IC,IR)*AREA
+            END DO
+          ELSE
+            DO icount = 1, DVRCH(istsg)
+              ihru = IRRROW(icount,istsg)
+              AREA = DELR(ic)*DELC(ir)
+              WRITE(IOUT,66) ISTSG,IHRU,SFRIRRPRMS(ihru)*AREA
+     +                                         *prms_inch2mf_q
+            END DO 
+          END IF
         END DO
         WRITE(IOUT,*)
       END IF
@@ -1801,12 +1812,21 @@ C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
         WRITE(IOUT,*)
         WRITE(IOUT,61) TEXT4,KKPER,KKSTP
         DO L=1,NWELLSTEMP 
-          DO I = 1, NUMCELLS(L)
-            IC = UZFCOL(I,L)
-            IR = UZFROW(I,L)
-            AREA = DELR(ic)*DELC(ir)
-            WRITE(IOUT,64) L,IR,IC,WELLIRRUZF(IC,IR)*AREA
-          END DO
+          IF ( GSFLOW_flag == 0 ) THEN
+            DO I = 1, NUMCELLS(L)
+              IC = UZFCOL(I,L)
+              IR = UZFROW(I,L)
+              AREA = DELR(ic)*DELC(ir)
+              WRITE(IOUT,64) L,IR,IC,WELLIRRUZF(IC,IR)*AREA
+            END DO
+          ELSE
+            DO I = 1, NUMCELLS(L)
+              IHRU = UZFROW(I,L)
+              AREA = HRU_PERV(IHRU)
+              WRITE(IOUT,67) L,IHRU,WELLIRRPRMS(IHRU)*AREA*
+     +                       prms_inch2mf_q
+            END DO  
+          END IF
         END DO
         WRITE(IOUT,*)
       END IF
@@ -1901,6 +1921,8 @@ C
      1      '   RATE ',1PG15.6)
    65 FORMAT(1X,'SEGMENT ',I6,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
+   66 FORMAT(1X,'SEGMENT ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
+   67 FORMAT(1X,'WELL ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
   300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
      1      ' TIME STEP ',I5)
   400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
