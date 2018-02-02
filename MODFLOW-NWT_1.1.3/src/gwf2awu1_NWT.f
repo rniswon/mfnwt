@@ -1133,10 +1133,6 @@ C
           IF ( SGNM > 0 ) THEN
             IRRSEG(J) = SGNM
             DVRCH(SGNM) = NMCL
-!            BACKSPACE(IN)
-     !!       READ(IN,*)IRRSEG(J),DVRCH(SGNM), 
-     !!+                   (IRRROW(K,SGNM),IRRCOL(K,SGNM),
-     !!+                    DVEFF(K,SGNM),DVRPERC(K,SGNM),K=1,NMCL)
             IF ( GSFLOW_flag == 1 ) then   !irrrow stores hru number for gsflow
               DO K=1,NMCL                
                 READ(IN,*)IRRROW(K,SGNM),DVEFF(K,SGNM),
@@ -1291,8 +1287,6 @@ C     ------------------------------------------------------------------
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-      USE PRMS_BASIN, ONLY: HRU_PERV
       IMPLICIT NONE
 C
 C        ARGUMENTS:
@@ -1421,17 +1415,17 @@ C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             IF ( GSFLOW_flag == 0 ) THEN
               DO I = 1, NUMCELLS(L)
                 SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+Convert irrigation for UZF to a rate per unit area
                 SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
                 WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) = 
      +                  WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
               END DO
             ELSE
-              mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
               DO I = 1, NUMCELLS(L)
                 IHRU = UZFROW(I,L)
                 SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
-                SUBRATE = SUBVOL/HRU_PERV(IHRU)
-                WELLIRRPRMS(IHRU) = WELLIRRPRMS(IHRU) + SUBRATE
+! Keep irrigation for PRMS as volume
+                WELLIRRPRMS(IHRU) = WELLIRRPRMS(IHRU) + SUBVOL
               END DO
             END IF
           END IF
@@ -1446,17 +1440,17 @@ C APPLY IRRIGATION FROM SW DIVERSIONS
             icc = IRRCOL(icount,istsg)
             dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
             dvt = dvt/(DELR(icc)*DELC(irr))
+Convert irrigation for UZF to a rate per unit area
             SFRIRRUZF(icc, irr) = SFRIRRUZF(icc, irr) + 
      +                         dvt*(1.0-DVEFF(ICOUNT,istsg))
           END DO
         ELSE
-          mf_q2prms_inch = DELT*Mfl2_to_acre*Mfl_to_inch
           DO icount = 1, DVRCH(istsg)   
             IHRU = IRRROW(icount,istsg)
             dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-            dvt = dvt/HRU_PERV(IHRU)
-            SFRIRRPRMS(IHRU) = SFRIRRPRMS(IHRU) + 
-     +           mf_q2prms_inch*dvt*(1.0-DVEFF(ICOUNT,istsg))
+            dvt = (1.0-DVEFF(ICOUNT,istsg))*dvt
+! Keep irrigation for PRMS as volume
+            SFRIRRPRMS(IHRU) = SFRIRRPRMS(IHRU) + dvt
           END DO
         END IF
       END DO
@@ -1480,8 +1474,6 @@ C     ------------------------------------------------------------------
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-      USE PRMS_BASIN, ONLY: HRU_PERV
       IMPLICIT NONE
 C        ARGUMENTS:
 C     ------------------------------------------------------------------
@@ -1536,8 +1528,6 @@ C     ------------------------------------------------------------------
       IBD4=0
       Qp = 1.0
       NWELLSTEMP = NWELLS
-      IF ( GSFLOW_flag > 0 ) 
-     +     prms_inch2mf_q = DONE/DELT*Mfl2_to_acre*Mfl_to_inch
 !      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    Now mxwells/=numtab
       IBDLBL=0
       iw1 = 1
@@ -1657,7 +1647,7 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             ACTUAL(J)  = ACTUAL(J) + SUP
           END DO
 C
-C9------APPLY IRRIGATION FROM WELLS
+C9------CALCULATE IRRIGATION FROM WELLS
           IF ( NUMCELLS(L)>0 ) QWELL = QWELL + QQ
           DO I = 1, NUMCELLS(L)
             SUBVOL = -(1.0-IRRFACT(I,L))*QQ*IRRPCT(I,L)
@@ -1703,8 +1693,7 @@ C
             ELSE
               DO I = 1, NUMCELLS(L)
                 IHRU = UZFROW(I,L)
-                AREA = HRU_PERV(IHRU)
-                QIRR = WELLIRRPRMS(IHRU)*AREA*prms_inch2mf_q
+                QIRR = WELLIRRPRMS(IHRU)
                 CALL UBDSVB(IRRWELLCB,NCOL,NROW,ihru,0,0,QIRR,
      1                   WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
               END DO
@@ -1742,8 +1731,7 @@ C         AND DIVERTED SW.
             DO icount = 1, DVRCH(istsg)
               QIRR = 0.0
               ihru = IRRROW(icount,istsg)
-              AREA = HRU_PERV(ihru)
-              QIRR = SFRIRRPRMS(IHRU)*AREA*prms_inch2mf_q
+              QIRR = SFRIRRPRMS(IHRU)
               CALL UBDSVB(IRRSFRCB,NCOL,NROW,IHRU,0,0,QIRR,
      1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
             END DO
@@ -1797,9 +1785,7 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
           ELSE
             DO icount = 1, DVRCH(istsg)
               ihru = IRRROW(icount,istsg)
-              AREA = DELR(ic)*DELC(ir)
-              WRITE(IOUT,66) ISTSG,IHRU,SFRIRRPRMS(ihru)*AREA
-     +                                         *prms_inch2mf_q
+              WRITE(IOUT,66) ISTSG,IHRU,SFRIRRPRMS(ihru)
             END DO 
           END IF
         END DO
@@ -1822,9 +1808,7 @@ C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
           ELSE
             DO I = 1, NUMCELLS(L)
               IHRU = UZFROW(I,L)
-              AREA = HRU_PERV(IHRU)
-              WRITE(IOUT,67) L,IHRU,WELLIRRPRMS(IHRU)*AREA*
-     +                       prms_inch2mf_q
+              WRITE(IOUT,67) L,IHRU,WELLIRRPRMS(IHRU)
             END DO  
           END IF
         END DO
@@ -2054,6 +2038,7 @@ C
            factor = pet/aet - done
            if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
+! convert PRMS ET deficit to MODFLOW flow
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
            dum = pet
@@ -2157,9 +2142,11 @@ C
         area = HRU_PERV(ihru)
         if ( aet < zerod30 ) aet = zerod2*pet
         factor = pet/aet - done
-        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
-        IF ( FACTOR > dhundred ) FACTOR = dhundred
-!pet is in inches need to convert to mfl3; need to fix time for mf not days
+        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
+        IF ( factor > dhundred ) factor = dhundred
+!
+! convert PRMS ET deficit to MODFLOW flow
+!
         QONLY(L) = QONLY(L) + factor*pet*area*prms_inch2mf_q
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
