@@ -2,6 +2,7 @@
 ! from well package
         INTEGER,SAVE,POINTER  :: NWELLS,MXWELL,NWELVL,NPWEL,IPRWEL
         INTEGER,SAVE,POINTER  :: IWELLCB,IRDPSI,NNPWEL,NAUX,ISFRCB
+        INTEGER,SAVE,POINTER  :: IWELLCBU
         INTEGER,SAVE,POINTER  :: IRRWELLCB,IRRSFRCB
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
@@ -93,8 +94,8 @@ C        VARIABLES
       REAL :: R
 C     ------------------------------------------------------------------
       ALLOCATE(VBVLAG(4,10),VBNMAG(10),MSUMAG)
-      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELLCB,ISFRCB,NAUX)
-      ALLOCATE(IRRWELLCB,IRRSFRCB)
+      ALLOCATE(NWELLS,MXWELL,NWELVL,IWELLCB,ISFRCB,NAUX,WELAUX(20))
+      ALLOCATE(IRRWELLCB,IRRSFRCB,IWELLCBU)
       ALLOCATE(PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW)
@@ -117,6 +118,7 @@ C     ------------------------------------------------------------------
       MXWELL=0
       NWELVL=0
       IWELLCB=0
+      IWELLCBU=0
       ISFRCB=0
       IRRWELLCB=0
       IRRSFRCB=0
@@ -351,6 +353,12 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELLCB,R,IOUT,IN)
             WRITE(IOUT,*)
             WRITE(IOUT,37) IWELLCB
+            WRITE(IOUT,*)
+! Option to output list for wells  
+        case('WELLCBC')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IWELLCBU,R,IOUT,IN)
+            WRITE(IOUT,*)
+            WRITE(IOUT,37) IWELLCBU
             WRITE(IOUT,*)
 ! Option to output list for segments
         case('SFRLIST')
@@ -615,7 +623,7 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
               DO J = 1, MXWELL    !RGN 1/22/18 SPECIFY A FILE FOR EACH WELL
                 READ(IN,*)TABUNIT(J),TABVAL(J),TABLAY(J),
      +                    TABROW(J),TABCOL(J)
-                DO I = 1, J
+                DO I = 1, J - 1
                   IF ( TABUNIT(I) == TABUNIT(J) ) THEN
                     MATCH = 1
                     TABID(J) = TABID(I)
@@ -1422,10 +1430,10 @@ Convert irrigation for UZF to a rate per unit area
               END DO
             ELSE
               DO I = 1, NUMCELLS(L)
-                IHRU = UZFROW(I,L)
+!                IHRU = UZFROW(I,L)
                 SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
 ! Keep irrigation for PRMS as volume
-                WELLIRRPRMS(IHRU) = WELLIRRPRMS(IHRU) + SUBVOL
+                WELLIRRPRMS(I) = WELLIRRPRMS(I) + SUBVOL
               END DO
             END IF
           END IF
@@ -1446,11 +1454,11 @@ Convert irrigation for UZF to a rate per unit area
           END DO
         ELSE
           DO icount = 1, DVRCH(istsg)   
-            IHRU = IRRROW(icount,istsg)
+!            IHRU = IRRROW(icount,istsg)
             dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
             dvt = (1.0-DVEFF(ICOUNT,istsg))*dvt
 ! Keep irrigation for PRMS as volume
-            SFRIRRPRMS(IHRU) = SFRIRRPRMS(IHRU) + dvt
+            SFRIRRPRMS(icount) = SFRIRRPRMS(icount) + dvt
           END DO
         END IF
       END DO
@@ -1487,7 +1495,7 @@ C     ------------------------------------------------------------------
       REAL :: Q,TIME,RATETERPQ,QIRR,BUDPERC
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
-      INTEGER :: IBD1,IBD2,IBD3,IBD4
+      INTEGER :: IBD1,IBD2,IBD3,IBD4,IBD5
       INTEGER :: TOTWELLCELLS,TOTSFRCELLS,IHRU
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
@@ -1526,38 +1534,36 @@ C     ------------------------------------------------------------------
       IBD2=0
       IBD3=0
       IBD4=0
+      IBD5=0
       Qp = 1.0
       NWELLSTEMP = NWELLS
-!      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB    Now mxwells/=numtab
       IBDLBL=0
       iw1 = 1
 ! Budget output for wells
-      IF(IWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD1=-1  
-      IF(IWELLCB.LT.0 .AND. IBUDFL.NE.0) IBD1=-1
-      IF(IWELLCB.GT.0) IBD1=ICBCFL
+      IF(IWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD1=IOUT 
+      IF(IWELLCB.GT.0 .AND. ICBCFL.NE.0) IBD1=IWELLCB
+! Unformatted cbc budget output for wells
+      IF(IWELLCBU.GT.0 ) IBD5=ICBCFL
 ! Budeget output for segments    
-      IF(ISFRCB.LT.0 .AND. ICBCFL.NE.0) IBD2=-1
-      IF(ISFRCB.LT.0 .AND. IBUDFL.NE.0) IBD2=-1
-      IF(ISFRCB.GT.0) IBD2=ICBCFL
+      IF(ISFRCB.LT.0 .AND. ICBCFL.NE.0) IBD2=IOUT
+      IF(ISFRCB.GT.0 .AND. ICBCFL.NE.0) IBD2=ISFRCB
 ! Budeget output for irrigation segments    
-      IF(IRRSFRCB.LT.0 .AND. ICBCFL.NE.0) IBD3=-1
-      IF(IRRSFRCB.LT.0 .AND. IBUDFL.NE.0) IBD3=-1
-      IF(IRRSFRCB.GT.0) IBD3=ICBCFL
+      IF(IRRSFRCB.LT.0 .AND. ICBCFL.NE.0) IBD3=IOUT
+      IF(IRRSFRCB.GT.0 .AND. ICBCFL.NE.0) IBD3=IRRSFRCB
 ! Budeget output for irrigation wells    
-      IF(IRRWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD4=-1
-      IF(IRRWELLCB.LT.0 .AND. IBUDFL.NE.0) IBD4=-1
-      IF(IRRWELLCB.GT.0) IBD4=ICBCFL
+      IF(IRRWELLCB.LT.0 .AND. ICBCFL.NE.0) IBD4=IOUT
+      IF(IRRWELLCB.GT.0 .AND. ICBCFL.NE.0) IBD4=IRRWELLCB
 C
 C1------ADD UP TOTAL NUMBER OF WELL IRRIGATION CELLS DURING STRESS PERIOD.
-      DO L=1,NWELLSTEMP 
-        TOTWELLCELLS = TOTWELLCELLS + NUMCELLS(L)
-      END DO
+      !DO L=1,NWELLSTEMP 
+      !  TOTWELLCELLS = TOTWELLCELLS + NUMCELLS(L)
+      !END DO
 C
 C1------ADD UP TOTAL NUMBER OF SFR IRRIGATION CELLS DURING STRESS PERIOD.   
-      DO L = 1, NUMIRRSFRSP
-        J = IRRSEG(L)
-        TOTSFRCELLS = TOTSFRCELLS + DVRCH(J)
-      END DO
+      !DO L = 1, NUMIRRSFRSP
+      !  J = IRRSEG(L)
+      !  TOTSFRCELLS = TOTSFRCELLS + DVRCH(J)
+      !END DO
 C
 C1------CLEAR THE BUFFER.
       DO 50 IL=1,NLAY
@@ -1575,25 +1581,11 @@ C2-----IF CELL-BY-CELL PUMPING WILL BE SAVED AS A LIST(COMPACT BUDGET),
 C       WRITE HEADER.
          NAUX=NWELVL-5
          IF(IAUXSV.EQ.0) NAUX=0
-! FOR WELLS
-      IF(IBD1.LT.0) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,WELAUX,IWELLCB,NCOL,NROW,NLAY,
+C
+C2-----IF CELL-BY-CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
+      IF(IBD5.EQ.2) THEN
+      CALL UBDSV4(KKSTP,KKPER,TEXT1,NAUX,WELAUX,IWELLCBU,NCOL,NROW,NLAY,
      1          NWELLS,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
-! FOR SEGMENTS (DIVERSIONS)
-      IF(IBD2.EQ.2) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT2,0,SFRAUX,ISFRCB,NCOL,NROW,NLAY,
-     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
-! SW IRRIGATION
-      IF(IBD3.LT.0) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT3,0,SFRAUX,IRRSFRCB,NCOL,NROW,NLAY,
-     1          NUMIRRSFR,IOUT,DELT,PERTIM,TOTIM,IBOUND)
-      END IF
-! GW IRRIGATION
-      IF(IBD4.LT.0) THEN
-      CALL UBDSV4(KKSTP,KKPER,TEXT4,NAUX,WELAUX,IRRWELLCB,NCOL,NROW,
-     1          NLAY,NUMIRRWEL,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 C
 C5------CALCULATE DIVERSION SHORTFALL TO SET SUPPLEMENTAL PUMPING DEMAND
@@ -1675,30 +1667,8 @@ C11D-----FLOW RATE IS ALWAYS NEGATIVE (DISCHARGE). ADD IT TO RATOUT.
 C
 C11E-----IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE FLOW.  
 C
-          IF(IBD1.EQ.2) CALL UBDSVB(IWELLCB,NCOL,NROW,IC,IR,IL,Q,
+          IF(IBD5.EQ.2) CALL UBDSVB(IWELLCBU,NCOL,NROW,IC,IR,IL,Q,
      1                  WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-C
-C12------IF SAVING CELL-BY-CELL FLOWS IN A LIST, WRITE GW IRRIGATION.
-C
-          IF(IBD4.EQ.2) THEN
-            IF ( GSFLOW_flag == 0 ) THEN
-              DO I = 1, NUMCELLS(L)
-                IC = UZFCOL(I,L)
-                IR = UZFROW(I,L)
-                AREA = DELR(ic)*DELC(ir)
-                QIRR = WELLIRRUZF(IC,IR)*AREA
-                CALL UBDSVB(IRRWELLCB,NCOL,NROW,IC,IR,1,QIRR,
-     1                WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-              END DO
-            ELSE
-              DO I = 1, NUMCELLS(L)
-                IHRU = UZFROW(I,L)
-                QIRR = WELLIRRPRMS(IHRU)
-                CALL UBDSVB(IRRWELLCB,NCOL,NROW,ihru,0,0,QIRR,
-     1                   WELL(:,L),NWELVL,NAUX,5,IBOUND,NLAY)
-              END DO
-            END IF
-          END IF
 C
 C--------COPY FLOW TO WELL LIST.
           WELL(NWELVL,L)=QQ
@@ -1716,33 +1686,12 @@ C         AND DIVERTED SW.
           QSWET=QSWET+DVT*(DVEFF(ICOUNT,istsg))
           QSWIRR = QSWIRR + DVT*(DONE-DVEFF(ICOUNT,istsg))
         END DO
-        IF(IBD3.EQ.2) THEN
-          IF ( GSFLOW_flag == 0 ) THEN
-            DO icount = 1, DVRCH(istsg)
-              QIRR = 0.0
-              ir = IRRROW(icount,istsg)
-              ic = IRRCOL(icount,istsg)
-              AREA = DELR(ic)*DELC(ir)
-              QIRR = SFRIRRUZF(IC,IR)*AREA
-              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IC,IR,1,QIRR,
-     1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
-            END DO
-          ELSE
-            DO icount = 1, DVRCH(istsg)
-              QIRR = 0.0
-              ihru = IRRROW(icount,istsg)
-              QIRR = SFRIRRPRMS(IHRU)
-              CALL UBDSVB(IRRSFRCB,NCOL,NROW,IHRU,0,0,QIRR,
-     1                  WELL(:,1),0,0,5,IBOUND,NLAY)  
-            END DO
-          END IF
-        END IF
       END DO
 !
 C13-----PRINT PUMPING RATE IF REQUESTED.
-      IF(IBD1.LT.0) THEN
-        WRITE(IOUT,*)
-        WRITE(IOUT,61) TEXT1,KKPER,KKSTP
+      IF(IBD1.GT.0) THEN
+        WRITE(IBD1,*)
+        WRITE(IBD1,61) TEXT1,KKPER,KKSTP
         DO L=1,NWELLSTEMP
           IF ( NUMTAB.LE.0 ) THEN
             IR=WELL(2,L)
@@ -1753,26 +1702,26 @@ C13-----PRINT PUMPING RATE IF REQUESTED.
             IC = TABCOL(L)
             IL = TABLAY(L)
           END IF
-          WRITE(IOUT,62) L,IL,IR,IC,WELL(NWELVL,L)
+          WRITE(IBD1,62) L,IL,IR,IC,WELL(NWELVL,L)
         END DO
-        WRITE(IOUT,*)
+        WRITE(IBD1,*)
       END IF
 !
 C13-----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
-      IF(IBD2.LT.0) THEN
-        WRITE(IOUT,*)
-        WRITE(IOUT,61) TEXT2,KKPER,KKSTP
+      IF(IBD2.GT.0) THEN
+        WRITE(IBD2,*)
+        WRITE(IBD2,61) TEXT2,KKPER,KKSTP
         DO L = 1, NUMIRRSFRSP
           istsg = IRRSEG(L)
-          WRITE(IOUT,63) istsg,SGOTFLW(istsg)
+          WRITE(IBD2,63) istsg,SGOTFLW(istsg)
         END DO
-        WRITE(IOUT,*)
+        WRITE(IBD2,*)
       END IF
 !
 C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL      
-      IF(IBD3.LT.0) THEN
-        WRITE(IOUT,*)
-        WRITE(IOUT,61) TEXT3,KKPER,KKSTP
+      IF(IBD3.GT.0) THEN
+        WRITE(IBD3,*)
+        WRITE(IBD3,61) TEXT3,KKPER,KKSTP
         DO L = 1, NUMIRRSFRSP
           ISTSG = IRRSEG(L)
           IF ( GSFLOW_flag == 0 ) THEN
@@ -1780,46 +1729,46 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
               ir = IRRROW(icount,istsg)
               ic = IRRCOL(icount,istsg)
               AREA = DELR(ic)*DELC(ir)
-              WRITE(IOUT,65) ISTSG,IR,IC,SFRIRRUZF(IC,IR)*AREA
+              WRITE(IBD3,65) ISTSG,IR,IC,SFRIRRUZF(IC,IR)*AREA
             END DO
           ELSE
             DO icount = 1, DVRCH(istsg)
               ihru = IRRROW(icount,istsg)
-              WRITE(IOUT,66) ISTSG,IHRU,SFRIRRPRMS(ihru)
+              WRITE(IBD3,66) ISTSG,IHRU,SFRIRRPRMS(icount)
             END DO 
           END IF
         END DO
-        WRITE(IOUT,*)
+        WRITE(IBD3,*)
       END IF
 C   
 !
 C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
-      IF(IBD4.LT.0) THEN
-        WRITE(IOUT,*)
-        WRITE(IOUT,61) TEXT4,KKPER,KKSTP
+      IF(IBD4.GT.0) THEN
+        WRITE(IBD4,*)
+        WRITE(IBD4,61) TEXT4,KKPER,KKSTP
         DO L=1,NWELLSTEMP 
           IF ( GSFLOW_flag == 0 ) THEN
             DO I = 1, NUMCELLS(L)
               IC = UZFCOL(I,L)
               IR = UZFROW(I,L)
               AREA = DELR(ic)*DELC(ir)
-              WRITE(IOUT,64) L,IR,IC,WELLIRRUZF(IC,IR)*AREA
+              WRITE(IBD4,64) L,IR,IC,WELLIRRUZF(IC,IR)*AREA
             END DO
           ELSE
             DO I = 1, NUMCELLS(L)
               IHRU = UZFROW(I,L)
-              WRITE(IOUT,67) L,IHRU,WELLIRRPRMS(IHRU)
+              WRITE(IBD4,67) L,IHRU,WELLIRRPRMS(I)
             END DO  
           END IF
         END DO
-        WRITE(IOUT,*)
+        WRITE(IBD4,*)
       END IF
 C
       IF (iw1.GT.1 )WRITE(IUNITRAMP,*)
 C
 C14------IF CELL-BY-CELL FLOWS WILL BE SAVED AS A 3-D ARRAY,
 C-------CALL UBUDSV TO SAVE THEM.
-      IF(IBD1.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCB,BUFF,NCOL,
+      IF(IBD5.EQ.1) CALL UBUDSV(KKSTP,KKPER,TEXT1,IWELLCBU,BUFF,NCOL,
      1                          NROW,NLAY,IOUT)
 C
 C15------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING.
@@ -2527,6 +2476,7 @@ C
         DEALLOCATE(MXWELL)
         DEALLOCATE(NWELVL)
         DEALLOCATE(IWELLCB)
+        DEALLOCATE(IWELLCBU)
         DEALLOCATE(ISFRCB)
         DEALLOCATE(IRRWELLCB)
         DEALLOCATE(IRRSFRCB)
