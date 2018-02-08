@@ -218,8 +218,10 @@ C3B-----GET OPTIONS.
      +      /1X,'  A MOMENTUM FACTOR OF ',E15.6,' .',//)
       IF ( BTRACK.GT.0 ) THEN 
         WRITE(IOUT,9012) Numtrack,BTOL,BREDUC
+        WRITE(IOUT,*)
       ELSE
         WRITE(IOUT,*)'***BACKTRACKING IS INACTIVE***'
+        WRITE(IOUT,*)
       END IF
  9012 FORMAT(1X,'  BACKTRACKING IS ACTIVE ',
      +      /1X,'  THE MAXIMUM NUMBER OF BACKTRACKS IS ',I5,' AND ',
@@ -864,9 +866,9 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
-!!      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Hcof, Rhs, Iout,botm,
-!!     +                 LBOTM, HOLD, HNEW, DELR, DELC, ISSFLG
-!!      USE GWFBASMODULE, ONLY:TOTIM, HNOFLO
+      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Hcof, Rhs, Iout,botm,
+     +                 LBOTM, HOLD, HNEW, DELR, DELC, ISSFLG
+      USE GWFBASMODULE, ONLY:TOTIM, HNOFLO
       USE GWFNWTMODULE
       USE XMDMODULE
       USE GMRESMODULE
@@ -1144,10 +1146,10 @@ C--Update heads.
      +                 ichld,irhld,ilhld,fhead,icfld,irfld,ilfld,
      +                 Fflux,RMS1,RMS2,FHEADSAVE
           ELSE
-            WRITE (Iout, 9002) II,itreal,n_iter,ichld,irhld,ilhld,fhead,
-     +                   icfld,irfld,ilfld,fflux,RMS1
- !    +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
- !    +      BOTM(ichld,irhld,ilhld)
+            WRITE (Iout, 9001) II,itreal,n_iter,ichld,irhld,ilhld,fhead,
+     +                   icfld,irfld,ilfld,fflux,RMS1,
+     +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
+     +      BOTM(ichld,irhld,ilhld)
           END IF
         END IF
       END IF
@@ -1155,7 +1157,7 @@ C--Update heads.
         WRITE (Iout,9003) itreal, itertot
       END IF
  9001 FORMAT (5X,I6,12X,I6,6X,I6,8X,I6,1x,I4,3X,I3,3X,E20.10,
-     +        2x,I6,1x,I4,3X,I2,1X,4(2X,E20.10))
+     +        2x,I6,1x,I4,3X,I2,1X,5(2X,E20.10))
  9002 FORMAT (5X,I6,12X,I6,6X,I6,8X,I6,1x,I4,3X,I3,3X,E20.10,
      +        2x,I6,1x,I4,3X,I2,3X,2(2X,E20.10))
  9003 FORMAT (/4x,'------------------------------------------------',/

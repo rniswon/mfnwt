@@ -645,6 +645,15 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
      +                      TABUNIT(J))
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,
      +                      TABUNIT)
+                  IF ( TRATE > 0.0 ) THEN
+                    WRITE(IOUT,*)
+                    WRITE(IOUT,*) 'ERROR: MAX AWU PUMPING RATE IN LIST',
+     +                        ' IS POSITIVE AND SHOULD BE NEGATIVE.',
+     +                        ' MODEL STOPPING'
+                    WRITE(IOUT,*)
+                  CALL USTOP('ERROR: MAX AWU PUMPING RATE IN LIST IS POS
+     +ITIVE AND SHOULD BE NEGATIVE. MODEL STOPPING')
+                  END IF
                   TABTIME(II,TABID(J)) = TTIME
                   TABRATE(II,TABID(J)) = TRATE
                 END DO
@@ -1366,7 +1375,7 @@ C7------CALCULATE SUPPLEMENTAL PUMPING FOR THIS WELL
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L)
               FMIN = SUPACT(J)
-              QSW = DEMAND(J)   !SGOTFLW(IDIVAR(1, J))
+              QSW = DEMAND(J)   !change the name of demand to duty
 !            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J) 
               FMIN = PCTSUP(I,L)*(FMIN - QSW)
               IF ( FMIN < ZERO ) FMIN = ZERO
@@ -1377,7 +1386,7 @@ C7------CALCULATE SUPPLEMENTAL PUMPING FOR THIS WELL
             SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
 C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
-            IF ( SUPFLOW(L) < WELL(4,L) ) SUPFLOW(L) = WELL(4,L)
+            IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
             Q = SUPFLOW(L)
           ELSE
 C
@@ -1389,53 +1398,52 @@ C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
                 Q = demandgw_prms(l)  
               END IF
             END IF
+          END IF
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
-            IF ( IUNITNWT.NE.0 ) THEN
-              IF ( LAYTYPUPW(il).GT.0 ) THEN
-                Hh = HNEW(ic,ir,il)
-                bbot = Botm(IC, IR, Lbotm(IL))
-                ttop = Botm(IC, IR, Lbotm(IL)-1)
-                Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
-                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
+          IF ( IUNITNWT.NE.0 ) THEN
+            IF ( LAYTYPUPW(il).GT.0 ) THEN
+              Hh = HNEW(ic,ir,il)
+              bbot = Botm(IC, IR, Lbotm(IL))
+              ttop = Botm(IC, IR, Lbotm(IL)-1)
+              Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
+              RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
 C
 C8------Derivative for RHS
-                ij = Icell(IC,IR,IL)
-                A(IA(ij)) = A(IA(ij)) + dQp*Q
-              ELSE
-                RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
-                Qp = Q
-              END IF
+              ij = Icell(IC,IR,IL)
+              A(IA(ij)) = A(IA(ij)) + dQp*Q
             ELSE
               RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
               Qp = Q
             END IF
+          ELSE
+            RHS(IC,IR,IL)=RHS(IC,IR,IL)-Q
+            Qp = Q
+          END IF
 C
 C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
-            SUP = 0.0
-            DO I = 1, NUMSEGS(L)
-              J = SFRSEG(I,L) 
-              SUP = SUP - Qp
-              ACTUAL(J)  = ACTUAL(J) + SUP
-            END DO
+          SUP = 0.0
+          DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supportes by single well
+            J = SFRSEG(I,L) 
+            SUP = SUP - Qp
+            ACTUAL(J)  = ACTUAL(J) + SUP
+          END DO
 ! APPLY IRRIGATION FROM WELLS
-            IF ( GSFLOW_flag == 0 ) THEN
-              DO I = 1, NUMCELLS(L)
-                SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+          IF ( GSFLOW_flag == 0 ) THEN
+            DO I = 1, NUMCELLS(L)
+              SUBVOL = -(DONE-IRRFACT(I,L))*Qp*IRRPCT(I,L)
 Convert irrigation for UZF to a rate per unit area
-                SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
-                WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) = 
+              SUBRATE = SUBVOL/(DELR(UZFCOL(I,L))*DELC(UZFROW(I,L)))
+              WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) = 
      +                  WELLIRRUZF(UZFCOL(I,L),UZFROW(I,L)) + SUBRATE
-              END DO
-            ELSE
-              DO I = 1, NUMCELLS(L)
-!                IHRU = UZFROW(I,L)
-                SUBVOL = -(1.0-IRRFACT(I,L))*Qp*IRRPCT(I,L)
-! Keep irrigation for PRMS as volume
-                WELLIRRPRMS(I) = WELLIRRPRMS(I) + SUBVOL
-              END DO
-            END IF
+            END DO
+          ELSE
+            DO I = 1, NUMCELLS(L)
+              SUBVOL = -(DONE-IRRFACT(I,L))*Qp*IRRPCT(I,L)
+! Keep irrigation for PRMS as volumetric rate
+              WELLIRRPRMS(I) = WELLIRRPRMS(I) + SUBVOL
+            END DO
           END IF
         END IF
       END DO
@@ -1985,7 +1993,7 @@ C
            aet = hru_actet(hru_id)
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
-           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+!           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
 ! convert PRMS ET deficit to MODFLOW flow
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
