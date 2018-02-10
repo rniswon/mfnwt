@@ -33,7 +33,7 @@
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERSW
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERGW
         REAL,             SAVE, DIMENSION(:,:),   POINTER ::WELLIRRUZF
-        REAL,             SAVE, DIMENSION(:),   POINTER :: WELLIRRPRMS
+        REAL,             SAVE, DIMENSION(:,:),   POINTER :: WELLIRRPRMS
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRFACT
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWELVAR
@@ -61,7 +61,7 @@
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRROW !(store cells to apply diverted recharge)
         INTEGER,SAVE,  DIMENSION(:,:),POINTER:: IRRCOL
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRRUZF
-        REAL,   SAVE,  DIMENSION(:),POINTER:: SFRIRRPRMS  !(store IRRIGATION AMOUNTS)
+        REAL,   SAVE,  DIMENSION(:,:),POINTER:: SFRIRRPRMS  !(store IRRIGATION AMOUNTS)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
 !        REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROP  !(crop coefficient)
@@ -219,7 +219,7 @@ C
       ALLOCATE(UZFROW(MAXCELLSHOLD,MXACTWIRR),
      +         UZFCOL(MAXCELLSHOLD,MXACTWIRR),IRRWELVAR(NUMIRRHOLD),
      +         WELLIRRUZF(NUMCOLS,NUMROWS),NUMCELLS(MXACTWIRR))
-      ALLOCATE(WELLIRRPRMS(MAXCELLSHOLD))
+      ALLOCATE(WELLIRRPRMS(MAXCELLSHOLD,MXACTWIRR))
       ALLOCATE(AETITERGW(MAXCELLSHOLD,MXACTWIRR))
       ALLOCATE (IRRFACT(MAXCELLSHOLD,MXACTWIRR),
      +           IRRPCT(MAXCELLSHOLD,MXACTWIRR),SUPFLOW(MXACTWSUP))
@@ -247,13 +247,13 @@ C-------allocate for SFR AWUptions
         ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
         ALLOCATE(AETITERSW(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
-        ALLOCATE (SFRIRRUZF(NCOL,NROW),SFRIRRPRMS(MAXCELLSSFR))  
+        ALLOCATE (SFRIRRUZF(NCOL,NROW),SFRIRRPRMS(MAXCELLSSFR,NSEGDIM))
         ALLOCATE (IRRSEG(NSEGDIM))
       ELSE
         ALLOCATE (DVRCH(1),DVEFF(1,1)) !  ,KCROP(1,1))      
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
         ALLOCATE (DVRPERC(1,1))  
-        ALLOCATE (SFRIRRUZF(1,1),SFRIRRPRMS(1))  
+        ALLOCATE (SFRIRRUZF(1,1),SFRIRRPRMS(1,1))  
         ALLOCATE (IRRSEG(1),AETITERSW(1,1))
       END IF
       DVRCH = 0    
@@ -1442,7 +1442,7 @@ Convert irrigation for UZF to a rate per unit area
             DO I = 1, NUMCELLS(L)
               SUBVOL = -(DONE-IRRFACT(I,L))*Qp*IRRPCT(I,L)
 ! Keep irrigation for PRMS as volumetric rate
-              WELLIRRPRMS(I) = WELLIRRPRMS(I) + SUBVOL
+              WELLIRRPRMS(I,L) = WELLIRRPRMS(I,L) + SUBVOL
             END DO
           END IF
         END IF
@@ -1466,7 +1466,7 @@ Convert irrigation for UZF to a rate per unit area
             dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
             dvt = (1.0-DVEFF(ICOUNT,istsg))*dvt
 ! Keep irrigation for PRMS as volume
-            SFRIRRPRMS(icount) = SFRIRRPRMS(icount) + dvt
+            SFRIRRPRMS(icount,l) = SFRIRRPRMS(icount,l) + dvt
           END DO
         END IF
       END DO
@@ -1742,7 +1742,7 @@ C13-----PRINT APPLIED SW IRRIGATION FOR EACH CELL
           ELSE
             DO icount = 1, DVRCH(istsg)
               ihru = IRRROW(icount,istsg)
-              WRITE(IBD3,66) ISTSG,IHRU,SFRIRRPRMS(icount)
+              WRITE(IBD3,66) ISTSG,IHRU,SFRIRRPRMS(icount,l)
             END DO 
           END IF
         END DO
@@ -1765,7 +1765,7 @@ C13-----PRINT APPLIED GW IRRIGATION FOR EACH CELL
           ELSE
             DO I = 1, NUMCELLS(L)
               IHRU = UZFROW(I,L)
-              WRITE(IBD4,67) L,IHRU,WELLIRRPRMS(I)
+              WRITE(IBD4,67) L,IHRU,WELLIRRPRMS(I,L)
             END DO  
           END IF
         END DO
@@ -1993,7 +1993,7 @@ C
            aet = hru_actet(hru_id)
            if ( aet < zerod30 ) aet = zerod30
            factor = pet/aet - done
-!           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
 ! convert PRMS ET deficit to MODFLOW flow
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
