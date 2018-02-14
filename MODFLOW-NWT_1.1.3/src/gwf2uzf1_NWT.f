@@ -1773,7 +1773,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFAWUMODULE, ONLY: SFRIRR,NUMIRRSFR,WELLIRR,NUMIRRWEL
+      USE GWFAWUMODULE, ONLY: SFRIRRUZF,NUMIRRSFR,WELLIRRUZF,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -1878,11 +1878,11 @@ C set excess precipitation to zero for integrated (GSFLOW) simulation
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
         IF ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRRUZF(IC,IR)
         ENDIF
 ! ADD WELL PUMPING AS IRRIGATION
         IF ( IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRRUZF(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -2301,8 +2301,8 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: ICBCFL, IBUDFL, TOTIM, PERTIM, DELT, MSUM,
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
-      USE GWFAWUMODULE, ONLY: SFRIRR, NUMIRRSFR, 
-     +                        WELLIRR, NUMIRRWEL
+      USE GWFAWUMODULE, ONLY: SFRIRRUZF, NUMIRRSFR, 
+     +                        WELLIRRUZF, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
 !!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
@@ -2441,10 +2441,10 @@ CDEP 05/05/2006
         END IF
 ! ADD SFR DIVERSION AS IRRIGATION
         IF ( IUNIT(44) > 0  .AND. IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRR(IC,IR)
+          IF ( NUMIRRSFR > 0 ) finfhold = finfhold + SFRIRRUZF(IC,IR)
         ENDIF
         IF ( IUNIT(66) > 0 ) THEN
-          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRR(IC,IR)
+          IF ( NUMIRRWEL > 0 ) finfhold = finfhold + WELLIRRUZF(IC,IR)
         END IF
 C set excess precipitation to zero for integrated (GSFLOW) simulation
         IF ( IGSFLOW.GT.0 .and. Isavefinf.EQ.0 ) THEN
@@ -3905,11 +3905,13 @@ C60----LOOP OVER GAGING STATIONS.
                 gaplinfltr = FINF(iuzcol, iuzrow)
                 if ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) then
                   if ( NUMIRRWEL > 0 )  
-     +                 gaplinfltr = gaplinfltr +WELLIRR(iuzcol, iuzrow)
+     +                 gaplinfltr = gaplinfltr + 
+     +                 WELLIRRUZF(iuzcol, iuzrow)
                 end if
                 if ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) then
                   if ( NUMIRRSFR > 0 ) gaplinfltr = 
-     +                                gaplinfltr +SFRIRR(iuzcol, iuzrow)
+     +                                 gaplinfltr +
+     +                                 SFRIRRUZF(iuzcol, iuzrow)
                 end if
                 gaplinfltr = gaplinfltr*(DELC(iuzrow)*DELR(iuzcol))
                 IF ( IUZFOPT.GT.0 ) THEN
