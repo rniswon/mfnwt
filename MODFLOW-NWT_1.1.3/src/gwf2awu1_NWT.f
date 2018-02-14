@@ -1375,9 +1375,13 @@ C7------CALCULATE SUPPLEMENTAL PUMPING FOR THIS WELL
           IF ( NUMSEGS(L) > 0 ) THEN
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L)
-              FMIN = SUPACT(J)
-              QSW = DEMAND(J)   !change the name of demand to duty
-!            IF ( QSW > DEMAND(J) ) QSW = DEMAND(J) 
+              IF ( ETDEMANDFLAG > 0 ) THEN
+                FMIN = SUPACT(J)
+                QSW = DEMAND(J)   !change the name of demand to duty 
+              ELSE
+                QSW = SGOTFLW(J)
+                FMIN = DEMAND(J)   !change the name of demand to duty 
+              END IF
               FMIN = PCTSUP(I,L)*(FMIN - QSW)
               IF ( FMIN < ZERO ) FMIN = ZERO
               SUP = SUP + FMIN
@@ -1653,7 +1657,7 @@ C9------CALCULATE IRRIGATION FROM WELLS
           DO I = 1, NUMCELLS(L)
             SUBVOL = -(1.0-IRRFACT(I,L))*QQ*IRRPCT(I,L)
             QWELLIRR=QWELLIRR+SUBVOL
-            QWELLET=QWELLET+IRRFACT(I,L)*QQ*IRRPCT(I,L)
+            QWELLET=QWELLET-IRRFACT(I,L)*QQ*IRRPCT(I,L)
           END DO
 C
 C10------WRITE WELLS WITH REDUCED PUMPING
@@ -1856,16 +1860,16 @@ C18-------SW EFFICIENCY ET
      1CALL SGWF2AWU7V(MSUMAG,VBNMAG,VBVLAG,KKSTP,KKPER,IOUT,BUDPERC)
 C
    61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-   62 FORMAT(1X,'WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+   62 FORMAT(1X,'AWU WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    63 FORMAT(1X,'SEGMENT ',I6,'   RATE ',1PG15.6)
-   64 FORMAT(1X,'WELL ',I6,'   ROW ',I5,'   COL ',I5,
+   64 FORMAT(1X,'AWU WELL ',I6,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    65 FORMAT(1X,'SEGMENT ',I6,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    66 FORMAT(1X,'SEGMENT ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
-   67 FORMAT(1X,'WELL ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
-  300 FORMAT(' WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
+   67 FORMAT(1X,'AWU WELL ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
+  300 FORMAT(' AWU WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
      1      ' TIME STEP ',I5)
   400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
      1       '        GW-HEAD       CELL-BOT')
@@ -1886,11 +1890,6 @@ C
       USE GWFAWUMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
-      USE PRMS_MODULE, ONLY: GSFLOW_flag
-      USE PRMS_BASIN, ONLY: HRU_PERV
-      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
-      USE PRMS_CLIMATEVARS, ONLY: POTET
-      USE GSFMODFLOW, ONLY: Mfq2inch_conv, Gwc_col, Gwc_row
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
