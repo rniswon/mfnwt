@@ -135,7 +135,6 @@ C     ------------------------------------------------------------------
       ETDEMANDFLAG = 0
       NUMIRRSFR = 0
       NUMIRRSFRSP = 0
-      NUMSUPWELLSEG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
@@ -238,6 +237,7 @@ C
       PCTSUP = 0.0
       SUPFLOW = 0.0
       AETITERGW = 0.0
+      NUMSUPWELLSEG = 0
 C
 C-------allocate for SFR AWUptions
       IF ( NUMIRRSFR > 0 ) THEN
