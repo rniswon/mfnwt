@@ -644,7 +644,7 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TTIME,IOUT,
      +                      TABUNIT(J))
                   CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,TRATE,IOUT,
-     +                      TABUNIT)
+     +                      TABUNIT(J))
                   IF ( TRATE > 0.0 ) THEN
                     WRITE(IOUT,*)
                     WRITE(IOUT,*) 'ERROR: MAX AWU PUMPING RATE IN LIST',
@@ -1365,6 +1365,7 @@ C4------SET MAX PUMPING RATE OR IRR DEMAND FOR GW
           IL = TABLAY(L)
           Q = RATETERPQ(TIME,TABID(L))  !For IRRWELLS that are not SUPWELLS
         END IF
+        IF ( NUMIRRSFRSP + NUMIRRWELSP == 0 ) Q = 0.0
 C
 C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
         IF(IBOUND(IC,IR,IL) > 0) THEN
