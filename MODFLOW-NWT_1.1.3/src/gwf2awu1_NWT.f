@@ -1075,7 +1075,7 @@ C
   104 FORMAT('***Error in IRR WEL*** maximum number of irrigation ',
      +       'wells is less than the number specified in stress ',
      +       'period. ',/
-     +       'Maximum segments and the number specified for stress '
+     +       'Maximum wells and the number specified for stress '
      +       'period are: ',2i6)
   105 FORMAT('***Error in IRR WEL*** maximum number of cells ',
      +       'irrigated by a well is less than the number ',
