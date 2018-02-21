@@ -4277,7 +4277,7 @@ C
       INTEGER I,J,III,JJJ,LK,IDISP,NINFLOW,ITRIB,IUPSEG,IUPRCH,USED,
      &        LENGTH
       REAL    STRLEN,TRBFLW,FLOWIN,XSA,transtor,runof,etsw,pptsw,
-     &        USERFLOW
+     &        USERFLOW,TRBFLW_TOT
       DOUBLE PRECISION CLOSEZERO
       LOGICAL WRITEVAL
       REAL, DIMENSION(5,NSTRM)   :: SFRFLOWVAL
@@ -4528,6 +4528,7 @@ C
           IDISP = 0
           III = 0
           JJJ = 0
+          TRBFLW_TOT = 0.0
 C
 C---------------------------------------------------------------
 C-------DETERMINE ALL INFLOW NODES, RATES, DISPERSION IDENTIFIER
@@ -4624,6 +4625,7 @@ C21-----CHECK TO SEE IF MORE THAN ONE TRIBUTARY OUTFLOW, WRITE EACH OF THE CONNE
                 DO WHILE(ITRIB.LE.NSS)
                   IF(ISTSG.EQ.IOTSG(ITRIB)) THEN
                     TRBFLW = SGOTFLW(ITRIB)
+                    TRBFLW_TOT = TRBFLW_TOT + TRBFLW
                     I=LASTRCH(ITRIB)
                     !IDENTIFY THE INDEX WITHIN STRM THAT IS CONTRIBUTING TRIBUTARY
                     !INFLOW TO THE CURRENT REACH.
@@ -4648,6 +4650,11 @@ C         AMEND CONNECTIONS WITH USER-SPECIFIED FLOWS THAT ARE IN ADDITION
 C         TO TRIBUTARY INFLOW (WHICH ARE PRINTED BY CODE ABOVE)
                 IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN
                   USERFLOW = SEG(2,ISTSG)      !Set flowin equal to specified inflow
+                  IF(USERFLOW.LT.0.0) THEN    
+                    IF(ABS(USERFLOW).GT.TRBFLW_TOT) THEN
+                      USERFLOW = -1 * TRBFLW_TOT !Ensure user-specified flow is capped at what's available from tribs
+                    ENDIF
+                  ENDIF
                   NINFLOW = 1
                   IDISP = 0
                   III = -ISTSG
