@@ -2219,7 +2219,12 @@ C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
 C
 C5------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
-            IF ( ISEG(3, istsg).EQ.5 ) flowin = SEG(2, istsg)
+            IF ( ISEG(3, istsg).EQ.5 ) THEN
+              flowin = SEG(2, istsg)
+              IF ( flowin.LT.0) THEN
+                flowin = 0
+              END IF
+            END IF
 C
 C6------STORE OUTFLOW FROM PREVIOUS SEGMENT IN SGOTFLW LIST AND IN
 C         STRIN FOR LAKE PACKAGE.
@@ -3786,6 +3791,9 @@ C
 C7------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
             flowin = SEG(2, istsg)
+            IF ( flowin.LT.0 .AND. ISEG(3, istsg).EQ.5 ) THEN !ISEG(3,:)==5 means no trib inflow
+              flowin = 0
+            END IF
 !EDM - Count connection for LMT
             IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
               IF ( ISEG(3, istsg).EQ.5 ) THEN  
@@ -4110,7 +4118,7 @@ C
 ! EDM calc x-sectional area of channel for LMT w/ SFR mass routine
 !  First, need some terms to send to CALC_XSA
             qlat = (runof + runoff + precip - etstr)/strlen
-            qa = STRM(25,l)
+            qa = STRM(10,l)
             qb = STRM(9,l)
             IF ( icalc.EQ.3 ) THEN
               cdpth = SEG(9, istsg)
