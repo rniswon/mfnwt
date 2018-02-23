@@ -8408,6 +8408,7 @@ C     CAUTION: DOES NOT WORK WITH TRANSIENT ROUTING.
 C--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG
+      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8451,7 +8452,7 @@ C
 C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
           IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
             FLOWOUT = STRM(9,L)
-            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + FLOWOUT - FLOWIN 
+            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + (FLOWOUT - FLOWIN)*DELT 
           END IF
         END DO
 C
@@ -8468,6 +8469,7 @@ C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR
+      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -8490,7 +8492,7 @@ C
 C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
 C         
           IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            SEG(2,iseg) = DIVS(ISEG)
+            SEG(2,iseg) = DIVS(ISEG)/DELT
           END IF
         END DO
 C  
