@@ -8462,7 +8462,7 @@ C8------RETURN.
 C
 C-------SUBROUTINE MODSIM2SFR
 C
-      SUBROUTINE MODSIM2SFR(DIVS)
+      SUBROUTINE MODSIM2SFR(Diversions)
 C     *******************************************************************
 C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION 
 C     SEGMENTS.
@@ -8475,7 +8475,7 @@ C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      DOUBLE PRECISION, INTENT(INOUT) :: DIVS(NSS)
+      DOUBLE PRECISION, INTENT(INOUT) :: Diversions(NSS)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -8492,7 +8492,7 @@ C
 C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
 C         
           IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
-            SEG(2,iseg) = DIVS(ISEG)/DELT
+            SEG(2,iseg) = Diversions(ISEG)/DELT
           END IF
         END DO
 C  
