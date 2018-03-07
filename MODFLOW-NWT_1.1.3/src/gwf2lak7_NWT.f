@@ -1045,6 +1045,7 @@ C------Define Initial Lake Volume & Initialize Cumulative Budget Terms
              STGINIT=STAGES(LK)
              VOL(LK)=VOLTERP(STGINIT,LK)
              VOLINIT(LK)=VOL(LK)
+             VOLOLDD(LK)=VOL(LK)
  8400   CONTINUE
         DO 8450 LK=1,NLAKES
              CUMPPT(LK)=0.0
