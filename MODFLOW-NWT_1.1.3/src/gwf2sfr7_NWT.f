@@ -53,7 +53,7 @@ C     READ STREAM DATA THAT IS CONSTANT FOR ENTIRE SIMULATION:
 C     REACH DATA AND PARAMETER DEFINITIONS
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -2067,7 +2067,7 @@ C     *****************************************************************
 C     ADD STREAM TERMS TO RHS AND HCOF IF FLOW OCCURS IN MODEL CELL
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     *****************************************************************
       USE GWFSFRMODULE
 !      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
@@ -2113,7 +2113,8 @@ C     -----------------------------------------------------------------
      +                 enpt1, enpt2, flwen1, flwen2, flwp, flobotp, 
      +                 flobotold, flwpetp, flwx, flwmpt2, flwest, 
      +                 flwpet1, flwpet2, err, dlhold, precip, etstr, 
-     +                 runof, runoff, qa, qb, qc, qd, hstrave, fbot
+     +                 runof, runoff, qa, qb, qc, qd, hstrave, fbot,
+     +                 depthave
       DOUBLE PRECISION fbcheck, hld, totflwt, sbdthk, thetas, epsilon, 
      +                 thr, thet1, dvrsn, fact,
      +                 depthtr, dwdh, wetpermsmooth,cstrsmooth
@@ -3512,9 +3513,11 @@ C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
               hstrave = hstrave + HSTRM(l,i)
             END DO
             hstrave = hstrave/FLOAT(numdelt)
+            depthave = hstrave - strtop
+            if ( depthave < 0.0 ) depthave = 0.0
             cstrsmooth = cstr
             IF ( icalc.EQ.1 ) cstrsmooth = cstr*
-     +                        smooth(hstrave,dwdh)
+     +                        smooth(depthave,dwdh)
             IF ( ABS(SUMLEAK(l)).GT.0.0 ) THEN
 C
 C77-----ADD TERMS TO RHS AND HCOF WHEN GROUND-WATER HEAD LESS THAN
