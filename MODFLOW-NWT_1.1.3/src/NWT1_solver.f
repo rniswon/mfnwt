@@ -4,7 +4,7 @@
 !
       SUBROUTINE GWF2NWT1AR(In, Mxiter, Iunitlak, Igrid)
 !
-!------NEWTON SOLVER VERSION NUMBER 1.1.3, 8/01/2017
+!------NEWTON SOLVER VERSION NUMBER 1.1.3, 4/01/2018
 !      RICHARD G. NISWONGER
       USE GLOBAL,     ONLY:NCOL,NROW,NLAY,IBOUND,BOTM,IOUT,LBOTM,HNEW
 !!      USE GLOBAL,     ONLY:NCOL,NROW,NLAY,ITRSS,LAYHDT,LAYHDS,LAYCBD,
@@ -51,7 +51,7 @@
 !1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (Iout, 9001) In
  9001 FORMAT (1X, /' NWT1 -- Newton Solver, ',
-     +    'VERSION 1.1.3, 8/01/2017', /, 9X, 'INPUT READ FROM UNIT',
+     +    'VERSION 1.1.4, 4/01/2018', /, 9X, 'INPUT READ FROM UNIT',
      +        I3,/)
       i = 1
       Itreal = 0
@@ -866,9 +866,9 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
-      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Hcof, Rhs, Iout,botm,
-     +                 LBOTM, HOLD, HNEW, DELR, DELC, ISSFLG
-      USE GWFBASMODULE, ONLY:TOTIM, HNOFLO
+!!      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Hcof, Rhs, Iout,botm,
+!!     +                 LBOTM, HOLD, HNEW, DELR, DELC, ISSFLG
+!!      USE GWFBASMODULE, ONLY:TOTIM, HNOFLO
       USE GWFNWTMODULE
       USE XMDMODULE
       USE GMRESMODULE
@@ -1025,7 +1025,7 @@ c            Maxitr_samg=maximal number of iterations
 c            control=1 no setup reuse
 c            control=2 automatic setup reuse
 !             control=1
-c            iout  Controls print output related to SAMGs solution phase.
+c            iout  Controls print output related to SAMG’s solution phase.
 c                <0 No printout, except for warnings and errors24.
 c                =0 Minimal output on results and timings.
 c                >0 Additional print output specified by the individual digits:
@@ -1146,10 +1146,10 @@ C--Update heads.
      +                 ichld,irhld,ilhld,fhead,icfld,irfld,ilfld,
      +                 Fflux,RMS1,RMS2,FHEADSAVE
           ELSE
-            WRITE (Iout, 9001) II,itreal,n_iter,ichld,irhld,ilhld,fhead,
-     +                   icfld,irfld,ilfld,fflux,RMS1,
-     +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
-     +      BOTM(ichld,irhld,ilhld)
+            WRITE (Iout, 9002) II,itreal,n_iter,ichld,irhld,ilhld,fhead,
+     +                   icfld,irfld,ilfld,fflux,RMS1
+ !    +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
+ !    +      BOTM(ichld,irhld,ilhld)
           END IF
         END IF
       END IF
@@ -1157,7 +1157,7 @@ C--Update heads.
         WRITE (Iout,9003) itreal, itertot
       END IF
  9001 FORMAT (5X,I6,12X,I6,6X,I6,8X,I6,1x,I4,3X,I3,3X,E20.10,
-     +        2x,I6,1x,I4,3X,I2,1X,5(2X,E20.10))
+     +        2x,I6,1x,I4,3X,I2,1X,4(2X,E20.10))
  9002 FORMAT (5X,I6,12X,I6,6X,I6,8X,I6,1x,I4,3X,I3,3X,E20.10,
      +        2x,I6,1x,I4,3X,I2,3X,2(2X,E20.10))
  9003 FORMAT (/4x,'------------------------------------------------',/
