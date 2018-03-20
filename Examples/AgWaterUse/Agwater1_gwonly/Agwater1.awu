@@ -134,34 +134,18 @@ IRRWELL
 0
 END
 stress period 23
-IRRSFR
-0
-IRRWELL
-0
-SUPWEL
-0
-END
-stress period 24
-IRRSFR
-0
 IRRWELL
 -1
-SUPWEL
-0
+END
+stress period 24
+IRRWELL
+-1
 END
 stress period 25
-IRRSFR
-0
 IRRWELL
-0
-SUPWEL
-0
+-1
 END
 stress period 26
-IRRSFR
-0
 IRRWELL
-0
-SUPWEL
-0
+-1
 END

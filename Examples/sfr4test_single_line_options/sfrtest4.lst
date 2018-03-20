@@ -1,0 +1,926 @@
+                                  MODFLOW-NWT-SWR1 
+      U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
+                            VERSION 1.1.4, 4/01/2018
+                    BASED ON MODFLOW-2005 VERSION 1.11.00 08/08/2013
+
+ LIST FILE: sfrtest4.lst
+                         UNIT   11
+
+ OPENING sfrtest4.cbc
+ FILE TYPE:DATA(BINARY)   UNIT    9   STATUS:REPLACE
+ FORMAT:BINARY                 ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.dis
+ FILE TYPE:DIS   UNIT   12   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.bas
+ FILE TYPE:BAS6   UNIT   13   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.oc
+ FILE TYPE:OC   UNIT   39   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.fhd
+ FILE TYPE:DATA   UNIT   37   STATUS:REPLACE
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.fdn
+ FILE TYPE:DATA   UNIT   38   STATUS:REPLACE
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.pcg
+ FILE TYPE:PCG   UNIT   18   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.lpf
+ FILE TYPE:LPF   UNIT   14   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.chd
+ FILE TYPE:CHD   UNIT   17   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ OPENING sfrtest4.sfr
+ FILE TYPE:SFR   UNIT   29   STATUS:OLD    
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ BAS -- BASIC PACKAGE, VERSION 1.1.4, 4/01/2018 INPUT READ FROM UNIT   13
+ 
+ MODFLOW was compiled using mixed precision
+ Precision of REAL variables:           6
+ Precision of DOUBLE PRECISION variables:          15
+
+ DISCRETIZATION INPUT DATA READ FROM UNIT   12
+ # Discretization File created on 1/23/2017 by ModelMuse version 3.8.1.25.
+ # Upper left corner: (0, 0)
+ # Lower left corner: (0, -1000)
+ # Upper right corner: (1000, 0)
+ # Lower right corner: (1000, -1000)
+ # Grid angle (in degrees counterclockwise): 0
+    3 LAYERS        10 ROWS        10 COLUMNS
+    4 STRESS PERIOD(S) IN SIMULATION
+ MODEL TIME UNIT IS SECONDS
+ MODEL LENGTH UNIT IS METERS
+  Confining bed flag for each layer:
+   0   0   0
+
+                     DELR =   100.000    
+
+                     DELC =   100.000    
+
+ TOP ELEVATION OF LAYER 1 =   0.00000    
+
+   MODEL LAYER BOTTOM EL. =  -10.0000     FOR LAYER   1
+
+   MODEL LAYER BOTTOM EL. =  -20.0000     FOR LAYER   2
+
+   MODEL LAYER BOTTOM EL. =  -30.0000     FOR LAYER   3
+
+
+ STRESS PERIOD     LENGTH       TIME STEPS     MULTIPLIER FOR DELT    SS FLAG
+ ----------------------------------------------------------------------------
+        1         1.000000          1                    1.000         SS
+        2        0.2500000          1                    1.000         TR
+        3        0.2500000          1                    1.000         TR
+        4        0.5000000          1                    1.000         TR
+
+ COMBINED STEADY-STATE AND TRANSIENT SIMULATION
+
+
+
+ 
+ # Basic Package file created on 1/23/2017 by ModelMuse version 3.8.1.25.        
+ THE FREE FORMAT OPTION HAS BEEN SELECTED
+ THE PRINTTIME OPTION HAS BEEN SELECTED
+ CALCULATE FLOW BETWEEN ADJACENT CONSTANT-HEAD CELLS
+
+           BOUNDARY ARRAY =              1 FOR LAYER   1
+
+           BOUNDARY ARRAY =              1 FOR LAYER   2
+
+           BOUNDARY ARRAY =              1 FOR LAYER   3
+
+ AQUIFER HEAD WILL BE SET TO -1.00000E+20 AT ALL NO-FLOW NODES (IBOUND=0).
+
+             INITIAL HEAD =   0.00000     FOR LAYER   1
+
+             INITIAL HEAD =   0.00000     FOR LAYER   2
+
+             INITIAL HEAD =   0.00000     FOR LAYER   3
+ # Output Control file created on 1/23/2017 by ModelMuse version 3.8.1.25.
+
+ OUTPUT CONTROL IS SPECIFIED ONLY AT TIME STEPS FOR WHICH OUTPUT IS DESIRED
+ HEADS WILL BE SAVED WITH FORMAT: (10(1X1PE13.5))     
+ SAVED HEADS WILL BE LABELED
+ DRAWDOWN WILL BE SAVED WITH FORMAT: (10(1X1PE13.5))     
+ SAVED DRAWDOWN WILL BE LABELED
+ COMPACT CELL-BY-CELL BUDGET FILES WILL BE WRITTEN
+ AUXILIARY DATA WILL BE SAVED IN CELL-BY-CELL BUDGET FILES
+ HEAD PRINT FORMAT CODE IS   0    DRAWDOWN PRINT FORMAT CODE IS   0
+ HEADS WILL BE SAVED ON UNIT   37    DRAWDOWNS WILL BE SAVED ON UNIT   38
+
+ LPF -- LAYER-PROPERTY FLOW PACKAGE, VERSION 7, 5/2/2005
+         INPUT READ FROM UNIT   14
+ # LPF: Layer Property Flow package file created on 1/23/2017 by ModelMuse version 3.8.1.25.
+ CELL-BY-CELL FLOWS WILL BE SAVED ON UNIT    9
+ HEAD AT CELLS THAT CONVERT TO DRY= -2.00000E+20
+ No named parameters
+
+   LAYER FLAGS:
+ LAYER       LAYTYP        LAYAVG         CHANI        LAYVKA        LAYWET
+ ---------------------------------------------------------------------------
+    1             1             0    -1.000E+00             0             0
+    2             0             0    -1.000E+00             0             0
+    3             0             0    -1.000E+00             0             0
+
+   INTERPRETATION OF LAYER FLAGS:
+                        INTERBLOCK     HORIZONTAL    DATA IN
+         LAYER TYPE   TRANSMISSIVITY   ANISOTROPY   ARRAY VKA   WETTABILITY
+ LAYER      (LAYTYP)      (LAYAVG)       (CHANI)      (LAYVKA)      (LAYWET)
+ ---------------------------------------------------------------------------
+    1   CONVERTIBLE      HARMONIC      VARIABLE    VERTICAL K  NON-WETTABLE
+    2      CONFINED      HARMONIC      VARIABLE    VERTICAL K  NON-WETTABLE
+    3      CONFINED      HARMONIC      VARIABLE    VERTICAL K  NON-WETTABLE
+
+ WETTING CAPABILITY IS NOT ACTIVE IN ANY LAYER
+
+    HYD. COND. ALONG ROWS =   100.000     FOR LAYER   1
+
+   HORIZ. ANI. (COL./ROW) =   1.00000     FOR LAYER   1
+
+      VERTICAL HYD. COND. =   1.00000     FOR LAYER   1
+
+         SPECIFIC STORAGE =  1.000000E-05 FOR LAYER   1
+
+           SPECIFIC YIELD =  0.200000     FOR LAYER   1
+
+    HYD. COND. ALONG ROWS =   100.000     FOR LAYER   2
+
+   HORIZ. ANI. (COL./ROW) =   1.00000     FOR LAYER   2
+
+      VERTICAL HYD. COND. =   1.00000     FOR LAYER   2
+
+         SPECIFIC STORAGE =  1.000000E-05 FOR LAYER   2
+
+    HYD. COND. ALONG ROWS =   100.000     FOR LAYER   3
+
+   HORIZ. ANI. (COL./ROW) =   1.00000     FOR LAYER   3
+
+      VERTICAL HYD. COND. =   1.00000     FOR LAYER   3
+
+         SPECIFIC STORAGE =  1.000000E-05 FOR LAYER   3
+
+ CHD -- TIME-VARIANT SPECIFIED-HEAD OPTION, VERSION 7, 5/2/2005
+ INPUT READ FROM UNIT   17
+ # CHD: Time-Variant Specified-Head package file created on 1/23/2017 by ModelMuse version 3.8.1.25.
+ No named parameters
+ MAXIMUM OF      2 TIME-VARIANT SPECIFIED-HEAD CELLS AT ONE TIME
+ AUXILIARY CHD VARIABLE: IFACE           
+
+
+     0 TIME-VARIANT SPECIFIED-HEAD PARAMETERS
+
+ SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.0.5, 2012-04-05
+         INPUT READ FROM UNIT  29
+ # SFR: Stream-Flow Routing package file created on 1/23/2017 by ModelMuse version 3.8.1.25.
+ No named parameters
+
+ PROCESSING SFR2 OPTIONS
+ 
+  Some stream information will be read by reach. This option replaces NSTRM<0
+ 
+ TRANSIENT ROUTING IN STREAMS IS ACTIVE
+ 
+
+ END PROCESSING SFR2 OPTIONS
+ 
+ IFACE values will be read from reach record
+
+
+ NUMBER OF STREAM REACHES IS   12
+
+ NUMBER OF STREAM SEGMENTS IS    2
+
+ NUMBER OF STREAM PARAMETERS IS    0
+
+ NUMBER OF STREAM SEGMENTS DEFINED USING PARAMETERS IS              0
+
+ MAXIMUM ERROR FOR STREAM LEAKAGE RATES IS  1.00E-04
+
+ CONSTANT FOR MANNINGS EQUATION IS  1.0000E+00
+
+
+
+
+
+ USING DATA INPUT MODIFIED FROM ORIGINAL SFR PROGRAM FOR FARM PACKAGE
+
+ FLOW TO AND FROM GROUND WATER FOR EACH STREAM REACH WILL BE SAVED ON UNIT    9
+ STREAM OUTPUT WILL BE WRITTEN TO FILE ON UNIT   11
+ TRANSIENT STREAMFLOW ROUTING IS ACTIVE 
+
+
+   STREAM NETWORK DESCRIPTION: 
+
+   LAYER    ROW    COL   SEGMENT   REACH     LENGTH     STREAMBED     STREAMBED   STREAMBED     STREAMBED
+                          NUMBER   NUMBER    IN CELL    TOP ELEV.       SLOPE     THICKNESS   HYDR. CONDUCT.   IFACE
+   -----------------------------------------------------------------------------------------------------------------
+       1      6      2       1        1    9.2570E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      5      2       1        2    4.2457E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      5      3       1        3    9.7049E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      4      3       1        4    4.6369E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      4      4       1        5    9.3138E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      3      4       1        6    5.0280E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      3      5       1        7    8.4388E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E-03       0
+       1      3      7       2        1    4.1454E+01   2.9000E+01   1.0000E-03   1.0000E+00   1.0000E+02       0
+       1      3      8       2        2    5.1920E+01   2.8787E+01   1.0000E-03   1.0000E+00   1.0000E+02       0
+       1      4      8       2        3    1.1518E+02   2.8524E+01   1.0000E-03   1.0000E+00   1.0000E+02       0
+       1      5      8       2        4    3.4461E+01   2.8288E+01   1.0000E-03   1.0000E+00   1.0000E+02       0
+       1      5      9       2        5    7.4089E+01   2.8000E+01   1.0000E-03   1.0000E+00   1.0000E+02       0
+
+
+
+
+ PCG -- CONJUGATE-GRADIENT SOLUTION PACKAGE, VERSION 7, 5/2/2005
+ # PCG: Preconditioned Conjugate Gradient package file created on 1/23/2017 by ModelMuse version 3.8.1.25.
+ MAXIMUM OF     20 CALLS OF SOLUTION ROUTINE
+ MAXIMUM OF     30 INTERNAL ITERATIONS PER CALL TO SOLUTION ROUTINE
+ MATRIX PRECONDITIONING TYPE :    1
+
+
+
+                                    SOLUTION BY THE CONJUGATE-GRADIENT METHOD
+                                   -------------------------------------------
+                    MAXIMUM NUMBER OF CALLS TO PCG ROUTINE =       20
+                        MAXIMUM ITERATIONS PER CALL TO PCG =       30
+                               MATRIX PRECONDITIONING TYPE =        1
+        RELAXATION FACTOR (ONLY USED WITH PRECOND. TYPE 1) =    0.10000E+01
+ PARAMETER OF POLYNOMIAL PRECOND. = 2 (2) OR IS CALCULATED :        1
+                         HEAD CHANGE CRITERION FOR CLOSURE =    0.10000E-04
+                     RESIDUAL CHANGE CRITERION FOR CLOSURE =    0.10000E+04
+            PCG HEAD AND RESIDUAL CHANGE PRINTOUT INTERVAL =        1
+     PRINTING FROM SOLVER IS LIMITED(1) OR SUPPRESSED (>1) =        0
+                            STEADY-STATE DAMPING PARAMETER =    0.10000E+01
+                               TRANSIENT DAMPING PARAMETER =    0.10000E+01
+1
+                            STRESS PERIOD NO.    1, LENGTH =   1.000000    
+                            -----------------------------------------------
+
+                              NUMBER OF TIME STEPS =     1
+
+                               MULTIPLIER FOR DELT =     1.000
+
+                            INITIAL TIME STEP SIZE =   1.000000    
+
+ CHD NO.   LAYER   ROW   COL    START HEAD        END HEAD         IFACE           
+ ----------------------------------------------------------------------------------
+      1      1      1      1       29.00           29.00           0.000    
+      2      1     10     10       30.00           30.00           0.000    
+
+
+      2 TIME-VARIANT SPECIFIED-HEAD CELLS
+
+
+
+ CLASSIFICATION & COUNT OF STREAM SEGMENTS BASED ON SOURCE OF INFLOW:
+
+                HEADWATER     DIVERSION     RECEIVES TRIBUTARY FLOW
+                ---------     ---------     -----------------------
+                     1              0               1
+
+
+
+                    INPUT DATA FOR EACH STREAM SEGMENT
+ ---------------------------------------------------------------------------------------------
+
+ SEGMENT    SEG.     INFLOW   OVERLAND   STREAM    STREAM   ICALC  OUTFLOW  DIVERSION PRIORITY
+    NO.    LENGTH     RATE     RUNOFF      ET       PPT.    METH.  TO SEG.  FROM SEG.    NO.
+
+      1  5.062E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    3        2        0        0
+      2  3.171E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    3        0        0        0
+
+
+         STREAMBED PROPERTIES AND STREAM DIMENSIONS
+
+ SEGMENT     WIDTH OF STREAM     DEPTH OF STREAM    STREAM ROUGHNESS
+    No.     UPPER     LOWER     UPPER     LOWER     CHANNEL      BANK
+
+
+ STREAMFLOW RELATION WITH DEPTH IS BASED ON EQUATION Q = CDPTH*(DEPTH)**FDPTH
+ STREAMFLOW RELATION WITH WIDTH IS BASED ON EQUATION Q = AWDTH*(WIDTH)**BWDTH
+
+ SEGMENT NO.      CDPTH     FDPTH    AWDTH     BWDTH
+
+          1 1.000E+00 1.000E+00 1.000E+00 1.000E+00
+          2 1.000E-04 1.010E+00 1.000E-05 1.010E+00
+
+
+
+ 
+ SOLVING FOR HEAD 
+
+
+     3 CALLS TO PCG ROUTINE FOR TIME STEP     1 IN STRESS PERIOD    1
+    25 TOTAL ITERATIONS
+
+ MAXIMUM HEAD CHANGE FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE 
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1   34.45      0   8.507      0  -3.130      0  -2.419      0 -0.8891    
+   (  2, 10,  9)  (  3,  1, 10)  (  3, 10,  1)  (  2,  9, 10)  (  3, 10,  7)
+  0 -0.2974      0  0.1735      0 -0.8720E-01  0 -0.4064E-01  0 -0.2257E-01
+   (  3,  8, 10)  (  1,  4, 10)  (  2,  5, 10)  (  3,  9,  9)  (  3,  9,  9)
+  0  0.3666E-02  0  0.1592E-02  0 -0.6136E-03  0  0.3522E-03  0 -0.1927E-03
+   (  3,  4,  1)  (  3,  3,  3)  (  2,  9,  9)  (  2,  1, 10)  (  3,  1, 10)
+  0  0.5609E-04  0 -0.3258E-04  0  0.1240E-04  0  0.3747E-05  1 -0.5992E-04
+   (  3, 10,  7)  (  3,  7,  9)  (  3,  7,  8)  (  3,  4,  4)  (  1,  4,  9)
+  0 -0.4503E-04  0 -0.4076E-04  0 -0.1157E-04  0 -0.5012E-05  1 -0.5879E-05
+   (  3, 10,  1)  (  3,  1, 10)  (  3, 10,  1)  (  1,  3, 10)  (  3, 10,  1)
+
+ MAXIMUM RESIDUAL FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL    
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.2132E+05  0  0.1622E+05  0  0.1196E+05  0  -3876.      0  -2143.    
+   (  2,  9, 10)  (  2,  9, 10)  (  2,  9, 10)  (  2,  9,  9)  (  2,  9,  9)
+  0  -824.2      0   470.0      0   257.1      0   97.13      0  -24.59    
+   (  2,  9,  9)  (  3,  9,  9)  (  3,  9,  9)  (  3,  9,  9)  (  3,  8,  9)
+  0  -9.291      0   3.252      0   1.019      0 -0.4719      0 -0.3501    
+   (  3,  8,  9)  (  2,  9,  9)  (  1,  9, 10)  (  1,  9,  9)  (  1,  9,  9)
+  0 -0.1412      0 -0.4641E-01  0 -0.2105E-01  0 -0.6358E-02  1  0.8056E-01
+   (  1,  9,  9)  (  1,  9,  9)  (  1,  9,  9)  (  1,  9,  9)  (  1,  5,  9)
+  0  0.3634E-01  0  0.2053E-01  0 -0.1521E-01  0 -0.1001E-01  1 -0.8100E-02
+   (  1,  5,  9)  (  2, 10, 10)  (  2, 10,  9)  (  2, 10,  9)  (  2, 10,  9)
+
+
+
+ OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
+    SAVE HEAD FOR ALL LAYERS
+    SAVE DRAWDOWN FOR ALL LAYERS
+    SAVE BUDGET
+    PRINT BUDGET
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   1
+ UBDSV4 SAVING "  STREAM LEAKAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   1
+
+
+
+ STREAM LISTING     PERIOD      1   STEP        1
+
+ LAYER ROW COL. STREAM  RCH.  FLOW INTO     FLOW TO   FLOW OUT OF   OVRLND.     DIRECT     STREAM       STREAM     STREAM     STREAM   STREAMBED  STREAMBED
+                SEG.NO.  NO.  STRM. RCH.    AQUIFER    STRM. RCH.    RUNOFF     PRECIP       ET          HEAD       DEPTH      WIDTH   CONDCTNC.   GRADIENT
+
+   1    6    2     1     1    0.0000E+00 -2.5857E-06   2.5857E-06  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  6.130E-05  6.130E-05  5.674E-06 -4.557E-01
+   1    5    2     1     2    2.5857E-06 -9.6014E-07   3.5459E-06  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  5.254E-05  5.254E-05  2.231E-06 -4.304E-01
+   1    5    3     1     3    3.5459E-06 -2.3428E-06   5.8887E-06  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  5.429E-05  5.429E-05  5.269E-06 -4.447E-01
+   1    4    3     1     4    5.8887E-06 -7.8033E-08   5.9667E-06  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  4.024E-06  4.024E-06  1.866E-07 -4.182E-01
+   1    4    4     1     5    5.9667E-06 -4.4107E-06   1.0377E-05  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.075E-04  1.075E-04  1.002E-05 -4.404E-01
+   1    3    4     1     6    1.0377E-05 -1.3256E-07   1.0510E-05  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  6.304E-06  6.304E-06  3.169E-07 -4.182E-01
+   1    3    5     1     7    1.0510E-05 -2.5660E-07   1.0767E-05  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  6.837E-06  6.837E-06  5.770E-07 -4.447E-01
+   1    3    7     2     1    1.0767E-05 -1.1932E-02   1.1942E-02  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  5.928E-05  5.928E-06  2.457E-02 -4.855E-01
+   1    3    8     2     2    1.1942E-02 -3.2169E-02   4.4112E-02  0.000E+00  0.000E+00  0.000E+00  2.87875E+01  8.697E-05  8.697E-06  4.516E-02 -7.124E-01
+   1    4    8     2     3    4.4112E-02 -6.8927E-02   1.1304E-01  0.000E+00  0.000E+00  0.000E+00  2.85240E+01  6.044E-05  6.044E-06  6.961E-02 -9.902E-01
+   1    5    8     2     4    1.1304E-01 -3.2581E-02   1.4562E-01  0.000E+00  0.000E+00  0.000E+00  2.82881E+01  7.597E-05  7.597E-06  2.618E-02 -1.245E+00
+   1    5    9     2     5    1.4562E-01 -1.0780E-01   2.5342E-01  0.000E+00  0.000E+00  0.000E+00  2.80001E+01  9.424E-05  9.424E-06  6.982E-02 -1.544E+00
+
+
+
+
+ HEAD WILL BE SAVED ON UNIT   37 AT END OF TIME STEP    1, STRESS PERIOD    1
+
+ DRAWDOWN WILL BE SAVED ON UNIT   38 AT END OF TIME STEP    1, STRESS PERIOD    1
+1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
+  ------------------------------------------------------------------------------
+
+     CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
+     ------------------                 ------------------------
+
+           IN:                                      IN:
+           ---                                      ---
+             STORAGE =           0.0000               STORAGE =           0.0000
+       CONSTANT HEAD =         668.1526         CONSTANT HEAD =         668.1526
+      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+
+            TOTAL IN =         668.1526              TOTAL IN =         668.1526
+
+          OUT:                                     OUT:
+          ----                                     ----
+             STORAGE =           0.0000               STORAGE =           0.0000
+       CONSTANT HEAD =         667.9020         CONSTANT HEAD =         667.9020
+      STREAM LEAKAGE =           0.2534        STREAM LEAKAGE =           0.2534
+
+           TOTAL OUT =         668.1554             TOTAL OUT =         668.1554
+
+            IN - OUT =      -2.8076E-03              IN - OUT =      -2.8076E-03
+
+ PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+
+
+
+
+
+
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    1
+                    SECONDS     MINUTES      HOURS       DAYS        YEARS
+                    -----------------------------------------------------------
+   TIME STEP LENGTH  1.0000     1.66667E-02 2.77778E-04 1.15741E-05 3.16881E-08
+ STRESS PERIOD TIME  1.0000     1.66667E-02 2.77778E-04 1.15741E-05 3.16881E-08
+         TOTAL TIME  1.0000     1.66667E-02 2.77778E-04 1.15741E-05 3.16881E-08
+1
+1
+                            STRESS PERIOD NO.    2, LENGTH =  0.2500000    
+                            -----------------------------------------------
+
+                              NUMBER OF TIME STEPS =     1
+
+                               MULTIPLIER FOR DELT =     1.000
+
+                            INITIAL TIME STEP SIZE =  0.2500000    
+
+ REUSING NON-PARAMETER SPECIFIED-HEAD DATA FROM LAST STRESS PERIOD
+
+
+      2 TIME-VARIANT SPECIFIED-HEAD CELLS
+
+
+
+ CLASSIFICATION & COUNT OF STREAM SEGMENTS BASED ON SOURCE OF INFLOW:
+
+                HEADWATER     DIVERSION     RECEIVES TRIBUTARY FLOW
+                ---------     ---------     -----------------------
+                     1              0               1
+
+
+
+                    INPUT DATA FOR EACH STREAM SEGMENT
+ ---------------------------------------------------------------------------------------------
+
+ SEGMENT    SEG.     INFLOW   OVERLAND   STREAM    STREAM   ICALC  OUTFLOW  DIVERSION PRIORITY
+    NO.    LENGTH     RATE     RUNOFF      ET       PPT.    METH.  TO SEG.  FROM SEG.    NO.
+
+      1  5.062E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    1        2        0        0
+      2  3.171E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    3        0        0        0
+
+
+         STREAMBED PROPERTIES AND STREAM DIMENSIONS
+
+ SEGMENT     WIDTH OF STREAM     DEPTH OF STREAM    STREAM ROUGHNESS
+    No.     UPPER     LOWER     UPPER     LOWER     CHANNEL      BANK
+
+     1    1.000E+01 1.000E+01                      3.500E-07
+
+ STREAMFLOW RELATION WITH DEPTH IS BASED ON EQUATION Q = CDPTH*(DEPTH)**FDPTH
+ STREAMFLOW RELATION WITH WIDTH IS BASED ON EQUATION Q = AWDTH*(WIDTH)**BWDTH
+
+ SEGMENT NO.      CDPTH     FDPTH    AWDTH     BWDTH
+
+          2 1.000E-04 1.010E+00 1.000E-05 1.010E+00
+
+
+
+ 
+ SOLVING FOR HEAD 
+
+
+     2 CALLS TO PCG ROUTINE FOR TIME STEP     1 IN STRESS PERIOD    2
+     8 TOTAL ITERATIONS
+
+ MAXIMUM HEAD CHANGE FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE 
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1 -0.4993E-03  0 -0.3468E-03  0 -0.1251E-03  0 -0.5569E-04  0 -0.2722E-04
+   (  1,  5,  3)  (  3,  1, 10)  (  3,  3,  3)  (  2,  7,  1)  (  2,  5,  7)
+  0 -0.1495E-04  0  0.9120E-05  1  0.3163E-05
+   (  3, 10,  1)  (  3, 10,  1)  (  1, 10,  7)
+
+ MAXIMUM RESIDUAL FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL    
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.1572      0  0.1196      0 -0.1082      0 -0.7131E-01  0 -0.2543E-01
+   (  1,  5,  3)  (  2, 10, 10)  (  2, 10,  9)  (  2,  9, 10)  (  2,  9, 10)
+  0 -0.1208E-01  0  0.6941E-02  1  0.5149E-02
+   (  2, 10,  9)  (  2,  9,  9)  (  2,  9,  9)
+
+
+
+ OUTPUT CONTROL FOR STRESS PERIOD    2   TIME STEP    1
+    SAVE HEAD FOR ALL LAYERS
+    SAVE DRAWDOWN FOR ALL LAYERS
+    SAVE BUDGET
+    PRINT BUDGET
+ UBDSV1 SAVING "         STORAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+ UBDSV4 SAVING "  STREAM LEAKAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   2
+
+
+
+ STREAM LISTING     PERIOD      2   STEP        1
+
+ LAYER ROW COL. STREAM  RCH.  FLOW INTO     FLOW TO   FLOW OUT OF   OVRLND.     DIRECT     STREAM       STREAM     STREAM     STREAM   STREAMBED  STREAMBED
+                SEG.NO.  NO.  STRM. RCH.    AQUIFER    STRM. RCH.    RUNOFF     PRECIP       ET          HEAD       DEPTH      WIDTH   CONDCTNC.   GRADIENT
+
+   1    6    2     1     1    0.0000E+00 -4.2106E-01   3.0084E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.519E-04  1.000E+01  9.257E-01 -4.549E-01
+   1    5    2     1     2    3.0084E-01 -1.8237E-01   3.1549E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.828E-04  1.000E+01  4.246E-01 -4.295E-01
+   1    5    3     1     3    3.1549E-01 -4.3066E-01   2.1951E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  2.078E-04  1.000E+01  9.705E-01 -4.438E-01
+   1    4    3     1     4    2.1951E-01 -1.9353E-01   2.0369E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.679E-04  1.000E+01  4.637E-01 -4.174E-01
+   1    4    4     1     5    2.0369E-01 -4.0938E-01   2.3558E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.866E-04  1.000E+01  9.314E-01 -4.395E-01
+   1    3    4     1     6    2.3558E-01 -2.0986E-01   2.1622E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.724E-04  1.000E+01  5.028E-01 -4.174E-01
+   1    3    5     1     7    2.1622E-01 -3.7455E-01   2.2857E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.861E-04  1.000E+01  8.439E-01 -4.438E-01
+   1    3    7     2     1    2.2857E-01 -2.6655E-03   2.3123E-01  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  1.326E-05  2.279E-06  5.495E-03 -4.851E-01
+   1    3    8     2     2    2.3123E-01 -6.3015E-03   2.3753E-01  0.000E+00  0.000E+00  0.000E+00  2.87874E+01  1.705E-05  2.342E-06  8.851E-03 -7.120E-01
+   1    4    8     2     3    2.3753E-01 -1.3771E-01   3.7524E-01  0.000E+00  0.000E+00  0.000E+00  2.85240E+01  1.208E-04  3.716E-06  1.392E-01 -9.896E-01
+   1    5    8     2     4    3.7524E-01 -1.0892E-02   3.8613E-01  0.000E+00  0.000E+00  0.000E+00  2.82880E+01  2.541E-05  3.825E-06  8.755E-03 -1.244E+00
+   1    5    9     2     5    3.8613E-01 -1.0774E-01   4.9387E-01  0.000E+00  0.000E+00  0.000E+00  2.80000E+01  9.422E-05  4.904E-06  6.980E-02 -1.543E+00
+
+
+
+
+ HEAD WILL BE SAVED ON UNIT   37 AT END OF TIME STEP    1, STRESS PERIOD    2
+
+ DRAWDOWN WILL BE SAVED ON UNIT   38 AT END OF TIME STEP    1, STRESS PERIOD    2
+1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   2
+  ------------------------------------------------------------------------------
+
+     CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
+     ------------------                 ------------------------
+
+           IN:                                      IN:
+           ---                                      ---
+             STORAGE =           0.1511               STORAGE =           0.6046
+       CONSTANT HEAD =         835.3638         CONSTANT HEAD =         668.8448
+      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+
+            TOTAL IN =         835.5149              TOTAL IN =         669.4494
+
+          OUT:                                     OUT:
+          ----                                     ----
+             STORAGE =           0.0000               STORAGE =           0.0000
+       CONSTANT HEAD =         834.6412         CONSTANT HEAD =         666.9567
+      STREAM LEAKAGE =           0.8751        STREAM LEAKAGE =           2.4868
+
+           TOTAL OUT =         835.5163             TOTAL OUT =         669.4435
+
+            IN - OUT =      -1.4038E-03              IN - OUT =       5.8594E-03
+
+ PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+
+
+
+
+
+
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    2
+                    SECONDS     MINUTES      HOURS       DAYS        YEARS
+                    -----------------------------------------------------------
+   TIME STEP LENGTH 0.25000     4.16667E-03 6.94444E-05 2.89352E-06 7.92202E-09
+ STRESS PERIOD TIME 0.25000     4.16667E-03 6.94444E-05 2.89352E-06 7.92202E-09
+         TOTAL TIME  1.2500     2.08333E-02 3.47222E-04 1.44676E-05 3.96101E-08
+1
+1
+                            STRESS PERIOD NO.    3, LENGTH =  0.2500000    
+                            -----------------------------------------------
+
+                              NUMBER OF TIME STEPS =     1
+
+                               MULTIPLIER FOR DELT =     1.000
+
+                            INITIAL TIME STEP SIZE =  0.2500000    
+
+ REUSING NON-PARAMETER SPECIFIED-HEAD DATA FROM LAST STRESS PERIOD
+
+
+      2 TIME-VARIANT SPECIFIED-HEAD CELLS
+
+
+
+ CLASSIFICATION & COUNT OF STREAM SEGMENTS BASED ON SOURCE OF INFLOW:
+
+                HEADWATER     DIVERSION     RECEIVES TRIBUTARY FLOW
+                ---------     ---------     -----------------------
+                     1              0               1
+
+
+
+                    INPUT DATA FOR EACH STREAM SEGMENT
+ ---------------------------------------------------------------------------------------------
+
+ SEGMENT    SEG.     INFLOW   OVERLAND   STREAM    STREAM   ICALC  OUTFLOW  DIVERSION PRIORITY
+    NO.    LENGTH     RATE     RUNOFF      ET       PPT.    METH.  TO SEG.  FROM SEG.    NO.
+
+      1  5.062E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    0        2        0        0
+      2  3.171E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    3        0        0        0
+
+
+         STREAMBED PROPERTIES AND STREAM DIMENSIONS
+
+ SEGMENT     WIDTH OF STREAM     DEPTH OF STREAM    STREAM ROUGHNESS
+    No.     UPPER     LOWER     UPPER     LOWER     CHANNEL      BANK
+
+     1  1.000E+01 1.000E+01 1.000E+00 1.000E+00
+
+ STREAMFLOW RELATION WITH DEPTH IS BASED ON EQUATION Q = CDPTH*(DEPTH)**FDPTH
+ STREAMFLOW RELATION WITH WIDTH IS BASED ON EQUATION Q = AWDTH*(WIDTH)**BWDTH
+
+ SEGMENT NO.      CDPTH     FDPTH    AWDTH     BWDTH
+
+          2 1.000E-04 1.010E+00 1.000E-05 1.010E+00
+
+
+
+ 
+ SOLVING FOR HEAD 
+
+
+     4 CALLS TO PCG ROUTINE FOR TIME STEP     1 IN STRESS PERIOD    3
+    17 TOTAL ITERATIONS
+
+ MAXIMUM HEAD CHANGE FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE 
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.6296E-03  0  0.3926E-03  0  0.1752E-03  0  0.7214E-04  0  0.3858E-04
+   (  1,  5,  3)  (  3,  1, 10)  (  3,  3,  3)  (  2,  6,  1)  (  1,  2,  7)
+  0  0.1461E-04  0 -0.7466E-05  1  0.4464E-04  0  0.2289E-04  0  0.5143E-05
+   (  1,  8,  1)  (  3, 10,  1)  (  1,  4,  4)  (  3,  1, 10)  (  3,  3,  5)
+  1 -0.1996E-03  0 -0.9476E-04  0 -0.2904E-04  0 -0.1827E-04  0 -0.1157E-04
+   (  1,  3,  5)  (  3, 10,  1)  (  3,  3,  3)  (  3,  1,  7)  (  1,  7,  4)
+  0 -0.4962E-05  1  0.3146E-05
+   (  2,  1,  9)  (  3,  1, 10)
+
+ MAXIMUM RESIDUAL FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL    
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1 -0.3777      0 -0.1439      0  0.1277      0  0.6392E-01  0  0.2517E-01
+   (  1,  5,  3)  (  1,  4,  4)  (  2, 10,  9)  (  2,  9, 10)  (  2,  9, 10)
+  0  0.1319E-01  0  0.6942E-02  1 -0.7015E-01  0  0.2508E-01  0 -0.1277E-01
+   (  2, 10,  9)  (  2,  4,  4)  (  1,  4,  4)  (  1,  3,  4)  (  2,  3,  4)
+  1  0.3007      0  0.6828E-01  0 -0.3953E-01  0  0.2645E-01  0  0.9898E-02
+   (  1,  3,  5)  (  1,  3,  5)  (  1,  2,  5)  (  2,  3,  4)  (  2,  2,  5)
+  0 -0.5294E-02  1 -0.4143E-02
+   (  1,  3,  5)  (  1,  3,  5)
+
+
+
+ OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    1
+    SAVE HEAD FOR ALL LAYERS
+    SAVE DRAWDOWN FOR ALL LAYERS
+    SAVE BUDGET
+    PRINT BUDGET
+ UBDSV1 SAVING "         STORAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV4 SAVING "  STREAM LEAKAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   3
+
+
+
+ STREAM LISTING     PERIOD      3   STEP        1
+
+ LAYER ROW COL. STREAM  RCH.  FLOW INTO     FLOW TO   FLOW OUT OF   OVRLND.     DIRECT     STREAM       STREAM     STREAM     STREAM   STREAMBED  STREAMBED
+                SEG.NO.  NO.  STRM. RCH.    AQUIFER    STRM. RCH.    RUNOFF     PRECIP       ET          HEAD       DEPTH      WIDTH   CONDCTNC.   GRADIENT
+
+   1    6    2     1     1    0.0000E+00 -4.2179E-01   4.2179E-01  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  0.000E+00  1.000E+01  9.257E-01 -4.556E-01
+   1    5    2     1     2    4.2179E-01 -1.8278E-01   6.0456E-01  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  0.000E+00  1.000E+01  4.246E-01 -4.305E-01
+   1    5    3     1     3    6.0456E-01 -4.3173E-01   1.0363E+00  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  0.000E+00  1.000E+01  9.705E-01 -4.449E-01
+   1    4    3     1     4    1.0363E+00  2.6975E-01   7.6655E-01  0.000E+00  0.000E+00  0.000E+00  3.00000E+01  1.000E+00  1.000E+01  4.637E-01  5.817E-01
+   1    4    4     1     5    7.6655E-01 -4.1036E-01   1.1769E+00  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  0.000E+00  1.000E+01  9.314E-01 -4.406E-01
+   1    3    4     1     6    1.1769E+00 -2.1029E-01   1.3872E+00  0.000E+00  0.000E+00  0.000E+00  2.90000E+01  0.000E+00  1.000E+01  5.028E-01 -4.182E-01
+   1    3    5     1     7    1.3872E+00  4.6865E-01   9.1856E-01  0.000E+00  0.000E+00  0.000E+00  3.00000E+01  1.000E+00  1.000E+01  8.439E-01  5.553E-01
+   1    3    7     2     1    9.1856E-01 -3.7029E-03   9.2226E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  1.840E-05  3.753E-06  7.626E-03 -4.855E-01
+   1    3    8     2     2    9.2226E-01 -9.5170E-03   9.3178E-01  0.000E+00  0.000E+00  0.000E+00  2.87875E+01  2.573E-05  3.848E-06  1.336E-02 -7.124E-01
+   1    4    8     2     3    9.3178E-01 -1.3783E-01   1.0696E+00  0.000E+00  0.000E+00  0.000E+00  2.85240E+01  1.209E-04  5.229E-06  1.392E-01 -9.901E-01
+   1    5    8     2     4    1.0696E+00 -1.1916E-02   1.0815E+00  0.000E+00  0.000E+00  0.000E+00  2.82881E+01  2.778E-05  5.349E-06  9.575E-03 -1.245E+00
+   1    5    9     2     5    1.0815E+00 -1.0780E-01   1.1893E+00  0.000E+00  0.000E+00  0.000E+00  2.80001E+01  9.424E-05  6.432E-06  6.982E-02 -1.544E+00
+
+
+
+
+ HEAD WILL BE SAVED ON UNIT   37 AT END OF TIME STEP    1, STRESS PERIOD    3
+
+ DRAWDOWN WILL BE SAVED ON UNIT   38 AT END OF TIME STEP    1, STRESS PERIOD    3
+1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   3
+  ------------------------------------------------------------------------------
+
+     CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
+     ------------------                 ------------------------
+
+           IN:                                      IN:
+           ---                                      ---
+             STORAGE =           0.1511               STORAGE =           0.0000
+       CONSTANT HEAD =        1002.4213         CONSTANT HEAD =         668.2302
+      STREAM LEAKAGE =           0.1785        STREAM LEAKAGE =           0.7139
+
+            TOTAL IN =        1002.7509              TOTAL IN =         668.9441
+
+          OUT:                                     OUT:
+          ----                                     ----
+             STORAGE =           0.1410               STORAGE =           0.5639
+       CONSTANT HEAD =        1001.6104         CONSTANT HEAD =         667.8770
+      STREAM LEAKAGE =           1.2935        STREAM LEAKAGE =           1.6736
+
+           TOTAL OUT =        1003.0449             TOTAL OUT =         670.1144
+
+            IN - OUT =          -0.2940              IN - OUT =          -1.1703
+
+ PERCENT DISCREPANCY =          -0.03     PERCENT DISCREPANCY =          -0.17
+
+
+
+
+
+
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    3
+                    SECONDS     MINUTES      HOURS       DAYS        YEARS
+                    -----------------------------------------------------------
+   TIME STEP LENGTH 0.25000     4.16667E-03 6.94444E-05 2.89352E-06 7.92202E-09
+ STRESS PERIOD TIME 0.25000     4.16667E-03 6.94444E-05 2.89352E-06 7.92202E-09
+         TOTAL TIME  1.5000     2.50000E-02 4.16667E-04 1.73611E-05 4.75321E-08
+1
+1
+                            STRESS PERIOD NO.    4, LENGTH =  0.5000000    
+                            -----------------------------------------------
+
+                              NUMBER OF TIME STEPS =     1
+
+                               MULTIPLIER FOR DELT =     1.000
+
+                            INITIAL TIME STEP SIZE =  0.5000000    
+
+ REUSING NON-PARAMETER SPECIFIED-HEAD DATA FROM LAST STRESS PERIOD
+
+
+      2 TIME-VARIANT SPECIFIED-HEAD CELLS
+
+
+
+ CLASSIFICATION & COUNT OF STREAM SEGMENTS BASED ON SOURCE OF INFLOW:
+
+                HEADWATER     DIVERSION     RECEIVES TRIBUTARY FLOW
+                ---------     ---------     -----------------------
+                     1              0               1
+
+
+
+                    INPUT DATA FOR EACH STREAM SEGMENT
+ ---------------------------------------------------------------------------------------------
+
+ SEGMENT    SEG.     INFLOW   OVERLAND   STREAM    STREAM   ICALC  OUTFLOW  DIVERSION PRIORITY
+    NO.    LENGTH     RATE     RUNOFF      ET       PPT.    METH.  TO SEG.  FROM SEG.    NO.
+
+      1  5.062E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    4        2        0        0
+      2  3.171E+02 0.000E+00 0.000E+00 0.000E+00 0.000E+00    3        0        0        0
+
+
+         STREAMBED PROPERTIES AND STREAM DIMENSIONS
+
+ SEGMENT     WIDTH OF STREAM     DEPTH OF STREAM    STREAM ROUGHNESS
+    No.     UPPER     LOWER     UPPER     LOWER     CHANNEL      BANK
+
+
+ STREAMFLOW RELATION WITH DEPTH IS BASED ON EQUATION Q = CDPTH*(DEPTH)**FDPTH
+ STREAMFLOW RELATION WITH WIDTH IS BASED ON EQUATION Q = AWDTH*(WIDTH)**BWDTH
+
+ SEGMENT NO.      CDPTH     FDPTH    AWDTH     BWDTH
+
+          2 1.000E-04 1.010E+00 1.000E-05 1.010E+00
+
+ STREAMFLOW RELATION WITH DEPTH AND WIDTH IS BASED ON TABULATED VALUES
+
+  SEGMENT NO.   STREAMFLOW       DEPTH       WIDTH
+
+          1     1.0000E+00   1.0000E+00   1.0000E+00
+          1     2.0000E+00   2.0000E+00   2.0000E+00
+
+
+
+ 
+ SOLVING FOR HEAD 
+
+
+     2 CALLS TO PCG ROUTINE FOR TIME STEP     1 IN STRESS PERIOD    4
+     7 TOTAL ITERATIONS
+
+ MAXIMUM HEAD CHANGE FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE    HEAD CHANGE 
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.1068E-03  0  0.6781E-04  0  0.3652E-04  0  0.1398E-04  0  0.1334E-04
+   (  3,  1, 10)  (  1,  3,  5)  (  3, 10,  1)  (  3,  6,  9)  (  2, 10,  5)
+  0  0.6519E-05  1 -0.2822E-05
+   (  3,  1, 10)  (  3,  1, 10)
+
+ MAXIMUM RESIDUAL FOR EACH ITERATION (1 INDICATES THE FIRST INNER ITERATION):
+
+    RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL       RESIDUAL    
+   LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL  LAYER,ROW,COL
+ ---------------------------------------------------------------------------
+  1  0.3082      0 -0.1214      0 -0.7555E-01  0  0.4334E-01  0  0.2084E-01
+   (  1,  4,  4)  (  1,  4,  3)  (  1,  4,  3)  (  2,  4,  3)  (  2,  4,  3)
+  0  0.7522E-02  1  0.5796E-02
+   (  2,  4,  3)  (  2,  4,  3)
+
+
+
+ OUTPUT CONTROL FOR STRESS PERIOD    4   TIME STEP    1
+    SAVE HEAD FOR ALL LAYERS
+    SAVE DRAWDOWN FOR ALL LAYERS
+    SAVE BUDGET
+    PRINT BUDGET
+ UBDSV1 SAVING "         STORAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+ UBDSV4 SAVING "  STREAM LEAKAGE" ON UNIT   9 AT TIME STEP     1, STRESS PERIOD   4
+
+
+
+ STREAM LISTING     PERIOD      4   STEP        1
+
+ LAYER ROW COL. STREAM  RCH.  FLOW INTO     FLOW TO   FLOW OUT OF   OVRLND.     DIRECT     STREAM       STREAM     STREAM     STREAM   STREAMBED  STREAMBED
+                SEG.NO.  NO.  STRM. RCH.    AQUIFER    STRM. RCH.    RUNOFF     PRECIP       ET          HEAD       DEPTH      WIDTH   CONDCTNC.   GRADIENT
+
+   1    6    2     1     1    0.0000E+00 -2.5864E-06   4.1639E-01  0.000E+00  0.000E+00  0.000E+00  2.94175E+01  6.131E-05  4.164E-01  5.675E-06 -4.557E-01
+   1    5    2     1     2    4.1639E-01 -2.4746E-04   6.0468E-01  0.000E+00  0.000E+00  0.000E+00  2.96047E+01  4.165E-01  6.048E-01  1.768E-02 -1.399E-02
+   1    5    3     1     3    6.0468E-01  9.0491E-03   1.0340E+00  0.000E+00  0.000E+00  0.000E+00  3.00345E+01  6.002E-01  1.034E+00  5.824E-02  1.554E-01
+   1    4    3     1     4    1.0340E+00  2.8444E-02   7.7289E-01  0.000E+00  0.000E+00  0.000E+00  2.97717E+01  1.020E+00  7.730E-01  4.729E-02  6.015E-01
+   1    4    4     1     5    7.7289E-01  2.2761E-02   1.1708E+00  0.000E+00  0.000E+00  0.000E+00  3.01720E+01  7.615E-01  1.171E+00  7.092E-02  3.209E-01
+   1    3    4     1     6    1.1708E+00  4.2276E-02   1.3905E+00  0.000E+00  0.000E+00  0.000E+00  3.03899E+01  1.150E+00  1.391E+00  5.781E-02  7.314E-01
+   1    3    5     1     7    1.3905E+00  1.0121E-01   9.1594E-01  0.000E+00  0.000E+00  0.000E+00  2.99165E+01  1.340E+00  9.160E-01  1.131E-01  8.951E-01
+   1    3    7     2     1    9.1594E-01 -1.0911E-02   9.2685E-01  0.000E+00  0.000E+00  0.000E+00  2.90001E+01  5.420E-05  9.262E-06  2.247E-02 -4.856E-01
+   1    3    8     2     2    9.2685E-01 -2.5772E-02   9.5263E-01  0.000E+00  0.000E+00  0.000E+00  2.87875E+01  6.967E-05  9.522E-06  3.617E-02 -7.125E-01
+   1    4    8     2     3    9.5263E-01 -5.7023E-02   1.0097E+00  0.000E+00  0.000E+00  0.000E+00  2.85240E+01  5.000E-05  1.010E-05  5.758E-02 -9.903E-01
+   1    5    8     2     4    1.0097E+00 -2.2186E-02   1.0318E+00  0.000E+00  0.000E+00  0.000E+00  2.82881E+01  5.172E-05  1.032E-05  1.782E-02 -1.245E+00
+   1    5    9     2     5    1.0318E+00 -8.1776E-02   1.1136E+00  0.000E+00  0.000E+00  0.000E+00  2.80001E+01  7.148E-05  1.115E-05  5.296E-02 -1.544E+00
+
+
+
+
+ HEAD WILL BE SAVED ON UNIT   37 AT END OF TIME STEP    1, STRESS PERIOD    4
+
+ DRAWDOWN WILL BE SAVED ON UNIT   38 AT END OF TIME STEP    1, STRESS PERIOD    4
+1
+  VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   4
+  ------------------------------------------------------------------------------
+
+     CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T
+     ------------------                 ------------------------
+
+           IN:                                      IN:
+           ---                                      ---
+             STORAGE =           0.1513               STORAGE =       2.1744E-04
+       CONSTANT HEAD =        1336.4536         CONSTANT HEAD =         668.0646
+      STREAM LEAKAGE =           0.2803        STREAM LEAKAGE =           0.2036
+
+            TOTAL IN =        1336.8851              TOTAL IN =         668.2685
+
+          OUT:                                     OUT:
+          ----                                     ----
+             STORAGE =           0.1690               STORAGE =       5.6080E-02
+       CONSTANT HEAD =        1335.6147         CONSTANT HEAD =         668.0088
+      STREAM LEAKAGE =           1.3925        STREAM LEAKAGE =           0.1979
+
+           TOTAL OUT =        1337.1763             TOTAL OUT =         668.2628
+
+            IN - OUT =          -0.2911              IN - OUT =       5.7373E-03
+
+ PERCENT DISCREPANCY =          -0.02     PERCENT DISCREPANCY =           0.00
+
+
+
+
+
+
+         TIME SUMMARY AT END OF TIME STEP    1 IN STRESS PERIOD    4
+                    SECONDS     MINUTES      HOURS       DAYS        YEARS
+                    -----------------------------------------------------------
+   TIME STEP LENGTH 0.50000     8.33333E-03 1.38889E-04 5.78704E-06 1.58440E-08
+ STRESS PERIOD TIME 0.50000     8.33333E-03 1.38889E-04 5.78704E-06 1.58440E-08
+         TOTAL TIME  2.0000     3.33333E-02 5.55556E-04 2.31481E-05 6.33762E-08
+1
+
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/03/20 10:10:04
+ Elapsed run time:  0.025 Seconds
+
