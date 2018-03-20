@@ -115,7 +115,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -410,7 +410,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       EXCESPP = 0.0
       REJ_INF = 0.0
       AIR_ENTRY = -16.0
-      H_ROOT = -15000.0
+      H_ROOT = -35000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
       IUZLIST = 0
       ALLOCATE (NWAVST(NUZCL,NUZRW))
@@ -1443,7 +1443,7 @@ C         IUZFOPT IS ZERO.
      +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
           ELSE
 C
-C12-----READ IN ARRAY FOR ET EXTINCTION DEPTH.
+C12-----READ IN ARRAY FOR ET WATER CONTENT.
             CALL U2DREL(WCWILT, aname(4), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR EXTINCTION WATER CONTENT LESS THAN RESIDUAL WATER
@@ -1775,7 +1775,7 @@ C     ******************************************************************
       USE GWFBASMODULE, ONLY: DELT, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
-      USE GWFAWUMODULE, ONLY: NUMIRRSFR,NUMIRRWEL,SFRIRRUZF,WELLIRRUZF
+      USE GWFAWUMODULE, ONLY: SFRIRRUZF,NUMIRRSFR,WELLIRRUZF,NUMIRRWEL
 
       IMPLICIT NONE
 C     -----------------------------------------------------------------
@@ -3910,11 +3910,13 @@ C60----LOOP OVER GAGING STATIONS.
                 gaplinfltr = FINF(iuzcol, iuzrow)
                 if ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) then
                   if ( NUMIRRWEL > 0 )  
-     +              gaplinfltr = gaplinfltr + WELLIRRUZF(iuzcol, iuzrow)
-                  end if
+     +                 gaplinfltr = gaplinfltr + 
+     +                 WELLIRRUZF(iuzcol, iuzrow)
+                end if
                 if ( IUNIT(44) > 0 .AND. IUNIT(66) > 0 ) then
                   if ( NUMIRRSFR > 0 ) gaplinfltr = 
-     +                            gaplinfltr +SFRIRRUZF(iuzcol, iuzrow)
+     +                                 gaplinfltr +
+     +                                 SFRIRRUZF(iuzcol, iuzrow)
                 end if
                 gaplinfltr = gaplinfltr*(DELC(iuzrow)*DELR(iuzcol))
                 IF ( IUZFOPT.GT.0 ) THEN
