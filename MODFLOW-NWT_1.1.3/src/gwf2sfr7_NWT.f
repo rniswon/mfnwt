@@ -53,7 +53,7 @@ C     READ STREAM DATA THAT IS CONSTANT FOR ENTIRE SIMULATION:
 C     REACH DATA AND PARAMETER DEFINITIONS
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -2067,7 +2067,7 @@ C     *****************************************************************
 C     ADD STREAM TERMS TO RHS AND HCOF IF FLOW OCCURS IN MODEL CELL
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     *****************************************************************
       USE GWFSFRMODULE
 !      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 
@@ -2113,9 +2113,10 @@ C     -----------------------------------------------------------------
      +                 enpt1, enpt2, flwen1, flwen2, flwp, flobotp, 
      +                 flobotold, flwpetp, flwx, flwmpt2, flwest, 
      +                 flwpet1, flwpet2, err, dlhold, precip, etstr, 
-     +                 runof, runoff, qa, qb, qc, qd, hstrave, fbot
+     +                 runof, runoff, qa, qb, qc, qd, hstrave, fbot,
+     +                 depthave
       DOUBLE PRECISION fbcheck, hld, totflwt, sbdthk, thetas, epsilon, 
-     +                 thr, thet1, dvrsn, fact, depthave,
+     +                 thr, thet1, dvrsn, fact,
      +                 depthtr, dwdh, wetpermsmooth,cstrsmooth
 !      DOUBLE PRECISION rhsh1, rhsh2, hcofh1, hcofh2
       REAL areamax, avhc, errold, fks, ha, qcnst, seep, 
@@ -2219,7 +2220,12 @@ C4------DETERMINE STREAM SEGMENT AND REACH NUMBER.
 C
 C5------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
-            IF ( ISEG(3, istsg).EQ.5 ) flowin = SEG(2, istsg)
+            IF ( ISEG(3, istsg).EQ.5 ) THEN
+              flowin = SEG(2, istsg)
+              IF ( flowin.LT.0) THEN
+                flowin = 0
+              END IF
+            END IF
 C
 C6------STORE OUTFLOW FROM PREVIOUS SEGMENT IN SGOTFLW LIST AND IN
 C         STRIN FOR LAKE PACKAGE.
@@ -3788,6 +3794,9 @@ C
 C7------SET FLOWIN EQUAL TO STREAM SEGMENT INFLOW IF FIRST REACH.
           IF ( nreach.EQ.1 ) THEN
             flowin = SEG(2, istsg)
+            IF ( flowin.LT.0 .AND. ISEG(3, istsg).EQ.5 ) THEN !ISEG(3,:)==5 means no trib inflow
+              flowin = 0
+            END IF
 !EDM - Count connection for LMT
             IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
               IF ( ISEG(3, istsg).EQ.5 ) THEN  
@@ -3863,7 +3872,7 @@ C22-----SUM TRIBUTARY OUTFLOW AND USE AS INFLOW INTO DOWNSTREAM SEGMENT.
               END DO
               flowin = flowin + SEG(2, istsg)  !SEG(2,istsg) stores specified inflow, and should have a spot in "Headwaters" flows
               IF(IUNIT(49).GT.0) THEN  !IUNIT(49): LMT
-                IF(SEG(2,ISTSG).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow. if the latter exist, count it next
+                IF(ABS(SEG(2,ISTSG)).GT.CLOSEZERO) THEN  !Possible to have both tributary inflow and specified inflow (or outflow, hence ABS()). If non specified FLOW, tally
                   NINTOT = NINTOT + 1   !EDM
                 ENDIF
               END IF
@@ -4112,7 +4121,7 @@ C
 ! EDM calc x-sectional area of channel for LMT w/ SFR mass routine
 !  First, need some terms to send to CALC_XSA
             qlat = (runof + runoff + precip - etstr)/strlen
-            qa = STRM(25,l)
+            qa = STRM(10,l)
             qb = STRM(9,l)
             IF ( icalc.EQ.3 ) THEN
               cdpth = SEG(9, istsg)
