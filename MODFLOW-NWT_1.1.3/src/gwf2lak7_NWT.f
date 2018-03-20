@@ -1045,6 +1045,7 @@ C------Define Initial Lake Volume & Initialize Cumulative Budget Terms
              STGINIT=STAGES(LK)
              VOL(LK)=VOLTERP(STGINIT,LK)
              VOLINIT(LK)=VOL(LK)
+             VOLOLDD(LK)=VOL(LK)
  8400   CONTINUE
         DO 8450 LK=1,NLAKES
              CUMPPT(LK)=0.0
@@ -1662,7 +1663,7 @@ C16D----DETERMINE DERIVATIVE AND COMPUTE NEW LAKE STAGE.
                   DSTG = ABS(DSTG)
                 ELSE
 C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
-                  VOL2 = RESID1
+                  VOL2 = RESID1*DELT
                   IF ( VOL2.LT.0.0 ) VOL2 = 0.0
                   STGNEW(LAKE) = STGTERP(VOL2,LAKE)
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
@@ -3283,7 +3284,7 @@ C
       RETURN
       END
 C
-      SUBROUTINE SGWF2LAK7UPW1RPS()
+      SUBROUTINE SGWF2LAK7UPW1RPS(LWRT)
 C
 C     ******************************************************************
 C     COMPUTE VERTICAL CONDUCTANCES AND HORIZONTAL CONDUCTANCES PER UNIT
@@ -4047,7 +4048,8 @@ C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
-     +                        STGNEW
+     +                        STGNEW,PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,
+     +                        SEEP
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -4063,14 +4065,15 @@ C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
       INTEGER LAKE
+      DOUBLE PRECISION DELTAQ
 C     -------------------------------------------------------------------
 C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
         DO LAKE=1,NLAKES
-!          DELTAQ = SURFIN(LAKE) - SURFOT(LAKE)
-          DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) 
+          DELTAQ = (SURFIN(LAKE) - SURFOT(LAKE))*DELT
+          DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
           LAKEVOL(LAKE) = VOL(LAKE)
 !          LAKEVOL(LAKE) = STGNEW(LAKE)
         END DO
@@ -4078,6 +4081,45 @@ C
 C5------RETURN.
       RETURN
       END SUBROUTINE LAK2MODSIM
+C
+C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
+      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL) 
+     &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
+      
+      !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
+      
+C     *******************************************************************
+C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
+!--------MARCH 8, 2017
+C     *******************************************************************
+      USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
+     +                        STGNEW
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+C     -------------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -------------------------------------------------------------------
+C     ARGUMENTS
+      DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
+     +                                   LAKEVOL(NLAKES)
+C      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
+C     -------------------------------------------------------------------
+!      INTEGER 
+!      DOUBLE PRECISION 
+C     -------------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -------------------------------------------------------------------
+      INTEGER LAKE
+C     -------------------------------------------------------------------
+C
+C
+C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
+C
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL) !,KITER,KSTP,KPER)
+C
+C5------RETURN.
+      RETURN
+      END SUBROUTINE LAK2MODSIM_InitLakes
 C   
 C
       SUBROUTINE GWF2LAK7DA(IUNITLAK, IGRID)

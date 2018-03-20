@@ -1008,13 +1008,13 @@ C1----REUSE VALUES FROM PREVIOUS STRESS PERIOD.
       IF (ITMP < 0 ) RETURN
 C
 C2--- INITIALIZE AG VARIABLES TO ZERO.
-      GSFLOW_flag = 0
       IRRWELVAR = 0
       NUMCELLS = 0
       IRRFACT = 0.0
       IRRPCT = 0.0
       UZFROW = 0
       UZFCOL = 0
+      GSFLOW_flag = 0
 C
 C1----INACTIVATE ALL IRRIGATION WELLS.
       IF (ITMP == 0 ) THEN
@@ -1302,7 +1302,7 @@ C     ------------------------------------------------------------------
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM,DELT
       USE GWFAWUMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, SEG
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
 !      USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1346,7 +1346,7 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
         IF ( GSFLOW_flag == 0 ) THEN
           CALL demandconjunctive_uzf()
         ELSE
-!          CALL demandconjunctive_prms()
+          CALL demandconjunctive_prms()
         END IF
       END IF
             
@@ -1403,7 +1403,7 @@ C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
               IF ( GSFLOW_flag == 0 ) THEN
                 Q = demandgw_uzf(l)
               ELSE
- !               Q = demandgw_prms(l)  
+                Q = demandgw_prms(l)  
               END IF
             END IF
           END IF
@@ -1951,74 +1951,74 @@ C
       return
       end subroutine demandconjunctive_uzf
 C
-!      subroutine demandconjunctive_prms()
+      subroutine demandconjunctive_prms()
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-!      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
-!      USE GWFAWUMODULE
-!      USE GWFBASMODULE, ONLY: DELT
-!      USE PRMS_BASIN, ONLY: HRU_PERV
-!      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
-!      USE PRMS_CLIMATEVARS, ONLY: POTET
-!      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-!      IMPLICIT NONE
-!! ----------------------------------------------------------------------
-!      !modules
-!      !arguments
-!      !dummy
-!      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
-!      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
-!     +                    aettotal,dhundred,prms_inch2mf_q
-!      integer :: k,iseg,hru_id,i
-!! ----------------------------------------------------------------------
-!!
-!      zerod30 = 1.0d-30
-!      zerod2 = 1.0d-2
-!      done = 1.0d0
-!      dhundred = 100.0d0
-!      dzero = 0.0d0
-!      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
-!C
-!C1------loop over diversion segments that supply irrigation
-!C
-!      do 300 i = 1, NUMIRRSFRSP
-!        iseg = IRRSEG(i)
-!        IF ( DEMAND(iseg) < zerod30 ) goto 300
-!        finfsum = dzero
-!C
-!C1------loop over hrus irrigated by diversion
-!C
-!        do k = 1, DVRCH(iseg)
-!           hru_id = IRRROW(k,iseg)
-!           area = hru_perv(hru_id)
-!           pet = potet(hru_id)
-!           aet = hru_actet(hru_id)
-!           if ( aet < zerod30 ) aet = zerod30
-!           factor = pet/aet - done
-!           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
-!           IF ( FACTOR > dhundred ) FACTOR = dhundred
-!! convert PRMS ET deficit to MODFLOW flow
-!           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
-!           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
-!           dum = pet
-!!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
-!           pettotal = pettotal + pet
-!           aettotal = aettotal + aet
-!           AETITERSW(K,ISEG) = AET
-!        end do
-!C
-!C1------set diversion to demand
-!C
-!      SEG(2,iseg) = SUPACT(iseg)
-!C
-!C1------limit diversion to water right
-!C
-!      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-!300   continue
-!      return
-!      end subroutine demandconjunctive_prms
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFAWUMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
+      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+     +                    aettotal,dhundred,prms_inch2mf_q
+      integer :: k,iseg,hru_id,i
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
+      done = 1.0d0
+      dhundred = 100.0d0
+      dzero = 0.0d0
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+C
+C1------loop over diversion segments that supply irrigation
+C
+      do 300 i = 1, NUMIRRSFRSP
+        iseg = IRRSEG(i)
+        IF ( DEMAND(iseg) < zerod30 ) goto 300
+        finfsum = dzero
+C
+C1------loop over hrus irrigated by diversion
+C
+        do k = 1, DVRCH(iseg)
+           hru_id = IRRROW(k,iseg)
+           area = hru_perv(hru_id)
+           pet = potet(hru_id)
+           aet = hru_actet(hru_id)
+           if ( aet < zerod30 ) aet = zerod30
+           factor = pet/aet - done
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           IF ( FACTOR > dhundred ) FACTOR = dhundred
+! convert PRMS ET deficit to MODFLOW flow
+           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
+           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
+           dum = pet
+!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
+           pettotal = pettotal + pet
+           aettotal = aettotal + aet
+           AETITERSW(K,ISEG) = AET
+        end do
+C
+C1------set diversion to demand
+C
+      SEG(2,iseg) = SUPACT(iseg)
+C
+C1------limit diversion to water right
+C
+      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+300   continue
+      return
+      end subroutine demandconjunctive_prms
 C
       double precision function demandgw_uzf(l)
 !     ******************************************************************
@@ -2066,55 +2066,55 @@ C
       demandgw_uzf = doneneg*QONLY(L)
       end function demandgw_uzf
 C
-!      double precision function demandgw_prms(l)
-!!     ******************************************************************
-!!     demandgw---- sums up irrigation demand using ET deficit for gw
-!!     ******************************************************************
-!!     SPECIFICATIONS:
-!      USE GWFAWUMODULE
-!      USE GWFBASMODULE, ONLY: DELT
-!      USE PRMS_BASIN, ONLY: HRU_PERV
-!      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
-!      USE PRMS_CLIMATEVARS, ONLY: POTET
-!      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
-!      IMPLICIT NONE
-!! ----------------------------------------------------------------------
-!      !modules
-!      !arguments
-!      integer, intent(in) :: l
-!      !dummy
-!      DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q
-!      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
-!      integer :: i,ihru
-!! ----------------------------------------------------------------------
-!!
-!      zerod30 = 1.0d-30
-!      zerod2 = 1.0d-2
-!      done = 1.0d0
-!      doneneg = -1.0d0
-!      dhundred = 100.0d0
-!      dzero = 0.0d0
-!      demandgw_prms = DZERO
-!      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
-!      DO I = 1, NUMCELLS(L)
-!        ihru = UZFROW(I,L)
-!        pet = potet(ihru)
-!        aet = hru_actet(ihru)
-!        area = HRU_PERV(ihru)
-!        if ( aet < zerod30 ) aet = zerod2*pet
-!        factor = pet/aet - done
-!        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
-!        IF ( factor > dhundred ) factor = dhundred
-!!
-!! convert PRMS ET deficit to MODFLOW flow
-!!
-!        QONLY(L) = QONLY(L) + factor*pet*area*prms_inch2mf_q
-!        dum = pet
-!!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
-!        AETITERGW(I,L) = AET
-!      end do
-!      demandgw_prms = doneneg*QONLY(L)
-!      end function demandgw_prms
+      double precision function demandgw_prms(l)
+!     ******************************************************************
+!     demandgw---- sums up irrigation demand using ET deficit for gw
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFAWUMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      integer, intent(in) :: l
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q
+      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
+      integer :: i,ihru
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
+      done = 1.0d0
+      doneneg = -1.0d0
+      dhundred = 100.0d0
+      dzero = 0.0d0
+      demandgw_prms = DZERO
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+      DO I = 1, NUMCELLS(L)
+        ihru = UZFROW(I,L)
+        pet = potet(ihru)
+        aet = hru_actet(ihru)
+        area = HRU_PERV(ihru)
+        if ( aet < zerod30 ) aet = zerod2*pet
+        factor = pet/aet - done
+        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
+        IF ( factor > dhundred ) factor = dhundred
+!
+! convert PRMS ET deficit to MODFLOW flow
+!
+        QONLY(L) = QONLY(L) + factor*pet*area*prms_inch2mf_q
+        dum = pet
+!if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
+        AETITERGW(I,L) = AET
+      end do
+      demandgw_prms = doneneg*QONLY(L)
+      end function demandgw_prms
 C
       subroutine timeseries(Kkper, Kkstp, Kkiter,numwells)
 !     ******************************************************************

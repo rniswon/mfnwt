@@ -177,7 +177,6 @@ C     ------------------------------------------------------------------
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
       ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
-      ALLOCATE (ETDEMANDFLAG)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
@@ -190,7 +189,6 @@ C     ------------------------------------------------------------------
       LAYNUM = 0
       SMOOTHET = 0.0D0
       smooth = 0.0
-      ETDEMANDFLAG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
@@ -2308,7 +2306,6 @@ C     ******************************************************************
       USE GWFAWUMODULE, ONLY: SFRIRRUZF, NUMIRRSFR, 
      +                        WELLIRRUZF, NUMIRRWEL
       USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
