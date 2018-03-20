@@ -115,7 +115,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -1443,7 +1443,7 @@ C         IUZFOPT IS ZERO.
      +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
           ELSE
 C
-C12-----READ IN ARRAY FOR ET EXTINCTION DEPTH.
+C12-----READ IN ARRAY FOR ET WATER CONTENT.
             CALL U2DREL(WCWILT, aname(4), NROW, NCOL, 0, In, IOUT)
 C
 C13-----CHECK FOR EXTINCTION WATER CONTENT LESS THAN RESIDUAL WATER
@@ -5660,6 +5660,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%SMOOTHET)
       DEALLOCATE (GWFUZFDAT(Igrid)%FINFSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%Isavefinf)
+      DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5753,12 +5754,12 @@ C     ------------------------------------------------------------------
       INETFLUX=>GWFUZFDAT(Igrid)%INETFLUX
       Ireadsurfk=>GWFUZFDAT(Igrid)%Ireadsurfk
       Isurfkreject=>GWFUZFDAT(Igrid)%Isurfkreject
-      UNITRECH=>GWFUZFDAT(Igrid)%UNITRECH
       UNITDIS=>GWFUZFDAT(Igrid)%UNITDIS
       ISEEPREJECT=>GWFUZFDAT(Igrid)%ISEEPREJECT
       SMOOTHET=>GWFUZFDAT(Igrid)%SMOOTHET
       FINFSAVE=>GWFUZFDAT(Igrid)%FINFSAVE
       ISAVEFINF=>GWFUZFDAT(Igrid)%ISAVEFINF
+      ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -5858,5 +5859,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%SMOOTHET=>SMOOTHET
       GWFUZFDAT(Igrid)%FINFSAVE=>FINFSAVE
       GWFUZFDAT(Igrid)%Isavefinf=>Isavefinf
+      GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
 C
       END SUBROUTINE SGWF2UZF1PSV

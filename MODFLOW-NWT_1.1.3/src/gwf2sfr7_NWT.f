@@ -53,7 +53,7 @@ C     READ STREAM DATA THAT IS CONSTANT FOR ENTIRE SIMULATION:
 C     REACH DATA AND PARAMETER DEFINITIONS
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -2067,7 +2067,7 @@ C     *****************************************************************
 C     ADD STREAM TERMS TO RHS AND HCOF IF FLOW OCCURS IN MODEL CELL
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C     *****************************************************************
       USE GWFSFRMODULE
 !      USE GLOBAL,       ONLY: NLAY, IOUT, ISSFLG, IBOUND, HNEW, HCOF, 

@@ -451,7 +451,7 @@ C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IBOUND,RHS,HCOF,LBOTM,BOTM,HNEW,IOUT,DELR,
      1                       DELC
       USE GWFWELMODULE, ONLY:NWELLS,WELL,PSIRAMP,TABROW,TABCOL,TABLAY, 
-     1                       NUMTAB
+     1                       NUMTAB,NWELVL
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFBASMODULE, ONLY: TOTIM
@@ -542,7 +542,7 @@ C     ------------------------------------------------------------------
      1                      VBVL,VBNM
       USE GWFWELMODULE,ONLY:NWELLS,IWELCB,WELL,NWELVL,WELAUX,PSIRAMP,
      1                      IUNITRAMP,IPRWEL,TABROW,TABCOL,TABLAY, 
-     2                      NUMTAB,NUMTAB
+     2                      NUMTAB
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
 !External function interface
       INTERFACE 
@@ -563,7 +563,6 @@ C     ------------------------------------------------------------------
       END FUNCTION RATETERP
       END INTERFACE
       CHARACTER*16 TEXT
-      CHARACTER*20 TEXT1
       DOUBLE PRECISION RATIN,RATOUT,QQ,QSAVE,FMIN
       double precision Qp,Hh,Ttop,Bbot,dQp
       real Q
