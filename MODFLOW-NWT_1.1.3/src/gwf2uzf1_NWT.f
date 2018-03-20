@@ -115,7 +115,7 @@ C     ALLOCATE ARRAY STORAGE FOR UNSATURATED FLOW, RECHARGE, AND ET
 C     READ AND CHECK VARIABLES THAT REMAIN CONSTANT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 8/01/2017
+!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
 C     ******************************************************************
       USE GWFUZFMODULE
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ITRSS, ISSFLG, 
@@ -1116,6 +1116,11 @@ C     ------------------------------------------------------------------
           WRITE(IOUT,'(A)')' SURFACE LEAKAGE WILL NOT BE SIMULATED '
           WRITE(iout,*)
           found = .true.
+        case('#')              !IN CASE A COMMENT IS ADDED TO THE END OF THE LINE. 10/19/2017
+          WRITE(iout,*)
+          WRITE(IOUT,'(A)')' COMMENT "#" ENCOUNTERED. EXITING OPTIONS'
+          WRITE(iout,*)
+          EXIT
         case default
           !Likely misspelled or unsupported 
           ! so terminate here.

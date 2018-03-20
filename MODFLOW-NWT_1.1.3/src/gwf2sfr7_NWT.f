@@ -2115,7 +2115,7 @@ C     -----------------------------------------------------------------
      +                 flwpet1, flwpet2, err, dlhold, precip, etstr, 
      +                 runof, runoff, qa, qb, qc, qd, hstrave, fbot
       DOUBLE PRECISION fbcheck, hld, totflwt, sbdthk, thetas, epsilon, 
-     +                 thr, thet1, dvrsn, fact,
+     +                 thr, thet1, dvrsn, fact, depthave,
      +                 depthtr, dwdh, wetpermsmooth,cstrsmooth
 !      DOUBLE PRECISION rhsh1, rhsh2, hcofh1, hcofh2
       REAL areamax, avhc, errold, fks, ha, qcnst, seep, 
@@ -3507,9 +3507,11 @@ C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
               hstrave = hstrave + HSTRM(l,i)
             END DO
             hstrave = hstrave/FLOAT(numdelt)
+            depthave = hstrave - strtop
+            if ( depthave < 0.0 ) depthave = 0.0
             cstrsmooth = cstr
             IF ( icalc.EQ.1 ) cstrsmooth = cstr*
-     +                        smooth(hstrave,dwdh)
+     +                        smooth(depthave,dwdh)
             IF ( ABS(SUMLEAK(l)).GT.0.0 ) THEN
 C
 C77-----ADD TERMS TO RHS AND HCOF WHEN GROUND-WATER HEAD LESS THAN

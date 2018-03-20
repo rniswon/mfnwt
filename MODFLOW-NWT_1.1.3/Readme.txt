@@ -50,7 +50,7 @@ The distribution file contains:
 
           Executables and source code for MODFLOW-NWT.
           MODFLOW-NWT documentation.
-          Ten MODFLOW-NWT sample problems.
+          Eleven MODFLOW-NWT sample problems.
 
 The MODFLOW-NWT program and related files can be extracted from the 
 distribution file.  Extracting these files is all that is required 
@@ -137,7 +137,7 @@ the same unformatted file structure.
 
 D. TESTING
 
-Ten sample problems with MODFLOW-NWT data sets are provided to verify that 
+Eleven sample problems with MODFLOW-NWT data sets are provided to verify that 
 MODFLOW-NWT is correctly installed and running on the system.  The sample 
 problems also may be looked at as examples of how to use the program. Five of 
 the test problems (Pr1a, Pr1b, Pr2, Pr3_lower (32 bit and 64 bit), and  
@@ -147,18 +147,18 @@ Simulation 1, one test problem (SwrSample05) is documented in Hughes and others
 (2012), and one test problem (swi2ex4sww) is documented in Bakker and others (2013). 
 A test problem (Sfr2weltab) was added that was modified from the hypothetical test 
 simulation described by Niswonger and Prudic (2005) to provide an example of specifying 
-tabular time series input files for specifying pumping rates. Another test problem 
+tabular time series input files for pumping rates. Another test problem 
 (Uzf_testoptions) was added that was modified from test simulation 2 of Niswonger and 
 others (2006) to provide as example of the new input options for UZF. Another test 
 problem (SFR_LAK_floodplain) was created that combines the SFR2, LAK7, and UZF1 packages   
-was added to demonstrate how the lake package can be used to simulate floodplains 
-adjacent to streams. These test problems can be run using either the 32-bit or 64-bit 
-version of the MODFLOW-NWT executable. Saved results for these simulations are included 
-in the Output_test and Output_test_64 directories for comparison.
+to demonstrate how the lake package can be used to simulate floodplains adjacent 
+to streams. These test problems can be run using either the 32-bit or 64-bit 
+versions of the MODFLOW-NWT executable. Saved results for these simulations are 
+included in the Output_test and Output_test_64 directories for comparison.
 
 E. COMPILING
 
-The executable files are provided in MODFLOW-NWT_1.1.3\bin Although executable versions   
+The executable files are provided in MODFLOW-NWT_1.1.3\bin. Although executable versions   
 of the program are provided, the source code also is provided in the MODFLOW-NWT_1.1.3\src 
 directory so that MODFLOW-NWT can be recompiled if necessary. However, the USGS cannot provide  
 assistance to those compiling MODFLOW-NWT.

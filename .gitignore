@@ -17,6 +17,7 @@
 *.hed
 *.lst~HEAD
 *.lst~develop
+<<<<<<< HEAD
 MF_NWT/MF_NWT/x64/Release/MF_NWT.exe.embed.manifest.rc
 MF_NWT/MF_NWT/x64/Release/MF_NWT.exe.embed.manifest
 MF_NWT/MF_NWT/x64/Release/MF_NWT.changetoexe
@@ -24,3 +25,10 @@ MF_NWT/MF_NWT/x64/Release/BuildLog.htm
 MF_NWT/MF_NWT/x64/Release/MF_NWT.zip
 MF_NWT/MF_NWT/x64/Release/MF_NWT.exe.intermediate.manifest
 MF_NWT/MF_NWT/x64/Release/MF_NWT.exe.embed.manifest.res
+=======
+Examples/AgOptions/Uzf_well_supp_irr/fort.222
+Examples/AgOptions/Uzf_well_supp_irr/cbc.unf
+Examples/AgOptions/~$Test_analysis.xlsx
+Examples/AgOptions/Uzf_well_supp_irr/wellsuppirr.lst
+Examples/AgOptions/Test_analysis.xlsx
+>>>>>>> develop

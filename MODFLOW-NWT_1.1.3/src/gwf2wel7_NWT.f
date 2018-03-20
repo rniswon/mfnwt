@@ -60,8 +60,8 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
-    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.1.2, ',
-     1' 9/15/2016 INPUT READ FROM UNIT ',I4)
+    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.1.4, ',
+     1' 4/01/2018 INPUT READ FROM UNIT ',I4)
       NWELLS=0
       NNPWEL=0
       IUNITRAMP=IOUT
@@ -234,6 +234,7 @@ C
       LLOC=1
       found = .false.
       option = .false.
+      text = 'WELL '
         DO
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -321,11 +322,6 @@ C
    32 FORMAT(1X,' Option to reduce pumping during cell ',
      +                 'dewatering is activated and NWT solver ',I10,
      +                 ' is not being used. Option deactivated')
-   33 FORMAT(1X,' Option to pump supplmental water ',
-     +          'for surface diversion shortfall is activted. '
-     +          ' A total of ',I10, 'supplemental wells are active')
-   34 FORMAT(1X,' Option to apply pumped water as irrigtion is active. '
-     +'Pumped irrigation water will be applied to ',I10,' UZF Cells.')
       END SUBROUTINE     
 C
 C
@@ -420,7 +416,7 @@ C1B-----IF THERE ARE NEW NON-PARAMETER WELLS, READ THEM.
            END DO
          END IF
       END IF
-      NWELLS=NNPWEL
+      NWELLS=NNPWEL        
 C
 C1C-----IF THERE ARE ACTIVE WELL PARAMETERS, READ THEM AND SUBSTITUTE
       CALL PRESET('Q')
@@ -486,7 +482,6 @@ C     ------------------------------------------------------------------
       Qp = 0.0
       NWELLSTEMP = NWELLS
       TIME = TOTIM
-!
       IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB
 C
 C1------IF NUMBER OF WELLS <= 0 THEN RETURN.
@@ -649,6 +644,7 @@ C
         Q = Qsave
       END IF
       QQ=Q
+C
 ! write wells with reduced pumping
       IF ( Qp.LT.0.9999D0 .AND. Iunitnwt.NE.0 .AND. 
      +     IPRWEL.NE.0 .and. Qsave < ZERO ) THEN

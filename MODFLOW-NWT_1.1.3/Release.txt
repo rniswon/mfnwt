@@ -25,7 +25,15 @@ Added ability to reuse the same well tabfile for more than one well. Changed
 reading the tabfiles to allow comment lines in tabfiles. Modified output of
 pumping rates to LST file to separate from printing of wells with reduced
 pumping. Modified keyword input formats to support backward compatibility
-of previous keyword input formats. 
+of previous keyword input formats. Character variable PHIRAMP can be used
+instead of SPECIFY for inputing PHIRAMP and optional output file unit number
+for writing reduced pumping rates. Thus, a phiramp value and outfile file unit
+number can be specified, respectively, in the first non-comment record
+in the WEL input file as:
+
+OPTIONS
+phiramp 0.1 15
+END
 
 Unsaturated-Zone Flow (UZF) package
 Fixed bug that occurred when IUZFOPT=0 and element 0 accessed in array DELSTOR.  
@@ -36,7 +44,10 @@ land surface to be incorrectly set for cells underlying lake cells.
 Streamflow Routing (SFR2) Package
 Keyword options were modified to allow for backward compatibility of previous input
 formats of keywords, including single line lists of keywords and keywords not
-surrounded by OPTIONS and END identifiers.
+surrounded by OPTIONS and END identifiers. A bug was fixed that affects models
+that use the LOSSFACTOR option for reducing streambed hydraulic conductivity for
+losing streams. This bug fix significantly affected stream seepage loss for models
+that specified a lossfactor value less than 1.
 
 Lake (LAK) Package
 Fixed array index from DELVOLLAK(NSSAR) to DELVOLLAK(NLAKES). Fixed lake package 
@@ -48,12 +59,19 @@ Initialized variable Hwell. Fixed reference to lbotm in botm arrays used for mod
 with quasi-confining units.
 
 Link-MT3DMS (LMT) Package
-Terms appearing in either SFR or LAK were removed from the LMTMODULE and instead placed 
-in SFRMODULE or LAKMODULE. Added IGWET to the LMTMODULE and allocated the variable to avoid 
-memory overwrite errors.  Bug fix for binary output in LMT (An extra term was being written 
-that was messing up FMI package in MT3D-USGS). Fixed a bug in LMT related to the linkage of 
-groundwater discharge (or runoff) to a sink (that is, not connected to surface-water 
-through IRUNBND). Bug fix to LMT to use KPER and KSTP from PRMSMODULE instead of GSFMODFLOW
+Terms appearing in either SFR or LAK were removed from the LMTMODULE and instead 
+placed in SFRMODULE or LAKMODULE. Added IGWET to the LMTMODULE and allocated the 
+variable to avoid memory overwrite errors. Bug fix for binary output in LMT (an 
+extra term was being written that was causing problems to the FMI package in 
+MT3D-USGS). Fixed a bug in LMT related to the linkage of groundwater discharge 
+(or runoff) to a sink (that is, not connected to surface-water through IRUNBND). 
+Bug fix to LMT to use KPER and KSTP from PRMSMODULE instead of GSFMODFLOW
+
+MODFLOW-NWT Main file (MF_NWT.f)
+Changed code to write a warning if model fails to converge and NWT solver
+character variable CONTINUE is specified. The phrase "Normal termination
+of simulation" is no longer printed to the screen or LST file if the model 
+fails to converge.
  
 o Version 1.1.2 09/15/2016:
 
