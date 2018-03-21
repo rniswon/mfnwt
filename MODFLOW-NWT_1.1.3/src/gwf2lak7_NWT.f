@@ -1662,7 +1662,7 @@ C16D----DETERMINE DERIVATIVE AND COMPUTE NEW LAKE STAGE.
                   DSTG = ABS(DSTG)
                 ELSE
 C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
-                  VOL2 = RESID1
+                  VOL2 = RESID1*DELT
                   IF ( VOL2.LT.0.0 ) VOL2 = 0.0
                   STGNEW(LAKE) = STGTERP(VOL2,LAKE)
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
