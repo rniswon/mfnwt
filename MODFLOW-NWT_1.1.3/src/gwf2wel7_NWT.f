@@ -234,7 +234,7 @@ C
       LLOC=1
       found = .false.
       option = .false.
-      text = 'WELL '
+      text = 'WELL PACKAGE '
         DO
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
