@@ -18,6 +18,8 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
+o Version 1.1.4 04/01/2018:
+
 o Version 1.1.3 08/01/2017:
 
 Well (WEL) package
