@@ -3283,7 +3283,7 @@ C
       RETURN
       END
 C
-      SUBROUTINE SGWF2LAK7UPW1RPS()
+      SUBROUTINE SGWF2LAK7UPW1RPS(LWRT)
 C
 C     ******************************************************************
 C     COMPUTE VERTICAL CONDUCTANCES AND HORIZONTAL CONDUCTANCES PER UNIT
