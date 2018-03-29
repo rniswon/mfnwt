@@ -1668,7 +1668,7 @@ C16E----LINEAR CASE. SIMPLY CALCULATE STAGE BASED ON VOLUME.
                   DSTG = ABS(STGNEW(LAKE) - STGITER(LAKE))
                   NCNCVR(LAKE) = 1
                 END IF
- !     IF (lake==1 .and. kkper==2)then
+ !     IF (lake==1 .and. kkper==1)then
  !     write(521,222)PRECIP(LAKE),EVAP(LAKE),RUNF(LAKE),RUNOFF(LAKE),
  !    1                WITHDRW(LAKE),SURFIN(LAKE),SURFOT(LAKE),
  !    2                SEEP(LAKE),VOLNEW1,VOLOLDD(LAKE),STGITER(LAKE),
