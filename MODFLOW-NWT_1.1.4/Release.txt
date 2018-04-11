@@ -118,6 +118,9 @@ condition is found.
 Several coding changes were made based on suggestions from Scott Boyce (CA WSC) 
 and are labeled with his initials (seb).
 
+A bug was fixed for writing header information to the compact budget output file
+when no wells are active.
+
 Other minor format changes were made for the output files. 
 
 o Version 1.1.3 08/01/2017:
