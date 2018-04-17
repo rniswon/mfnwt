@@ -1,0 +1,9 @@
+# MODFLOW-NWT Name File
+# Problem 3 
+LIST  7 .\Ex_prob3\Pr3_MFNWT_lower.lst
+BAS6  1 .\Ex_prob3\Pr3.bas
+DIS  10 .\Ex_prob3\Pr3.dis
+UPW  11 .\Ex_prob3\Pr3.upw
+RCH  18 .\Ex_prob3\Pr3_lower.rch
+NWT  13 .\Ex_prob3\Pr3.nwt
+OC   22 .\Ex_prob3\Pr3.oc
