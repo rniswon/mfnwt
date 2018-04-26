@@ -1,7 +1,7 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.3, 8/01/2017
-                    BASED ON MODFLOW-2005 VERSION 1.11.00 08/08/2013
+                             VERSION 1.1.4 4/01/2018
+                    BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Sfr2weltab\Sfr2weltab.lst
                          UNIT   12
@@ -82,7 +82,7 @@
  FILE TYPE:DATA   UNIT   90   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.3, 8/01/2017 INPUT READ FROM UNIT   41
+ BAS -- BASIC PACKAGE, VERSION 1.1.4, 4/01/2018 INPUT READ FROM UNIT   41
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -296,7 +296,7 @@
  # Test Problem 3 for MODFLOW-NWT
  #HEADTOL  FLUXTOL MAXITEROUT THICKFACT LINMETH IPRNWT IBOTAV OPTIONS DBDREDUCE DBDINCREASE DBDGAMMA MOMFACT BACKFLAG MAXBACKITER BACKTOL BACKREDUCE
 
- NWT1 -- Newton Solver, VERSION 1.1.3, 8/01/2017
+ NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
          INPUT READ FROM UNIT 43
 
  SPECIFIED OPTION:
@@ -330,7 +330,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.3, 8/01/2017
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.4, 4/01/2018
          INPUT READ FROM UNIT 42
 
  # LPF Package input file for hypothetical test simulation
@@ -357,16 +357,16 @@
 
            SPECIFIC YIELD =  0.200000     FOR LAYER   1
 
- WEL -- WELL PACKAGE FOR NWT VERSION 1.1.3,  8/01/2017 INPUT READ FROM UNIT   91
+ WEL -- WELL PACKAGE FOR NWT VERSION 1.1.4,  4/01/2018 INPUT READ FROM UNIT   91
  # header lines
  # header lines
  No named parameters
 
- PROCESSING                  OPTIONS
+ PROCESSING WELL OPTIONS
   Pumping rates will be read from time series input files.          2 files will be read
   Pumping rates will be read from time series input files. A maximum of         51 row entries will be read per file
 
- END PROCESSING                  OPTIONS
+ END PROCESSING WELL OPTIONS
  MAXIMUM OF      2 ACTIVE WELLS AT ONE TIME
  CELL-BY-CELL FLOWS WILL BE PRINTED WHEN ICBCFL NOT 0
  No named parameters
@@ -1053,8 +1053,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -1690,8 +1690,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -4795,8 +4795,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD    5
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD    5
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -8813,8 +8813,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   10
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   10
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -13183,8 +13183,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   15
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   15
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -17893,8 +17893,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   20
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   20
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -22582,8 +22582,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   25
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   25
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -27282,8 +27282,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   30
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   30
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -31976,8 +31976,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   35
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   35
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -36669,8 +36669,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   40
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   40
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -41349,8 +41349,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   45
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   45
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -46020,8 +46020,8 @@
 
 
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    30 IN STRESS PERIOD   50
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  30 IN STRESS PERIOD   50
+  ---------------------------------------------------------------------------
 
           1      2      3      4      5      6      7      8      9     10
          11     12     13     14     15     16     17     18     19     20
@@ -46148,6 +46148,6 @@
          TOTAL TIME 1.29600E+08 2.16000E+06  36000.      1500.0      4.1068    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/10 12:28:20
- Elapsed run time: 27.890 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/04/10 13:28:03
+ Elapsed run time: 26.233 Seconds
 

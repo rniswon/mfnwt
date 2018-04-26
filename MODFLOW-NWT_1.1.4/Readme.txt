@@ -1,20 +1,29 @@
 
 
-                     MODFLOW-NWT - Version: 1.1.3
+                     MODFLOW-NWT - Version: 1.1.4
                  Newton Formulation for MODFLOW-2005
 
+      
+This software has been approved for release by the U.S. Geological Survey (USGS). 
+Although the software has been subjected to rigorous review, the USGS reserves 
+the right to update the software as needed pursuant to further analysis and review. 
+No warranty, expressed or implied, is made by the USGS or the U.S. Government as 
+to the functionality of the software and related material nor shall the fact of 
+release constitute any such warranty. Furthermore, the software is released on 
+condition that neither the USGS nor the U.S. Government shall be held liable for 
+any damages resulting from its authorized or unauthorized use.
 
-NOTE: Any use of trade, product or firm names is for descriptive purposes 
-      only and does not imply endorsement by the U.S. Government.
+Any use of trade, product or firm names is for descriptive purposes only and 
+does not imply endorsement by the U.S. Government.
 
-MODFLOW-NWT version 1.1.3 is packaged for personal computers using one of the 
+MODFLOW-NWT version 1.1.4 is packaged for personal computers using one of the 
 Microsoft Windows operating systems. Executable files for personal 
 computers are provided as well as the source code at the following URL:
 
 http://water.usgs.gov/ogw/modflow-nwt/
 
 The executable files were compiled on a personal computer with the Intel(R) 
-Core(TM) i7-4702HQ CPU, running the Microsoft Windows 7 Professional 
+Core(TM) i7-7820HQ CPU, running the Microsoft Windows 10 Enterprise 
 operating system, using the Microsoft Visual Studio 2013 Version 12.0.21005.1
 development environment and the Intel® Parallel Studio XE 2017 Update 1 Composer 
 Edition for Fortran Windows* Integration for Microsoft Visual Studio* 2013, 
@@ -44,7 +53,7 @@ A. DISTRIBUTION FILE
 
 The following distribution file is for use on personal computers:
 
-         MODFLOW-NWT_1.1.3.zip
+         MODFLOW-NWT_1.1.4.zip
 
 The distribution file contains:
 
@@ -61,7 +70,7 @@ file contains the following directory structure.
 
 
    |
-   |--MODFLOW-NWT_1.1.3
+   |--MODFLOW-NWT_1.1.4
    |    |--bin           ; Compiled MODFLOW-NWT executables for personal computers
    |    |--data          ; Sample problems
    |    |--doc           ; Documentation report for MODFLOW-NWT and the Surface-
@@ -70,7 +79,7 @@ file contains the following directory structure.
    |    |--output_test_64   ; Output files from running the sample problems, 64 bit versions
    |    |--src           ; Source code for MODFLOW-NWT
 
-Included in directory MODFLOW-NWT_1.1.3\doc is the MODFLOW-NWT documentation 
+Included in directory MODFLOW-NWT_1.1.4\doc is the MODFLOW-NWT documentation 
 report, which is a Portable Document Format (PDF) file. The PDF file is 
 readable and printable on various computer platforms using Acrobat Reader 
 from Adobe. The Acrobat Reader is freely available from the following World
@@ -81,17 +90,17 @@ Wide Web site:
 B. INSTALLING
 
 To make the executable versions of MODFLOW-NWT accessible from any
-directory, the directory containing the executables (MODFLOW-NWT_1.1.3\bin)
+directory, the directory containing the executables (MODFLOW-NWT_1.1.4\bin)
 should be included in the PATH environment variable.  
 
 As an alternative, the executable files, MODFLOW-NWT.exe and MODFLOW-NWT_64.exe, 
-in the MODFLOW-NWT_1.1.3\bin directory can be copied into a directory already
+in the MODFLOW-NWT_1.1.4\bin directory can be copied into a directory already
 included in the PATH environment variable.
 
 
 C. EXECUTING THE SOFTWARE
 
-A 32 bit and a 64 bit executable are provided in the MODFLOW-NWT_1.1.3\bin  
+A 32 bit and a 64 bit executable are provided in the MODFLOW-NWT_1.1.4\bin  
 directory. Two executables are provided because computers often use either  
 the 32 bit Windows XP or the 64 bit Windows 7 operating systems. Large 
 simulations may not run on a 32 bit operating system due to limitations 
@@ -100,7 +109,7 @@ system provides much more available RAM than a 32 bit operating system.
 Thus, it is recommended that a 64 bit executable be used on a 64 bit operating  
 system for large simulations.   
 
-After the executable files in the MODFLOW-NWT_1.1.3\bin directory are installed in
+After the executable files in the MODFLOW-NWT_1.1.4\bin directory are installed in
 a directory that is included in your PATH, MODFLOW-NWT is initiated in
 a Windows Command-Prompt window using the commands:
 
@@ -158,8 +167,8 @@ included in the Output_test and Output_test_64 directories for comparison.
 
 E. COMPILING
 
-The executable files are provided in MODFLOW-NWT_1.1.3\bin. Although executable versions   
-of the program are provided, the source code also is provided in the MODFLOW-NWT_1.1.3\src 
+The executable files are provided in MODFLOW-NWT_1.1.4\bin. Although executable versions   
+of the program are provided, the source code also is provided in the MODFLOW-NWT_1.1.4\src 
 directory so that MODFLOW-NWT can be recompiled if necessary. However, the USGS cannot provide  
 assistance to those compiling MODFLOW-NWT.
 

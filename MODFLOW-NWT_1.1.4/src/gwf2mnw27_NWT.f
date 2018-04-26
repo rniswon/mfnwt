@@ -29,7 +29,7 @@
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR MNW2 PACKAGE.
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
 C     ******************************************************************
 C     LFK  May 2015  Revision in GWF2MNW2BH to fix possible error in borehole flow calculation.
 C     LFK  May 2015  Revision in GWF2MNW27RP to add optional printout of data if PUMPLOC option selected.
@@ -2443,7 +2443,7 @@ C-LFK     2                       SMALL,WELLID,NTOTNOD
 C     ------------------------------------------------------------------
       DOUBLE PRECISION ratin,ratout,hhnew,DryTest,
      & q,qdes,hlim,hwell,s,sNL,sL,qnet,qin,qout,verysmall,hcell
-      INTEGER firstnode,lastnode
+      INTEGER firstnode,lastnode,ntotheader
       CHARACTER*16 text
 c-lfk  10/10/2012
       CHARACTER*25 ctext1
@@ -2473,13 +2473,15 @@ c  clear ratin and ratout accumulators.
       ibd=0
       IF(IWL2CB.GT.0) IBD=ICBCFL
 C
-C2-----IF CELL-BY-CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.
+C2-----IF CELL-BY-CELL FLOWS WILL BE SAVED AS A LIST, WRITE HEADER.               
       IF(IBD.EQ.2) THEN  !swm: check if wells are active 
          NAUX=NMNWVL-30
 C-LFK         NAUX = 0   !!   Set to zero -- Change order to dump
 c         IF(IAUXSV.EQ.0) NAUX=0
+         ntotheader = 0
+         if (nmnw2.gt.0) ntotheader = ntotnod
          CALL UBDSV4(KSTP,KPER,TEXT,NAUX,MNWAUX,IWL2CB,NCOL,NROW,NLAY,
-     1          ntotnod,IOUT,DELT,PERTIM,TOTIM,IBOUND)
+     1          ntotheader,IOUT,DELT,PERTIM,TOTIM,IBOUND)
       END IF
 c  clear the buffer.
       buff=0.000000000

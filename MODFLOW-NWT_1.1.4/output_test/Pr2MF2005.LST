@@ -1,7 +1,7 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.3, 8/01/2017
-                    BASED ON MODFLOW-2005 VERSION 1.11.00 08/08/2013
+                             VERSION 1.1.4 4/01/2018
+                    BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Ex_prob2\Pr2MF2005.LST
                          UNIT    1
@@ -34,7 +34,7 @@
  FILE TYPE:LPF   UNIT   34   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.3, 8/01/2017 INPUT READ FROM UNIT    2
+ BAS -- BASIC PACKAGE, VERSION 1.1.4, 4/01/2018 INPUT READ FROM UNIT    2
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -3701,15 +3701,15 @@
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   1
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   1
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -3877,8 +3877,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4046,8 +4046,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4215,8 +4215,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4384,8 +4384,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4553,8 +4553,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4722,8 +4722,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -4891,8 +4891,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5060,8 +5060,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5229,8 +5229,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5398,8 +5398,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5567,8 +5567,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5736,8 +5736,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -5905,8 +5905,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP     1 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP   1 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -6566,15 +6566,15 @@
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP    10, STRESS PERIOD   1
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP 10, STRESS PERIOD   1
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -6742,8 +6742,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -6911,8 +6911,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7080,8 +7080,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7249,8 +7249,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7418,8 +7418,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7587,8 +7587,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7756,8 +7756,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -7925,8 +7925,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -8094,8 +8094,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -8263,8 +8263,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -8432,8 +8432,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -8601,8 +8601,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -8770,8 +8770,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP    10 IN STRESS PERIOD    1
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP  10 IN STRESS PERIOD    1
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -9195,15 +9195,15 @@
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   2
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   2
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -9371,8 +9371,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -9540,8 +9540,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -9709,8 +9709,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -9878,8 +9878,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10047,8 +10047,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10216,8 +10216,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10385,8 +10385,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10554,8 +10554,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10723,8 +10723,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -10892,8 +10892,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -11061,8 +11061,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -11230,8 +11230,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -11399,8 +11399,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP     2 IN STRESS PERIOD    2
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP   2 IN STRESS PERIOD    2
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -11719,15 +11719,15 @@
  OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    1
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP     1, STRESS PERIOD   3
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP  1, STRESS PERIOD   3
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -11895,8 +11895,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12064,8 +12064,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12233,8 +12233,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12402,8 +12402,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12571,8 +12571,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12740,8 +12740,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -12909,8 +12909,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13078,8 +13078,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13247,8 +13247,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13416,8 +13416,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13585,8 +13585,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13754,8 +13754,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -13923,8 +13923,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP     1 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP   1 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -14198,15 +14198,15 @@
  OUTPUT CONTROL FOR STRESS PERIOD    3   TIME STEP    2
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP     2, STRESS PERIOD   3
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP  2, STRESS PERIOD   3
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -14374,8 +14374,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -14543,8 +14543,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -14712,8 +14712,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -14881,8 +14881,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15050,8 +15050,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15219,8 +15219,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15388,8 +15388,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15557,8 +15557,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15726,8 +15726,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -15895,8 +15895,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -16064,8 +16064,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -16233,8 +16233,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -16402,8 +16402,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP     2 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP   2 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -17702,15 +17702,15 @@
     SAVE BUDGET
     PRINT HEAD FOR ALL LAYERS
     PRINT BUDGET
- UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
- UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
- UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
- UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP    17, STRESS PERIOD   3
+ UBDSV1 SAVING "         STORAGE" ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
+ UBDSV2 SAVING "   CONSTANT HEAD" ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW RIGHT FACE " ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW FRONT FACE " ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
+ UBDSV1 SAVING "FLOW LOWER FACE " ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
+ UBDSV3 SAVING "        RECHARGE" ON UNIT  32 AT TIME STEP 17, STRESS PERIOD   3
 1
-              HEAD IN LAYER   1 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   1 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -17878,8 +17878,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   2 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   2 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18047,8 +18047,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   3 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   3 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18216,8 +18216,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   4 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   4 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18385,8 +18385,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   5 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   5 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18554,8 +18554,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   6 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   6 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18723,8 +18723,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   7 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   7 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -18892,8 +18892,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   8 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   8 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19061,8 +19061,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER   9 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER   9 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19230,8 +19230,8 @@
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
        -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90      -99.90    
 1
-              HEAD IN LAYER  10 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  10 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19399,8 +19399,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  11 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  11 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19568,8 +19568,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  12 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  12 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19737,8 +19737,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  13 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  13 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -19906,8 +19906,8 @@
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
         25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00       25.00    
 1
-              HEAD IN LAYER  14 AT END OF TIME STEP    17 IN STRESS PERIOD    3
-  -----------------------------------------------------------------------------
+              HEAD IN LAYER  14 AT END OF TIME STEP  17 IN STRESS PERIOD    3
+  ---------------------------------------------------------------------------
 
             1           2           3           4           5           6           7           8           9          10
            11          12          13          14          15          16          17          18          19          20
@@ -20114,6 +20114,6 @@
          TOTAL TIME 2.27232E+08 3.78720E+06  63120.      2630.0      7.2005    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2017/08/10 12:27:16
- Elapsed run time:  1.014 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2018/04/10 12:52:39
+ Elapsed run time:  0.785 Seconds
 

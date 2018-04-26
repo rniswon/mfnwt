@@ -1852,7 +1852,7 @@ C6------SPECIAL CHECK FOR 1ST FILE.
      &             6X,'U.S. GEOLOGICAL SURVEY MODULAR',
      &             ' FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL',/,
      &             A,'VERSION ',A,/,20X,'BASED ON MODFLOW-2005 VERSION '
-     %             ,'1.11.00 08/08/2013'/)
+     %             ,'1.12.00 02/03/2017'/)
           WRITE(IOUT,78) FNAME(1:IFLEN),IOUT
 78        FORMAT(1X,'LIST FILE: ',A,/25X,'UNIT ',I4)
         ELSE
