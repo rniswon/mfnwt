@@ -49,10 +49,7 @@
 		<Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"/>
 		<Filter Name="Source Files" Filter="f90;for;f;fpp;ftn;def;odl;idl">
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.4\src\de47_NWT.f"/>
-<<<<<<< HEAD
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.4\src\gwf2awu1_NWT.f"/>
-=======
->>>>>>> develop
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.4\src\gwf2bas7_NWT.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.4\src\gwf2bcf7.f"/>
 		<File RelativePath="..\..\MODFLOW-NWT_1.1.4\src\gwf2chd7.f"/>
