@@ -15,12 +15,15 @@ C     ******************************************************************
       FUNCTION ICHKSTRBOT(self)
       type (check_bot), intent(in) :: self
       INTEGER JRCH,IRCH,KRCH,JSEG,ISEG,ICHKSTRBOT
+      REAL UHC
       ICHKSTRBOT = 0
       KRCH = ISTRM(1,self%IRCHNUM)
       IRCH = ISTRM(2,self%IRCHNUM)
       JRCH = ISTRM(3,self%IRCHNUM)
       JSEG = ISTRM(4,self%IRCHNUM)
       ISEG = ISTRM(5,self%IRCHNUM)
+      UHC = STRM(6,self%IRCHNUM)
+      IF ( UHC > 1.0e-20 ) THEN
       IF ( self%LTYPE.GT.0  .AND. IBOUND(JRCH,IRCH,KRCH).GT.0 ) THEN 
         IF ( STRM(4, self%IRCHNUM)-BOTM(JRCH,IRCH,LBOTM(KRCH))
      +                                      .LT.-1.0E-12 ) THEN
@@ -34,6 +37,7 @@ C     ******************************************************************
      +                STRM(4, self%IRCHNUM),BOTM(JRCH,IRCH,LBOTM(KRCH))
           ICHKSTRBOT = 1
         END IF
+      END IF
       END IF
       IF ( self%IFLAG.GT.0 .AND. self%IRCHNUM.EQ.NSTRM ) THEN
         WRITE(self%IUNIT,*)' MODEL STOPPING DUE TO REACH ALTITUDE ERROR'
