@@ -7188,8 +7188,8 @@ C
 C       FEPS IS USED TO SUPPRESS A NEW WAVE WHEN CHANGES IN WATER TABLE 
 C       ARE NEGLIGIBLE. FEPS2 IS USED TO SUPPRESS A NEW WAVE WHEN
 C       CHANGES IN FLUX ARE NEGLIGIBLE.
-      IF ( feps.LT.1.0D-8 ) feps = 1.0D-8
-      IF ( feps2.LT.1.0D-8 ) feps2 = 1.0D-8
+      IF ( feps.LT.5.0D-8 ) feps = 5.0D-8
+      IF ( feps2.LT.5.0D-8 ) feps2 = 5.0D-8
       fm = 0.0D0
       Oldsflx = Flux(Jpnt+Numwaves-1)
 C
