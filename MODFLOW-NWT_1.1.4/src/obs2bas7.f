@@ -65,6 +65,7 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL, ONLY: NCOL,NROW,NLAY,DELR,DELC,
      1                  NPER,NSTP,PERLEN,TSMULT,ISSFLG,IOUT,ITRSS
+      USE GSFMODFLOW, ONLY : Modflow_skip_time_step
       USE OBSBASMODULE
 C
       CHARACTER*200 LINE
@@ -73,7 +74,7 @@ C
 C1------ALLOCATE AND INITIALIZE TIME STEP COUNTER FOR USE BY ANY
 C1------OBSERVATION PACKAGE.
       ALLOCATE(ITS)
-      ITS=0
+      ITS=Modflow_skip_time_step    !to account for MODFLOW_TIME_ZERO/=START_TIME IN GSFLOW 5/4/2018
       IF(IUHDOB.LE.0) GO TO 700
 C
 C2------ALLOCATE OTHER SCALARS IF HEAD OBSERVATIONS ARE BEING SPECIFIED.
