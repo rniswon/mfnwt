@@ -7181,8 +7181,8 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
       time = 0.0D0
       Totalflux = 0.0D0
-      feps = 1.0D-12/Deltinc
-      feps2 = 1.0D-12/Deltinc
+      feps = 1.0D-11/Deltinc
+      feps2 = 1.0D-11/Deltinc
       itrailflg = 0
 C
 C       FEPS IS USED TO SUPPRESS A NEW WAVE WHEN CHANGES IN WATER TABLE 
