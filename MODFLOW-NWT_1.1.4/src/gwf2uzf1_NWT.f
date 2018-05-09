@@ -410,7 +410,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       EXCESPP = 0.0
       REJ_INF = 0.0
       AIR_ENTRY = -16.0
-      H_ROOT = -35000.0
+      H_ROOT = -15000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
       IUZLIST = 0
       ALLOCATE (NWAVST(NUZCL,NUZRW))
@@ -496,7 +496,7 @@ C8b-----Set flag for determining if FINF will be provided by PRMS.
 C       A value of zero means that FINF will not be set by PRMS.
       IGSFLOW = 0
       
-      IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.3 ) THEN
+      IF ( NUZTOP.GE.1 .AND. NUZTOP.LE.4 ) THEN
         IF ( NUZTOP.EQ.1 ) WRITE (IOUT, 9009)
  9009   FORMAT (' OPTION 1 -- RECHARGE IN UZF TO TOP LAYER ONLY ')
         IF ( NUZTOP.EQ.2 ) WRITE (IOUT, 9010)
@@ -505,6 +505,9 @@ C       A value of zero means that FINF will not be set by PRMS.
         IF ( NUZTOP.EQ.3 ) WRITE (IOUT, 9011)
  9011   FORMAT (' OPTION 3 -- RECHARGE IN UZF TO HIGHEST ACTIVE ', 
      +          'NODE IN EACH VERTICAL COLUMN')
+       IF ( NUZTOP.EQ.4 ) WRITE (IOUT, 9008)
+ 9008   FORMAT (' OPTION 4 -- RECHARGE IN UZF TO HIGHEST CELL ', 
+     +          'WITH WATER TABLE')
 C
 C9------STOP SIMULATION IF NUZTOP IS NOT WITHIN SPECIFIED RANGE.
       ELSE
@@ -1514,6 +1517,10 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
         iflginit = 0   
       END IF
       IF ( iflginit.GE.1 ) THEN
+C
+C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
+C
+         IF ( NUZTOP.EQ.4 ) CALL SETLAY()
         l = 0
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
@@ -1543,26 +1550,29 @@ C16-----SEARCH FOR UPPERMOST ACTIVE CELL.
                   END IF
                   ill = ill + 1
                 END DO
+              ELSE IF ( NUZTOP.EQ.4 ) THEN
+                IL = LAYNUM(IC,IR)  
               END IF
 C
 C16B-----SEARCH FOR UPPER MOST ACTIVE CELL WITH A WATER LEVEL.
               ilay = il
               IF ( il.GT.0 ) THEN
-                IF ( IBOUND(ic, ir, il).GT.0 ) THEN
-                  TOPCELL: DO WHILE ( ilay.LT.nlayp1 )
+!                IF ( IBOUND(ic, ir, il).GT.0 ) THEN
+!                  TOPCELL: DO WHILE ( ilay.LT.nlayp1 )
 !                    IF ( HNEW(ic, ir, ilay).LE.BOTM(ic,ir,ilay) ) THEN
 !                      ilay = ilay + 1
 !                    ELSE
-                      EXIT TOPCELL
+!                      EXIT TOPCELL
 !                    END IF
-                  END DO TOPCELL
-                END IF
-                IF ( ilay.LT.nlayp1 ) THEN
-                  il = ilay
-                  h = HNEW(ic, ir, il)
-                ELSE
-                  h = DBLE(BOTM(ic,ir,NLAY))
-                END IF
+!                  END DO TOPCELL
+!                END IF
+                !IF ( ilay.LT.nlayp1 ) THEN
+                !  il = ilay
+                !  h = HNEW(ic, ir, il)
+                !ELSE
+                !  h = DBLE(BOTM(ic,ir,NLAY))
+                !END IF
+                h = HNEW(ic, ir, il)
                 land = ABS(IUZFBND(ic, ir))
 crgn changed HNEW(ic, ir, il) to h in next line.
                 HLDUZF(ic, ir) = h
@@ -1755,6 +1765,87 @@ C28-----RETURN.
       RETURN
       END SUBROUTINE GWF2UZF1RP
 C
+C
+C-------SUBROUTINE GWF2UZF1AD
+      SUBROUTINE GWF2UZF1AD(In, KKPER, Igrid)
+C     ******************************************************************
+C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
+C     VERSION 1.1.4:  April 29, 2018
+C     ******************************************************************
+      USE GWFUZFMODULE
+      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+     +                        HNEW, BOTM, LBOTM
+      IMPLICIT NONE
+C     -----------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -----------------------------------------------------------------
+C     ARGUMENTS
+C     -----------------------------------------------------------------
+      INTEGER In, Kkper, Igrid
+C     -----------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -----------------------------------------------------------------
+      DOUBLE PRECISION h
+      INTEGER :: IC, IR, IL, ILL, LL, IBND
+C     -----------------------------------------------------------------
+C
+      IF ( NUZTOP.NE.4 ) RETURN
+C1------SET POINTERS FOR THE CURRENT GRID.
+      CALL SGWF2UZF1PNT(Igrid)
+C      
+C2------CALL SETLAY TO SET GWF LAYER
+C       FOR EACH TIME STEP.
+C
+      IF ( KKPER.GT.1 ) CALL SETLAY()
+      END SUBROUTINE GWF2UZF1AD
+C
+C
+C-------SUBROUTINE GWF2UZF1AD
+      SUBROUTINE SETLAY()
+C     ******************************************************************
+C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
+C     VERSION 1.1.4:  April 29, 2018
+C     ******************************************************************
+      USE GWFUZFMODULE
+      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+     +                        HNEW, BOTM, LBOTM
+      IMPLICIT NONE
+C     -----------------------------------------------------------------
+C     SPECIFICATIONS:
+C     -----------------------------------------------------------------
+C     ARGUMENTS
+C     -----------------------------------------------------------------
+C     -----------------------------------------------------------------
+C     LOCAL VARIABLES
+C     -----------------------------------------------------------------
+      INTEGER :: IC, IR, IL, ILL, LL, IBND
+C     -----------------------------------------------------------------
+C      
+C1------SET LAYER NUMBER FOR UZF RECHARGE/DISCHARGE
+C       FOR BEGINNING OF EACH TIME STEP
+        IF ( NUZTOP.EQ.4 ) THEN
+          DO ll = 1, NUMCELLS
+            IL = nlay
+            ir = IUZHOLD(1, ll)
+            ic = IUZHOLD(2, ll)
+            ibnd = IUZFBND(ic, ir)
+            IF ( ibnd*ibnd > 0 ) THEN
+              ill = NLAY
+              il = ILL
+              DO WHILE ( ill.GT.0 )
+                IF ( HNEW(ic, ir, ill).GT.BOTM(ic, ir, ill) ) il = ill
+                ill = ill - 1
+              END DO
+            END IF
+            IF ( IBOUND(IC,IR,IL) ==0 ) THEN
+              IUZFBND(ic, ir) = 0
+              IL = 0
+            END IF
+            LAYNUM(IC,IR) = IL
+          END DO
+        END IF
+      END SUBROUTINE SETLAY
+C
 C--------SUBROUTINE GWF2UZF1FM
 C SWR - JDH ADDED Iunitswr
       SUBROUTINE GWF2UZF1FM(Kkper, Kkstp, Kkiter, Iunitsfr, Iunitlak, 
@@ -1925,6 +2016,8 @@ C3------SEARCH FOR UPPERMOST ACTIVE CELL.
             END IF
             ill = ill + 1
           END DO
+        ELSEIF ( NUZTOP==4 ) THEN
+          il = LAYNUM(ic, ir)
         END IF
         IF ( land.LT.0 ) land = ABS(land)
         IF ( land.EQ.0 ) land = 1
@@ -2533,6 +2626,8 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
      +                 , ' LAYER-- SOME WATER MAY FLOW PAST', 
      +                 ' LOWEST LAYER'
           END IF
+        ELSEIF ( NUZTOP==4 ) THEN
+          il = LAYNUM(ic, ir)
         END IF
         LAYNUM(ic, ir) = il
         IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = 1
