@@ -1268,7 +1268,7 @@ C2------RETURN.
       END SUBROUTINE SGWF2UZF1VKS
 C
 C-------SUBROUTINE GWF2UZF1RP
-      SUBROUTINE GWF2UZF1RP(In, Kkper, Iunitsfr, Igrid)
+      SUBROUTINE GWF2UZF1RP(In, Kkper, Kkstp, Iunitsfr, Igrid)
 C     ******************************************************************
 C     READ AND CHECK VARIABLES EACH STRESS PERIOD 
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
@@ -1283,7 +1283,7 @@ C     SPECIFICATIONS:
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
-      INTEGER In, Kkper, Iunitsfr, Igrid
+      INTEGER In, Kkper, Kkstp, Iunitsfr, Igrid
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
@@ -1520,7 +1520,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
 C
-         IF ( NUZTOP.EQ.4 ) CALL SETLAY()
+        IF ( NUZTOP.EQ.4 .AND. KKPER+KKSTP.EQ.2 ) CALL SETLAY(1)
         l = 0
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
@@ -1767,7 +1767,7 @@ C28-----RETURN.
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-      SUBROUTINE GWF2UZF1AD(In, KKPER, Igrid)
+      SUBROUTINE GWF2UZF1AD(In, KKPER, KKSTP, Igrid)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1781,7 +1781,7 @@ C     SPECIFICATIONS:
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
-      INTEGER In, Kkper, Igrid
+      INTEGER In, Kkper, kkstp, Igrid
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
@@ -1796,12 +1796,12 @@ C
 C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
-      IF ( KKPER.GT.1 ) CALL SETLAY()
+!      IF ( KKPER+KKSTP>1 ) CALL SETLAY(KKSTP)
       END SUBROUTINE GWF2UZF1AD
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-      SUBROUTINE SETLAY()
+      SUBROUTINE SETLAY(kkstp)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1818,23 +1818,29 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP
+      DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
 C1------SET LAYER NUMBER FOR UZF RECHARGE/DISCHARGE
 C       FOR BEGINNING OF EACH TIME STEP
-        IF ( NUZTOP.EQ.4 ) THEN
+          
           DO ll = 1, NUMCELLS
-            IL = nlay
+            IL = 1
             ir = IUZHOLD(1, ll)
             ic = IUZHOLD(2, ll)
             ibnd = IUZFBND(ic, ir)
             IF ( ibnd*ibnd > 0 ) THEN
               ill = NLAY
               il = ILL
-              DO WHILE ( ill.GT.0 )
-                IF ( HNEW(ic, ir, ill).GT.BOTM(ic, ir, ill) ) il = ill
-                ill = ill - 1
+              DO WHILE ( ill > 0 )
+                S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
+                S2 = ZEROD15
+                IF ( ill < NLAY) S2 = HNEW(ic, ir, ill+1) -
+     +                                BOTM(ic, ir, ill )  
+                 
+                  IF ( S1 > NEARZERO .AND. S2 > NEARZERO ) il = ill
+                  ill = ill - 1
               END DO
             END IF
             IF ( IBOUND(IC,IR,IL) ==0 ) THEN
@@ -1843,7 +1849,6 @@ C       FOR BEGINNING OF EACH TIME STEP
             END IF
             LAYNUM(IC,IR) = IL
           END DO
-        END IF
       END SUBROUTINE SETLAY
 C
 C--------SUBROUTINE GWF2UZF1FM
@@ -3331,7 +3336,7 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
           UZTOTBAL(ic, ir, 4) = UZTOTBAL(ic, ir, 4) + volet
           UZTOTBAL(ic, ir, 7) = UZTOTBAL(ic, ir, 7) + volinflt +
      +                              Excespp(ic, ir) + rej_inf(ic, ir)
-!      error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
+ !     error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
           IF ( IUZFOPT.GT.0 ) THEN
             IF ( ibnd.GT.0 ) THEN
               UZTOTBAL(ic, ir, 2) = UZTOTBAL(ic, ir, 2)
