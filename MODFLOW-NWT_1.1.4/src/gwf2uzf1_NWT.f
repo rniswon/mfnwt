@@ -1520,7 +1520,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
 C
-        IF ( NUZTOP.EQ.4 .AND. KKPER+KKSTP.EQ.2 ) CALL SETLAY(1)
+        IF ( NUZTOP.EQ.4 .AND. KKPER.EQ.1 ) CALL SETLAY(1)
         l = 0
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
@@ -1796,7 +1796,7 @@ C
 C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
-      IF ( KKPER+KKSTP>1 ) CALL SETLAY(KKSTP)
+      IF ( KKPER+KKSTP > 2 ) CALL SETLAY(KKSTP)
       END SUBROUTINE GWF2UZF1AD
 C
 C
@@ -1843,10 +1843,10 @@ C       FOR BEGINNING OF EACH TIME STEP
                   ill = ill - 1
               END DO
             END IF
-            IF ( IBOUND(IC,IR,IL) ==0 ) THEN
-              IUZFBND(ic, ir) = 0
-              IL = 0
-            END IF
+            !IF ( IBOUND(IC,IR,IL) == 0 ) THEN
+            !  IUZFBND(ic, ir) = 0
+            !  IL = 0
+            !END IF
             LAYNUM(IC,IR) = IL
           END DO
       END SUBROUTINE SETLAY
@@ -3336,7 +3336,7 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
           UZTOTBAL(ic, ir, 4) = UZTOTBAL(ic, ir, 4) + volet
           UZTOTBAL(ic, ir, 7) = UZTOTBAL(ic, ir, 7) + volinflt +
      +                              Excespp(ic, ir) + rej_inf(ic, ir)
- !     error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
+!      error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
           IF ( IUZFOPT.GT.0 ) THEN
             IF ( ibnd.GT.0 ) THEN
               UZTOTBAL(ic, ir, 2) = UZTOTBAL(ic, ir, 2)
