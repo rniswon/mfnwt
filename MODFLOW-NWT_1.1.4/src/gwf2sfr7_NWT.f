@@ -930,9 +930,6 @@ C         NWAVS INITIALLY SET TO 1.
       AVWAT = 0.0
       ALLOCATE (WAT1(NUMAVE,NUZST))
       WAT1 = 0.0
-      ALLOCATE (CHECKTIME(NSTOTRL), MORE(NSTOTRL))
-      CHECKTIME = 0.0d0
-      MORE = 0
 C
 C22B-----INITIALIZE VARIABLES FOR STREAM DEPTH, LEAKAGE, AND 
 C         PREVIOUS HEAD BENEATH STREAM.
@@ -7058,7 +7055,7 @@ C         STREAM.
           CALL UZFLOW(L, surflux, dlength, zoldist, Uzdpit, Uzthit, 
      +                Uzflit, Uzspit, Itrlit, Ltrlit, totflux, 
      +                numwaves, Thr, Thetas, Fks, Epsilon, oldsflx, 
-     +                iset, Deltinc)
+     +                iset, Deltinc) 
           IF ( totflux.LT.0.0 ) totflux = 0.0D0
           Uzflwt(i) = totflux*Uzwdth(i)*STRM(1, L)
           IF ( Uzflwt(i).LT.0.0 ) Uzflwt(i) = 0.0D0
@@ -7153,67 +7150,49 @@ C2------RETURN.
 C
 C-------SUBROUTINE UZFLOW
       SUBROUTINE UZFLOW(I, Surflux, Dlength, Zoldist, Depth, Theta, 
-     +                   Flux, Speed, Itrwave, Ltrail, Totalflux, 
-     +                   Numwaves, Thetar, Thetas, Fksat, Eps, Oldsflx, 
-     +                   Jpnt, Delt)
+     +                  Flux, Speed, Itrwave, Ltrail, Totalflux, 
+     +                  Numwaves, Thetar, Thetas, Fksat, Eps, Oldsflx, 
+     +                  Jpnt, Deltinc)
 C     ******************************************************************
-C     COMPUTE WAVE INTERACTION WITHIN AN UNSATURATED FLOW CELL
+C     WAVE INTERACTION WITHIN AN UNSATURATED FLOW COMPARTMENT
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
-C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
-      USE GWFSFRMODULE, ONLY: NSFRSETS, NSTRAIL, THETAB, FLUXB,
-     +                        NEARZERO, ZEROD6, ZEROD7, ZEROD9,
-     +                        NSTOTRL
-      USE GLOBAL,       ONLY: ITMUNI, LENUNI, IOUT
+      USE GWFSFRMODULE, ONLY: NSTOTRL, NSFRSETS, NSTRAIL, THETAB, FLUXB
+      USE GLOBAL,    ONLY: IOUT
       IMPLICIT NONE
+      INTRINSIC ABS, DABS
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
 C     ARGUMENTS
 C     ------------------------------------------------------------------
-      INTEGER I, Jpnt, Numwaves, Itrwave(NSTOTRL), Ltrail(NSTOTRL) 
-      REAL Fksat, Delt
-      DOUBLE PRECISION :: Thetas, Eps
+      INTEGER I, Jpnt, Numwaves, Itrwave(NSTOTRL), Ltrail(NSTOTRL)
+      REAL Fksat, Deltinc
       DOUBLE PRECISION Depth(NSTOTRL), Theta(NSTOTRL), Flux(NSTOTRL), 
      +                 Speed(NSTOTRL)
       DOUBLE PRECISION Dlength, Zoldist, Totalflux, Surflux, Oldsflx, 
-     +                 Thetar
+     +                 Thetar, Thetas, Eps
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION ffcheck, feps2, feps, time, fm, dlength2, 
-     +                 factor1, factor2
-      DOUBLE PRECISION thetadif
-      INTEGER itester, j, jj, jm1, itrailflg, numwavesd
-      INTEGER jpntp1, jpntm1, ic, ir
+      DOUBLE PRECISION ffcheck, feps2, feps, time, fm, dlength2
+      REAL thetadif
+      INTEGER itester, j, jj, jm1, itrailflg
 C     ------------------------------------------------------------------
-      jpntp1 = Jpnt + 1
-      jpntm1 = Jpnt - 1
       time = 0.0D0
       Totalflux = 0.0D0
-      factor1 = 1.0D0
-      factor2 = 1.0D0
-      feps = ZEROD9
-      feps2 = ZEROD9
-      IF ( ITMUNI.EQ.1 ) THEN
-        factor1 = 1.0D0/86400.0D0
-      ELSE IF ( ITMUNI.EQ.2 ) THEN
-        factor1 = 1.0D0/1440.0D0
-      ELSE IF ( ITMUNI.EQ.3 ) THEN
-        factor1 = 1.0D0/24.0D0 
-      ELSE IF ( ITMUNI.EQ.5 ) THEN
-        factor1 = 365.0D0
-      END IF    
-      IF ( LENUNI.EQ.1 ) THEN
-        factor2 = 1.0D0/0.3048
-      ELSE IF ( LENUNI.EQ.3 ) THEN
-        factor2 = 100.0D0
-      END IF 
-      feps = feps*factor1*factor2
-      feps2 = feps2*factor1*factor2
+      feps = 1.0D-12/Deltinc
+      feps2 = 1.0D-12/Deltinc
       itrailflg = 0
+C
+C       FEPS IS USED TO SUPPRESS A NEW WAVE WHEN CHANGES IN WATER TABLE 
+C       ARE NEGLIGIBLE. FEPS2 IS USED TO SUPPRESS A NEW WAVE WHEN
+C       CHANGES IN FLUX ARE NEGLIGIBLE.
+      IF ( feps.LT.1.0D-8 ) feps = 1.0D-8
+      IF ( feps2.LT.1.0D-8 ) feps2 = 1.0D-8
       fm = 0.0D0
-      Oldsflx = Flux(jpntm1+Numwaves)
+      Oldsflx = Flux(Jpnt+Numwaves-1)
+C
 C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
       IF ( (Dlength-Zoldist).LT.-feps ) THEN
         dlength2 = Dlength
@@ -7221,8 +7200,8 @@ C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
       ELSE IF ( (Dlength-Zoldist).GT.feps ) THEN
         dlength2 = Zoldist + 1.0D0
         thetadif = ABS(Theta(Jpnt)-Thetar)
-        IF ( thetadif.GT.ZEROD6 ) THEN
-          DO j = Jpnt + Numwaves, jpntp1, -1
+        IF ( thetadif.GT.1.0E-6 ) THEN
+          DO j = Jpnt + Numwaves, Jpnt + 1, -1
             jm1 = j - 1
             Theta(j) = Theta(jm1)
             Flux(j) = Flux(jm1)
@@ -7231,10 +7210,10 @@ C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
             Itrwave(j) = Itrwave(jm1)
             Ltrail(j) = Ltrail(jm1)
           END DO
-          IF ( Theta(jpntp1).GT.Thetar ) THEN
-            Speed(jpntp1) = Flux(jpntp1)/(Theta(jpntp1)-Thetar)
+          IF ( Theta(Jpnt+1).GT.Thetar ) THEN
+            Speed(Jpnt+1) = Flux(Jpnt+1)/(Theta(Jpnt+1)-Thetar)
           ELSE
-            Speed(jpntp1) = 0.0D0
+            Speed(Jpnt+1) = 0.0D0
           END IF
           Theta(Jpnt) = Thetar
           Flux(Jpnt) = 0.0D0
@@ -7242,12 +7221,11 @@ C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
           Depth(Jpnt) = Dlength
           Ltrail(Jpnt) = 0
           Numwaves = Numwaves + 1
-          IF ( Numwaves.GE.NSFRSETS*NSTRAIL ) THEN
-            WRITE (*, *) 'TOO MANY WAVES IN UNSAT CELL ',I,Numwaves,
-     +                   '  PROGRAM TERMINATED IN UZSFR-1'
-            WRITE (IOUT, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves,
-     +        ' PROGRAM TERMINATED IN UZSFR-1;', 
-     +        ' INCREASE NSFRSETS'
+          IF ( Numwaves.GT.NSFRSETS*NSTRAIL ) THEN
+            WRITE (*, *) 'TOO MANY WAVES IN STREAM CELL', I, Numwaves, 
+     +                   '   PROGRAM TERMINATED IN UZFLOW-1'
+            WRITE (IOUT, *)'TOO MANY WAVES IN STREAM CELL', I, Numwaves,
+     +           '   PROGRAM TERMINATED IN UZFLOW-1; INCREASE NSFRSETS'
             STOP
           END IF
         ELSE
@@ -7261,85 +7239,88 @@ C1------DETERMINE IF WATER TABLE IS RISING OR FALLING.
       FLUXB = Flux(Jpnt)
       Totalflux = 0.00D0
       itester = 0
-      ffcheck = (Surflux-Flux(jpntm1+Numwaves))
+      ffcheck = (Surflux-Flux(Jpnt+Numwaves-1))
 C
-C2------CREATE A NEW WAVE WHEN SURFACE FLUX CHANGES.
-C         CALL TRAILWAVE2 IF SURFACE FLUX DECREASES.
-C         CALL LEADWAVE2 IF SURFACE FLUX INCREASES.
-      IF ( ffcheck.GT.feps2 .OR. ffcheck.LT.-feps2 ) THEN
+C2------CREATE A NEW WAVE IF SURFACE FLUX CHANGES.
+C         CALL TRAILWAVE IF SURFACE FLUX DECREASES.
+C         CALL LEADWAVE IF SURFACE FLUX INCREASES.
+      IF ( DABS(ffcheck).GT.feps2 ) THEN
         Numwaves = Numwaves + 1
-        IF ( Numwaves.GE.NSFRSETS*NSTRAIL ) THEN
-          WRITE (*, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves, 
-     +              ic,ir,'   PROGRAM TERMINATED IN UZSFR-2'
-          WRITE (IOUT, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves,
-     +        ic,ir,'   PROGRAM TERMINATED IN UZSFR-2; INCREASE NSETS'
+        IF ( Numwaves.GT.NSFRSETS*NSTRAIL ) THEN
+          WRITE (*, *) 'TOO MANY WAVES IN STREAM CELL', I, Numwaves, 
+     +                 '   PROGRAM TERMINATED IN UZFLOW-2'
+          WRITE (IOUT, *) 'TOO MANY WAVES IN STREAM CELL', I, Numwaves, 
+     +       '   PROGRAM TERMINATED IN UZFLOW-2; INCREASE NSFRSETS'
           STOP
         END IF
       ELSE IF ( Numwaves.EQ.1 ) THEN
         itester = 1
       END IF
-C
+
       IF ( Numwaves.GT.1 ) THEN
         IF ( ffcheck.LT.-feps2 ) THEN
           CALL TRAILWAVE(Numwaves, I, Flux, Theta, Speed, Depth, 
-     +                    Itrwave, Ltrail, Fksat, Eps, Thetas, Thetar, 
-     +                    Surflux, Jpnt )
+     +                   Itrwave, Ltrail, Fksat, Eps, Thetas, Thetar, 
+     +                   Surflux, Jpnt)
           itrailflg = 1
         END IF
-        CALL LEADWAVE(Numwaves, time, Totalflux, itester, Flux, 
-     +                 Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
-     +                 Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
-     +                 feps2, itrailflg, Delt, ffcheck)
+        CALL LEADWAVE(Numwaves, time, Totalflux, itester, Flux,
+     +                Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
+     +                Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
+     +                feps2, itrailflg, Deltinc)
       END IF
       IF ( itester.EQ.1 ) THEN
-        Totalflux = Totalflux + (Delt-time)*Flux(Jpnt)
+        Totalflux = Totalflux + (Deltinc-time)*Flux(Jpnt)
         time = 0.0D0
         itester = 0
       END IF
 C
-C3------CALCULATE VOLUME OF WATER BELOW WATER TABLE.
+C3------CALCULATE VOLUME OF WATER IN UNSATURATED ZONE LOST WHEN
+C         WATER TABLE ROSE AND ADD AS RECHARGE TO GROUND WATER.
       IF ( dlength2.LT.Zoldist ) THEN
         j = 2
         jj = 1
-        IF ( Depth(jpntp1).GT.dlength2 ) THEN
+        IF ( Depth(Jpnt+1).GT.dlength2 ) THEN
           DO WHILE ( j.LE.Numwaves )
-            IF ( Depth(jpntm1+j).GE.dlength2 ) jj = j
+            IF ( Depth(Jpnt+j-1).GE.dlength2 ) jj = j
             IF ( j.EQ.jj .AND. Depth(Jpnt+j).LT.dlength2 ) j = Numwaves
             j = j + 1
           END DO
         END IF
         IF ( jj.GT.1 .AND. Numwaves.GT.1 ) THEN
-          fm = (Depth(Jpnt)-Depth(jpntp1))*(Theta(Jpnt)-Thetar)
-          DO j = 2 + jpntm1, jj - 1
-            fm = fm + (Depth(j)-Depth(j+1))*(Theta(j)-Thetar)
+          fm = (Depth(Jpnt)-Depth(Jpnt+1))*(Theta(Jpnt)-Thetar)
+          DO j = 2, jj - 1
+            fm = fm + (Depth(Jpnt+j-1)-Depth(Jpnt+j))*(Theta(Jpnt+j-1)-
+     +           Thetar)
           END DO
-          fm = fm+(Theta(jpntm1+jj)-Thetar)*(Depth(jpntm1+jj)-dlength2)
+          fm = fm+(Theta(Jpnt+jj-1)-Thetar)*(Depth(Jpnt+jj-1)-dlength2)
         ELSE
           fm = (Depth(Jpnt)-dlength2)*(Theta(Jpnt)-Thetar)
         END IF
         Dlength = dlength2
         Totalflux = Totalflux + fm
-        IF ( Totalflux.LT.NEARZERO ) Totalflux = 0.0D0
+        IF ( Totalflux.LT.1.0D-30 ) Totalflux = 0.0D0
       END IF
-C
-C5-----RETURN.
+C4------RETURN.
       RETURN
       END SUBROUTINE UZFLOW
-
 C
-C--------SUBROUTINE LEADWAVE
-      SUBROUTINE LEADWAVE(Numwaves, Time, Totalflux, Itester, Flux, 
-     +                     Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
-     +                     Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
-     +                     Feps2, Itrailflg, Delt, ffcheck)
+C
+C-------SUBROUTINE LEADWAVE
+      SUBROUTINE LEADWAVE(Numwaves, Time, Totalflux, Itester, Flux,
+     +                    Theta, Speed, Depth, Itrwave, Ltrail, Fksat, 
+     +                    Eps, Thetas, Thetar, Surflux, Oldsflx, Jpnt, 
+     +                    Feps2, Itrailflg, Deltinc)
 C     ******************************************************************
 C     CREATE LEAD WAVE WHEN THE SURFACE FLUX INCREASES AND ROUTE WAVES.
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
-C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
-      USE GWFSFRMODULE, ONLY: NSTOTRL, CLOSEZERO, NEARZERO, THETAB, 
-     +    FLUXB, FLUXHLD2, ZEROD15, ZEROD9, ZEROD6, CHECKTIME, MORE
+C
+      USE GWFSFRMODULE, ONLY: NSTOTRL, NEARZERO, CLOSEZERO, THETAB,
+     +                        FLUXB, FLUXHLD2
+C      USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
+      INTRINSIC ABS
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -7347,146 +7328,123 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
       INTEGER Itester, Jpnt, Numwaves, Itrailflg
       INTEGER Itrwave(NSTOTRL), Ltrail(NSTOTRL)
-      REAL Fksat, Delt
-      DOUBLE PRECISION Eps, Thetas
-      DOUBLE PRECISION Depth(NSTOTRL), Theta(NSTOTRL), Flux(NSTOTRL), 
+      REAL Fksat, Deltinc
+      DOUBLE PRECISION Depth(NSTOTRL), Theta(NSTOTRL), Flux(NSTOTRL),
      +                 Speed(NSTOTRL)
-      DOUBLE PRECISION Feps2, Totalflux, Surflux, Oldsflx, Thetar, Time,
-     +                 ffcheck
+      DOUBLE PRECISION Feps2, Totalflux, Surflux, Oldsflx, Thetar, Time
+      DOUBLE PRECISION Eps, Thetas
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION bottomtime, shortest, fcheck, fhold, fhold2
-      DOUBLE PRECISION eps_m1, timenew, feps3, bottom
-      DOUBLE PRECISION thsrinv, epsfksths, timedt, big, f7, f8
-      DOUBLE PRECISION ttt, diff, comp1, comp2, ftheta1, ftheta2
+      DOUBLE PRECISION ffcheck, bottomtime, shortest, fcheck, fhold
+      DOUBLE PRECISION eps_m1, checktime(NSTOTRL), timenew, feps3
+      REAL big, comp1, comp2, diff, f7, f8, ftheta1, ftheta2 
       INTEGER idif, iflag, iflag2, iflx, iremove, itrwaveb, j, jj, k, 
-     +        kk, l, jpnwavesm1
-      INTEGER jpntm1, jpntm2, jpntm3, jpntp1, nwavp1, jjj, km1
-      LOGICAL lcheck
+     +        kk, l, jpnwavesm1, jpntpkm1, jpntpkm2, more(NSTOTRL)
 C     ------------------------------------------------------------------
-      feps3 = Feps2/10.0D0
-      eps_m1 = DBLE(Eps) - 1.0D0
-      f7 = 0.495D0
-      f8 = 1.0D0 - f7
-      big = 1.0D30
-      thsrinv = 1.0D0/(Thetas-Thetar)
-      epsfksths = Eps*Fksat*thsrinv
-      jpntp1 = Jpnt + 1
-      jpntm1 = Jpnt - 1
-      jpntm2 = Jpnt - 2
-      jpntm3 = Jpnt - 3
+C     ADDED FEPS3 TO LIMIT CHANGES IN WATER CONTENT.
+      eps_m1 = Eps - 1.0D0
+      feps3 = 1.0D-07
+      f7 = 0.495
+      f8 = 1.0 - f7
+      big = 1.0E30
 C
 C1------INITIALIZE NEWEST WAVE.
       IF ( Itrailflg.EQ.0 ) THEN
-        jpnwavesm1 = jpntm1 + Numwaves
- !       ffcheck = Surflux - oldsflx  ! RGN 4/18/2013
+        jpnwavesm1 = Jpnt + Numwaves - 1
+        ffcheck = Surflux - Oldsflx
         IF ( ffcheck.GT.Feps2 ) THEN
           Flux(jpnwavesm1) = Surflux
           IF ( Flux(jpnwavesm1).LT.NEARZERO ) Flux(jpnwavesm1) = 0.0D0
-          Theta(jpnwavesm1) = (((Flux(jpnwavesm1)/Fksat)**(1.0/Eps))*
+          Theta(jpnwavesm1) = (((Flux(jpnwavesm1)/Fksat)**(1.0D0/Eps))*
      +                        (Thetas-Thetar)) + Thetar
           IF ( Theta(jpnwavesm1)-Theta(jpnwavesm1-1).GT.feps3 ) THEN
             Speed(jpnwavesm1) = (Flux(jpnwavesm1)-Flux(jpnwavesm1-1))/
      +                          (Theta(jpnwavesm1)-Theta(jpnwavesm1-1))
+            Depth(jpnwavesm1) = 0.0D0
+            Ltrail(jpnwavesm1) = 0
+            Itrwave(jpnwavesm1) = 0
           ELSE
             Speed(jpnwavesm1) = 0.0D0
+            Numwaves = Numwaves - 1
           END IF
-          Depth(jpnwavesm1) = 0.0D0
-          Ltrail(jpnwavesm1) = 0
-          Itrwave(jpnwavesm1) = 0
         END IF
       END IF
 C
 C2------ROUTE ALL WAVES AND INTERCEPTION OF WAVES OVER TIME STEP.
-
-      diff = 1.0D0
+      diff = 1.0
       iflx = 0
       FLUXHLD2 = Flux(Jpnt)
       IF ( Numwaves.EQ.0 ) Itester = 1
-      IF ( Itester.NE.1 ) THEN
-      DO WHILE ( diff.GT.ZEROD6 )
-        timedt = Delt - Time
+      DO WHILE ( diff.GT.1.0E-7 .AND. Itester.NE.1 )
         DO j = 1, Numwaves
-          CHECKTIME(j) = 0.0D0
-          MORE(j) = 0
+          checktime(j) = 0.0D0
+          more(j) = 0
         END DO
         j = 2
 C
-C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE A WAVE AHEAD.
-        nwavp1 = Numwaves + 1
-        DO WHILE ( j.LT.nwavp1 )
+C3------CALCULATE TIME UNTIL A WAVE WILL OVERTAKE NEXT WAVE BELOW.
+! RGN 1/25/08 broke up IF statement to make sure Itrwave(Jpnt+j) does not exceed bounds.
+        DO WHILE ( j.LE.Numwaves )
           IF ( j.LT.Numwaves ) THEN
-            lcheck = (Ltrail(jpntm1+j).NE.0 .AND. Itrwave(Jpnt+j).GT.0)
-            IF ( lcheck ) THEN
-              DO WHILE ( lcheck )
+            IF ( Ltrail(Jpnt+j-1).NE.0 .AND. Itrwave(Jpnt+j).GT.0 ) THEN
+              DO WHILE ( Ltrail(Jpnt+j-1).NE.0 .AND. 
+     +                 Itrwave(Jpnt+j).GT.0)
                 kk = j + Itrwave(Jpnt+j)
-                IF ( j.GT.2 ) THEN
-                  IF ( ABS(Speed(jpntm2+j)-
-     +                 Speed(jpntm1+j)).GT.ZEROD15 ) THEN
-                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
-     +                            /(Speed(jpntm2+j)-Speed(jpntm1+j))
-                  ELSE
-                    CHECKTIME(j) = big
-                  END IF
+                IF ( j.GT.2 .AND. ABS(Speed(Jpnt+j-2)-Speed(Jpnt+j-1))
+     +              .GT.CLOSEZERO ) THEN
+                  checktime(j) = (Depth(Jpnt+j-1)-Depth(Jpnt+j-2))
+     +                     /(Speed(Jpnt+j-2)-Speed(Jpnt+j-1))
+                ELSE
+                  checktime(j) = big
                 END IF
                 IF ( Numwaves.GT.kk ) THEN
                   jj = j
                   j = j + Itrwave(Jpnt+j) + 1
-                  lcheck = (Ltrail(jpntm1+j).NE.0 .AND.
-     +                     Itrwave(Jpnt+j).GT.0)
 C
-C4------LEAD WAVE INTERSECTS A TRAIL WAVE.
+C4------LEAD WAVE INTERSECTING TRAIL WAVE.
                   fhold = 0.0D0
-                  IF ( ABS(Theta(jpntm1+jj)-Thetar).GT.ZEROD15 )
-     +                fhold = (f7*Theta(jpntm2+j)+f8*Theta(jpntm3+j)-
-     +                        Thetar)/(Theta(jpntm1+jj)-Thetar)
-                  fhold2 = (Speed(jpntm1+jj)
-     +                             *(fhold**eps_m1)-Speed(jpntm1+j))
-                  IF ( abs(fhold2).LT.ZEROD15 ) fhold2 = ZEROD15
-                    CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm1+jj)
-     +                             *(fhold**eps_m1))/fhold2
+                  IF ( ABS(Theta(Jpnt+jj-1)-Thetar).GT.CLOSEZERO )
+     +                 fhold = (f7*Theta(Jpnt+j-2)+f8*Theta(Jpnt+j-3)-
+     +                           Thetar)/(Theta(Jpnt+jj-1)-Thetar)
+                  IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
+                  checktime(j) = (Depth(Jpnt+j-1)-Depth(Jpnt+jj-1)
+     +                         *(fhold**eps_m1))/(Speed(Jpnt+jj-1)
+     +                         *(fhold**eps_m1)-Speed(Jpnt+j-1))
                 ELSE
                   j = j + 1
-                  lcheck = (Ltrail(jpntm1+j).NE.0 .AND.
-     +                     Itrwave(Jpnt+j).GT.0)
                 END IF
               END DO
-            ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
-     +                .AND. j.NE.1 ) THEN
-              CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
-     +                       /(Speed(jpntm2+j)-Speed(jpntm1+j))
+            ELSE IF ( ABS(Speed(Jpnt+j-2)-Speed(Jpnt+j-1)).GT.
+     +              CLOSEZERO .AND. j.NE.1 )THEN
+              checktime(j) = (Depth(Jpnt+j-1)-Depth(Jpnt+j-2))
+     +                     /(Speed(Jpnt+j-2)-Speed(Jpnt+j-1))
             ELSE
-              CHECKTIME(j) = big
+              checktime(j) = big
             END IF
-          ELSE IF ( ABS(Speed(jpntm2+j)-Speed(jpntm1+j)).GT.ZEROD15
-     +                .AND. j.NE.1 ) THEN
-            CHECKTIME(j) = (Depth(jpntm1+j)-Depth(jpntm2+j))
-     +                     /(Speed(jpntm2+j)-Speed(jpntm1+j))
+          ELSE IF ( ABS(Speed(Jpnt+j-2)-Speed(Jpnt+j-1)).GT.
+     +              CLOSEZERO .AND. j.NE.1 )THEN
+            checktime(j) = (Depth(Jpnt+j-1)-Depth(Jpnt+j-2))
+     +                     /(Speed(Jpnt+j-2)-Speed(Jpnt+j-1))
           ELSE
-            CHECKTIME(j) = big
-          END IF
+            checktime(j) = big
+          END IF          
           j = j + 1
         END DO
         DO j = 2, Numwaves
-          IF ( CHECKTIME(j).LT.ZEROD15 ) CHECKTIME(j) = big
+          IF ( checktime(j).LT.NEARZERO ) checktime(j) = big
         END DO
 C
 C5------CALCULATE HOW LONG IT WILL TAKE BEFORE DEEPEST WAVE REACHES
 C         WATER TABLE.
-        bottomtime = big
         IF ( Numwaves.GT.1 ) THEN
-Cdep 
-          IF ( Speed(jpntp1).GT.0.0D0 ) THEN
-            bottom = Speed(jpntp1)
-            IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
-            bottomtime = (Depth(Jpnt)-Depth(jpntp1))/bottom
-            IF ( bottomtime.LT.ZEROD15 ) bottomtime = ZEROD15
-          END IF
+          bottomtime = (Depth(Jpnt)-Depth(Jpnt+1))/Speed(Jpnt+1)
+          IF ( bottomtime.LE.0.0 ) bottomtime = 1.0D-12
+        ELSE
+          bottomtime = big
         END IF
-C
 C6------CALCULATE SHORTEST TIME FOR WAVE INTERCEPTION.
-        shortest = timedt
+        shortest = Deltinc - Time
         DO j = Numwaves, 3, -1
           IF ( CHECKTIME(j).LE.shortest ) THEN
             MORE(j) = 1
@@ -7501,69 +7459,71 @@ C6------CALCULATE SHORTEST TIME FOR WAVE INTERCEPTION.
         DO k = 3, Numwaves
           IF ( CHECKTIME(k)>shortest ) MORE(k) = 0
         END DO
-        IF ( Numwaves.EQ.2 ) shortest = timedt
+        IF ( Numwaves.EQ.2 ) shortest = Deltinc - Time
 C
-C7------CHECK IF DEEPEST WAVE REACHES WATER TABLE BEFORE WAVES
-C         INTERCEPT EACH OTHER.
+C7------CHECK IF DEEPEST WAVE REACHES WATER TABLE BEFORE WAVES 
+C          INTERCEPT EACH OTHER.
         iremove = 0
         timenew = Time
-        fcheck = (Time+shortest) - Delt
+        fcheck = (Time+shortest) - Deltinc
         IF ( shortest.LT.1.0E-7 ) fcheck = -1.0D0
-        IF ( bottomtime.LT.shortest .AND. Time+bottomtime.LE.Delt ) THEN
+        IF ( bottomtime.LT.shortest .AND.
+     +       Time+bottomtime.LE.Deltinc ) THEN
           j = 2
-          DO WHILE ( j.LT.nwavp1 )
+          DO WHILE ( j.LE.Numwaves )
 C
-C8--------ROUTE TRAILING WAVES.
-            IF ( Itrwave(jpntm1+j).EQ.0 ) THEN
-              Depth(jpntm1+j) = Depth(jpntm1+j) + Speed(jpntm1+j)
+C8------ROUTE TRAIL WAVES.
+            IF ( Itrwave(Jpnt+j-1).EQ.0 ) THEN
+              Depth(Jpnt+j-1) = Depth(Jpnt+j-1) + Speed(Jpnt+j-1)
      +                          *bottomtime
             ELSE
-              jjj = jpntm2 + j
-              DO k = j + jpntm1, j + Itrwave(jpntm1+j) - 1
-                bottom = Theta(jjj)-Thetar
-                IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
-                Depth(k) = Depth(jjj)*(((f7*Theta(k)
-     +                     +f8*Theta(k-1)-Thetar)
-     +                     /(bottom))**eps_m1)
+              DO k = j, j + Itrwave(Jpnt+j-1) - 1
+Cdep check to see if theta = thetar do not route?
+                IF(Theta(Jpnt+j-2)-Thetar.GT.CLOSEZERO) THEN
+                  Depth(Jpnt+k-1) = Depth(Jpnt+j-2)*((f7*Theta(Jpnt+k-1)
+     +                              +f8*Theta(Jpnt+k-2)-Thetar)
+     +                              /(Theta(Jpnt+j-2)-Thetar))**eps_m1
+                END IF
               END DO
-              j = j + Itrwave(jpntm1+j) - 1
+              j = j + Itrwave(Jpnt+j-1) - 1
             END IF
             j = j + 1
           END DO
-          FLUXB = Flux(jpntp1)
-          THETAB = Theta(jpntp1)
+          FLUXB = Flux(Jpnt+1)
+          THETAB = Theta(Jpnt+1)
           iflx = 1
           itrwaveb = Itrwave(Jpnt+2)
-          DO k = 2 + jpntm1, Numwaves
-            km1 = k - 1
-            Flux(km1) = Flux(k)
-            Theta(km1) = Theta(k)
-            Speed(km1) = Speed(k)
-            Depth(km1) = Depth(k)
-            Itrwave(km1) = Itrwave(k)
-            Ltrail(km1) = Ltrail(k)
+          DO k = 2, Numwaves
+            jpntpkm1 = Jpnt + k - 1
+            jpntpkm2 = jpntpkm1 - 1
+            Flux(jpntpkm2) = Flux(jpntpkm1)
+            Theta(jpntpkm2) = Theta(jpntpkm1)
+            Speed(jpntpkm2) = Speed(jpntpkm1)
+            Depth(jpntpkm2) = Depth(jpntpkm1)
+            Itrwave(jpntpkm2) = Itrwave(jpntpkm1)
+            Ltrail(jpntpkm2) = Ltrail(jpntpkm1)
           END DO
           IF ( itrwaveb.EQ.1 ) THEN
-            Itrwave(jpntp1) = 0
-            Ltrail(jpntp1) = 1
-            fhold = (Theta(jpntp1)-Thetar)*thsrinv
+            Itrwave(Jpnt+1) = 0
+            Ltrail(Jpnt+1) = 1
+            fhold = (Theta(Jpnt+1)-Thetar)/(Thetas-Thetar)
             IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-            Speed(jpntp1) = epsfksths * (fhold**eps_m1)
+            Speed(Jpnt+1) = (Eps*Fksat/(Thetas-Thetar))*fhold**eps_m1
 C
-C9------CONVERT TRAIL WAVES TO LEAD TRAIL WAVES.
+C9------MAKE ALL TRAIL WAVES LEAD TRAIL WAVES.
           ELSE IF ( itrwaveb.GT.1 ) THEN
-            DO k = jpntp1, Jpnt + itrwaveb
+            DO k = Jpnt + 1, Jpnt + itrwaveb
               Itrwave(k) = 0
               Ltrail(k) = 1
               IF ( ABS(Theta(k)-Theta(k-1)).LT.CLOSEZERO ) THEN
-                fhold = ((Theta(k)-Thetar)*thsrinv)**Eps
+                fhold = ((Theta(k)-Thetar)/(Thetas-Thetar))**Eps
                 IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                Speed(k) = epsfksths * (fhold**eps_m1)
+                Speed(k) = (Eps*Fksat/(Thetas-Thetar))*fhold**eps_m1
               ELSE
-                fhold = ((Theta(k-1)-Thetar)*thsrinv)**Eps
+                fhold = ((Theta(k-1)-Thetar)/(Thetas-Thetar))**Eps
                 IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                 ftheta1 = Fksat*fhold
-                fhold = ((Theta(k)-Thetar)*thsrinv)**Eps
+                fhold = ((Theta(k)-Thetar)/(Thetas-Thetar))**Eps
                 IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                 ftheta2 = Fksat*fhold
                 Speed(k) = (ftheta1-ftheta2)/(Theta(k-1)-Theta(k))
@@ -7578,183 +7538,180 @@ C
 C10-----CHECK IF WAVES INTERCEPT BEFORE TIME STEP ENDS.
         ELSE IF ( fcheck.LT.0.0 .AND. Numwaves.GT.2 ) THEN
           j = 2
-          DO WHILE ( j.LT.nwavp1 )
-            IF ( Itrwave(jpntm1+j).EQ.0 ) THEN
-              Depth(jpntm1+j) = Depth(jpntm1+j) + Speed(jpntm1+j)
+          DO WHILE ( j.LE.Numwaves )
+            IF ( Itrwave(Jpnt+j-1).EQ.0 ) THEN
+              Depth(Jpnt+j-1) = Depth(Jpnt+j-1) + Speed(Jpnt+j-1)
      +                          *shortest
             ELSE
 C
 C11-----ROUTE TRAIL WAVES.
-              jjj = jpntm2 + j
-              bottom = Theta(jjj)-Thetar
-              IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
-              ttt = 1.0D0/bottom
-              DO k = j+jpntm1, j + Itrwave(jpntm1+j) - 1
-                Depth(k) = Depth(jjj)*(((f7*Theta(k)
-     +                     +f8*Theta(k-1)-Thetar)*ttt)**eps_m1)
+              DO k = j, j + Itrwave(Jpnt+j-1) - 1
+Cdep check to see if theta = thetar do not route?
+                IF(Theta(Jpnt+j-2)-Thetar.GT.CLOSEZERO) THEN
+                  Depth(Jpnt+k-1) = Depth(Jpnt+j-2)*((f7*Theta(Jpnt+k-1)
+     +                              +f8*Theta(Jpnt+k-2)-Thetar)
+     +                              /(Theta(Jpnt+j-2)-Thetar))**eps_m1
+                END IF
               END DO
-              j = j + Itrwave(jpntm1+j) - 1
+              j = j + Itrwave(Jpnt+j-1) - 1
             END IF
             j = j + 1
           END DO
 C
-C12-----REMOVE WAVES THAT HAVE BEEN INTERCEPTED AND UPDATE SPEED
-C         OF COMBINED WAVE.
+C12-----REMOVE WAVES THAT HAVE BEEN INTERCEPTED AND COMPUTE SPEED OF
+C         COMBINED WAVE.
           j = 3
           l = j
           iflag = 0
-          DO WHILE ( iflag.EQ.0 )          
-            IF ( MORE(j).EQ.1 ) THEN
+          DO WHILE ( iflag.EQ.0 )
+            IF ( more(j).EQ.1 ) THEN
               l = j
-C
-C13-----CHECK IF INTERCEPTED WAVES ARE TRAIL WAVES. 
-              IF ( Ltrail(jpntm1+j).NE.1 ) THEN
+              IF ( Ltrail(Jpnt+j-1).NE.1 ) THEN
                 iflag2 = 0
                 k = j - 1
                 idif = 0
                 DO WHILE ( iflag2.EQ.0 )
-                  IF ( Itrwave(jpntm1+k).GT.0 ) THEN
+                  IF ( Itrwave(Jpnt+k-1).GT.0 ) THEN
                     iflag2 = 1
                     idif = j - k
-                    IF ( idif.EQ.Itrwave(jpntm1+k) )
-     +                   Itrwave(jpntm1+k) = Itrwave(jpntm1+k) - 1
+                    IF ( idif.EQ.Itrwave(Jpnt+k-1) )
+     +                   Itrwave(Jpnt+k-1) = Itrwave(Jpnt+k-1) - 1
                   ELSE
                     k = k - 1
                     IF ( k.EQ.0 ) iflag2 = 1
                   END IF
                 END DO
                 IF ( j.EQ.3 ) THEN
-                  comp1 = ABS(Theta(jpntm1+j)-THETAB)
-                  comp2 = ABS(Flux(jpntm1+j)-FLUXB)
-                  IF ( comp1.LT.ZEROD9 )
-     +                 Theta(jpntm1+j) = THETAB - ZEROD9
-                  IF ( comp2.LT.CLOSEZERO )
-     +                 Flux(jpntm1+j) = FLUXB - ZEROD15
-                  Speed(jpntm1+j) = (Flux(jpntm1+j)-FLUXB)
-     +                              /(Theta(jpntm1+j)-THETAB)
+                  comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
+                  comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
+                  IF ( comp1.LE.1.E-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                  IF ( comp2.LE.1.E-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                  Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
+     +                              /(Theta(Jpnt+j-1)-THETAB)
                 ELSE
-                  comp1 = ABS(Theta(jpntm1+j)-Theta(jpntm3+j))
-                  comp2 = ABS(Flux(jpntm1+j)-Flux(jpntm3+j))
-                  IF ( comp1.LT.ZEROD9 ) Theta(jpntm1+j)
-     +                 = Theta(jpntm3+j) - ZEROD9
-                  IF ( comp2.LT.CLOSEZERO ) Flux(jpntm1+j)
-     +                 = Flux(jpntm3+j) - ZEROD15
-                  Speed(jpntm1+j) = (Flux(jpntm1+j)-Flux(jpntm3+j))/
-     +                              (Theta(jpntm1+j)-Theta(jpntm3+j))
+                  comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
+                  comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
+                  IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
+     +                 = Theta(Jpnt+j-3) - 1.0D-9
+                  IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
+     +                 = Flux(Jpnt+j-3) - 1.0D-15
+                  Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-Flux(Jpnt+j-3))/
+     +                              (Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                 END IF
-C
-C14-----CONVERT REMAINING TRAIL WAVES TO LEAD TRAIL WAVES WHEN
-C         WHEN LEAD TRAIL WAVE INTERSECTS A LEAD WAVE.                
               ELSE IF ( Itrwave(Jpnt+j).GT.0 ) THEN
-                IF ( ABS(Speed(jpntm2+j)).GT.CLOSEZERO ) THEN
-                  DO k = Jpnt + j, jpntm1 + j + Itrwave(Jpnt+j)
+                IF ( ABS(Speed(Jpnt+j-2)).GT.CLOSEZERO ) THEN
+C
+C13-----CONVERT TRAIL WAVES TO LEAD TRAIL WAVES WHEN LEAD TRAIL 
+C         WAVE INTERSECTS A LEAD WAVE.
+                  DO k = Jpnt + j, Jpnt + j + Itrwave(Jpnt+j) - 1
                     Ltrail(k) = 1
                     Itrwave(k) = 0
                     IF ( ABS(Theta(k)-Theta(k-1)).LT.CLOSEZERO ) THEN
-                      fhold = ((Theta(k)-Thetar)*thsrinv)**Eps
+                      fhold = ((Theta(k)-Thetar)/(Thetas-Thetar))**Eps
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                      Speed(k) = epsfksths * (fhold**eps_m1)
+                      Speed(k) = (Eps*Fksat/(Thetas-Thetar))*fhold
+     +                           **eps_m1
                     ELSE
-                      fhold = ((Theta(k-1)-Thetar)*thsrinv)**Eps
+                      fhold = ((Theta(k-1)-Thetar)/(Thetas-Thetar))**Eps
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                       ftheta1 = Fksat*fhold
-                      fhold = ((Theta(k)-Thetar)*thsrinv)**Eps
+                      fhold = ((Theta(k)-Thetar)/(Thetas-Thetar))**Eps
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
                       ftheta2 = Fksat*fhold
                       Speed(k) = (ftheta1-ftheta2)/(Theta(k-1)-Theta(k))
                     END IF
                   END DO
-                  Ltrail(jpntm1+j) = 0                 
+                  Ltrail(Jpnt+j-1) = 0
                   IF ( j.EQ.3 ) THEN
-                    comp1 = ABS(Theta(jpntm1+j)-THETAB)
-                    comp2 = ABS(Flux(jpntm1+j)-FLUXB)
-                    IF ( comp1.LT.ZEROD9 )
-     +                  Theta(jpntm1+j) = THETAB - ZEROD9
-                    IF ( comp2.LT.CLOSEZERO )
-     +                   Flux(jpntm1+j) = FLUXB - ZEROD15
-                    Speed(jpntm1+j) = (Flux(jpntm1+j)-FLUXB)
-     +                                /(Theta(jpntm1+j)-THETAB)
-                    IF ( Flux(jpntm1+j)-FLUXB.LT.0.0D0 ) THEN
-                      fhold = (Theta(jpntm1+j)-Thetar)*thsrinv
+C
+C14-----RECALCULATE FLUX.
+                    comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
+                    comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
+                    IF (comp1.LE.1.E-9) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                    IF (comp2.LE.1.E-15) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                    Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
+     +                                /(Theta(Jpnt+j-1)-THETAB)
+                    IF ( Flux(Jpnt+j-1)-FLUXB.LT.0.0D0 ) THEN
+                      fhold = (Theta(Jpnt+j-1)-Thetar)/(Thetas-Thetar)
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                      Speed(jpntm1+j) = epsfksths * (fhold**eps_m1)
-                      Ltrail(jpntm1+j) = 1
+                      Speed(Jpnt+j-1) = ((Eps*Fksat)/(Thetas-Thetar))
+     +                                  *fhold**eps_m1
+                      Ltrail(Jpnt+j-1) = 1
                     ELSE
-                      Speed(jpntm1+j) = (Flux(jpntm1+j)-FLUXB)
-     +                                  /(Theta(jpntm1+j)-THETAB)
+                      Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
+     +                                  /(Theta(Jpnt+j-1)-THETAB)
                     END IF
+
                   ELSE
-                    comp1 = ABS(Theta(jpntm1+j)-Theta(jpntm3+j))
-                    comp2 = ABS(Flux(jpntm1+j)-Flux(jpntm3+j))
-                    IF ( comp1.LT.ZEROD9 ) Theta(jpntm1+j)
-     +                   = Theta(jpntm3+j) - ZEROD9
-                    IF ( comp2.LT.CLOSEZERO ) Flux(jpntm1+j)
-     +                   = Flux(jpntm3+j) - ZEROD15
-                    IF ( Flux(jpntm1+j)-Flux(jpntm3+j).LT.
-     +                                                CLOSEZERO ) THEN
-                      fhold = (Theta(jpntm1+j)-Thetar)*thsrinv
+                    comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
+                    comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
+                    IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
+     +                   = Theta(Jpnt+j-3) - 1.0D-9
+                    IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
+     +                   = Flux(Jpnt+j-3) - 1.0D-15
+                    IF ( Flux(Jpnt+j-1)-Flux(Jpnt+j-3).LT.0.0D0 ) THEN
+                      fhold = (Theta(Jpnt+j-1)-Thetar)/(Thetas-Thetar)
                       IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                      Speed(jpntm1+j) = epsfksths * (fhold**eps_m1)
-                      Ltrail(jpntm1+j) = 1
+                      Speed(Jpnt+j-1) = ((Eps*Fksat)/(Thetas-Thetar))
+     +                                  *fhold**eps_m1
+                      Ltrail(Jpnt+j-1) = 1
                     ELSE
-                      Speed(jpntm1+j) = (Flux(jpntm1+j)-Flux(jpntm3+j))
-     +                                /(Theta(jpntm1+j)-Theta(jpntm3+j))
+                      Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
+     +                                /(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                     END IF
+
                   END IF
                 END IF
                 iflag2 = 0
                 k = j - 1
                 idif = 0
                 DO WHILE ( iflag2.EQ.0 )
-                  IF ( Itrwave(jpntm1+k).GT.0 ) THEN
+                  IF ( Itrwave(Jpnt+k-1).GT.0 ) THEN
                     iflag2 = 1
                     idif = j - k
-                    IF ( idif.EQ.Itrwave(jpntm1+k) )
-     +                   Itrwave(jpntm1+k) = Itrwave(jpntm1+k) - 1
+                    IF ( idif.EQ.Itrwave(Jpnt+k-1) )
+     +                   Itrwave(Jpnt+k-1) = Itrwave(Jpnt+k-1) - 1
                   ELSE
                     k = k - 1
                     IF ( k.EQ.0 ) iflag2 = 1
                   END IF
                 END DO
-                j = j + Itrwave(jpntp1+j) + 2
-C
-C15-----NON TRAIL WAVES INTERCEPTS A NON TRAIL WAVE. 
+                j = j + Itrwave(Jpnt+j+1) + 2
               ELSE
-                Ltrail(jpntm1+j) = 0
+                Ltrail(Jpnt+j-1) = 0
                 Itrwave(Jpnt+j) = 0
                 IF ( j.EQ.3 ) THEN
-                  comp1 = ABS(Theta(jpntm1+j)-THETAB)
-                  comp2 = ABS(Flux(jpntm1+j)-FLUXB)
-                  IF ( comp1.LT.ZEROD9 )
-     +                 Theta(jpntm1+j) = THETAB - ZEROD9
-                  IF ( comp2.LT.CLOSEZERO )
-     +                 Flux(jpntm1+j) = FLUXB - ZEROD15
-                  Speed(jpntm1+j) = (Flux(jpntm1+j)-FLUXB)
-     +                              /(Theta(jpntm1+j)-THETAB)
+                  comp1 = ABS(Theta(Jpnt+j-1)-THETAB)
+                  comp2 = ABS(Flux(Jpnt+j-1)-FLUXB)
+                  IF ( comp1.LE.1.E-9 ) Theta(Jpnt+j-1) = THETAB - 1.D-9
+                  IF ( comp2.LE.1.E-15 ) Flux(Jpnt+j-1) = FLUXB - 1.D-15
+                  Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-FLUXB)
+     +                              /(Theta(Jpnt+j-1)-THETAB)
                 ELSE
-                  comp1 = ABS(Theta(jpntm1+j)-Theta(jpntm3+j))
-                  comp2 = ABS(Flux(jpntm1+j)-Flux(jpntm3+j))
-                  IF ( comp1.LT.ZEROD9 ) Theta(jpntm1+j)
-     +                 = Theta(jpntm3+j) - ZEROD9
-                  IF ( comp2.LT.CLOSEZERO ) Flux(jpntm1+j)
-     +                 = Flux(jpntm3+j) - ZEROD15
-                  Speed(jpntm1+j) = (Flux(jpntm1+j)-Flux(jpntm3+j))/
-     +                              (Theta(jpntm1+j)-Theta(jpntm3+j))
+                  comp1 = ABS(Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
+                  comp2 = ABS(Flux(Jpnt+j-1)-Flux(Jpnt+j-3))
+                  IF ( comp1.LT.1.0E-9 ) Theta(Jpnt+j-1)
+     +                 = Theta(Jpnt+j-3) - 1.0D-9
+                  IF ( comp2.LT.1.0E-15 ) Flux(Jpnt+j-1)
+     +                 = Flux(Jpnt+j-3) - 1.0D-15
+                  Speed(Jpnt+j-1) = (Flux(Jpnt+j-1)-Flux(Jpnt+j-3))/
+     +                              (Theta(Jpnt+j-1)-Theta(Jpnt+j-3))
                 END IF
                 iflag2 = 0
                 k = j - 1
                 idif = 0
                 DO WHILE ( iflag2.EQ.0 )
-                  IF ( Itrwave(jpntm1+k).GT.0 ) THEN
+                  IF ( Itrwave(Jpnt+k-1).GT.0 ) THEN
                     iflag2 = 1
                     idif = j - k
-                    IF ( idif.EQ.Itrwave(jpntm1+k) ) THEN
-                      Itrwave(jpntm1+k) = Itrwave(jpntm1+k) - 1
-                      IF ( Theta(jpntm1+j).LE.Theta(jpntm3+j) ) THEN
-                        Ltrail(jpntm1+j) = 1
-                        fhold = (Theta(jpntm1+j)-Thetar)*thsrinv
+                    IF ( idif.EQ.Itrwave(Jpnt+k-1) ) THEN
+                      Itrwave(Jpnt+k-1) = Itrwave(Jpnt+k-1) - 1
+                      IF ( Theta(Jpnt+j-1).LE.Theta(Jpnt+j-3) ) THEN
+                        Ltrail(Jpnt+j-1) = 1
+                        fhold = (Theta(Jpnt+j-1)-Thetar)/(Thetas-Thetar)
                         IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-                        Speed(jpntm1+j) = epsfksths * (fhold**eps_m1)
+                        Speed(Jpnt+j-1) = ((Eps*Fksat)/(Thetas-Thetar))
+     +                                    *fhold**eps_m1
                       END IF
                     END IF
                   ELSE
@@ -7763,123 +7720,107 @@ C15-----NON TRAIL WAVES INTERCEPTS A NON TRAIL WAVE.
                   END IF
                 END DO
               END IF
-C
-C16-----UPDATE WAVES.
-              DO k = l + jpntm1, Numwaves
-                km1 = k - 1
-                Flux(km1) = Flux(k)
-                Theta(km1) = Theta(k)
-                Speed(km1) = Speed(k)
-                Depth(km1) = Depth(k)
-                Itrwave(km1) = Itrwave(k)
-                Ltrail(km1) = Ltrail(k)
+              DO k = l, Numwaves
+                jpntpkm1 = Jpnt + k - 1
+                jpntpkm2 = jpntpkm1 - 1
+                Flux(jpntpkm2) = Flux(jpntpkm1)
+                Theta(jpntpkm2) = Theta(jpntpkm1)
+                Speed(jpntpkm2) = Speed(jpntpkm1)
+                Depth(jpntpkm2) = Depth(jpntpkm1)
+                Itrwave(jpntpkm2) = Itrwave(jpntpkm1)
+                Ltrail(jpntpkm2) = Ltrail(jpntpkm1)
               END DO
               l = Numwaves + 1
               iremove = iremove + 1
-            ELSE IF ( Itrwave(jpntm1+j).GT.0 ) THEN
-              j = j + Itrwave(jpntm1+j) - 1
+            ELSE IF ( Itrwave(Jpnt+j-1).GT.0 ) THEN
+              j = j + Itrwave(Jpnt+j-1) - 1
             END IF
             j = j + 1
             IF ( j.GT.Numwaves ) iflag = 1
           END DO
           timenew = timenew + shortest
 C
-C17-----CALCULATE TOTAL FLUX TO WATER TABLE FOR CONSTANT FLUX
-C         DURING REMAINING TIME.
+C15-----CALCULATE TOTAL FLUX TO WATER TABLE DURING REMAINING TIME IN
+C         STEP.
         ELSE
           j = 2
-          DO WHILE ( j.LT.nwavp1 )
-            IF ( Itrwave(jpntm1+j).EQ.0 ) THEN
-              Depth(jpntm1+j) = Depth(jpntm1+j) + Speed(jpntm1+j)
-     +                          *timedt
+          DO WHILE ( j.LE.Numwaves )
+            IF ( Itrwave(Jpnt+j-1).EQ.0 ) THEN
+              Depth(Jpnt+j-1) = Depth(Jpnt+j-1) + Speed(Jpnt+j-1)
+     +                          *(Deltinc-Time)
             ELSE
 C
-C18-----ROUTE TRAILING WAVES.
-              jjj = jpntm2 + j
-              bottom = Theta(jjj)-Thetar
-              IF ( bottom.LT.ZEROD15 ) bottom = ZEROD15
-              ttt = 1.0D0/bottom
-              DO k = j+jpntm1, j + Itrwave(jpntm1+j) - 1
-                Depth(k) = Depth(jjj)*(((f7*Theta(k)
-     +                     +f8*Theta(k-1)-Thetar)*ttt)**eps_m1)
+C16-----ROUTE TRAIL WAVES.
+              DO k = j, j + Itrwave(Jpnt+j-1) - 1
+Cdep check to see if theta = thetar do not route?
+                IF(Theta(Jpnt+j-2)-Thetar.GT.CLOSEZERO) THEN
+                  Depth(Jpnt+k-1) = Depth(Jpnt+j-2)*((f7*Theta(Jpnt+k-1)
+     +                              +f8*Theta(Jpnt+k-2)-Thetar)
+     +                              /(Theta(Jpnt+j-2)-Thetar))**eps_m1
+                END IF
               END DO
-              j = j + Itrwave(jpntm1+j) - 1
+              j = j + Itrwave(Jpnt+j-1) - 1
             END IF
             j = j + 1
           END DO
-          timenew = Delt
+          timenew = Deltinc
         END IF
         Totalflux = Totalflux + FLUXHLD2*(timenew-Time)
         IF ( iflx.EQ.1 ) THEN
           FLUXHLD2 = Flux(Jpnt)
           iflx = 0
         END IF
-C
-C19-------REMOVE WAVES THAT WERE INTERCEPTED OR REACHED WATER TABLE.
+C17-----REMOVE ARRAY ELEMENTS RESULTING FROM INTERCEPTED WAVES.
         Numwaves = Numwaves - iremove
         Time = timenew
-        diff = Delt - Time
-        IF ( Numwaves.EQ.1 ) THEN
-          Itester = 1
-          EXIT
-        END IF
+        diff = Deltinc - Time
+        IF ( Numwaves.EQ.1 ) Itester = 1
       END DO
-      END IF
-C
-C20-----RETURN.
+C18-----RETURN.
       RETURN
       END SUBROUTINE LEADWAVE
 C
-C--------SUBROUTINE TRAILWAVE
-C
+C-------SUBROUTINE TRAILWAVE
       SUBROUTINE TRAILWAVE(Numwaves, I, Flux, Theta, Speed, Depth, 
-     +                      Itrwave, Ltrail, Fksat, Eps, Thetas, Thetar,
-     +                      Surflux, Jpnt)
-      USE GWFSFRMODULE, ONLY: NSTOTRL, NSTRAIL, NEARZERO, THETAB, FLUXB,
-     +                        FLUXHLD2, ZEROD6, NSFRSETS
-      USE GLOBAL, ONLY: IOUT
+     +                     Itrwave, Ltrail, Fksat, Eps, Thetas, Thetar, 
+     +                     Surflux, Jpnt)
 C     ******************************************************************
-C     INITIALIZE NEW SET OF TRAIL WAVES WHEN SURFACE FLUX DECREASES
+C     INITIALIZE A NEW SET OF TRAIL WAVES WHEN SURFACE FLUX DECREASES.
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
-C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
+      USE GWFSFRMODULE, ONLY: NSTOTRL, NSTRAIL, NSFRSETS, NEARZERO,
+     +                        FLUXHLD2, FLUXB, THETAB
+      USE GLOBAL,       ONLY: IOUT
       IMPLICIT NONE
+      INTRINSIC FLOAT
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
 C     ARGUMENTS
 C     ------------------------------------------------------------------
       REAL Fksat
-      INTEGER I, Jpnt, Numwaves, Itrwave(NSTOTRL), Ltrail(NSTOTRL)
-      DOUBLE PRECISION Depth(NSTOTRL), Theta(NSTOTRL), Flux(NSTOTRL), 
-     +                 Speed(NSTOTRL)
-      DOUBLE PRECISION Surflux, Thetar, Eps, Thetas
+      INTEGER Numwaves, I, Jpnt, Itrwave(NSTOTRL), Ltrail(NSTOTRL)
+      DOUBLE PRECISION Speed(NSTOTRL), Flux(NSTOTRL), Depth(NSTOTRL), 
+     +                 Theta(NSTOTRL), Surflux, Thetar, Thetas, Eps
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION smoist, smoistinc, ftrail, fhold, eps_m1, feps3
-      DOUBLE PRECISION thsrinv, epsfksths
+      DOUBLE PRECISION smoist, smoistinc, ftrail, fhold, eps_m1
       REAL fnuminc
       INTEGER j, jj, jk, kk, numtrail2, jpnwavesm1, jpnwavesm2, jpntpjm1
-      INTEGER jpntm1, jpntm2
 C     ------------------------------------------------------------------
-      eps_m1 = DBLE(Eps) - 1.0D0
+      eps_m1 = Eps - 1.0D0
       THETAB = Theta(Jpnt)
       FLUXB = Flux(Jpnt)
       numtrail2 = NSTRAIL
-      jpntm1 = Jpnt - 1
-      jpntm2 = Jpnt - 2
-      jpnwavesm1 = jpntm1 + Numwaves
+      jpnwavesm1 = Jpnt + Numwaves - 1
       jpnwavesm2 = jpnwavesm1 - 1
-      feps3 = ZEROD6
-      thsrinv = 1.0/(Thetas-Thetar)
-      epsfksths = Eps*Fksat*thsrinv
-C1------INITIALIZE TRAILING WAVES.
+C1------INITIALIZE TRAIL WAVES WHEN SURFACE FLUX DECREASES.
       kk = 1
       FLUXHLD2 = Flux(Jpnt)
       IF ( Surflux.LT.NEARZERO ) Surflux = 0.0D0
-      smoist = (((Surflux/Fksat)**(1.0/Eps))*(Thetas-Thetar)) + Thetar
-      IF ( Theta(jpnwavesm2)-smoist.GT.feps3 ) THEN
+      smoist = (((Surflux/Fksat)**(1.0D0/Eps))*(Thetas-Thetar)) + Thetar
+      IF ( Theta(jpnwavesm2)-smoist.GT.1.0D-6 ) THEN
         fnuminc = 0.0
         DO jk = 1, NSTRAIL
           fnuminc = fnuminc + FLOAT(jk)
@@ -7888,31 +7829,32 @@ C1------INITIALIZE TRAILING WAVES.
         jj = NSTRAIL
         ftrail = NSTRAIL + 1
         DO j = Numwaves, Numwaves + numtrail2 - 1
-          IF ( j.GT.NSFRSETS*NSTRAIL ) THEN
+          IF ( j.GT.NSTOTRL ) THEN
             WRITE (*, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves, 
-     +                   '   PROGRAM TERMINATED IN TRAILWAVE SFR - 2'
+     +                   '   PROGRAM TERMINATED IN TRAILWAVE SFR2'
             WRITE (IOUT, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves,
-     +            '   PROGRAM TERMINATED IN UZSFR-2; INCREASE NSFRSETS'
+     +      '   PROGRAM TERMINATED IN TRAILWAVE SFR2; INCREASE NSFRSETS'
             STOP
           END IF
-          jpntpjm1 = jpntm1 + j
+          jpntpjm1 = Jpnt + j - 1
           Ltrail(jpntpjm1) = 0
           Itrwave(jpntpjm1) = 0
           IF ( j.GT.Numwaves ) THEN
-            Theta(jpntpjm1) = Theta(jpntm2+j)
+            Theta(jpntpjm1) = Theta(Jpnt+j-2)
      +                        - ((ftrail-FLOAT(jj))*smoistinc)
           ELSE
-            Theta(jpntpjm1) = Theta(jpntm2+j) - feps3
+            Theta(jpntpjm1) = Theta(Jpnt+j-2) - 1.0D-8
           END IF
           jj = jj - 1
-          IF ( Theta(jpntpjm1).LE.Thetar+feps3 ) Theta(jpntpjm1)
-     +         = Thetar + feps3
-          Flux(jpntpjm1) = Fksat*(((Theta(jpntpjm1)-Thetar)
-     +                     *thsrinv)**Eps)
+          IF ( Theta(jpntpjm1).LE.Thetar+1.0D-6 ) Theta(jpntpjm1)
+     +         = Thetar + 1.0D-6
+          Flux(jpntpjm1) = Fksat*((Theta(jpntpjm1)-Thetar)
+     +                     /(Thetas-Thetar))**Eps
           IF ( j.EQ.Numwaves ) THEN
-            fhold = (Theta(jpntpjm1)-Thetar)*thsrinv
+            fhold = (Theta(jpntpjm1)-Thetar)/(Thetas-Thetar)
             IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-            Speed(jpntpjm1) = epsfksths * (fhold**eps_m1)
+            Speed(jpntpjm1) = ((Eps*Fksat)/(Thetas-Thetar))*fhold
+     +                        **eps_m1
           ELSE
             Speed(jpntpjm1) = 0.0D0
           END IF
@@ -7922,30 +7864,28 @@ C1------INITIALIZE TRAILING WAVES.
         Itrwave(Jpnt+Numwaves) = numtrail2 - 1
         Ltrail(jpnwavesm1) = 1
         Numwaves = Numwaves + numtrail2 - 1
-        IF ( Numwaves.GE.NSFRSETS*NSTRAIL ) THEN
-          WRITE (*, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves, 
-     +                 '   PROGRAM TERMINATED IN UZSFR-4'
-          WRITE (IOUT, *) 'TOO MANY WAVES IN UNSAT CELL', I, Numwaves, 
-     +            '   PROGRAM TERMINATED IN UZSFR-4; INCREASE NSFRSETS'
-          STOP
+        IF ( Numwaves.GT.NSFRSETS*NSTRAIL ) THEN
+            WRITE (*, *) 'TOO MANY WAVES IN STREAM CELL', I, Numwaves, 
+     +                   '   PROGRAM TERMINATED IN UZFLOW-4'
+            WRITE (IOUT, *)'TOO MANY WAVES IN STREAM CELL', I, Numwaves,
+     +            '   PROGRAM TERMINATED IN UZFLOW-4; INCREASE NSFRSETS'
+            STOP
         END IF
       ELSE
-        Ltrail(jpnwavesm1) = 1
         Itrwave(jpnwavesm1) = 0
+        Ltrail(jpnwavesm1) = 1
         Theta(jpnwavesm1) = Theta(jpnwavesm2)
+        fhold = (Theta(jpnwavesm1)-Thetar)/(Thetas-Thetar)
         Depth(jpnwavesm1) = 0.0D0
-        fhold = (Theta(jpnwavesm1)-Thetar)*thsrinv
         IF ( fhold.LT.NEARZERO ) fhold = 0.0D0
-        Speed(jpnwavesm1) = epsfksths * (fhold**eps_m1)
-        Flux(jpnwavesm1) = Fksat*(((Theta(jpnwavesm1)-Thetar)
-     +                     *thsrinv)**Eps)
-        Theta(jpnwavesm1) = smoist
+        Speed(jpnwavesm1) = ((Eps*Fksat)/(Thetas-Thetar))*fhold**eps_m1
+        Flux(jpnwavesm1) = Fksat*((Theta(jpnwavesm1)-Thetar)
+     +                     /(Thetas-Thetar))**Eps
       END IF
 C
 C2------RETURN.
       RETURN
       END SUBROUTINE TRAILWAVE
-
 C
 C-------SUBROUTINE CHANNELAREA
       SUBROUTINE CHANNELAREA(Istsg, L)
@@ -8692,9 +8632,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFSFRDAT(IGRID)%Nfoldflbt)
       DEALLOCATE (GWFSFRDAT(IGRID)%NUMTAB)
       DEALLOCATE (GWFSFRDAT(IGRID)%MAXVAL)
-      DEALLOCATE (GWFSFRDAT(IGRID)%CHECKTIME)
-      DEALLOCATE (GWFSFRDAT(IGRID)%MORE)
-C
 C
       END SUBROUTINE GWF2SFR7DA
 C
@@ -8810,8 +8747,6 @@ C     ------------------------------------------------------------------
       Nfoldflbt=>GWFSFRDAT(IGRID)%Nfoldflbt
       NUMTAB=>GWFSFRDAT(IGRID)%NUMTAB
       MAXVAL=>GWFSFRDAT(IGRID)%MAXVAL
-      CHECKTIME=>GWFSFRDAT(IGRID)%CHECKTIME
-      MORE=>GWFSFRDAT(IGRID)%MORE
       END SUBROUTINE SGWF2SFR7PNT
 C
 C-------SUBROUTINE SGWF2SFR7PSV
@@ -8926,7 +8861,5 @@ C     ------------------------------------------------------------------
       GWFSFRDAT(IGRID)%Nfoldflbt=>Nfoldflbt
       GWFSFRDAT(IGRID)%NUMTAB=>NUMTAB
       GWFSFRDAT(IGRID)%MAXVAL=>MAXVAL
-      GWFSFRDAT(IGRID)%CHECKTIME=>CHECKTIME
-      GWFSFRDAT(IGRID)%MORE=>MORE
 C
       END SUBROUTINE SGWF2SFR7PSV

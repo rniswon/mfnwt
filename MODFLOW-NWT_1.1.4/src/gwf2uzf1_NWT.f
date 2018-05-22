@@ -1835,7 +1835,7 @@ C       FOR BEGINNING OF EACH TIME STEP
               il = ILL
               DO WHILE ( ill > 0 )
                 S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
-                S2 = ZEROD15
+!                S2 = ZEROD15
                 IF ( ill < NLAY) S2 = HNEW(ic, ir, ill+1) -
      +                                BOTM(ic, ir, ill )  
                  
