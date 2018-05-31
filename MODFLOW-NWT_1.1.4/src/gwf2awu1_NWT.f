@@ -2116,7 +2116,7 @@ C
 !      demandgw_prms = doneneg*QONLY(L)
 !      end function demandgw_prms
 C
-      subroutine timeseries(Kkper, Kkstp, Kkiter,numwells)
+      subroutine timeseries_well(Kkper, Kkstp, Kkiter,numwells)
 !     ******************************************************************
 !     timeseries---- write AWU water use time series for SW and GW
 !     ******************************************************************
@@ -2149,7 +2149,7 @@ C
         END IF
       END DO
       return
-      end subroutine timeseries
+      end subroutine timeseries_well
 !
 !      subroutine UZFIRRDEMANDSET()
 !!     ******************************************************************
