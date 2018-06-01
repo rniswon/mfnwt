@@ -201,8 +201,8 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
      2                                     NSOL,IOUTS,IUNIT(55),IGRID)
       IF(IUNIT(43).GT.0 .AND. IUNIT(44).GT.0)
      1                     CALL GWF2HYD7SFR7RP(IUNIT(43),KKPER,IGRID)
-        IF(IUNIT(55).GT.0) CALL GWF2UZF1RP(IUNIT(55),KKPER,IUNIT(44),
-     1                                     IGRID)
+        IF(IUNIT(55).GT.0) CALL GWF2UZF1RP(IUNIT(55),KKPER,KKSTP,
+     1                                     IUNIT(44),IGRID)
         IF(IUNIT(22).GT.0) CALL GWF2LAK7RP(IUNIT(22),IUNIT(1),
      1               IUNIT(15),IUNIT(23),IUNIT(37),IUNIT(44),IUNIT(55),
      2               IUNIT(62),KKPER,NSOL,IOUTS,IGRID)
@@ -238,6 +238,8 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
           IF(IUNIT(16).GT.0) CALL GWF2FHB7AD(IGRID)
           IF(IUNIT(22).GT.0) CALL GWF2LAK7AD(KKPER,KKSTP,IUNIT(15),
      1                                           IGRID)
+          IF(IUNIT(55).GT.0) CALL GWF2UZF1AD(IUNIT(55), KKPER, KKSTP, 
+     1                                       Igrid)
           IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
           IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
      1                                    kkstp,kkper,IGRID)  !rgn 6/12/12
