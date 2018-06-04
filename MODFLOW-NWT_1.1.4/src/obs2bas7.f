@@ -1,6 +1,10 @@
       MODULE OBSBASMODULE
          INTEGER, SAVE,POINTER ::ITS,NH,MAXM,MOBS,IUHOBSV,IDRY,JDRY
+<<<<<<< .merge_file_a04848
          INTEGER, SAVE,POINTER ::IPRT
+=======
+         INTEGER, SAVE,POINTER ::IPRT, OBSTART
+>>>>>>> .merge_file_a02872
          REAL,    SAVE,POINTER ::HOBDRY
          INTEGER, SAVE, DIMENSION(:,:), POINTER ::NDER
          INTEGER, SAVE, DIMENSION(:,:), POINTER ::MLAY
@@ -18,7 +22,11 @@
          CHARACTER*12,SAVE,DIMENSION(:),POINTER ::OBSNAM
        TYPE OBSBASTYPE
          INTEGER,  POINTER    ::ITS,NH,MAXM,MOBS,IUHOBSV,IDRY,JDRY
+<<<<<<< .merge_file_a04848
          INTEGER,  POINTER    ::IPRT
+=======
+         INTEGER,  POINTER    ::IPRT, OBSTART
+>>>>>>> .merge_file_a02872
          REAL,     POINTER    ::HOBDRY
          INTEGER,  DIMENSION(:,:), POINTER ::NDER
          INTEGER,  DIMENSION(:,:), POINTER ::MLAY
@@ -65,6 +73,10 @@ C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL, ONLY: NCOL,NROW,NLAY,DELR,DELC,
      1                  NPER,NSTP,PERLEN,TSMULT,ISSFLG,IOUT,ITRSS
+<<<<<<< .merge_file_a04848
+=======
+!      USE GSFMODFLOW, ONLY : Modflow_skip_time_step
+>>>>>>> .merge_file_a02872
       USE OBSBASMODULE
 C
       CHARACTER*200 LINE
@@ -72,8 +84,14 @@ C     ------------------------------------------------------------------
 C
 C1------ALLOCATE AND INITIALIZE TIME STEP COUNTER FOR USE BY ANY
 C1------OBSERVATION PACKAGE.
+<<<<<<< .merge_file_a04848
       ALLOCATE(ITS)
       ITS=0
+=======
+      ALLOCATE(ITS,OBSTART)
+      ITS=0.0   
+      OBSTART = 0
+>>>>>>> .merge_file_a02872
       IF(IUHDOB.LE.0) GO TO 700
 C
 C2------ALLOCATE OTHER SCALARS IF HEAD OBSERVATIONS ARE BEING SPECIFIED.
