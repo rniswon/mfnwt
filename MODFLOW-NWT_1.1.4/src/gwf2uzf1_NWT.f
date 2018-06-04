@@ -1526,11 +1526,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
 C
-<<<<<<< HEAD
-         IF ( NUZTOP.EQ.4 ) CALL SETLAY()
-=======
         IF ( NUZTOP.EQ.4 .AND. KKPER.EQ.1 ) CALL SETLAY(1)
->>>>>>> develop
         l = 0
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
@@ -1777,11 +1773,7 @@ C28-----RETURN.
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-<<<<<<< HEAD
-      SUBROUTINE GWF2UZF1AD(In, KKPER, Igrid)
-=======
       SUBROUTINE GWF2UZF1AD(In, KKPER, KKSTP, Igrid)
->>>>>>> develop
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1795,11 +1787,7 @@ C     SPECIFICATIONS:
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
-<<<<<<< HEAD
-      INTEGER In, Kkper, Igrid
-=======
       INTEGER In, Kkper, kkstp, Igrid
->>>>>>> develop
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
@@ -1814,20 +1802,13 @@ C
 C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
-<<<<<<< HEAD
-      IF ( KKPER.GT.1 ) CALL SETLAY()
-=======
       IF ( KKPER+KKSTP > 2 ) CALL SETLAY(KKSTP)
->>>>>>> develop
+C
       END SUBROUTINE GWF2UZF1AD
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-<<<<<<< HEAD
-      SUBROUTINE SETLAY()
-=======
       SUBROUTINE SETLAY(kkstp)
->>>>>>> develop
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1844,39 +1825,21 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-<<<<<<< HEAD
-      INTEGER :: IC, IR, IL, ILL, LL, IBND
-=======
       INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP
       DOUBLE PRECISION :: S1, S2
->>>>>>> develop
 C     -----------------------------------------------------------------
 C      
 C1------SET LAYER NUMBER FOR UZF RECHARGE/DISCHARGE
 C       FOR BEGINNING OF EACH TIME STEP
-<<<<<<< HEAD
-        IF ( NUZTOP.EQ.4 ) THEN
-          DO ll = 1, NUMCELLS
-            IL = nlay
-=======
           
           DO ll = 1, NUMCELLS
             IL = 1
->>>>>>> develop
             ir = IUZHOLD(1, ll)
             ic = IUZHOLD(2, ll)
             ibnd = IUZFBND(ic, ir)
             IF ( ibnd*ibnd > 0 ) THEN
               ill = NLAY
               il = ILL
-<<<<<<< HEAD
-              DO WHILE ( ill.GT.0 )
-                IF ( HNEW(ic, ir, ill).GT.BOTM(ic, ir, ill) ) il = ill
-                ill = ill - 1
-              END DO
-            END IF
-            IF ( IBOUND(IC,IR,IL) ==0 ) THEN
-=======
               DO WHILE ( ill > 0 )
                 S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
                 S2 = ZEROD15
@@ -1887,17 +1850,12 @@ C       FOR BEGINNING OF EACH TIME STEP
                   ill = ill - 1
               END DO
             END IF
-            IF ( IBOUND(IC,IR,IL) == 0 ) THEN
->>>>>>> develop
-              IUZFBND(ic, ir) = 0
-              IL = 0
-            END IF
+            !IF ( IBOUND(IC,IR,IL) == 0 ) THEN
+            !  IUZFBND(ic, ir) = 0
+            !  IL = 0
+            !END IF
             LAYNUM(IC,IR) = IL
           END DO
-<<<<<<< HEAD
-        END IF
-=======
->>>>>>> develop
       END SUBROUTINE SETLAY
 C
 C--------SUBROUTINE GWF2UZF1FM

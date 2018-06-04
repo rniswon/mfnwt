@@ -244,11 +244,7 @@ C7C1----CALCULATE TIME STEP LENGTH. SET HOLD=HNEW.
      1                                       Igrid)
           IF(IUNIT(65).GT.0) CALL GWF2SWI2AD(KKSTP,KKPER,IGRID)  !SWI2
           IF( IUNIT(44).GT.0 ) CALL GWF2SFR7AD(IUNIT(44),IUNIT(22),
-<<<<<<< HEAD
      1                                         KKSTP,KKPER,IGRID)  !rgn 6/12/12
-=======
-     1                                    kkstp,kkper,IGRID)  !rgn 6/12/12
->>>>>>> develop
           IF(IUNIT(50).GT.0) THEN
             IF (IUNIT(1).GT.0) THEN
               CALL GWF2MNW27BCF(KPER,IGRID)

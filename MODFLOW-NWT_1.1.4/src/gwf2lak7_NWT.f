@@ -3777,7 +3777,6 @@ C
 C------FUNCTION FXLKOT_TERP FOR SMOOTHING SPECIFIED LAKE OUTFLOWS TO STREAMS.
 C
       DOUBLE PRECISION FUNCTION FXLKOT_TERP(DSTAGE,Botlake,Splakout,dy)
-<<<<<<< .merge_file_a22088
       IMPLICIT NONE
       DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy
       FXLKOT_TERP = 0.0D0
@@ -3797,32 +3796,6 @@ C
       END IF
       FXLKOT_TERP = y*Splakout
       END FUNCTION FXLKOT_TERP
-=======
-      IMPLICIT NONE                                               
-      DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy                                               
-      s = 1.0                                                       
-      x = DSTAGE-Botlake                                               
-      IF ( x-s.GT.0.0 ) THEN                                           
-      FXLKOT_TERP = Splakout                                         
-      dy = 0.0D0                                                     
-      RETURN                                                         
-      END IF                                                           
-      aa = -1.0d0/(s**2.0d0)                                           
-      ad = -2.0D0/(s**2.0d0)                                           
-      b = 2.0d0/s                                                      
-      y = aa*x**2.0d0 + b*x                                            
-      dy = (ad*x + b)                                                  
-      IF ( x.LE.0.0 ) THEN                                             
-        y = 0.0D0                                                      
-        dy = 0.0D0                                                     
-      ELSE IF ( x-s.GT.-1.0e-14 ) THEN                                 
-        y = 1.0D0                                                      
-        dy = 0.0D0                                                     
-      END IF                                                           
-      FXLKOT_TERP = y*Splakout                                         
-      dy = dy*Splakout                                                 
-      END FUNCTION FXLKOT_TERP                                         
->>>>>>> .merge_file_a22492
 C
       SUBROUTINE GET_FLOBOT(IC, IR, IL, ITYPE, INOFLO,CONDUC,
      1                FLOBOT,FLOBO3,FLOTOUZF,DLSTG,CLOSEZERO,H,
