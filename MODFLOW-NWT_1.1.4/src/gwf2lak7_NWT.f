@@ -2110,8 +2110,8 @@ C          NEW VOLUME.
      +                -WDRAW+RUNFD+SURFIN(LAKE)-SURFOT(LAKE)+GWIN(LAKE)    !10/4/2014 added SEEPUZ(LAKE)
      +                -GWOUT(LAKE)-SEEPUZ(LAKE))*DELT
           IF(VOL2.LE.0.0) VOL2=0.0
-          VOL(LAKE) = VOL2
-          STGNEW(LAKE)= STGTERP(VOL2,LAKE)
+!          VOL(LAKE) = VOL2
+!          STGNEW(LAKE) = STGTERP(VOL2,LAKE)
 !C
 !C18B-----COMPUTE LAKE VOLUME FROM ALL INFLOWS AND OUTFLOWS FOR 
 !C          STEADY STATE SIMULATION.
@@ -3775,25 +3775,30 @@ C
 C------FUNCTION FXLKOT_TERP FOR SMOOTHING SPECIFIED LAKE OUTFLOWS TO STREAMS.
 C
       DOUBLE PRECISION FUNCTION FXLKOT_TERP(DSTAGE,Botlake,Splakout,dy)
-      IMPLICIT NONE
-      DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy
-      FXLKOT_TERP = 0.0D0
-      s = 2.0
-      x = DSTAGE-Botlake
-      aa = -1.0d0/(s**2.0d0)
-      ad = -2.0D0/(s**2.0d0)
-      b = 2.0d0/s
-      y = aa*x**2.0d0 + b*x
-      dy = (ad*x + b)*Splakout
-      IF ( x.LE.0.0 ) THEN
-        y = 0.0D0
-        dy = 0.0D0
-      ELSE IF ( x-s.GT.-1.0e-14 ) THEN
-        y = 1.0D0
-        dy = 0.0D0
-      END IF
-      FXLKOT_TERP = y*Splakout
-      END FUNCTION FXLKOT_TERP
+      IMPLICIT NONE                                               
+      DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy                                               
+      s = 1.0                                                       
+      x = DSTAGE-Botlake                                               
+      IF ( x-s.GT.0.0 ) THEN                                           
+      FXLKOT_TERP = Splakout                                         
+      dy = 0.0D0                                                     
+      RETURN                                                         
+      END IF                                                           
+      aa = -1.0d0/(s**2.0d0)                                           
+      ad = -2.0D0/(s**2.0d0)                                           
+      b = 2.0d0/s                                                      
+      y = aa*x**2.0d0 + b*x                                            
+      dy = (ad*x + b)                                                  
+      IF ( x.LE.0.0 ) THEN                                             
+        y = 0.0D0                                                      
+        dy = 0.0D0                                                     
+      ELSE IF ( x-s.GT.-1.0e-14 ) THEN                                 
+        y = 1.0D0                                                      
+        dy = 0.0D0                                                     
+      END IF                                                           
+      FXLKOT_TERP = y*Splakout                                         
+      dy = dy*Splakout                                                 
+      END FUNCTION FXLKOT_TERP                                         
 C
       SUBROUTINE GET_FLOBOT(IC, IR, IL, ITYPE, INOFLO,CONDUC,
      1                FLOBOT,FLOBO3,FLOTOUZF,DLSTG,CLOSEZERO,H,
