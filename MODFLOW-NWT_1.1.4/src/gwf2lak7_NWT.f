@@ -1716,6 +1716,7 @@ C
 C18-----PRINT NEW LAKE STAGE AND PREVIOUS LAKE ITERATION STAGE
 C        WHEN LAKE STAGE DOES NOT CONVERGE.
       DO LAKE=1,NLAKES
+        IF ( ISS > 0 ) VOLOLDD(LAKE) = VOL(LAKE)   !RGN for modsim 5/15/18
         IF( L1.GE.MTER.AND.NCNCVR(LAKE).EQ.0 ) THEN
           WRITE(IOUT,1004) KKITER,  
      1    LAKE,STGNEW(LAKE), STGITER(LAKE)
@@ -3779,7 +3780,7 @@ C
       IMPLICIT NONE
       DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy
       FXLKOT_TERP = 0.0D0
-      s = 2.0
+      s = 1
       x = DSTAGE-Botlake
       aa = -1.0d0/(s**2.0d0)
       ad = -2.0D0/(s**2.0d0)
@@ -4042,7 +4043,7 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
       END SUBROUTINE GET_FLOBOT   
 C
 C-------SUBROUTINE LAK2MODSIM
-      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL)
+      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL, Diversions, Nsegshold)
 C     *******************************************************************
 C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
@@ -4050,33 +4051,50 @@ C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
      +                        STGNEW,PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,
      +                        SEEP
+      USE GWFSFRMODULE, ONLY: IDIVAR
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
+      INTEGER,          INTENT(IN)    :: Nsegshold
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
-     +                                   LAKEVOL(NLAKES)
+     +                                   LAKEVOL(NLAKES),
+     +                                   Diversions(Nsegshold)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER LAKE
+      INTEGER LAKE, M, LAK_ID
       DOUBLE PRECISION DELTAQ
 C     -------------------------------------------------------------------
 C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-        DO LAKE=1,NLAKES
-          DELTAQ = (SURFIN(LAKE) - SURFOT(LAKE))*DELT
-          DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
-          LAKEVOL(LAKE) = VOL(LAKE)
-!          LAKEVOL(LAKE) = STGNEW(LAKE)
-        END DO
+      DO LAKE=1,NLAKES
+        DELTAQ = (SURFIN(LAKE) - SURFOT(LAKE))*DELT
+        DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
+        LAKEVOL(LAKE) = VOL(LAKE)
+!        LAKEVOL(LAKE) = STGNEW(LAKE)
+        WRITE(222,333)LAKE,PRECIP(LAKE),EVAP(LAKE),
+     1            RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
+     2              SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE)
+      END DO
+  333 FORMAT(I5,10E15.7)
+C
+C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
+      IF (Nsegshold.GT.-1) THEN
+        DO M = 1, Nsegshold
+          IF (IDIVAR(1,M).LT.0) THEN
+            LAK_ID = ABS(IDIVAR(1,M))
+            Diversions(M) = SURFOT(LAK_ID)
+          ENDIF
+        ENDDO
+      ENDIF
 C
 C5------RETURN.
       RETURN
@@ -4115,7 +4133,7 @@ C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
-      CALL LAK2MODSIM(DELTAVOL,LAKEVOL) !,KITER,KSTP,KPER)
+      CALL LAK2MODSIM(DELTAVOL,LAKEVOL, 0, -1) !,KITER,KSTP,KPER)
 C
 C5------RETURN.
       RETURN
