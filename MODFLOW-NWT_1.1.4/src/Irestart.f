@@ -47,12 +47,8 @@ C
       SUBROUTINE WRITE_UZF(IOUT,IURESTARTUZF)
       USE GWFUZFMODULE, ONLY: UZDPST, UZFLST, UZSPST, UZTHST, UZSTOR,
      +                        UZOLSFLX, NWAVST, ITRLST, LTRLST, HLDUZF,
-<<<<<<< .merge_file_a12828
-     +                        IUZHOLD, HLDUZF, PETRATE, SEEPOUT, FINF
-=======
      +                        IUZHOLD, HLDUZF, PETRATE, SEEPOUT, FINF, 
      +                        LAYNUM
->>>>>>> .merge_file_a00736
       IMPLICIT NONE
       INTEGER IOUT, IURESTARTUZF
       CHARACTER*30 ANAME
@@ -73,22 +69,15 @@ C
          WRITE(IURESTARTUZF) PETRATE
          WRITE(IURESTARTUZF) SEEPOUT
          WRITE(IURESTARTUZF) FINF
-<<<<<<< .merge_file_a12828
-=======
          WRITE(IURESTARTUZF) LAYNUM
->>>>>>> .merge_file_a00736
       END SUBROUTINE WRITE_UZF
 C
 C
       SUBROUTINE READ_UZF(IOUT,IURESTARTUZF)
       USE GWFUZFMODULE, ONLY: UZDPST, UZFLST, UZSPST, UZTHST, UZSTOR,
      +                        UZOLSFLX, NWAVST, ITRLST, LTRLST, HLDUZF,
-<<<<<<< .merge_file_a12828
-     +                        IUZHOLD, HLDUZF, PETRATE, SEEPOUT, FINF
-=======
      +                        IUZHOLD, HLDUZF, PETRATE, SEEPOUT, FINF, 
      +                        LAYNUM
->>>>>>> .merge_file_a00736
       IMPLICIT NONE
       INTEGER IOUT, IURESTARTUZF
       CHARACTER*30 ANAME
@@ -109,10 +98,7 @@ C
          READ(IURESTARTUZF) PETRATE
          READ(IURESTARTUZF) SEEPOUT
          READ(IURESTARTUZF) FINF
-<<<<<<< .merge_file_a12828
-=======
          READ(IURESTARTUZF) LAYNUM
->>>>>>> .merge_file_a00736
       END SUBROUTINE READ_UZF
 C
        SUBROUTINE WRITE_SFR(IOUT,IURESTARTSFR)
