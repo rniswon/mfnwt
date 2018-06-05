@@ -1152,7 +1152,7 @@ C     PROPERTY FLOW PACKAGE
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
-      USE GWFUZFMODULE, ONLY: VKS, IUZFBND, CLOSEZERO, NUZTOP
+      USE GWFUZFMODULE, ONLY: VKS, IUZFBND, CLOSEZERO, NUZTOP, LAYNUM
       USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, IBOUND, BOTM, 
      +                        LAYHDT
       USE GWFLPFMODULE, ONLY: LAYVKA, VKA, HK
@@ -1199,6 +1199,8 @@ C       SET VKS EQUAL TO VKALPF FOR CORRESPONDING MODEL CELL.
 CRGN made il = 0 when all layers for column are inactive 2/21/08
               ill = ill + 1
             END DO
+          ELSE IF ( NUZTOP.EQ.4 ) THEN
+            il = LAYNUM(ncck, nrck)
           END IF
           krck = il
           IF ( krck.NE.0 ) THEN
@@ -1268,7 +1270,7 @@ C2------RETURN.
       END SUBROUTINE SGWF2UZF1VKS
 C
 C-------SUBROUTINE GWF2UZF1RP
-      SUBROUTINE GWF2UZF1RP(In, Kkper, Iunitsfr, Igrid)
+      SUBROUTINE GWF2UZF1RP(In, Kkper, Kkstp, Iunitsfr, Igrid)
 C     ******************************************************************
 C     READ AND CHECK VARIABLES EACH STRESS PERIOD 
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
@@ -1283,7 +1285,7 @@ C     SPECIFICATIONS:
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
-      INTEGER In, Kkper, Iunitsfr, Igrid
+      INTEGER In, Kkper, Kkstp, Iunitsfr, Igrid
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
@@ -1418,6 +1420,8 @@ C10-----CHECK FOR NEGATIVE ET EXTINCTION DEPTH.
 CRGN made il = 0 when all layers for column are inactive 2/21/08
                   ill = ill + 1
                 END DO
+              ELSE IF ( NUZTOP.EQ.4 ) THEN
+                il = LAYNUM(ncck, nrck)
               END IF
               land = ABS(IUZFBND(ncck, nrck))
 !
@@ -1474,6 +1478,7 @@ C         CONTENT.
         END IF
       END IF
 C13B-----SEARCH FOR UPPERMOST ACTIVE CELL.
+      IF ( NUZTOP.NE.4 ) THEN ! rsr, 5/30/2018 don't need to do for NUZTOP = 4
       DO ir = 1, NROW
         DO ic = 1, NCOL
           IF ( IUZFBND(ic, ir).NE.0 ) THEN
@@ -1502,6 +1507,7 @@ C13B-----SEARCH FOR UPPERMOST ACTIVE CELL.
           END IF
         END DO
       END DO
+      END IF
 C
 C14------INITIALIZE UNSATURATED ZONE IF ACTIVE.
 C
@@ -1520,7 +1526,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
 C
-         IF ( NUZTOP.EQ.4 ) CALL SETLAY()
+        IF ( NUZTOP.EQ.4 .AND. KKPER.EQ.1 ) CALL SETLAY(1)
         l = 0
         DO ll = 1, NUMCELLS
           ir = IUZHOLD(1, ll)
@@ -1767,7 +1773,7 @@ C28-----RETURN.
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-      SUBROUTINE GWF2UZF1AD(In, KKPER, Igrid)
+      SUBROUTINE GWF2UZF1AD(In, KKPER, KKSTP, Igrid)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1781,7 +1787,7 @@ C     SPECIFICATIONS:
 C     -----------------------------------------------------------------
 C     ARGUMENTS
 C     -----------------------------------------------------------------
-      INTEGER In, Kkper, Igrid
+      INTEGER In, Kkper, kkstp, Igrid
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
@@ -1796,12 +1802,13 @@ C
 C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
-      IF ( KKPER.GT.1 ) CALL SETLAY()
+      IF ( KKPER+KKSTP > 2 ) CALL SETLAY(KKSTP)
+C
       END SUBROUTINE GWF2UZF1AD
 C
 C
 C-------SUBROUTINE GWF2UZF1AD
-      SUBROUTINE SETLAY()
+      SUBROUTINE SETLAY(kkstp)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.1.4:  April 29, 2018
@@ -1818,32 +1825,37 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP
+      DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
 C1------SET LAYER NUMBER FOR UZF RECHARGE/DISCHARGE
 C       FOR BEGINNING OF EACH TIME STEP
-        IF ( NUZTOP.EQ.4 ) THEN
+          
           DO ll = 1, NUMCELLS
-            IL = nlay
+            IL = 1
             ir = IUZHOLD(1, ll)
             ic = IUZHOLD(2, ll)
             ibnd = IUZFBND(ic, ir)
             IF ( ibnd*ibnd > 0 ) THEN
               ill = NLAY
               il = ILL
-              DO WHILE ( ill.GT.0 )
-                IF ( HNEW(ic, ir, ill).GT.BOTM(ic, ir, ill) ) il = ill
-                ill = ill - 1
+              DO WHILE ( ill > 0 )
+                S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
+                S2 = ZEROD15
+                IF ( ill < NLAY) S2 = HNEW(ic, ir, ill+1) -
+     +                                BOTM(ic, ir, ill )  
+                 
+                  IF ( S1 > NEARZERO .AND. S2 > NEARZERO ) il = ill
+                  ill = ill - 1
               END DO
             END IF
-            IF ( IBOUND(IC,IR,IL) ==0 ) THEN
-              IUZFBND(ic, ir) = 0
-              IL = 0
-            END IF
+            !IF ( IBOUND(IC,IR,IL) == 0 ) THEN
+            !  IUZFBND(ic, ir) = 0
+            !  IL = 0
+            !END IF
             LAYNUM(IC,IR) = IL
           END DO
-        END IF
       END SUBROUTINE SETLAY
 C
 C--------SUBROUTINE GWF2UZF1FM
@@ -2426,7 +2438,7 @@ C     -----------------------------------------------------------------
       REAL csepmx, csep, finfact, finfhold, gcumapl, gaplinfltr
       REAL totalwc, totrin, totrot, totvin, totvot, volet, volflwtb, 
      +     volinflt, wiltwc, zero, celthick
-!      REAL error
+      REAL error
       INTEGER ibd, ibduzf, ic, ick, iftunit, igflg, ii, il, ill,
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
@@ -2630,7 +2642,7 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           il = LAYNUM(ic, ir)
         END IF
         LAYNUM(ic, ir) = il
-        IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = 1
+!        IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = 1   check this 5/30/2018
 ! Suppress seepout and ET beneath a lake
         lakflg = 0
         lakflginf = 0
@@ -3348,6 +3360,8 @@ C28-----COMPUTE UNSATURATED ERROR FOR EACH CELL.
           UZTOTBAL(ic, ir, 7) = UZTOTBAL(ic, ir, 7) + volinflt +
      +                              Excespp(ic, ir) + rej_inf(ic, ir)
 !      error = volinflt-volflwtb-volet-DELSTOR(ic, ir)
+!      write(222,333)l,ll,ic,ir,il,error,volflwtb
+!333   format(5i10,2e20.10)
           IF ( IUZFOPT.GT.0 ) THEN
             IF ( ibnd.GT.0 ) THEN
               UZTOTBAL(ic, ir, 2) = UZTOTBAL(ic, ir, 2)
@@ -3431,11 +3445,11 @@ C SET UZ INTERCELL FLUX TO ZERO WHEN BELOW WATER TABLE
         END IF
       END IF
       END DO
-      DO ir = 1, NROW
-        DO ic = 1, NCOL
-          IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = NLAY
-        END DO
-      END DO
+      !DO ir = 1, NROW
+      !  DO ic = 1, NCOL
+      !    IF ( LAYNUM(ic, ir).EQ.0 ) LAYNUM(ic, ir) = NLAY    check this 5/30/2018
+      !  END DO
+      !END DO
 C
 C
 C31-----UPDATE RATES AND BUFFERS WITH ET FOR UZF OR MODFLOW BUDGET ITEMS.
@@ -3934,14 +3948,16 @@ C58----CALCULATE DIFFERENCE AND ERROR BETWEEN INFLOW AND OUTFLOW.
           ratedif = UZTSRAT(1) - (UZTSRAT(2)+UZTSRAT(3))
           acumdif = ABS(cumdiff)
           aratdif = ABS(ratedif)
-          IF ( acumdif.LT.NEARZERO .AND. 
-     +         (acumdif.GE.bigvl2 .OR. acumdif.LT.small) ) THEN
+!          IF ( acumdif.LT.NEARZERO .AND. 
+!     +         (acumdif.GE.bigvl2 .OR. acumdif.LT.small) ) THEN
+          IF ( acumdif>bigvl2 .OR. acumdif<small ) THEN
             WRITE (val1, '(1PE17.4)') cumdiff
           ELSE
             WRITE (val1, '(F17.4)') cumdiff
           END IF
-          IF ( aratdif.LT.NEARZERO .AND. 
-     +         (aratdif.GE.bigvl2 .OR. aratdif.LT.small) ) THEN
+!          IF ( aratdif.LT.NEARZERO .AND. 
+!     +         (aratdif.GE.bigvl2 .OR. aratdif.LT.small) ) THEN
+          IF ( aratdif>bigvl2 .OR. aratdif<small) THEN
             WRITE (val2, '(1PE17.4)') ratedif
           ELSE
             WRITE (val2, '(F17.4)') ratedif
@@ -3950,14 +3966,16 @@ C58----CALCULATE DIFFERENCE AND ERROR BETWEEN INFLOW AND OUTFLOW.
           WRITE (IOUT, 9007)
           unsatvol = ABS(CUMUZVOL(4))
           unsatrat = ABS(UZTSRAT(4))
-          IF ( unsatvol.LT.NEARZERO .AND. 
-     +         (unsatvol.GE.bigvl1 .OR. unsatvol.LT.small) ) THEN
+!          IF ( unsatvol.LT.NEARZERO .AND. 
+!     +         (unsatvol.GE.bigvl1 .OR. unsatvol.LT.small) ) THEN
+          IF ( unsatvol>bigvl2 .OR. unsatvol<small ) THEN
             WRITE (val1, '(1PE17.4)') CUMUZVOL(4)
           ELSE
             WRITE (val1, '(F17.4)') CUMUZVOL(4)
           END IF
-          IF ( unsatrat.LT.NEARZERO .AND. 
-     +         (unsatrat.GE.bigvl1 .OR. unsatrat.LT.small) ) THEN
+!          IF ( unsatrat.LT.NEARZERO .AND. 
+!     +         (unsatrat.GE.bigvl1 .OR. unsatrat.LT.small) ) THEN
+          IF ( unsatrat>bigvl2 .OR. unsatrat<small ) THEN
             WRITE (val2, '(1PE17.4)') UZTSRAT(4)
           ELSE
             WRITE (val2, '(F17.4)') UZTSRAT(4)

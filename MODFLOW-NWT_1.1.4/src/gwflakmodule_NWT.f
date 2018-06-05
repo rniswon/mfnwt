@@ -10,6 +10,8 @@ C------MINOR UPDATES JAN. 2013 (LFK)
         INTEGER,SAVE,POINTER   ::MXLKND,LKNODE,ICMX,NCLS,LWRT,NDV,NTRB,
      +                           IRDTAB
         REAL,   SAVE,POINTER   ::THETA,SSCNCR,SURFDEPTH
+        DOUBLE PRECISION,   SAVE,POINTER   ::RAMP
+        REAL,   SAVE, DIMENSION(:),  POINTER :: DEADPOOLVOL
 Cdep    Added SURFDEPTH  3/3/2009
 Crgn    Added budget variables for GSFLOW CSV file
         REAL,   SAVE,POINTER   ::TOTGWIN_LAK,TOTGWOT_LAK,TOTDELSTOR_LAK
@@ -81,6 +83,8 @@ Crsr    Allocate arrays in BD subroutine
      +                            IRDTAB
 Cdep    Added SURFDEPTH 3/3/2009
         REAL,         POINTER   ::THETA,SSCNCR,SURFDEPTH
+        DOUBLE PRECISION,         POINTER   ::RAMP
+        REAL,      DIMENSION(:),  POINTER :: DEADPOOLVOL
 Crgn    Added budget variables for GSFLOW CSV file
         REAL,         POINTER   ::TOTGWIN_LAK,TOTGWOT_LAK,TOTDELSTOR_LAK
         REAL,         POINTER   ::TOTSTOR_LAK,TOTEVAP_LAK,TOTPPT_LAK
