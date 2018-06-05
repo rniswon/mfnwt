@@ -8432,6 +8432,7 @@ C     *******************************************************************
       USE GWFSFRMODULE, ONLY: STRM, NSTRM, NSS, ISTRM, ISEG, IDIVAR,
      1                        DVRSFLW, STRIN, STROUT
       USE GWFLAKMODULE, ONLY: SURFOT
+      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
