@@ -4059,14 +4059,15 @@ C          FLOB02 AND FLOBO3 AS A FRACTION OF FLOBO1 AND FLOBO3.
       END SUBROUTINE GET_FLOBOT   
 C
 C-------SUBROUTINE LAK2MODSIM
-      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL, Diversions, Nsegshold)
+      SUBROUTINE LAK2MODSIM(DELTAVOL, LAKEVOL, Diversions, Nsegshold,
+     +                      RELEASABLE_STOR)
 C     *******************************************************************
 C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
      +                        STGNEW,PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,
-     +                        SEEP
+     +                        SEEP,DEADPOOLVOL
       USE GWFSFRMODULE, ONLY: IDIVAR
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -4077,7 +4078,8 @@ C     ARGUMENTS
       INTEGER,          INTENT(IN)    :: Nsegshold
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
      +                                   LAKEVOL(NLAKES),
-     +                                   Diversions(Nsegshold)
+     +                                   Diversions(Nsegshold),
+     +                                   RELEASABLE_STOR(NLAKES)
 C     -------------------------------------------------------------------
 !      INTEGER 
 !      DOUBLE PRECISION 
@@ -4095,7 +4097,6 @@ C
         DELTAQ = (SURFIN(LAKE) - SURFOT(LAKE))*DELT
         DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
         LAKEVOL(LAKE) = VOL(LAKE)
-!        LAKEVOL(LAKE) = STGNEW(LAKE)
         WRITE(222,333)LAKE,PRECIP(LAKE),EVAP(LAKE),
      1            RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
      2              SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE),
@@ -4112,6 +4113,11 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
           ENDIF
         ENDDO
       ENDIF
+C
+C-----UPDATE RELEASABLE STORAGE ARRAY RETURNED TO MODSIM FOR RESETTING POTENTIAL RELEASE AMOUNT
+      DO LAKE=1,NLAKES
+        RELEASABLE_STOR(LAKE) = VOL(LAKE) - DEADPOOLVOL(LAKE)
+      ENDDO
 C
 C5------RETURN.
       RETURN
