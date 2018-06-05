@@ -65,7 +65,7 @@ C
       THETA = 0.0
       IF (IN.GT.0) THEN
 Cdep added SURFDEPTH 3/3/2009
-        ALLOCATE (ILKCB, NSSITR, SSCNCR, SURFDEPTH)
+        ALLOCATE (ILKCB, NSSITR, SSCNCR, SURFDEPTH,RAMP)
         ALLOCATE (MXLKND, LKNODE, ICMX, NCLS, LWRT, NDV, NTRB)
         ALLOCATE (IRDTAB)
 C
@@ -77,6 +77,7 @@ Cdep  initialize number of iterations and closure criteria to zero.
       NSSITR = 0
       SSCNCR = 0.0
       SURFDEPTH = 0.0
+      RAMP = 1.0
 !
       lloc = 1
       IRDTAB = 0
@@ -1598,7 +1599,7 @@ C15-----SUM UP OUTFLOWS FROM OUTFLOWING STREAM REACHES.
 ! Set Botlake to elevation of stream channel for specified flow diversion.
                     Botlake = SEG(8,INODE)
                     STROUT(INODE) = 0.0
-                    FXLKOT(INODE) = FXLKOT_TERP(DSTAGE,Botlake,
+                    FXLKOT(INODE) = FXLKOT_TERP(RAMP,DSTAGE,Botlake,
      +                                          Splakout,dy)
                     DSRFOT(LAKE) = DSRFOT(LAKE) + dy
                   END IF
@@ -2968,9 +2969,12 @@ C
 C    -------------------------------------------------------------------
 C        SPECIFICATIONS:
 C    -------------------------------------------------------------------
-      USE GWFLAKMODULE, ONLY: NLAKES, NTRB, NDV, ITRB, IDIV, IRK
+      USE GWFLAKMODULE, ONLY: NLAKES, NTRB, NDV, ITRB, IDIV, IRK, RAMP
       USE GLOBAL,       ONLY: IOUT, NODES
       USE GWFSFRMODULE, ONLY: NSS, IDIVAR, IOTSG, SEG,  ISEG
+      DOUBLE PRECISION :: SPILL,V
+      DOUBLE PRECISION VOLTERP
+      EXTERNAL VOLTERP
 C
 C-- DOUBLE CHECK SIZE OF IRK (STORED IN BUFF) vs. NLAKES
 C
@@ -3012,6 +3016,13 @@ C---  Stream Outflow from Lakes
         K1 = IRK(2,LAKE)
         IDIV(LAKE,K1) = LSEG
         IF(IRK(2,LAKE).GT.NDV) NDV = IRK(2,LAKE)
+C CALCULATE DEAD POOL STORAGE
+        SPILL = SEG(8,LSEG) + RAMP
+        V = VOLTERP(SPILL,LAKE)   
+        WRITE(IOUT,*)
+        WRITE(IOUT,9008)LAKE,V
+        WRITE(IOUT,*)
+9008  FORMAT(6X,'DEAD POOL STORAGE FOR LAKE ',I4,' IS EQUAL TO ',E20.10)
       ENDIF
   100 CONTINUE
 C
@@ -3776,11 +3787,13 @@ C          to "FUNCTION"
 C
 C------FUNCTION FXLKOT_TERP FOR SMOOTHING SPECIFIED LAKE OUTFLOWS TO STREAMS.
 C
-      DOUBLE PRECISION FUNCTION FXLKOT_TERP(DSTAGE,Botlake,Splakout,dy)
+      DOUBLE PRECISION FUNCTION FXLKOT_TERP(RAMP,DSTAGE,Botlake,
+     +                                      Splakout,dy)
       IMPLICIT NONE
       DOUBLE PRECISION DSTAGE,Botlake,Splakout, s, aa, ad, b, x, y, dy
+      DOUBLE PRECISION RAMP
       FXLKOT_TERP = 0.0D0
-      s = 1
+      s = RAMP
       x = DSTAGE-Botlake
       aa = -1.0d0/(s**2.0d0)
       ad = -2.0D0/(s**2.0d0)
@@ -4167,6 +4180,7 @@ C
       DEALLOCATE (GWFLAKDAT(IGRID)%NSSITR)
 Cdep  deallocate SURFDEPTH 3/3/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%SURFDEPTH)
+      DEALLOCATE (GWFLAKDAT(IGRID)%RAMP)
       DEALLOCATE (GWFLAKDAT(IGRID)%MXLKND)
       DEALLOCATE (GWFLAKDAT(IGRID)%LKNODE)
       DEALLOCATE (GWFLAKDAT(IGRID)%ICMX)
@@ -4306,6 +4320,7 @@ C
       SSCNCR=>GWFLAKDAT(IGRID)%SSCNCR
 Cdep  added SURFDEPTH 3/3/2009
       SURFDEPTH=>GWFLAKDAT(IGRID)%SURFDEPTH
+      RAMP=>GWFLAKDAT(IGRID)%RAMP
       ICS=>GWFLAKDAT(IGRID)%ICS
       NCNCVR=>GWFLAKDAT(IGRID)%NCNCVR
       LIMERR=>GWFLAKDAT(IGRID)%LIMERR
@@ -4451,8 +4466,9 @@ C
       GWFLAKDAT(IGRID)%NDV=>NDV
       GWFLAKDAT(IGRID)%NTRB=>NTRB
       GWFLAKDAT(IGRID)%SSCNCR=>SSCNCR
-Cdep  Added SURDEPTH 3/3/2009
+Cdep  Added SURFDEPTH 3/3/2009
       GWFLAKDAT(IGRID)%SURFDEPTH=>SURFDEPTH
+      GWFLAKDAT(IGRID)%RAMP=>RAMP
       GWFLAKDAT(IGRID)%ICS=>ICS
       GWFLAKDAT(IGRID)%NCNCVR=>NCNCVR
       GWFLAKDAT(IGRID)%LIMERR=>LIMERR
