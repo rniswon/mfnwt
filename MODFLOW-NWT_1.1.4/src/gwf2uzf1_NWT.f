@@ -176,7 +176,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NUZGAG, NUZGAGAR, NUZCL, NUZRW, TOTRUNOFF)
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
-      ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
+      ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET,UZFRESTART)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
@@ -189,6 +189,7 @@ C     ------------------------------------------------------------------
       LAYNUM = 0
       SMOOTHET = 0.0D0
       smooth = 0.0
+      UZFRESTART = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
@@ -1522,6 +1523,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
       ELSE
         iflginit = 0   
       END IF
+      IF ( UZFRESTART > 0 ) iflginit = 0
       IF ( iflginit.GE.1 ) THEN
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
