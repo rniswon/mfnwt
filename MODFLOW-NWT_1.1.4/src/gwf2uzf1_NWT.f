@@ -4135,10 +4135,10 @@ C67-----FORMATS.
  9015 FORMAT (//)
  9016 FORMAT (9X, 1PE14.7, 1X, 9(2X,1PE14.7))
       
-      write(222, 333)laynum(158,13),UZDPST(1, 3),BOTM(158,13,0)-
-     +               hnew(158,13,laynum(158,13)),HLDUZF(158,13),
-     +               hnew(158,13,laynum(158,13))     
-  333 format(i5,4e20.10)
+  !    write(222, 333)laynum(158,13),UZDPST(1, 3),BOTM(158,13,0)-
+  !   +               hnew(158,13,laynum(158,13)),HLDUZF(158,13),
+  !   +               hnew(158,13,laynum(158,13))     
+  !333 format(i5,4e20.10)
 C
       RETURN
       END SUBROUTINE GWF2UZF1BD
