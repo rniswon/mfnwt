@@ -1826,7 +1826,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1844,8 +1844,10 @@ C       FOR BEGINNING OF EACH TIME STEP
               DO WHILE ( ill > 0 )
                 S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
                 S2 = ZEROD15
-                IF ( ill < NLAY) S2 = HNEW(ic, ir, ill+1) -
-     +                                BOTM(ic, ir, ill )  
+                IF ( ill < NLAY) THEN  
+                  IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
+     +                        HNEW(ic, ir, ill+1) - BOTM(ic, ir, ill)
+                END IF
                  
                   IF ( S1 > NEARZERO .AND. S2 > NEARZERO ) il = ill
                   ill = ill - 1
@@ -4132,6 +4134,11 @@ C67-----FORMATS.
  9014 FORMAT (62X, 2(1PE14.7, 1X))
  9015 FORMAT (//)
  9016 FORMAT (9X, 1PE14.7, 1X, 9(2X,1PE14.7))
+      
+      write(222, 333)laynum(158,13),UZDPST(1, 3),BOTM(158,13,0)-
+     +               hnew(158,13,laynum(158,13)),HLDUZF(158,13),
+     +               hnew(158,13,laynum(158,13))     
+  333 format(i5,4e20.10)
 C
       RETURN
       END SUBROUTINE GWF2UZF1BD
