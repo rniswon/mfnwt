@@ -4115,8 +4115,9 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
         DO M = 1, Nsegshold
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
-C            Diversions(M) = SURFOT(LAK_ID)
-            Diversions(M) = RELEASABLE_STOR(LAK_ID) / DELT
+            IF ((RELEASABLE_STOR(LAK_ID) / DELT).LT.Diversions(M)) THEN
+              Diversions(M) = RELEASABLE_STOR(LAK_ID) / DELT
+            ENDIF
           ENDIF
         ENDDO
       ENDIF
