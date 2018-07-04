@@ -4115,9 +4115,9 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
         DO M = 1, Nsegshold
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
-            IF ((RELEASABLE_STOR(LAK_ID) / DELT).LT.Diversions(M)) THEN
+            !IF ((RELEASABLE_STOR(LAK_ID) / DELT).LT.Diversions(M)) THEN
               Diversions(M) = RELEASABLE_STOR(LAK_ID) / DELT
-            ENDIF
+            !ENDIF
           ENDIF
         ENDDO
       ENDIF
@@ -4137,7 +4137,7 @@ C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
-     +                        STGNEW
+     +                        STGNEW, DEADPOOLVOL
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -4160,6 +4160,11 @@ C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
       CALL LAK2MODSIM(DELTAVOL,LAKEVOL, 0, -1) !,KITER,KSTP,KPER)
+C
+C2------STUFF DELTAVOL WITH DEADPOOL INFORMATION CALCULATED BY MODFLOW
+      DO LAKE=1, NLAKES
+        DELTAVOL(LAKE) = DEADPOOLVOL(LAKE)
+      ENDDO
 C
 C5------RETURN.
       RETURN
