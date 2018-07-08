@@ -1293,25 +1293,25 @@ C11-----RETURN.
       END
 C
 C-------SUBROUTINE TSREAD
-      SUBROUTINE WRITE_HEADER(TSTYPE)
-C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
-      USE GWFAWUMODULE
-      USE GWFSFRMODULE, ONLY: NSEGDIM
-      USE GLOBAL,       ONLY: IUNIT
-      IMPLICIT NONE
-C     ------------------------------------------------------------------
-C     ARGUMENTS
-      INTEGER, INTENT(IN)::TSTYPE
-C     ------------------------------------------------------------------
-C     VARIABLES
-C     ------------------------------------------------------------------
-      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
-      INTEGER ISTARTSAVE,NUMFOUNDSW,NUMFOUNDGW
-      real :: R
-      character(len=16)  :: text        = 'AWU'
-      character(len=17)  :: char1     = 'TIME SERIES'
-      character(len=200) :: line
-C     ------------------------------------------------------------------  
+!      SUBROUTINE WRITE_HEADER(TSTYPE)
+!C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
+!      USE GWFAWUMODULE
+!      USE GWFSFRMODULE, ONLY: NSEGDIM
+!      USE GLOBAL,       ONLY: IUNIT
+!      IMPLICIT NONE
+!C     ------------------------------------------------------------------
+!C     ARGUMENTS
+!      INTEGER, INTENT(IN)::TSTYPE
+!C     ------------------------------------------------------------------
+!C     VARIABLES
+!C     ------------------------------------------------------------------
+!      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
+!      INTEGER ISTARTSAVE,NUMFOUNDSW,NUMFOUNDGW
+!      real :: R
+!      character(len=16)  :: text        = 'AWU'
+!      character(len=17)  :: char1     = 'TIME SERIES'
+!      character(len=200) :: line
+!C     ------------------------------------------------------------------  
 C
       SUBROUTINE GWF2AWU7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
 C     ******************************************************************
