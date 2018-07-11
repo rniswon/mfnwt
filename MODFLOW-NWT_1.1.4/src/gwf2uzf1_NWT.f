@@ -1850,10 +1850,10 @@ C       FOR BEGINNING OF EACH TIME STEP
                   ill = ill - 1
               END DO
             END IF
-            !IF ( IBOUND(IC,IR,IL) == 0 ) THEN
-            !  IUZFBND(ic, ir) = 0
-            !  IL = 0
-            !END IF
+            IF ( IBOUND(IC,IR,IL) == 0 ) THEN
+              IUZFBND(ic, ir) = 0
+              IL = 0
+            END IF
             LAYNUM(IC,IR) = IL
           END DO
       END SUBROUTINE SETLAY

@@ -1434,8 +1434,8 @@ C-----SET HNEW TO HDRY IF IPHRY>0
       term2 = (-Cvm1-Ccm1-Crm1-Crr-Ccc-Cvv+Hcoff)*H
       term3 = Crr*Hcp1 + Ccc*Hrp1 + Cvv*Hvp1 - Rhss
       GW_func = term1 + term2 + term3
-  !    if(ic==130.and.ir==239.and.il==3)then
-  !    write(iout,222)ic,ir,il,cvm1*(Hvm1-h),ccm1*(hrm1-h),crm1*(hcm1-h),
+  !    if(ic==134.and.ir==108.and.il==4)then
+  !    write(888,222)ic,ir,il,cvm1*(Hvm1-h),ccm1*(hrm1-h),crm1*(hcm1-h),
   !   +cvv*(hvp1-h),ccc*(hrp1-h),crr*(hcp1-h),hcoff,h,rhss,gw_func
   !    end if
   !222 format(3i5,10e20.10)
