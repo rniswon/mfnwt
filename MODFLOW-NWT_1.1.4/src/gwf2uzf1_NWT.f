@@ -176,7 +176,7 @@ C     ------------------------------------------------------------------
       ALLOCATE (NUZGAG, NUZGAGAR, NUZCL, NUZRW, TOTRUNOFF)
       ALLOCATE (SURFDEP,IGSFLOW, RTSOLUTE)
       ALLOCATE (ITHTIFLG, ITHTRFLG, IETBUD, ETOPT)
-      ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET)
+      ALLOCATE (INETFLUX,UNITRECH,UNITDIS,SMOOTHET,UZFRESTART)
       INETFLUX = 0
       ITHTIFLG = 0
       ITHTRFLG = 0
@@ -189,6 +189,7 @@ C     ------------------------------------------------------------------
       LAYNUM = 0
       SMOOTHET = 0.0D0
       smooth = 0.0
+      UZFRESTART = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (IOUT, 9001) In
@@ -1522,6 +1523,7 @@ C15------SET FLAGS FOR STEADY STATE OR TRANSIENT SIMULATIONS.
       ELSE
         iflginit = 0   
       END IF
+      IF ( UZFRESTART > 0 ) iflginit = 0
       IF ( iflginit.GE.1 ) THEN
 C
 C--------NUZTOP EQUAL 4 SO SET LAYNUM ARRAY
@@ -1803,7 +1805,6 @@ C2------CALL SETLAY TO SET GWF LAYER
 C       FOR EACH TIME STEP.
 C
       IF ( KKPER+KKSTP > 2 ) CALL SETLAY(KKSTP)
-C
       END SUBROUTINE GWF2UZF1AD
 C
 C
@@ -1825,7 +1826,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1843,8 +1844,10 @@ C       FOR BEGINNING OF EACH TIME STEP
               DO WHILE ( ill > 0 )
                 S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
                 S2 = ZEROD15
-                IF ( ill < NLAY) S2 = HNEW(ic, ir, ill+1) -
-     +                                BOTM(ic, ir, ill )  
+                IF ( ill < NLAY) THEN  
+                  IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
+     +                        HNEW(ic, ir, ill+1) - BOTM(ic, ir, ill)
+                END IF
                  
                   IF ( S1 > NEARZERO .AND. S2 > NEARZERO ) il = ill
                   ill = ill - 1

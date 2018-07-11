@@ -1249,6 +1249,7 @@ C1--- INITIALIZE VARIABLES
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
             TSSWUNIT(SGNM) = UNIT
+            CALL WRITE_HEADER('SFR')
             NUMFOUNDSW = NUMFOUNDSW + 1
             IF ( SGNM > NSEGDIM ) THEN
               WRITE(IOUT,*) 'Bad segment number for AWU time series. '
@@ -1290,6 +1291,27 @@ C
 C11-----RETURN.
       RETURN
       END
+C
+C-------SUBROUTINE TSREAD
+!      SUBROUTINE WRITE_HEADER(TSTYPE)
+!C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
+!      USE GWFAWUMODULE
+!      USE GWFSFRMODULE, ONLY: NSEGDIM
+!      USE GLOBAL,       ONLY: IUNIT
+!      IMPLICIT NONE
+!C     ------------------------------------------------------------------
+!C     ARGUMENTS
+!      INTEGER, INTENT(IN)::TSTYPE
+!C     ------------------------------------------------------------------
+!C     VARIABLES
+!C     ------------------------------------------------------------------
+!      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
+!      INTEGER ISTARTSAVE,NUMFOUNDSW,NUMFOUNDGW
+!      real :: R
+!      character(len=16)  :: text        = 'AWU'
+!      character(len=17)  :: char1     = 'TIME SERIES'
+!      character(len=200) :: line
+!C     ------------------------------------------------------------------  
 C
       SUBROUTINE GWF2AWU7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
 C     ******************************************************************
@@ -1689,7 +1711,12 @@ C
 C
 C--------COPY FLOW TO WELL LIST.
           WELL(NWELVL,L)=QQ
-        END IF
+      END IF
+C
+C--------OUTPUT TIME SERIES FOR WELL
+!        IF ( TSACTIVEGW ) THEN
+          CALL timeseries_well(Kkper, Kkstp, Qsave, QQ)
+!        END IF
       END DO
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
@@ -2116,7 +2143,7 @@ C
 !      demandgw_prms = doneneg*QONLY(L)
 !      end function demandgw_prms
 C
-      subroutine timeseries_well(Kkper, Kkstp, Kkiter,numwells)
+      subroutine timeseries_well(Kkper, Kkstp, qd, q)
 !     ******************************************************************
 !     timeseries---- write AWU water use time series for SW and GW
 !     ******************************************************************
@@ -2129,25 +2156,17 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: kkper,kkstp,kkiter,numwells
+      integer, intent(in) :: kkper,kkstp
       ! -- dummy
-      double precision :: zerod2,done
+      double precision :: zerod2,done,qd,q
       integer :: k,iseg,ic,ir,i,l,il
 ! ----------------------------------------------------------------------
 !
       zerod2 = 1.0d-2
       done = 1.0d0
-      DO L=1,numwells
-        IF ( NUMTAB.LE.0 ) THEN
-          IR=WELL(2,L)
-          IC=WELL(3,L)
-          IL=WELL(1,L)
-        ELSE
-          IR = TABROW(L)
-          IC = TABCOL(L)
-          IL = TABLAY(L)
-        END IF
-      END DO
+      open(999,file='Qsup.out')
+      write(999,2)kkper,kkstp,qd,q
+    2 format(2i5,2e20.10)
       return
       end subroutine timeseries_well
 !
