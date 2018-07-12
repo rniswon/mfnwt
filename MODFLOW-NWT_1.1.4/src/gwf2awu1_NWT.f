@@ -5,6 +5,7 @@
         INTEGER,SAVE,POINTER  :: IWELLCBU
         INTEGER,SAVE,POINTER  :: IRRWELLCB,IRRSFRCB
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
+        INTEGER, SAVE,POINTER :: NUMSW, NUMGW
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -18,7 +19,9 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABID
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TABUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWUNIT
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWUNIT
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWNUM
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
@@ -98,7 +101,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(IRRWELLCB,IRRSFRCB,IWELLCBU)
       ALLOCATE(PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
-      ALLOCATE(TSACTIVEGW,TSACTIVESW)
+      ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -108,6 +111,8 @@ C     ------------------------------------------------------------------
       NAUX = 0
       TSACTIVEGW=.FALSE.
       TSACTIVESW=.FALSE.
+      NUMSW = 0
+      NUMGW = 0
 !
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
@@ -150,8 +155,11 @@ C
 C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
 C
       ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
+      ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIM))
       TSSWUNIT = 0
       TSGWUNIT = 0
+      TSSWNUM = 0
+      TSGWNUM = 0
       QONLY = 0.0
 C
 C4------READ TS
@@ -1223,18 +1231,13 @@ C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
-      INTEGER ISTARTSAVE,NUMFOUNDSW,NUMFOUNDGW
+      INTEGER ISTARTSAVE,ITEST
       real :: R
       character(len=16)  :: text        = 'AWU'
       character(len=17)  :: char1     = 'TIME SERIES'
       character(len=200) :: line
 C     ------------------------------------------------------------------  
 C
-C1--- INITIALIZE VARIABLES 
-       NUMFOUNDSW=0
-       NUMFOUNDGW=0
-       !TSSWUNIT = 0
-       !TSGWUNIT = 0
        CALL URDCOM(In, IOUT, line)
        LLOC=1
        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -1248,9 +1251,14 @@ C1--- INITIALIZE VARIABLES
           case('SFR')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
-            TSSWUNIT(SGNM) = UNIT
-            CALL WRITE_HEADER('SFR')
-            NUMFOUNDSW = NUMFOUNDSW + 1
+            NUMSW = NUMSW + 1
+            TSSWUNIT(NUMSW) = UNIT
+            TSSWNUM(NUMSW) = SGNM
+            ITEST = 0
+            DO I = 1, NUMSW - 1
+              IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
+            END DO               
+            IF ( ITEST /= 1 ) CALL WRITE_HEADER('SFR',NUMSW)
             IF ( SGNM > NSEGDIM ) THEN
               WRITE(IOUT,*) 'Bad segment number for AWU time series. '
               CALL USTOP('Bad segment number for AWU time series.')
@@ -1258,8 +1266,14 @@ C1--- INITIALIZE VARIABLES
           case('WELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,WLNM,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
-            TSGWUNIT(WLNM) = UNIT
-            NUMFOUNDGW = NUMFOUNDGW + 1
+            NUMGW = NUMGW + 1
+            TSGWUNIT(NUMGW) = UNIT
+            TSGWNUM(NUMGW) = WLNM
+            ITEST = 0
+            DO I = 1, NUMGW - 1
+              IF (  UNIT == TSGWUNIT(I) ) ITEST = 1
+            END DO
+            IF ( ITEST /= 1 ) CALL WRITE_HEADER('WEL',NUMGW)
             IF ( WLNM > MXWELL ) THEN
               WRITE(IOUT,*) 'Bad well number for AWU time series. '
               CALL USTOP('Bad well number for AWU time series.')
@@ -1280,8 +1294,8 @@ C1--- INITIALIZE VARIABLES
       end do
 C
 C11-----output number of files activated for time series output.
-      write(iout,6)NUMFOUNDSW
-      write(iout,7)NUMFOUNDGW
+      write(iout,6)NUMSW
+      write(iout,7)NUMGW
 C
     6 FORMAT(' A total number of ',i10,' AWU output time series files '
      +       'were activated for SURFACE WATER ')
@@ -1292,26 +1306,35 @@ C11-----RETURN.
       RETURN
       END
 C
-C-------SUBROUTINE TSREAD
-!      SUBROUTINE WRITE_HEADER(TSTYPE)
-!C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
-!      USE GWFAWUMODULE
-!      USE GWFSFRMODULE, ONLY: NSEGDIM
-!      USE GLOBAL,       ONLY: IUNIT
-!      IMPLICIT NONE
-!C     ------------------------------------------------------------------
-!C     ARGUMENTS
-!      INTEGER, INTENT(IN)::TSTYPE
-!C     ------------------------------------------------------------------
-!C     VARIABLES
-!C     ------------------------------------------------------------------
-!      INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
-!      INTEGER ISTARTSAVE,NUMFOUNDSW,NUMFOUNDGW
-!      real :: R
-!      character(len=16)  :: text        = 'AWU'
-!      character(len=17)  :: char1     = 'TIME SERIES'
-!      character(len=200) :: line
-!C     ------------------------------------------------------------------  
+C-------SUBROUTINE WRITE_HEADER
+      SUBROUTINE WRITE_HEADER(TSTYPE,NUM)
+C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
+      USE GWFAWUMODULE
+      IMPLICIT NONE
+C     ------------------------------------------------------------------
+C     ARGUMENTS
+      CHARACTER(len=3), INTENT(IN)::TSTYPE
+      INTEGER, INTENT(IN)::NUM
+C     ------------------------------------------------------------------
+C     VARIABLES
+C     ------------------------------------------------------------------
+      integer :: UNIT,SGNM,WLNM
+      character(len=30)  :: text1        = 'AWU SFR Time Series'
+      character(len=30)  :: text2        = 'AWU WELL Time Series'
+C     ------------------------------------------------------------------  
+        select case (TSTYPE)
+          case('SFR')
+            UNIT = TSSWUNIT(NUM)
+            SGNM = TSSWNUM(NUM)
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DEMAND SW-DIVERSION'
+          case('WEL')  
+            UNIT = TSGWUNIT(NUM)
+            WLNM = TSGWNUM(NUM)
+            WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-DIVERSION'
+          end select
+      END SUBROUTINE WRITE_HEADER
+            
+            
 C
       SUBROUTINE GWF2AWU7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
 C     ******************************************************************
@@ -1533,7 +1556,7 @@ C     ------------------------------------------------------------------
       REAL :: Q,TIME,RATETERPQ,QIRR,BUDPERC
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
-      INTEGER :: IBD1,IBD2,IBD3,IBD4,IBD5
+      INTEGER :: IBD1,IBD2,IBD3,IBD4,IBD5,UNIT
       INTEGER :: TOTWELLCELLS,TOTSFRCELLS,IHRU,GSFLOW_flag
       EXTERNAL :: SMOOTHQ, RATETERPQ
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
@@ -1714,10 +1737,29 @@ C--------COPY FLOW TO WELL LIST.
       END IF
 C
 C--------OUTPUT TIME SERIES FOR WELL
-!        IF ( TSACTIVEGW ) THEN
-          CALL timeseries_well(Kkper, Kkstp, Qsave, QQ)
-!        END IF
+        IF ( TSACTIVEGW ) THEN
+          DO I = 1, NUMGW
+            IF ( TSGWNUM(I) == L ) THEN
+              UNIT = TSGWUNIT(I)
+              CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
+     +                             Qsave, QQ)
+            END IF
+          END DO
+        END IF
       END DO
+C
+C--------OUTPUT TIME SERIES FOR SEGMENTS
+C
+        IF ( TSACTIVESW ) THEN
+          DO I = 1, NUMSW
+            UNIT = TSSWUNIT(I)
+            L = TSSWNUM(I)
+            Qsave = demand(L)
+            QQ = SEG(2,L)
+            CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
+     +                      Qsave, QQ)
+          END DO
+        END IF      
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
 C         IF SAVING CELL-BY-CELL FLOWS IN A LIST (COMPACT BUDGET), WRITE SW IRRIGATION
@@ -2143,32 +2185,26 @@ C
 !      demandgw_prms = doneneg*QONLY(L)
 !      end function demandgw_prms
 C
-      subroutine timeseries_well(Kkper, Kkstp, qd, q)
+      subroutine timeseries(unit,Kkper, Kkstp, time, id, qd, q)
 !     ******************************************************************
-!     timeseries---- write AWU water use time series for SW and GW
+!     timeseries---- write AWU water use time series for SW and GW use
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
       USE GWFAWUMODULE
-      USE GLOBAL,     ONLY: DELR, DELC
-      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
-      !modules
       !arguments
-      integer, intent(in) :: kkper,kkstp
+      integer, intent(in) :: kkper,kkstp,id,unit
+      real, intent(in) :: time
+      double precision, intent(in) :: qd, q
       ! -- dummy
-      double precision :: zerod2,done,qd,q
-      integer :: k,iseg,ic,ir,i,l,il
 ! ----------------------------------------------------------------------
 !
-      zerod2 = 1.0d-2
-      done = 1.0d0
-      open(999,file='Qsup.out')
-      write(999,2)kkper,kkstp,qd,q
-    2 format(2i5,2e20.10)
+
+      write(unit,2)time,kkper,kkstp,id,qd,q
+    2 format(E20.10,3I10,2E20.10)
       return
-      end subroutine timeseries_well
+      end subroutine timeseries
 !
 !      subroutine UZFIRRDEMANDSET()
 !!     ******************************************************************
@@ -2540,6 +2576,10 @@ C
       DEALLOCATE (NUMIRRWELSP)
       DEALLOCATE (TSSWUNIT)
       DEALLOCATE (TSGWUNIT)  
+      DEALLOCATE (TSSWNUM)
+      DEALLOCATE (TSGWNUM)
+      DEALLOCATE (NUMSW)
+      DEALLOCATE (NUMGW)
       DEALLOCATE (TSACTIVESW)
       DEALLOCATE (TSACTIVEGW)
       DEALLOCATE (QONLY)

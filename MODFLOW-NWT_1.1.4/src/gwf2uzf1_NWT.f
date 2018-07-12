@@ -5850,6 +5850,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%FINFSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%Isavefinf)
       DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
+      DEALLOCATE (GWFUZFDAT(Igrid)%UZFRESTART)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5949,6 +5950,7 @@ C     ------------------------------------------------------------------
       FINFSAVE=>GWFUZFDAT(Igrid)%FINFSAVE
       ISAVEFINF=>GWFUZFDAT(Igrid)%ISAVEFINF
       ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
+      UZFRESTART=>GWFUZFDAT(Igrid)%UZFRESTART
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -6049,5 +6051,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%FINFSAVE=>FINFSAVE
       GWFUZFDAT(Igrid)%Isavefinf=>Isavefinf
       GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
+      GWFUZFDAT(Igrid)%UZFRESTART=>UZFRESTART
 C
       END SUBROUTINE SGWF2UZF1PSV
