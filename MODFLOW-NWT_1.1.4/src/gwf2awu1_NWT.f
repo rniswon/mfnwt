@@ -5,7 +5,8 @@
         INTEGER,SAVE,POINTER  :: IWELLCBU
         INTEGER,SAVE,POINTER  :: IRRWELLCB,IRRSFRCB
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
-        INTEGER, SAVE,POINTER :: NUMSW, NUMGW
+        LOGICAL, SAVE,POINTER :: TSACTIVEGWET, TSACTIVESWET
+        INTEGER, SAVE,POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -22,6 +23,12 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWNUM
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWET
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWET
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWETUNIT
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETUNIT
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWNUMET
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWNUMET
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
@@ -102,6 +109,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(PSIRAMP,IUNITRAMP)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
+      ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -111,8 +119,12 @@ C     ------------------------------------------------------------------
       NAUX = 0
       TSACTIVEGW=.FALSE.
       TSACTIVESW=.FALSE.
+      TSACTIVEGWET=.FALSE.
+      TSACTIVESWET=.FALSE.
       NUMSW = 0
       NUMGW = 0
+      NUMSWET = 0
+      NUMGWET = 0
 !
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
@@ -156,14 +168,24 @@ C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
 C
       ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
       ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIM))
+      ALLOCATE(TSSWET(NSEGDIM),TSGWET(MXWELL))
+      ALLOCATE(TSSWETUNIT(NSEGDIM),TSGWETUNIT(MXWELL))
+      ALLOCATE(TSSWNUMET(NSEGDIM),TSGWNUMET(MXWELL))
       TSSWUNIT = 0
       TSGWUNIT = 0
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
+      TSSWET = 0
+      TSGWET = 0
+      TSSWETUNIT = 0
+      TSGWETUNIT = 0
+      TSSWNUMET = 0
+      TSGWNUMET = 0
 C
 C4------READ TS
-      IF ( TSACTIVEGW .OR. TSACTIVESW ) CALL TSREAD(IN,IOUT)
+      IF ( TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR. 
+     +                     TSACTIVESWET) CALL TSREAD(IN,IOUT)
 C
 C3-------ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
       NUMTABHOLD = NUMTAB
@@ -395,6 +417,18 @@ C
 ! Option to output time series by GW right
         case('TIMESERIES_WELL')
             TSACTIVEGW=.TRUE.
+            WRITE(IOUT,*)
+            WRITE(IOUT,40)
+            WRITE(IOUT,*)
+            ! Option to output time series by SW right 
+        case('TIMESERIES_SFRET')
+            TSACTIVESWET=.TRUE. 
+            WRITE(IOUT,*)
+            WRITE(IOUT,39)
+            WRITE(IOUT,*)
+! Option to output time series by GW right
+        case('TIMESERIES_WELLET')
+            TSACTIVEGWET=.TRUE.
             WRITE(IOUT,*)
             WRITE(IOUT,40)
             WRITE(IOUT,*)
@@ -1278,6 +1312,36 @@ C
               WRITE(IOUT,*) 'Bad well number for AWU time series. '
               CALL USTOP('Bad well number for AWU time series.')
             END IF
+          case('SFRET')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
+            NUMSWET = NUMSWET + 1
+            TSSWETUNIT(NUMSWET) = UNIT
+            TSSWNUMET(NUMSWET) = SGNM
+            ITEST = 0
+            DO I = 1, NUMSWET - 1
+              IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
+            END DO               
+            IF ( ITEST /= 1 ) CALL WRITE_HEADER('SET',NUMSWET)
+            IF ( SGNM > NSEGDIM ) THEN
+              WRITE(IOUT,*) 'Bad segment number for AWU time series. '
+              CALL USTOP('Bad segment number for AWU time series.')
+            END IF
+          case('WELLET')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,WLNM,R,IOUT,IN)
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
+            NUMGWET = NUMGWET + 1
+            TSGWETUNIT(NUMGWET) = UNIT
+            TSGWNUMET(NUMGWET) = WLNM
+            ITEST = 0
+            DO I = 1, NUMGWET - 1
+              IF (  UNIT == TSGWETUNIT(I) ) ITEST = 1
+            END DO
+            IF ( ITEST /= 1 ) CALL WRITE_HEADER('GET',NUMGWET)
+            IF ( WLNM > MXWELL ) THEN
+              WRITE(IOUT,*) 'Bad well number for AWU ET time series. '
+              CALL USTOP('Bad well number for AWU ET time series.')
+            END IF
           case ('END')
             write(iout,'(/1x,a)') 'FINISHED READING '//
      +                            trim(adjustl(char1))
@@ -1296,11 +1360,17 @@ C
 C11-----output number of files activated for time series output.
       write(iout,6)NUMSW
       write(iout,7)NUMGW
+      write(iout,8)NUMSWET
+      write(iout,9)NUMGWET
 C
     6 FORMAT(' A total number of ',i10,' AWU output time series files '
      +       'were activated for SURFACE WATER ')
     7 FORMAT(' A total number of ',i10,' AWU output time series files '
      +       'were activated for GROUNDWATER ')
+    8 FORMAT(' A total number of ',i10,' AWU output time series files '
+     +       'were activated for SURFACE WATER ET')
+    9 FORMAT(' A total number of ',i10,' AWU output time series files '
+     +       'were activated for GROUNDWATER ET')
 
 C11-----RETURN.
       RETURN
@@ -1319,18 +1389,26 @@ C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
       integer :: UNIT,SGNM,WLNM
-      character(len=30)  :: text1        = 'AWU SFR Time Series'
-      character(len=30)  :: text2        = 'AWU WELL Time Series'
+C      character(len=30)  :: text1        = 'AWU SFR Time Series'
+C      character(len=30)  :: text2        = 'AWU WELL Time Series'
 C     ------------------------------------------------------------------  
         select case (TSTYPE)
           case('SFR')
             UNIT = TSSWUNIT(NUM)
             SGNM = TSSWNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DEMAND SW-DIVERSION'
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DUTY SW-DIVERSION'
           case('WEL')  
             UNIT = TSGWUNIT(NUM)
             WLNM = TSGWNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-DIVERSION'
+            WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-PUMPED'
+          case('SET')
+            UNIT = TSSWETUNIT(NUM)
+            SGNM = TSSWNUMET(NUM)
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETo ETa'
+          case('GET')  
+            UNIT = TSGWETUNIT(NUM)
+            WLNM = TSGWNUMET(NUM)
+            WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa'
           end select
       END SUBROUTINE WRITE_HEADER
             
@@ -1359,7 +1437,7 @@ C     ------------------------------------------------------------------
 C
 C        VARIABLES:
 C     ------------------------------------------------------------------
-      INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
+      INTEGER :: L,I,J,ISTSG,ICOUNT,IRR,ICC,IC,IR,IL,IJ,LL
       DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
       EXTERNAL :: SMOOTHQ, RATETERPQ,demandgw_uzf !, demandgw_prms
       REAL :: RATETERPQ,TIME
@@ -1397,11 +1475,9 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
             
 C
 C3------SET MAX NUMBER OF POSSIBLE WELLS.
-      NWELLSTEMP = NWELLS
-!      IF ( NUMTAB.GT.0 ) NWELLSTEMP = NUMTAB  Now mxwells/=numtab
 C
 C4------SET MAX PUMPING RATE OR IRR DEMAND FOR GW
-      DO L=1,NWELLSTEMP 
+      DO L=1, NWELLS
         IF ( NUMTAB.LE.0 ) THEN
           IR=WELL(2,L)
           IC=WELL(3,L)
@@ -1441,6 +1517,7 @@ C
 C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
             IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
             Q = SUPFLOW(L)
+            QONLY(L) = Q
           ELSE
 C
 C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
@@ -1735,31 +1812,10 @@ C
 C--------COPY FLOW TO WELL LIST.
           WELL(NWELVL,L)=QQ
       END IF
-C
-C--------OUTPUT TIME SERIES FOR WELL
-        IF ( TSACTIVEGW ) THEN
-          DO I = 1, NUMGW
-            IF ( TSGWNUM(I) == L ) THEN
-              UNIT = TSGWUNIT(I)
-              CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
-     +                             Qsave, QQ)
-            END IF
-          END DO
-        END IF
       END DO
 C
-C--------OUTPUT TIME SERIES FOR SEGMENTS
-C
-        IF ( TSACTIVESW ) THEN
-          DO I = 1, NUMSW
-            UNIT = TSSWUNIT(I)
-            L = TSSWNUM(I)
-            Qsave = demand(L)
-            QQ = SEG(2,L)
-            CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
-     +                      Qsave, QQ)
-          END DO
-        END IF      
+C--------WRITE REQUESTED TIME SERIES OUTPUT.
+      call timeseriesout(KKPER,KKSTP,TOTIM)
 C
 C12-------APPLY IRRIGATION FROM DIVERSIONS
 C         IF SAVING CELL-BY-CELL FLOWS IN A LIST (COMPACT BUDGET), WRITE SW IRRIGATION
@@ -2019,6 +2075,121 @@ C
 300   continue
       return
       end subroutine demandconjunctive_uzf
+! ----------------------------------------------------------------------
+C
+!
+!
+!
+      subroutine timeseriesout(KKPER,KKSTP,TOTIM)
+!     ******************************************************************
+!     timeseriesout---- output to time series file each time step
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFAWUMODULE
+      USE GLOBAL,     ONLY: DELR, DELC
+      USE GWFBASMODULE, ONLY: DELT
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !arguments
+      INTEGER, INTENT(IN) :: KKPER,KKSTP
+      REAL, INTENT(IN) :: TOTIM
+      !dummy
+      DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot
+      DOUBLE PRECISION :: Q, QQ, DVT
+      integer :: k,iseg,ic,ir,i,l,UNIT
+! ----------------------------------------------------------------------
+!
+C
+C
+C--------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
+C
+        IF ( TSACTIVESW ) THEN
+          DO I = 1, NUMSW
+            UNIT = TSSWUNIT(I)
+            L = TSSWNUM(I)
+            Q = demand(L)
+            QQ = SEG(2,L)
+            CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
+     +                      Q, QQ)
+          END DO
+        END IF  
+C
+C-----Output time series of ET irrigated by diversions
+C-----Total ET for all cells irrigated by each diversion
+C
+      if ( TSACTIVESWET ) then
+          do I = 1, NUMSW
+            UNIT = TSSWUNIT(I)
+            iseg = TSSWNUM(I)
+            do k = 1, DVRCH(iseg)  !cells per segement
+              IF ( ETDEMANDFLAG > 0 ) THEN
+                ic = IRRCOL(k,iseg)
+                ir = IRRROW(k,iseg)
+                area = delr(ic)*delc(ir)
+                pet = PETRATE(ic,ir)*area
+                uzet = uzfetout(ic,ir)/DELT
+                aet = gwet(ic,ir)+uzet  !vol rate
+                aettot = aettot + aet
+                pettot = pettot + pet
+              ELSE
+                dvt = SGOTFLW(iseg)*DVRPERC(k,iseg)
+                aettot = aettot + dvt*DVEFF(k,iseg)
+                pettot = aettot
+              END IF
+            end do          
+          Q = pettot
+          QQ = aettot
+          CALL timeseries(unit, Kkper, Kkstp, TOTIM, iseg, 
+     +                    Q, QQ)
+        end do
+      end if
+        
+C
+C--------OUTPUT TIME SERIES FOR WELL
+C
+      DO L=1,NWELLS
+        IF ( TSACTIVEGW ) THEN
+          DO I = 1, NUMGW
+            IF ( TSGWNUM(I) == L ) THEN
+              UNIT = TSGWUNIT(I)
+              Q = QONLY(L)
+              QQ = WELL(NWELVL,L)
+              CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
+     +                              Q, QQ)
+            END IF
+          END DO
+        END IF
+C
+C-----Total ET for all cells irrigated by each well
+C
+        IF ( TSACTIVEGWET ) THEN
+          do I = 1, NUMCELLS(L)
+            IC = UZFCOL(I,L)
+            IR = UZFROW(I,L)
+            IF ( ETDEMANDFLAG > 0 ) THEN
+              area = delr(ic)*delc(ir)
+              pet = PETRATE(ic,ir) * area
+              uzet = uzfetout(ic,ir)/DELT
+              aet = gwet(ic,ir) + uzet
+              pettot = pettot + pet
+              aettot = aettot + aet
+            ELSE
+              QQ = WELL(NWELVL,L)
+              aettot = aettot-IRRFACT(I,L)*QQ*IRRPCT(I,L)
+              pettot = pettot-IRRFACT(I,L)*QQ*IRRPCT(I,L)
+            END IF
+          end do         
+          QQ = aettot
+          Q = pettot
+          CALL timeseries(unit, Kkper, Kkstp, TOTIM, iseg, 
+     +                    Q, QQ)
+        end if
+      END DO
+      return
+      end subroutine timeseriesout
+C
 C
 !      subroutine demandconjunctive_prms()
 !!     ******************************************************************
