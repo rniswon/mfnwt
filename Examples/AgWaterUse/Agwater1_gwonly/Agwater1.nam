@@ -13,6 +13,7 @@ data                 56 seg9.tab
 AWU                  57 Agwater1.awu
 data                 62 Agwater1.hed     
 data                 106 Agwater1.ts5 
+data                 107 Agwater1_ET.ts5
 DATA(BINARY)         61 Agwater1.uzfot
 DATA(BINARY)         102 Agwater1cbc.unf
 DATA(BINARY)         103 welllist.unf

@@ -23,13 +23,12 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWNUM
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWET
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWET
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWETUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETUNIT
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWNUMET
-        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWNUMET
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWETNUM
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETNUM
         REAL,             SAVE,                 POINTER     ::PSIRAMP
+        REAL,             SAVE,                 POINTER     ::ACCEL
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
         INTEGER,          SAVE,                 POINTER     ::NUMTAB
         INTEGER,          SAVE,                 POINTER     ::MAXVAL
@@ -106,13 +105,14 @@ C     ------------------------------------------------------------------
       ALLOCATE(VBVLAG(4,10),VBNMAG(10),MSUMAG)
       ALLOCATE(NWELLS,MXWELL,NWELVL,IWELLCB,ISFRCB,NAUX,WELAUX(20))
       ALLOCATE(IRRWELLCB,IRRSFRCB,IWELLCBU)
-      ALLOCATE(PSIRAMP,IUNITRAMP)
+      ALLOCATE(PSIRAMP,IUNITRAMP,ACCEL)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
       ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
+      ACCEL = 1.0
       NUMTAB = 0
       MAXVAL = 1
       IPRWEL = 1
@@ -168,20 +168,17 @@ C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
 C
       ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
       ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIM))
-      ALLOCATE(TSSWET(NSEGDIM),TSGWET(MXWELL))
       ALLOCATE(TSSWETUNIT(NSEGDIM),TSGWETUNIT(MXWELL))
-      ALLOCATE(TSSWNUMET(NSEGDIM),TSGWNUMET(MXWELL))
+      ALLOCATE(TSSWETNUM(NSEGDIM),TSGWETNUM(MXWELL))
       TSSWUNIT = 0
       TSGWUNIT = 0
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
-      TSSWET = 0
-      TSGWET = 0
       TSSWETUNIT = 0
       TSGWETUNIT = 0
-      TSSWNUMET = 0
-      TSGWNUMET = 0
+      TSSWETNUM = 0
+      TSGWETNUM = 0
 C
 C4------READ TS
       IF ( TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR. 
@@ -508,10 +505,12 @@ C
             WRITE(IOUT,*)
             found = .true.
         case('ETDEMAND')
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,I,ACCEL,IOUT,IN)
               ETDEMANDFLAG = 1
               WRITE(iout,*)
               WRITE(IOUT,'(A)')' AGRICULTURAL DEMANDS WILL BE '//
      +        'CALCULATED USING ET DEFICIT'
+              WRITE(IOUT,41) ACCEL
               WRITE(iout,*)
               IF ( IUNIT(55) < 1 ) THEN
                 WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
@@ -589,6 +588,8 @@ C
      +,' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
    40 FORMAT(1X,' GROUND WATER IRRIGATION, POTENTIAL AND ACTUAL ET'
      +,' WILL BE SAVED TO TIMES SERIES OUTPUT FILES.')
+   41 FORMAT(1X,' IRRIGATION RATE ADJUSTMENT FACTOR WAS'
+     +,' SET EQUAL TO.',F10.3)
       END SUBROUTINE     
 C
 C
@@ -1317,7 +1318,7 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
             NUMSWET = NUMSWET + 1
             TSSWETUNIT(NUMSWET) = UNIT
-            TSSWNUMET(NUMSWET) = SGNM
+            TSSWETNUM(NUMSWET) = SGNM
             ITEST = 0
             DO I = 1, NUMSWET - 1
               IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
@@ -1332,7 +1333,7 @@ C
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
             NUMGWET = NUMGWET + 1
             TSGWETUNIT(NUMGWET) = UNIT
-            TSGWNUMET(NUMGWET) = WLNM
+            TSGWETNUM(NUMGWET) = WLNM
             ITEST = 0
             DO I = 1, NUMGWET - 1
               IF (  UNIT == TSGWETUNIT(I) ) ITEST = 1
@@ -1403,11 +1404,11 @@ C     ------------------------------------------------------------------
             WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-PUMPED'
           case('SET')
             UNIT = TSSWETUNIT(NUM)
-            SGNM = TSSWNUMET(NUM)
+            SGNM = TSSWETNUM(NUM)
             WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETo ETa'
           case('GET')  
             UNIT = TSGWETUNIT(NUM)
-            WLNM = TSGWNUMET(NUM)
+            WLNM = TSGWETNUM(NUM)
             WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa'
           end select
       END SUBROUTINE WRITE_HEADER
@@ -1441,7 +1442,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION :: ZERO, DONE, SUP, FMIN,Q,SUBVOL,SUBRATE,DVT
       EXTERNAL :: SMOOTHQ, RATETERPQ,demandgw_uzf !, demandgw_prms
       REAL :: RATETERPQ,TIME
-      DOUBLE PRECISION :: Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO
+      DOUBLE PRECISION :: Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO,QQ
       DOUBLE PRECISION :: demandgw_uzf !, demandgw_prms, mf_q2prms_inch
       INTEGER :: ihru, GSFLOW_flag
       
@@ -1523,11 +1524,14 @@ C
 C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
             IF ( ETDEMANDFLAG > 0 ) THEN
               IF ( GSFLOW_flag == 0 ) THEN
-                Q = demandgw_uzf(l)
+                QQ = demandgw_uzf(l,kkiter)
               ELSE
-!                Q = demandgw_prms(l)  
+!                QQ = demandgw_prms(l)  
               END IF
             END IF
+            IF ( QQ < Q ) QQ = Q
+            Q = QQ
+            QONLY(L) = -1.0*Q
           END IF
 C
 C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
@@ -2053,7 +2057,7 @@ C
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
-           factor = pet/aet - done
+           factor = ACCEL*(pet/aet - done)
            if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
@@ -2098,10 +2102,12 @@ C
       !dummy
       DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot
       DOUBLE PRECISION :: Q, QQ, DVT
-      integer :: k,iseg,ic,ir,i,l,UNIT
+      integer :: k,iseg,ic,ir,i,l,UNIT,J
 ! ----------------------------------------------------------------------
 !
 C
+      aettot = 0.0
+      pettot = 0.0
 C
 C--------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
 C
@@ -2120,9 +2126,9 @@ C-----Output time series of ET irrigated by diversions
 C-----Total ET for all cells irrigated by each diversion
 C
       if ( TSACTIVESWET ) then
-          do I = 1, NUMSW
-            UNIT = TSSWUNIT(I)
-            iseg = TSSWNUM(I)
+          do I = 1, NUMSWET
+            UNIT = TSSWETUNIT(I)
+            iseg = TSSWETNUM(I)
             do k = 1, DVRCH(iseg)  !cells per segement
               IF ( ETDEMANDFLAG > 0 ) THEN
                 ic = IRRCOL(k,iseg)
@@ -2154,7 +2160,7 @@ C
           DO I = 1, NUMGW
             IF ( TSGWNUM(I) == L ) THEN
               UNIT = TSGWUNIT(I)
-              Q = QONLY(L)
+              Q = -1.0*QONLY(L)
               QQ = WELL(NWELVL,L)
               CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                              Q, QQ)
@@ -2165,27 +2171,32 @@ C
 C-----Total ET for all cells irrigated by each well
 C
         IF ( TSACTIVEGWET ) THEN
-          do I = 1, NUMCELLS(L)
-            IC = UZFCOL(I,L)
-            IR = UZFROW(I,L)
-            IF ( ETDEMANDFLAG > 0 ) THEN
-              area = delr(ic)*delc(ir)
-              pet = PETRATE(ic,ir) * area
-              uzet = uzfetout(ic,ir)/DELT
-              aet = gwet(ic,ir) + uzet
-              pettot = pettot + pet
-              aettot = aettot + aet
-            ELSE
-              QQ = WELL(NWELVL,L)
-              aettot = aettot-IRRFACT(I,L)*QQ*IRRPCT(I,L)
-              pettot = pettot-IRRFACT(I,L)*QQ*IRRPCT(I,L)
-            END IF
-          end do         
-          QQ = aettot
-          Q = pettot
-          CALL timeseries(unit, Kkper, Kkstp, TOTIM, iseg, 
-     +                    Q, QQ)
-        end if
+          DO I = 1, NUMGWET
+            IF ( TSGWETNUM(I) == L ) THEN
+              UNIT = TSGWETUNIT(I)
+              do J = 1, NUMCELLS(L)
+                IC = UZFCOL(J,L)
+                IR = UZFROW(J,L)
+                IF ( ETDEMANDFLAG > 0 ) THEN
+                  area = delr(ic)*delc(ir)
+                  pet = PETRATE(ic,ir) * area
+                  uzet = uzfetout(ic,ir)/DELT
+                  aet = gwet(ic,ir) + uzet
+                  pettot = pettot + pet
+                  aettot = aettot + aet
+                ELSE
+                  QQ = WELL(NWELVL,L)
+                  aettot = aettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
+                  pettot = pettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
+                END IF
+              end do         
+              QQ = aettot
+              Q = pettot
+              CALL timeseries(unit, Kkper, Kkstp, TOTIM, l, 
+     +                        Q, QQ)
+            end if
+          END DO
+        END IF
       END DO
       return
       end subroutine timeseriesout
@@ -2236,7 +2247,7 @@ C
 !           pet = potet(hru_id)
 !           aet = hru_actet(hru_id)
 !           if ( aet < zerod30 ) aet = zerod30
-!           factor = pet/aet - done
+!           factor = ACCEL*(pet/aet - done)
 !           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
 !           IF ( FACTOR > dhundred ) FACTOR = dhundred
 !! convert PRMS ET deficit to MODFLOW flow
@@ -2260,7 +2271,7 @@ C
 !      return
 !      end subroutine demandconjunctive_prms
 C
-      double precision function demandgw_uzf(l)
+      double precision function demandgw_uzf(l,kiter)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -2273,15 +2284,17 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l
+      integer, intent(in) :: l,kiter
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod7
       integer :: iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod3 = 1.0d-3
+      zerod7 = 1.0d-7
       done = 1.0d0
       doneneg = -1.0d0
       dhundred = 100.0d0
@@ -2294,11 +2307,13 @@ C
         pet = PETRATE(ic,ir)
         uzet = uzfetout(ic,ir)/DELT
         aet = (gwet(ic,ir)+uzet)/area
-        if ( aet < zerod30 ) aet = zerod2*pet
-        factor = pet/aet - done
-        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
-        IF ( FACTOR > dhundred ) FACTOR = dhundred
+        if ( aet < zerod30 ) aet = zerod3*pet
+        factor = ACCEL*(pet/aet - done)
+        if( abs(AETITERGW(I,L)-AET) < zerod3*pet .and. 
+     +          kiter > 1 ) factor = 0.0
+!        IF ( FACTOR > 100.0d0 ) FACTOR = 100.0d0
         QONLY(L) = QONLY(L) + factor*pet*area
+        if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
         AETITERGW(I,L) = AET
@@ -2342,7 +2357,7 @@ C
 !        aet = hru_actet(ihru)
 !        area = HRU_PERV(ihru)
 !        if ( aet < zerod30 ) aet = zerod2*pet
-!        factor = pet/aet - done
+!        factor = ACCEL*(pet/aet - done)
 !        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
 !        IF ( factor > dhundred ) factor = dhundred
 !!
@@ -2754,6 +2769,11 @@ C
       DEALLOCATE (TSACTIVESW)
       DEALLOCATE (TSACTIVEGW)
       DEALLOCATE (QONLY)
+      DEALLOCATE(TSSWETUNIT)
+      DEALLOCATE(TSGWETUNIT)
+      DEALLOCATE(TSSWETNUM)
+      DEALLOCATE(TSGWETNUM)
+      DEALLOCATE(ACCEL)
 C
       RETURN
       END

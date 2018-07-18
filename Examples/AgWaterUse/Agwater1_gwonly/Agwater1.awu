@@ -1,15 +1,17 @@
 # AWU options
 options
-etdemand
+etdemand 100.
 irrigation_well 6 1 
 maxwells 6  
 welllist -2
 wellirrlist -2
 timeseries_well
+TIMESERIES_WELLET
 end
 # AWU time series
 time series
 well 5 106
+wellet 5 107
 end
 # AWU well list
 well list
