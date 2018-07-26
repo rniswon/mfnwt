@@ -1808,7 +1808,7 @@ C
       END SUBROUTINE GWF2UZF1AD
 C
 C
-C-------SUBROUTINE GWF2UZF1AD
+C-------SUBROUTINE SETLAY
       SUBROUTINE SETLAY(kkstp)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
@@ -1842,20 +1842,24 @@ C       FOR BEGINNING OF EACH TIME STEP
               ill = NLAY
               il = ILL
               DO WHILE ( ill > 0 )
-                S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
-                S2 = ZEROD15
-                IF ( ill < NLAY) THEN  
-                  IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
+                IF ( IBOUND(IC,IR,ILL) > 0 ) THEN
+                  S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
+                  S2 = ZEROD15
+                  IF ( ill < NLAY) THEN  
+                    IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
      +                        HNEW(ic, ir, ill+1) - BOTM(ic, ir, ill)
-                END IF
+                  END IF
                  
                   IF ( S1 > NEARZERO .AND. S2 > NEARZERO ) il = ill
-                  ill = ill - 1
+                END IF
+                ill = ill - 1
               END DO
-            END IF
-            IF ( IBOUND(IC,IR,IL) == 0 ) THEN
-              IUZFBND(ic, ir) = 0
-              IL = 0
+              IF ( IBOUND(IC,IR,IL) == 0 ) THEN
+                WRITE (IOUT, 9012) il,ir,ic
+ 9012   FORMAT (1X, '---ERROR---UZF cell connected to inactive cells ', 
+     +          'LAYER, ROW, COLUMN: ',3i10)
+                CALL USTOP(' ')
+              END IF
             END IF
             LAYNUM(IC,IR) = IL
           END DO
