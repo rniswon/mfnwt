@@ -1448,6 +1448,8 @@ C     ------------------------------------------------------------------
       
 C      
 C     ------------------------------------------------------------------
+C
+C1-----INITIALIZE LOCAL VARIABLES
       ZERO=0.0D0
       DONE=1.0D0
       NEARZERO = 1.0D-17
@@ -1473,55 +1475,51 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
  !         CALL demandconjunctive_prms()
         END IF
       END IF
-            
 C
-C3------SET MAX NUMBER OF POSSIBLE WELLS.
-C
-C4------SET MAX PUMPING RATE OR IRR DEMAND FOR GW
+C3------SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L=1, NWELLS
         IF ( NUMTAB.LE.0 ) THEN
           IR=WELL(2,L)
           IC=WELL(3,L)
           IL=WELL(1,L)
-          Q=WELL(4,L)   !This is just a limit for sup
+          Q=WELL(4,L)
         ELSE
           IR = TABROW(L)
           IC = TABCOL(L)
           IL = TABLAY(L)
-          Q = RATETERPQ(TIME,TABID(L))  !For IRRWELLS that are not SUPWELLS
+          Q = RATETERPQ(TIME,TABID(L))  
         END IF
         IF ( NUMIRRSFRSP + NUMIRRWELSP == 0 ) Q = 0.0
 C
-C6------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
+C4------IF THE CELL IS INACTIVE THEN BYPASS PROCESSING.
         IF(IBOUND(IC,IR,IL) > 0) THEN
 C
-C7------CALCULATE SUPPLEMENTAL PUMPING FOR THIS WELL
-          SUP = 0.0
+C5------CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
+          SUP = ZERO
           IF ( NUMSEGS(L) > 0 ) THEN
             DO I = 1, NUMSEGS(L)
               J = SFRSEG(I,L)
               IF ( ETDEMANDFLAG > 0 ) THEN
                 FMIN = SUPACT(J)
-                QSW = DEMAND(J)   !change the name of demand to duty 
+                QSW = DEMAND(J)   
               ELSE
                 QSW = SGOTFLW(J)
-                FMIN = DEMAND(J)   !change the name of demand to duty 
+                FMIN = DEMAND(J)  
               END IF
               FMIN = PCTSUP(I,L)*(FMIN - QSW)
               IF ( FMIN < ZERO ) FMIN = ZERO
               SUP = SUP + FMIN
-!            SUP = SUP - ACTUAL(J)
             END DO
-!            IF ( SUP < ZERO ) SUP = ZERO
+
             SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
 C
-C5A------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
+C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
             IF ( SUPFLOW(L) < Q ) SUPFLOW(L) = Q
             Q = SUPFLOW(L)
             QONLY(L) = Q
           ELSE
 C
-C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
+C7------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
             IF ( ETDEMANDFLAG > 0 ) THEN
               IF ( GSFLOW_flag == 0 ) THEN
                 QQ = demandgw_uzf(l,kkiter)
@@ -1534,7 +1532,7 @@ C6------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
             QONLY(L) = -1.0*Q
           END IF
 C
-C7------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
+C8------IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
 C       THE RHS ACCUMULATOR.
           IF ( IUNITNWT.NE.0 ) THEN
             IF ( LAYTYPUPW(il).GT.0 ) THEN
@@ -1558,7 +1556,7 @@ C8------Derivative for RHS
 C
 C3------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
           SUP = 0.0
-          DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supportes by single well
+          DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
             J = SFRSEG(I,L) 
             SUP = SUP - Qp
             ACTUAL(J)  = ACTUAL(J) + SUP
@@ -2170,6 +2168,8 @@ C
 C
 C-----Total ET for all cells irrigated by each well
 C
+        aettot = 0.0
+        pettot = 0.0
         IF ( TSACTIVEGWET ) THEN
           DO I = 1, NUMGWET
             IF ( TSGWETNUM(I) == L ) THEN

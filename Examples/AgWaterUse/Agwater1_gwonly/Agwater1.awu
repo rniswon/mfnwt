@@ -6,12 +6,12 @@ maxwells 6
 welllist -2
 wellirrlist -2
 timeseries_well
-TIMESERIES_WELLET
+timeseries_wellet
 end
 # AWU time series
 time series
-well 5 106
-wellet 5 107
+well 5 105
+wellet 5 106
 end
 # AWU well list
 well list
