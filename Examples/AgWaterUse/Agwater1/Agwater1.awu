@@ -1,6 +1,6 @@
 # AWU options
 options
-etdemand
+etdemand 1000.
 irrigation_sfr 1 6
 supplemental_well 6 1 
 irrigation_well 6 1 
@@ -9,13 +9,15 @@ sfrlist -2
 welllist -2
 wellirrlist -2
 sfrirrlist -2
-timeseries_sfr
 timeseries_well
+timeseries_sfr
+timeseries_sfret
 end
 # AWU time series
 time series
-sfr 9 105
-well 5 106
+well 5 105   
+sfr 9 107      
+sfret 9 108
 end
 # AWU well list
 well list

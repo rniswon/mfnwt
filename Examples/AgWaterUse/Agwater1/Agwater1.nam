@@ -11,9 +11,10 @@ GAGE                 32 Agwater1.gag
 data                 55 seg1.tab
 data                 56 seg9.tab
 AWU                  57 Agwater1.awu
-data                 62 Agwater1.hed     
-data                 105 Agwater1SW.ts9  
-data                 106 Agwater1GW.ts5 
+data                 62 Agwater1.hed 
+data                 105 Agwater1gw.ts5     
+data                 107 Agwater1SW.ts9 
+data                 108 Agwater1SW_ET.ts9 
 DATA(BINARY)         61 Agwater1.uzfot
 DATA(BINARY)         102 Agwater1cbc.unf
 DATA(BINARY)         103 welllist.unf

@@ -7,6 +7,7 @@
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE,POINTER :: TSACTIVEGWET, TSACTIVESWET
         INTEGER, SAVE,POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
+        INTEGER, SAVE,POINTER :: TSGWETALLUNIT
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -47,6 +48,7 @@
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::IRRPCT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::SUPWELVAR
         REAL,             SAVE, DIMENSION(:),   POINTER     ::SUPFLOW
+        REAL,             SAVE, DIMENSION(:),   POINTER     ::SUPSEG
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::IRRWELVAR
         REAL,             SAVE, DIMENSION(:,:),   POINTER     ::PCTSUP
         INTEGER,          SAVE,                 POINTER     ::NUMSUP
@@ -108,7 +110,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(PSIRAMP,IUNITRAMP,ACCEL)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
-      ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET)
+      ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET,TSGWETALLUNIT)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -125,6 +127,7 @@ C     ------------------------------------------------------------------
       NUMGW = 0
       NUMSWET = 0
       NUMGWET = 0
+      TSGWETALLUNIT = 0
 !
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
@@ -169,7 +172,7 @@ C
       ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
       ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIM))
       ALLOCATE(TSSWETUNIT(NSEGDIM),TSGWETUNIT(MXWELL))
-      ALLOCATE(TSSWETNUM(NSEGDIM),TSGWETNUM(MXWELL))
+      ALLOCATE(TSSWETNUM(NSEGDIM),TSGWETNUM(MXWELL),SUPSEG(NSEGDIM))
       TSSWUNIT = 0
       TSGWUNIT = 0
       TSSWNUM = 0
@@ -179,6 +182,7 @@ C
       TSGWETUNIT = 0
       TSSWETNUM = 0
       TSGWETNUM = 0
+      SUPSEG = 0.0
 C
 C4------READ TS
       IF ( TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR. 
@@ -1343,6 +1347,10 @@ C
               WRITE(IOUT,*) 'Bad well number for AWU ET time series. '
               CALL USTOP('Bad well number for AWU ET time series.')
             END IF
+          case('WELLETALL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
+            TSGWETALLUNIT = UNIT
+            CALL WRITE_HEADER('ALL',NUMGWET)
           case ('END')
             write(iout,'(/1x,a)') 'FINISHED READING '//
      +                            trim(adjustl(char1))
@@ -1397,19 +1405,23 @@ C     ------------------------------------------------------------------
           case('SFR')
             UNIT = TSSWUNIT(NUM)
             SGNM = TSSWNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DUTY SW-DIVERSION'
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DUTY SW-DIVERSION ',
+     +                   'SUP-PUMPING'
           case('WEL')  
             UNIT = TSGWUNIT(NUM)
             WLNM = TSGWNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-PUMPED'
+            WRITE(UNIT,*)'TIME KPER KSTP WELL GW-DEMAND GW-PUMPED NULL'
           case('SET')
             UNIT = TSSWETUNIT(NUM)
             SGNM = TSSWETNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETo ETa'
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETo ETa NULL'
           case('GET')  
             UNIT = TSGWETUNIT(NUM)
             WLNM = TSGWETNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa'
+            WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa NULL'
+          case('ALL')  
+            UNIT = TSGWETALLUNIT
+            WRITE(UNIT,*)'TIME KPER KSTP NULL ETo ETa NULL'
           end select
       END SUBROUTINE WRITE_HEADER
             
@@ -1426,7 +1438,7 @@ C     ------------------------------------------------------------------
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM,DELT
       USE GWFAWUMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, SEG
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
 !      USE PRMS_MODULE, ONLY: GSFLOW_flag
@@ -1470,7 +1482,7 @@ C
 C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( ETDEMANDFLAG > 0 ) THEN
         IF ( GSFLOW_flag == 0 ) THEN
-          CALL demandconjunctive_uzf()
+          CALL demandconjunctive_uzf(kkper,kkstp,kkiter)
         ELSE
  !         CALL demandconjunctive_prms()
         END IF
@@ -1501,7 +1513,7 @@ C5------CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
               J = SFRSEG(I,L)
               IF ( ETDEMANDFLAG > 0 ) THEN
                 FMIN = SUPACT(J)
-                QSW = DEMAND(J)   
+                QSW = SEG(2,J)   
               ELSE
                 QSW = SGOTFLW(J)
                 FMIN = DEMAND(J)  
@@ -1522,7 +1534,7 @@ C
 C7------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
             IF ( ETDEMANDFLAG > 0 ) THEN
               IF ( GSFLOW_flag == 0 ) THEN
-                QQ = demandgw_uzf(l,kkiter)
+                QQ = demandgw_uzf(l,kkper,kkstp,kkiter,time)
               ELSE
 !                QQ = demandgw_prms(l)  
               END IF
@@ -1541,6 +1553,7 @@ C       THE RHS ACCUMULATOR.
               ttop = Botm(IC, IR, Lbotm(IL)-1)
               Qp = Q*smoothQ(Hh,Ttop,Bbot,dQp)
               RHS(IC,IR,IL)=RHS(IC,IR,IL)-Qp
+!      if(l==3)write(888,*)kkper,kkstp,kkiter,Qp,Qsw
 C
 C8------Derivative for RHS
               ij = Icell(IC,IR,IL)
@@ -1664,6 +1677,7 @@ C     ------------------------------------------------------------------
       QWELLET=ZERO
       QWELL=ZERO
       QIRR=ZERO
+      SUPSEG=ZERO
       TOTWELLCELLS=0
       TOTSFRCELLS=0
       TIME = TOTIM
@@ -1778,6 +1792,7 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             J = SFRSEG(I,L) 
             SUP = SUP - Q
             ACTUAL(J)  = ACTUAL(J) + SUP
+            SUPSEG(J) = SUPSEG(J) - Q/dble(NUMSUPWELLSEG(L))
           END DO
 C
 C9------CALCULATE IRRIGATION FROM WELLS
@@ -2010,14 +2025,14 @@ C19------RETURN
       END
 ! ----------------------------------------------------------------------
 C
-      subroutine demandconjunctive_uzf()
+      subroutine demandconjunctive_uzf(kper,kstp,kiter)
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk
-      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFSFRMODULE, ONLY: SEG,DVRSFLW
       USE GWFAWUMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2025,15 +2040,16 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
+      integer, intent(in) :: kper,kstp,kiter
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+      double precision :: zerod5,zerod30,done,dzero,dum,pettotal, 
      +                    aettotal,dhundred
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod5 = 1.0d-5
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -2042,6 +2058,9 @@ C1------loop over diversion segments that supply irrigation
 C
       do 300 i = 1, NUMIRRSFRSP
         iseg = IRRSEG(i)
+C
+C1b-------Update demand as max flow is segment
+C
         IF ( DEMAND(iseg) < zerod30 ) goto 300
         finfsum = dzero
 C
@@ -2056,7 +2075,7 @@ C
            aet = (gwet(ic,ir)+uzet)/area
            if ( aet < zerod30 ) aet = zerod30
            factor = ACCEL*(pet/aet - done)
-           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod30 ) factor = 0.0
            IF ( FACTOR > dhundred ) FACTOR = dhundred
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
@@ -2071,9 +2090,15 @@ C1------set diversion to demand
 C
       SEG(2,iseg) = SUPACT(iseg)
 C
-C1------limit diversion to water right
+C1------limit diversion to water right and flow in river
 C
+!      k = IDIVAR(1,ISEG)
+!      if(kper==9.and.kstp==22)write(888,333)kiter,k,SEG(2,iseg),
+!     +   DVRSFLW(iseg),demand(ISEG),factor,pet,aet
+!333   format(2i5,6e20.10)
+      IF ( SEG(2,iseg) > DVRSFLW(iseg) ) SEG(2,iseg) = DVRSFLW(iseg)
       if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+      
 300   continue
       return
       end subroutine demandconjunctive_uzf
@@ -2099,13 +2124,14 @@ C
       REAL, INTENT(IN) :: TOTIM
       !dummy
       DOUBLE PRECISION :: area, uzet, aet, pet, aettot, pettot
-      DOUBLE PRECISION :: Q, QQ, DVT
+      DOUBLE PRECISION :: Q, QQ, QQQ, DVT
       integer :: k,iseg,ic,ir,i,l,UNIT,J
 ! ----------------------------------------------------------------------
 !
 C
       aettot = 0.0
       pettot = 0.0
+      QQQ = 0.0
 C
 C--------OUTPUT TIME SERIES FOR SEGMENTS DIVERSIONS
 C
@@ -2115,8 +2141,9 @@ C
             L = TSSWNUM(I)
             Q = demand(L)
             QQ = SEG(2,L)
+            QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
-     +                      Q, QQ)
+     +                      Q, QQ, QQQ)
           END DO
         END IF  
 C
@@ -2145,8 +2172,9 @@ C
             end do          
           Q = pettot
           QQ = aettot
+          QQQ = 0.0
           CALL timeseries(unit, Kkper, Kkstp, TOTIM, iseg, 
-     +                    Q, QQ)
+     +                    Q, QQ, QQQ)
         end do
       end if
         
@@ -2159,9 +2187,10 @@ C
             IF ( TSGWNUM(I) == L ) THEN
               UNIT = TSGWUNIT(I)
               Q = -1.0*QONLY(L)
-              QQ = WELL(NWELVL,L)
+              QQ = -1.0*WELL(NWELVL,L)
+              QQQ = 0.0
               CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
-     +                              Q, QQ)
+     +                              Q, QQ, QQQ)
             END IF
           END DO
         END IF
@@ -2189,15 +2218,46 @@ C
                   aettot = aettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
                   pettot = pettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
                 END IF
-              end do         
+              end do      
+              QQQ = 0.0
               QQ = aettot
               Q = pettot
               CALL timeseries(unit, Kkper, Kkstp, TOTIM, l, 
-     +                        Q, QQ)
+     +                        Q, QQ, QQQ)
             end if
           END DO
         END IF
       END DO
+      aettot = 0.0
+      pettot = 0.0
+      j = 0
+      IF ( TSGWETALLUNIT > 0 ) THEN
+        DO L=1, NWELLS
+          UNIT = TSGWETALLUNIT
+          do J = 1, NUMCELLS(L)
+            IC = UZFCOL(J,L)
+            IR = UZFROW(J,L)
+            IF ( ETDEMANDFLAG > 0 ) THEN
+              area = delr(ic)*delc(ir)
+              pet = PETRATE(ic,ir) * area
+              uzet = uzfetout(ic,ir)/DELT
+              aet = gwet(ic,ir) + uzet
+              pettot = pettot + pet
+              aettot = aettot + aet
+            ELSE
+              QQ = WELL(NWELVL,L)
+              aettot = aettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
+              pettot = pettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
+            END IF
+          end do      
+          QQQ = 0.0
+          QQ = aettot
+          Q = pettot
+          j = 0
+        END DO
+        CALL timeseries(unit, Kkper, Kkstp, TOTIM, j, 
+     +                        Q, QQ, QQQ)
+      END IF
       return
       end subroutine timeseriesout
 C
@@ -2266,12 +2326,14 @@ C
 !C
 !C1------limit diversion to water right
 !C
-!      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+       !k = IDIVAR(1,ISEG)
+       !IF ( SEG(2,iseg) > SGOTFLW(k) ) SEG(2,iseg) = SGOTFLW(k)
+       !IF ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
 !300   continue
 !      return
 !      end subroutine demandconjunctive_prms
 C
-      double precision function demandgw_uzf(l,kiter)
+      double precision function demandgw_uzf(l,kper,kstp,kiter,time)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -2284,12 +2346,15 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l,kiter
+      integer, intent(in) :: l,kiter,kper,kstp
+      real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
       double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
       double precision :: zerod7
       integer :: iseg,ic,ir,i
+      external :: RATETERPQ
+      real :: RATETERPQ, Q
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
@@ -2299,6 +2364,8 @@ C
       doneneg = -1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
+      Q=WELL(4,L)
+      IF ( NUMTAB.GT.0 ) Q = RATETERPQ(TIME,TABID(L))  
       demandgw_uzf = DZERO
       DO I = 1, NUMCELLS(L)
         IC = UZFCOL(I,L)
@@ -2307,16 +2374,20 @@ C
         pet = PETRATE(ic,ir)
         uzet = uzfetout(ic,ir)/DELT
         aet = (gwet(ic,ir)+uzet)/area
-        if ( aet < zerod30 ) aet = zerod3*pet
+        if ( aet < zerod30 ) aet = zerod30
         factor = ACCEL*(pet/aet - done)
-        if( abs(AETITERGW(I,L)-AET) < zerod3*pet .and. 
-     +          kiter > 1 ) factor = 0.0
-!        IF ( FACTOR > 100.0d0 ) FACTOR = 100.0d0
+        if( abs(AETITERGW(I,L)-AET) < zerod30 ) factor = 0.0
+        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*pet*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
+        if ( QONLY(L) > doneneg*Q ) QONLY(L) = doneneg*Q
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
         AETITERGW(I,L) = AET
+!
+!      if(kper==9.and.kstp==12.and.l==3)write(888,333)kiter,QONLY(L),
+!     +  factor,aet,AETITERGW(I,L)
+!333   format(i5,4e20.10)
       end do
       demandgw_uzf = doneneg*QONLY(L)
       end function demandgw_uzf
@@ -2371,7 +2442,7 @@ C
 !      demandgw_prms = doneneg*QONLY(L)
 !      end function demandgw_prms
 C
-      subroutine timeseries(unit,Kkper, Kkstp, time, id, qd, q)
+      subroutine timeseries(unit, Kkper, Kkstp, time, id, qd, q, qq)
 !     ******************************************************************
 !     timeseries---- write AWU water use time series for SW and GW use
 !     ******************************************************************
@@ -2382,13 +2453,12 @@ C
       !arguments
       integer, intent(in) :: kkper,kkstp,id,unit
       real, intent(in) :: time
-      double precision, intent(in) :: qd, q
+      double precision, intent(in) :: qd, q, qq
       ! -- dummy
 ! ----------------------------------------------------------------------
 !
-
-      write(unit,2)time,kkper,kkstp,id,qd,q
-    2 format(E20.10,3I10,2E20.10)
+      write(unit,2)time,kkper,kkstp,id,qd,q,qq
+    2 format(E20.10,3I10,3E20.10)
       return
       end subroutine timeseries
 !
@@ -2769,11 +2839,13 @@ C
       DEALLOCATE (TSACTIVESW)
       DEALLOCATE (TSACTIVEGW)
       DEALLOCATE (QONLY)
-      DEALLOCATE(TSSWETUNIT)
-      DEALLOCATE(TSGWETUNIT)
-      DEALLOCATE(TSSWETNUM)
-      DEALLOCATE(TSGWETNUM)
-      DEALLOCATE(ACCEL)
+      DEALLOCATE (TSSWETUNIT)
+      DEALLOCATE (TSGWETUNIT)
+      DEALLOCATE (TSSWETNUM)
+      DEALLOCATE (TSGWETNUM)
+      DEALLOCATE (ACCEL)
+      DEALLOCATE (SUPSEG)
+      DEALLOCATE (TSGWETALLUNIT)
 C
       RETURN
       END

@@ -1,6 +1,6 @@
 # AWU options
 options
-etdemand 100.
+etdemand 1000.
 irrigation_well 6 1 
 maxwells 6  
 welllist -2
@@ -12,6 +12,7 @@ end
 time series
 well 5 105
 wellet 5 106
+welletall 107
 end
 # AWU well list
 well list
@@ -27,19 +28,19 @@ stress period 1
 IRRWELL
 0
 END
-stress period 2
+stress period 2   Jan
 IRRWELL
 -1
 END
-stress period 3
+stress period 3   Feb
 IRRWELL
 -1
 END
-stress period 4
+stress period 4   Mar
 IRRWELL
 -1
 END
-stress period 5 
+stress period 5   April
 IRRWELL
 6
 1 1                       IRRWELLLID NUMCELLWELL 
@@ -55,51 +56,51 @@ IRRWELL
 6 1
 8 5 0.0 1.0 
 end
-stress period 6     
+stress period 6     May
 IRRWELL
 -1 
 END
-stress period 7
+stress period 7     June
 IRRWELL
 -1
 END
-stress period 8
+stress period 8     July
 IRRWELL
 -1
 END
-stress period 9
+stress period 9     Aug
 IRRWELL
 -1
 END
-stress period 10
+stress period 10    Sept
 IRRWELL
 -1
 END
-stress period 11
+stress period 11    Oct
 IRRWELL
 0
 END
-stress period 12
+stress period 12    Nov
 IRRWELL
 -1
 END
-stress period 13
+stress period 13    Dec
 IRRWELL
 -1
 END 
-stress period 14
+stress period 14    Jan
 IRRWELL
 -1
 END
-stress period 15
+stress period 15    Feb
 IRRWELL
 -1
 END
-stress period 16
+stress period 16    March
 IRRWELL
 -1
 END
-stress period 17
+stress period 17    April
 IRRWELL
 6
 1 1                       IRRWELLLID NUMCELLWELL 
@@ -115,39 +116,35 @@ IRRWELL
 6 1
 8 5 0.0 1.0 
 end
-stress period 18
+stress period 18     May
 IRRWELL
 -1
 END
-stress period 19
+stress period 19     June
 IRRWELL
 -1
 END
-stress period 20
+stress period 20     July
 IRRWELL
 -1
 END
-stress period 21
+stress period 21     August
 IRRWELL
 -1
 END
-stress period 22
+stress period 22     Sept
+IRRWELL
+-1
+END
+stress period 23      Oct
 IRRWELL
 0
 END
-stress period 23
+stress period 24      Nov
 IRRWELL
 -1
 END
-stress period 24
-IRRWELL
--1
-END
-stress period 25
-IRRWELL
--1
-END
-stress period 26
+stress period 25      Dec
 IRRWELL
 -1
 END
