@@ -13,6 +13,7 @@ time series
 well 5 105
 wellet 5 106
 welletall 107
+wellall 108
 end
 # AWU well list
 well list

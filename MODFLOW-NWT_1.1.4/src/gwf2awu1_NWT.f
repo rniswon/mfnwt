@@ -7,7 +7,7 @@
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE,POINTER :: TSACTIVEGWET, TSACTIVESWET
         INTEGER, SAVE,POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
-        INTEGER, SAVE,POINTER :: TSGWETALLUNIT
+        INTEGER, SAVE,POINTER :: TSGWETALLUNIT, TSGWALLUNIT
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -110,7 +110,8 @@ C     ------------------------------------------------------------------
       ALLOCATE(PSIRAMP,IUNITRAMP,ACCEL)
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
-      ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET,TSGWETALLUNIT)
+      ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET)
+      ALLOCATE(TSGWALLUNIT,TSGWETALLUNIT)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -128,6 +129,7 @@ C     ------------------------------------------------------------------
       NUMSWET = 0
       NUMGWET = 0
       TSGWETALLUNIT = 0
+      TSGWALLUNIT = 0
 !
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
@@ -1270,13 +1272,15 @@ C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
-      INTEGER ISTARTSAVE,ITEST
+      INTEGER ISTARTSAVE,ITEST,NUMGWETALL,NUMGWALL
       real :: R
       character(len=16)  :: text        = 'AWU'
       character(len=17)  :: char1     = 'TIME SERIES'
       character(len=200) :: line
 C     ------------------------------------------------------------------  
 C
+       NUMGWETALL = 0
+       NUMGWALL = 0
        CALL URDCOM(In, IOUT, line)
        LLOC=1
        CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
@@ -1350,7 +1354,13 @@ C
           case('WELLETALL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
             TSGWETALLUNIT = UNIT
-            CALL WRITE_HEADER('ALL',NUMGWET)
+            CALL WRITE_HEADER('AL1',NUMGWET)
+            NUMGWETALL = 1
+          case('WELLALL')
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
+            TSGWALLUNIT = UNIT
+            CALL WRITE_HEADER('AL2',NUMGWET)
+            NUMGWALL = 1
           case ('END')
             write(iout,'(/1x,a)') 'FINISHED READING '//
      +                            trim(adjustl(char1))
@@ -1368,9 +1378,9 @@ C
 C
 C11-----output number of files activated for time series output.
       write(iout,6)NUMSW
-      write(iout,7)NUMGW
+      write(iout,7)NUMGW + NUMGWALL
       write(iout,8)NUMSWET
-      write(iout,9)NUMGWET
+      write(iout,9)NUMGWET + NUMGWETALL
 C
     6 FORMAT(' A total number of ',i10,' AWU output time series files '
      +       'were activated for SURFACE WATER ')
@@ -1419,9 +1429,12 @@ C     ------------------------------------------------------------------
             UNIT = TSGWETUNIT(NUM)
             WLNM = TSGWETNUM(NUM)
             WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa NULL'
-          case('ALL')  
+          case('AL1')  
             UNIT = TSGWETALLUNIT
             WRITE(UNIT,*)'TIME KPER KSTP NULL ETo ETa NULL'
+          case('AL2')  
+            UNIT = TSGWALLUNIT
+            WRITE(UNIT,*)'TIME KPER KSTP NULL GW-DEMAND GW-PUMPED NULL'
           end select
       END SUBROUTINE WRITE_HEADER
             
@@ -2141,7 +2154,7 @@ C
             L = TSSWNUM(I)
             Q = demand(L)
             QQ = SEG(2,L)
-            QQQ = SUPSEG(L)
+            QQQ = QQQ + SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                      Q, QQ, QQQ)
           END DO
@@ -2186,7 +2199,7 @@ C
           DO I = 1, NUMGW
             IF ( TSGWNUM(I) == L ) THEN
               UNIT = TSGWUNIT(I)
-              Q = -1.0*QONLY(L)
+              Q = QONLY(L)
               QQ = -1.0*WELL(NWELVL,L)
               QQQ = 0.0
               CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
@@ -2222,15 +2235,17 @@ C
               QQQ = 0.0
               QQ = aettot
               Q = pettot
-              CALL timeseries(unit, Kkper, Kkstp, TOTIM, l, 
+              CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                        Q, QQ, QQQ)
             end if
           END DO
         END IF
       END DO
+C
+C-------TOTAL ET FOR ALL WELLS USED FOR IRRIGATION
+C
       aettot = 0.0
       pettot = 0.0
-      j = 0
       IF ( TSGWETALLUNIT > 0 ) THEN
         DO L=1, NWELLS
           UNIT = TSGWETALLUNIT
@@ -2250,12 +2265,28 @@ C
               pettot = pettot-IRRFACT(J,L)*QQ*IRRPCT(J,L)
             END IF
           end do      
-          QQQ = 0.0
           QQ = aettot
           Q = pettot
-          j = 0
         END DO
-        CALL timeseries(unit, Kkper, Kkstp, TOTIM, j, 
+        QQQ = 0.0
+        J = 0
+        CALL timeseries(unit, Kkper, Kkstp, TOTIM, J, 
+     +                        Q, QQ, QQQ)
+      END IF
+C
+C-------TOTAL GW USED BY ALL WELLS FOR IRRIGATION
+C
+      IF ( TSGWALLUNIT > 0 ) THEN
+        Q = 0.0
+        QQ = 0.0
+        J = 0
+        DO L=1, NWELLS
+          UNIT = TSGWALLUNIT
+          Q = Q + 1.0*QONLY(L)
+          QQ = QQ - 1.0*WELL(NWELVL,L)
+          QQQ = 0.0
+        END DO
+        CALL timeseries(unit, Kkper, Kkstp, TOTIM, J, 
      +                        Q, QQ, QQQ)
       END IF
       return

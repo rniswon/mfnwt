@@ -15,6 +15,7 @@ data                 62 Agwater1.hed
 data                 105 Agwater1GW.ts5 
 data                 106 Agwater1GW_ET.ts5    
 data                 107 Agwater1GW_ET.all
+data                 108 Agwater1GW.all
 DATA(BINARY)         61 Agwater1.uzfot
 DATA(BINARY)         102 Agwater1cbc.unf
 DATA(BINARY)         103 welllist.unf
