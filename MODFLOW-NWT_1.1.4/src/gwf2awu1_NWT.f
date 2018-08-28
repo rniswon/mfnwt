@@ -7,7 +7,7 @@
         LOGICAL, SAVE,POINTER :: TSACTIVEGW, TSACTIVESW
         LOGICAL, SAVE,POINTER :: TSACTIVEGWET, TSACTIVESWET
         INTEGER, SAVE,POINTER :: NUMSW, NUMGW, NUMSWET, NUMGWET
-        INTEGER, SAVE,POINTER :: TSGWETALLUNIT, TSGWALLUNIT
+        INTEGER, SAVE,POINTER :: TSGWETALLUNIT, TSGWALLUNIT, NSEGDIMTEMP
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::WELAUX
         CHARACTER(LEN=16),SAVE, DIMENSION(:),   POINTER     ::SFRAUX
         REAL,             SAVE, DIMENSION(:,:), POINTER     ::WELL
@@ -28,6 +28,7 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETUNIT
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWETNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETNUM
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::LASTREACH
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         REAL,             SAVE,                 POINTER     ::ACCEL
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
@@ -81,7 +82,7 @@
       END MODULE GWFAWUMODULE
 
 
-      SUBROUTINE GWF2AWU7AR(IN,IUNITNWT)
+      SUBROUTINE GWF2AWU7AR(IN,IUNITSFR,IUNITNWT)
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR AWU PACKAGE
 C     ******************************************************************
@@ -94,7 +95,7 @@ C     ------------------------------------------------------------------
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C        ARGUMENTS
-      integer,intent(in) :: IN,IUNITNWT
+      integer,intent(in) :: IN,IUNITSFR,IUNITNWT
 C     ------------------------------------------------------------------
 C        VARIABLES
 !      CHARACTER(len=16) :: text        = ' AWU PACKAGE '
@@ -111,7 +112,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(NUMTAB,MAXVAL,NPWEL,NNPWEL,IPRWEL)
       ALLOCATE(TSACTIVEGW,TSACTIVESW,NUMSW,NUMGW)
       ALLOCATE(TSACTIVEGWET,TSACTIVESWET,NUMSWET,NUMGWET)
-      ALLOCATE(TSGWALLUNIT,TSGWETALLUNIT)
+      ALLOCATE(TSGWALLUNIT,TSGWETALLUNIT,NSEGDIMTEMP)
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
@@ -171,12 +172,13 @@ C
 C
 C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
 C
-      ALLOCATE(TSSWUNIT(NSEGDIM),TSGWUNIT(MXWELL),QONLY(MXWELL))
-      ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIM))
-      ALLOCATE(TSSWETUNIT(NSEGDIM),TSGWETUNIT(MXWELL))
-      ALLOCATE(TSSWETNUM(NSEGDIM),TSGWETNUM(MXWELL),SUPSEG(NSEGDIM))
-      TSSWUNIT = 0
-      TSGWUNIT = 0
+      IF ( IUNITSFR > 0 ) NSEGDIMTEMP = NSEGDIM
+      ALLOCATE(TSSWUNIT(NSEGDIMTEMP),TSGWUNIT(MXWELL),QONLY(MXWELL))
+      ALLOCATE(TSGWNUM(MXWELL),TSSWNUM(NSEGDIMTEMP))
+      ALLOCATE(TSSWETUNIT(NSEGDIMTEMP),TSGWETUNIT(MXWELL))
+      ALLOCATE(TSSWETNUM(NSEGDIMTEMP),TSGWETNUM(MXWELL))
+      ALLOCATE(SUPSEG(NSEGDIMTEMP))
+      ALLOCATE(LASTREACH(NSEGDIMTEMP))
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -185,6 +187,7 @@ C
       TSSWETNUM = 0
       TSGWETNUM = 0
       SUPSEG = 0.0
+      LASTREACH = 0
 C
 C4------READ TS
       IF ( TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR. 
@@ -233,10 +236,9 @@ C
           NUMSUPHOLD = 1
           MXACTWSUP = 1
           MAXSEGSHOLD = 1
-          ALLOCATE (DEMAND(1),ACTUAL(1),SUPACT(1))
-      ELSE
-          ALLOCATE (DEMAND(NSEGDIM),ACTUAL(NSEGDIM),SUPACT(NSEGDIM))
-      END IF     
+      END IF
+      ALLOCATE (DEMAND(NSEGDIMTEMP),ACTUAL(NSEGDIMTEMP))
+      ALLOCATE (SUPACT(NSEGDIMTEMP))   
       IF ( NUMIRRHOLD.EQ.0 ) THEN
         MAXCELLSHOLD = 1
         NUMIRRHOLD = 1
@@ -274,14 +276,15 @@ C
 C
 C-------allocate for SFR AWUptions
       IF ( NUMIRRSFR > 0 ) THEN
-        ALLOCATE (DVRCH(NSEGDIM),DVEFF(MAXCELLSSFR,NSEGDIM))
-!        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIM))
-        ALLOCATE (IRRROW(MAXCELLSSFR,NSEGDIM))
-        ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIM)) 
-        ALLOCATE(AETITERSW(MAXCELLSSFR,NSEGDIM))
-        ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIM))  
-        ALLOCATE (SFRIRRUZF(NCOL,NROW),SFRIRRPRMS(MAXCELLSSFR,NSEGDIM))
-        ALLOCATE (IRRSEG(NSEGDIM))
+        ALLOCATE (DVRCH(NSEGDIMTEMP),DVEFF(MAXCELLSSFR,NSEGDIMTEMP))
+!        ALLOCATE (KCROP(MAXCELLSSFR,NSEGDIMTEMP))
+        ALLOCATE (IRRROW(MAXCELLSSFR,NSEGDIMTEMP))
+        ALLOCATE (IRRCOL(MAXCELLSSFR,NSEGDIMTEMP)) 
+        ALLOCATE(AETITERSW(MAXCELLSSFR,NSEGDIMTEMP))
+        ALLOCATE (DVRPERC(MAXCELLSSFR,NSEGDIMTEMP))  
+        ALLOCATE (SFRIRRUZF(NCOL,NROW))
+        ALLOCATE (SFRIRRPRMS(MAXCELLSSFR,NSEGDIMTEMP))
+        ALLOCATE (IRRSEG(NSEGDIMTEMP))
       ELSE
         ALLOCATE (DVRCH(1),DVEFF(1,1)) !  ,KCROP(1,1))      
         ALLOCATE (IRRROW(1,1),IRRCOL(1,1))  
@@ -599,7 +602,7 @@ C
       END SUBROUTINE     
 C
 C
-      SUBROUTINE GWF2AWU7RP(IN,KPER)
+      SUBROUTINE GWF2AWU7RP(IN,IUNITSFR,KPER)
 C     ******************************************************************
 C     READ AWU DATA FOR A STRESS PERIOD
 C     ******************************************************************
@@ -608,11 +611,12 @@ C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
       USE GWFAWUMODULE
+      USE GWFSFRMODULE, ONLY: ISTRM,NSTRM,NSS
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C        ARGUMENTS:
 C     ------------------------------------------------------------------
-      INTEGER, INTENT(IN):: IN, KPER
+      INTEGER, INTENT(IN):: IN, KPER, IUNITSFR
 C     ------------------------------------------------------------------
 C        VARIABLES:
 C     ------------------------------------------------------------------
@@ -631,6 +635,7 @@ C     ------------------------------------------------------------------
 
       INTEGER LLOC,ISTART,ISTOP,ISTARTSAVE
       INTEGER J,II,KPER2,L,MATCH,NUMTABS
+      INTEGER istsg, nreach, istsgold
       logical :: FOUND
       logical :: found1,found2,found3,found4
       REAL :: R,TTIME,TRATE
@@ -734,6 +739,18 @@ C3------PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
   101 FORMAT(1X,/1X,I6,A)
   100 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
      +       'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
+C
+C-------DETERMINE MASTER REACH NUMBER FOR LAST REACH IN EACH SEGMENT
+C
+        IF ( IUNITSFR>0 ) THEN
+          istsg = 1
+          DO l = 1, NSTRM
+            istsgold = istsg
+            istsg = ISTRM(4, l)
+            if ( istsgold /= istsg ) lastreach(istsgold) = l - 1
+          END DO
+          lastreach(NSS) = NSTRM
+        END IF
       END IF
 C
 C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DATA).
@@ -902,7 +919,7 @@ C     ------------------------------------------------------------------
 C        ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
 C
-      INTEGER ISEG
+      INTEGER ISEG, i
 C     ------------------------------------------------------------------
 C
 C1-------RESET DEMAND IF IT CHANGES
@@ -1262,7 +1279,6 @@ C-------SUBROUTINE TSREAD
       SUBROUTINE TSREAD(IN,IOUT)
 C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
       USE GWFAWUMODULE
-      USE GWFSFRMODULE, ONLY: NSEGDIM
       USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -1302,7 +1318,7 @@ C
               IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
             END DO               
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('SFR',NUMSW)
-            IF ( SGNM > NSEGDIM ) THEN
+            IF ( SGNM > NSEGDIMTEMP ) THEN
               WRITE(IOUT,*) 'Bad segment number for AWU time series. '
               CALL USTOP('Bad segment number for AWU time series.')
             END IF
@@ -1332,7 +1348,7 @@ C
               IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
             END DO               
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('SET',NUMSWET)
-            IF ( SGNM > NSEGDIM ) THEN
+            IF ( SGNM > NSEGDIMTEMP ) THEN
               WRITE(IOUT,*) 'Bad segment number for AWU time series. '
               CALL USTOP('Bad segment number for AWU time series.')
             END IF
@@ -1655,6 +1671,7 @@ C     ------------------------------------------------------------------
 C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER*22 TEXT2,TEXT6,TEXT7,TEXT8,TEXT1,TEXT3,TEXT4,TEXT5
+      CHARACTER*16 TEXT9
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
       DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG,AREA
       DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWET,DONE
@@ -1667,14 +1684,15 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DOUBLE PRECISION :: DONENEG, prms_inch2mf_q
-      DATA TEXT1 /'AWU WELLS'/
-      DATA TEXT2 /'DIVERSION SEGMENTS'/
-      DATA TEXT3 /'SW IRRIGATION'/
-      DATA TEXT4 /'GW IRRIGATION'/
-      DATA TEXT5 /'SW RETURN FLOW'/
-      DATA TEXT6 /'GW RETURN FLOW'/
-      DATA TEXT7 /'EFFICIENCY FACTOR SWET'/
-      DATA TEXT8 /'EFFICIENCY FACTOR GWET'/
+      DATA TEXT1 /'           AWU WELLS'/
+      DATA TEXT2 /'  DIVERSION SEGMENTS'/
+      DATA TEXT3 /'       SW IRRIGATION'/
+      DATA TEXT4 /'       GW IRRIGATION'/
+      DATA TEXT5 /'       SW RETURN FLOW'/
+      DATA TEXT6 /'       GW RETURN FLOW'/
+      DATA TEXT7 /'    SYSTEM LOSSES SW'/
+      DATA TEXT8 /'    SYSTEM LOSSES GW'/
+      DATA TEXT9 /'       AWU WELLS'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       DONE=1.0D0
@@ -1805,7 +1823,7 @@ C8------SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
             J = SFRSEG(I,L) 
             SUP = SUP - Q
             ACTUAL(J)  = ACTUAL(J) + SUP
-            SUPSEG(J) = SUPSEG(J) - Q/dble(NUMSUPWELLSEG(L))
+            SUPSEG(J) = SUPSEG(J) - Q/dble(NUMSEGS(L))
           END DO
 C
 C9------CALCULATE IRRIGATION FROM WELLS
@@ -1852,12 +1870,17 @@ C         IF SAVING CELL-BY-CELL FLOWS IN A LIST (COMPACT BUDGET), WRITE SW IRRI
 C         AND DIVERTED SW.  
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
+        QSW=QSW+SEG(2,istsg)
+C
+C12B-----ADD UP SPECIFIED LOSSES
         DO icount = 1, DVRCH(istsg)
           DVT = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-          QSW=QSW+DVT
           QSWET=QSWET+DVT*(DVEFF(ICOUNT,istsg))
           QSWIRR = QSWIRR + DVT*(DONE-DVEFF(ICOUNT,istsg))
         END DO
+C
+C12B-----ADD SIMULATED CANAL GAINS/LOSSES
+        QSWET=QSWET + SEG(2,istsg) - SGOTFLW(istsg)
       END DO
 !
 C13-----PRINT PUMPING RATE IF REQUESTED.
@@ -1885,7 +1908,7 @@ C13-----PRINT IRRIGATION DIVERSION RATE IF REQUESTED.
         WRITE(IBD2,61) TEXT2,KKPER,KKSTP
         DO L = 1, NUMIRRSFRSP
           istsg = IRRSEG(L)
-          WRITE(IBD2,63) istsg,SGOTFLW(istsg)
+          WRITE(IBD2,63) istsg,SEG(2,istsg)
         END DO
         WRITE(IBD2,*)
       END IF
@@ -1950,7 +1973,7 @@ C15------MOVE RATES, VOLUMES & LABELS INTO ARRAYS FOR PRINTING.
       VBVL(4,MSUM)=ROUT
       VBVL(1,MSUM)=VBVL(1,MSUM)+RIN*DELT
       VBVL(2,MSUM)=VBVL(2,MSUM)+ROUT*DELT
-      VBNM(MSUM)=TEXT1
+      VBNM(MSUM)=TEXT9
 C
 C16------INCREMENT BUDGET TERM COUNTER(MSUM).
       MSUM=MSUM+1
@@ -2045,7 +2068,7 @@ C
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk
-      USE GWFSFRMODULE, ONLY: SEG,DVRSFLW
+      USE GWFSFRMODULE, ONLY: SEG,DVRSFLW,IDIVAR,SGOTFLW,STRM
       USE GWFAWUMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2056,13 +2079,13 @@ C
       integer, intent(in) :: kper,kstp,kiter
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod5,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal,dhundred
+      double precision :: zerod7,zerod30,done,dzero,dum,pettotal, 
+     +                    aettotal,dhundred,fmaxirr,fmaxflow
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod5 = 1.0d-5
+      zerod7 = 1.0d-7
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -2086,10 +2109,10 @@ C
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
-           if ( aet < zerod30 ) aet = zerod30
+!           if ( aet < zerod30 ) aet = zerod30
            factor = ACCEL*(pet/aet - done)
-           if( abs(AETITERSW(K,ISEG)-AET) < zerod30 ) factor = 0.0
-           IF ( FACTOR > dhundred ) FACTOR = dhundred
+!           if( abs(AETITERSW(K,ISEG)-AET) < zerod7*PET ) factor = 0.0
+!           IF ( FACTOR > dhundred ) FACTOR = dhundred
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
            dum = pet
@@ -2105,11 +2128,12 @@ C
 C
 C1------limit diversion to water right and flow in river
 C
-!      k = IDIVAR(1,ISEG)
+      k = IDIVAR(1,ISEG)
 !      if(kper==9.and.kstp==22)write(888,333)kiter,k,SEG(2,iseg),
 !     +   DVRSFLW(iseg),demand(ISEG),factor,pet,aet
 !333   format(2i5,6e20.10)
-      IF ( SEG(2,iseg) > DVRSFLW(iseg) ) SEG(2,iseg) = DVRSFLW(iseg)
+      fmaxflow = STRM(9,LASTREACH(K))
+      IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
       if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
       
 300   continue
@@ -2405,10 +2429,10 @@ C
         pet = PETRATE(ic,ir)
         uzet = uzfetout(ic,ir)/DELT
         aet = (gwet(ic,ir)+uzet)/area
-        if ( aet < zerod30 ) aet = zerod30
+!        if ( aet < zerod30 ) aet = zerod30
         factor = ACCEL*(pet/aet - done)
-        if( abs(AETITERGW(I,L)-AET) < zerod30 ) factor = 0.0
-        IF ( FACTOR > dhundred ) FACTOR = dhundred
+!        if( abs(AETITERGW(I,L)-AET) < zerod30 ) factor = 0.0
+!        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*pet*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
         if ( QONLY(L) > doneneg*Q ) QONLY(L) = doneneg*Q
@@ -2877,6 +2901,8 @@ C
       DEALLOCATE (ACCEL)
       DEALLOCATE (SUPSEG)
       DEALLOCATE (TSGWETALLUNIT)
+      DEALLOCATE (NSEGDIMTEMP)
+      DEALLOCATE (LASTREACH)
 C
       RETURN
       END
