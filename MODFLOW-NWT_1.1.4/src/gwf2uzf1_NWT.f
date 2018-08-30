@@ -1808,7 +1808,7 @@ C
       END SUBROUTINE GWF2UZF1AD
 C
 C
-C-------SUBROUTINE GWF2UZF1AD
+C-------SUBROUTINE SETLAY
       SUBROUTINE SETLAY(kkstp)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
