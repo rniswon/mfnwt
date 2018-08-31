@@ -2117,8 +2117,8 @@ C
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
            dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
-           pettotal = pettotal + pet
-           aettotal = aettotal + aet
+!           pettotal = pettotal + pet
+!           aettotal = aettotal + aet
            AETITERSW(K,ISEG) = AET
         end do
 C
