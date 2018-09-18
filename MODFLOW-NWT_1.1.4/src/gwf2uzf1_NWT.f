@@ -5546,7 +5546,7 @@ C     AVEARGE WATER CONTENT AND FLUX FOR MT3DMS
 C     ******************************************************************
       USE GLOBAL,       ONLY: BOTM, IOUT, NLAY
       USE GWFBASMODULE, ONLY: DELT
-      USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST,
+      USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST, ZEROD9,
      +                        RTSOLUTE, GRIDSTOR, GRIDET, IUZFOPT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -5600,7 +5600,7 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
                     jk = iset + Nwv - 1
                     nwavm1 = jk - 1
                     DO WHILE ( jk.GT.iset-1 )
-                      IF ( Depth(jk)-depthsave.LT.0.0D0 ) jj = jk
+                      IF ( Depth(jk)-depthsave.LT. -ZEROD9 ) jj = jk
                         jk = jk - 1
                     END DO
                     IF ( jj.GT.iset ) THEN
