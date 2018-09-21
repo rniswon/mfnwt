@@ -1119,7 +1119,7 @@ C---READ NEW IRRIGATION WELL DATA
           IF ( GSFLOW_flag == 1 ) then   !uzfrow stores hru number for gsflow
             DO K = 1, NMCL
               READ(IN,*)UZFROW(K,IRWL),IRRFACT(K,IRWL),
-     +                IRRPCT(K,IRWL),KCROPWELL(K,IRWL)
+     +                IRRPCT(K,IRWL)                                      !,KCROPWELL(K,IRWL)
             END DO
             DO K = 1, NUMCELLS(IRRWELVAR(J))
               IF ( UZFROW(K,IRRWELVAR(J))==0 ) THEN
@@ -1225,7 +1225,7 @@ C
             IF ( GSFLOW_flag == 1 ) then   !irrrow stores hru number for gsflow
               DO K=1,NMCL                
                 READ(IN,*)IRRROW(K,SGNM),DVEFF(K,SGNM),
-     +                    DVRPERC(K,SGNM),KCROPSFR(K,SGNM)
+     +                    DVRPERC(K,SGNM)                             !,KCROPSFR(K,SGNM)
               END DO
               totdum  = 0.0
               DO K = 1, NMCL
@@ -1663,7 +1663,8 @@ C     ------------------------------------------------------------------
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBNM,VBVL,MSUM,IBUDFL
       USE GWFAWUMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR, 
+     1                        DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       IMPLICIT NONE
 C        ARGUMENTS:
@@ -1675,7 +1676,7 @@ C     ------------------------------------------------------------------
       CHARACTER*16 TEXT9
       DOUBLE PRECISION :: RATIN,RATOUT,FMIN,ZERO,DVT,RIN,ROUT
       DOUBLE PRECISION :: SUP,SUBVOL,SUBRATE,RATINAG,RATOUTAG,AREA
-      DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWET,DONE
+      DOUBLE PRECISION :: QSW,QSWIRR,QWELL,QWELLIRR,QWELLET,QSWGL,DONE
       REAL :: Q,TIME,RATETERPQ,QIRR,BUDPERC
       INTEGER :: NWELLSTEMP,L,I,J,ISTSG,ICOUNT,IL
       INTEGER :: IC,IR,IBDLBL,IW1,ISEG
@@ -1704,7 +1705,7 @@ C     ------------------------------------------------------------------
       RATOUTAG=ZERO
       QSW=ZERO
       QSWIRR=ZERO
-      QSWET=ZERO
+      QSWGL=ZERO
       QWELLIRR=ZERO
       QWELLET=ZERO
       QWELL=ZERO
@@ -1870,17 +1871,18 @@ C         IF SAVING CELL-BY-CELL FLOWS IN A LIST (COMPACT BUDGET), WRITE SW IRRI
 C         AND DIVERTED SW.  
       DO L = 1, NUMIRRSFRSP
         istsg = IRRSEG(L)
-        QSW=QSW+SEG(2,istsg)
+        QSW=QSW+DVRSFLW(istsg)
+        
 C
 C12B-----ADD UP SPECIFIED LOSSES
         DO icount = 1, DVRCH(istsg)
           DVT = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
-          QSWET=QSWET+DVT*(DVEFF(ICOUNT,istsg))
+          QSWGL=QSWGL+DVT*(DVEFF(ICOUNT,istsg))
           QSWIRR = QSWIRR + DVT*(DONE-DVEFF(ICOUNT,istsg))
         END DO
 C
 C12B-----ADD SIMULATED CANAL GAINS/LOSSES
-        QSWET=QSWET + SEG(2,istsg) - SGOTFLW(istsg)
+        QSWGL=QSWGL + DVRSFLW(istsg) - SGOTFLW(istsg)
       END DO
 !
 C13-----PRINT PUMPING RATE IF REQUESTED.
@@ -2029,9 +2031,14 @@ C18-------GW EFFICIENCY ET
       VBNMAG(MSUMAG)=TEXT8
       MSUMAG = MSUMAG + 1
 C
-C18-------SW EFFICIENCY ET
-      RIN = 0.0
-      ROUT = QSWET
+C18-------SW EFFICIENCY (GAINS/LOSSES)
+      IF ( QSWGL > ZERO ) THEN
+        RIN = ZERO
+        ROUT = QSWGL
+      ELSE
+        RIN = -DONE*QSWGL
+        ROUT = ZERO
+      END IF
       VBVLAG(3,MSUMAG)=RIN
       VBVLAG(4,MSUMAG)=ROUT
       VBVLAG(1,MSUMAG)=VBVLAG(1,MSUMAG)+RIN*DELT
@@ -2080,12 +2087,13 @@ C
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
       double precision :: zerod7,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal,dhundred,fmaxirr,fmaxflow
+     +                    aettotal,dhundred,fmaxirr,fmaxflow,zerod2
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
       zerod7 = 1.0d-7
+      zerod2 = 1.0d-2
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -2111,7 +2119,7 @@ C
            aet = (gwet(ic,ir)+uzet)/area
 !           if ( aet < zerod30 ) aet = zerod30
            factor = ACCEL*(pet/aet - done)
-!           if( abs(AETITERSW(K,ISEG)-AET) < zerod7*PET ) factor = 0.0
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*PET ) factor = 0.0
 !           IF ( FACTOR > dhundred ) FACTOR = dhundred
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
@@ -2191,7 +2199,7 @@ C
            aet = hru_actet(hru_id)
 !           if ( aet < zerod30 ) aet = zerod30
            factor = ACCEL*(pet/aet - done)
-!           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
 !           IF ( FACTOR > dhundred ) FACTOR = dhundred
 ! convert PRMS ET deficit to MODFLOW flow
            SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
@@ -2235,7 +2243,7 @@ C
       real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
       double precision :: zerod7
       integer :: iseg,ic,ir,i
       external :: RATETERPQ
@@ -2243,7 +2251,7 @@ C
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod3 = 1.0d-3
+      zerod2 = 1.0d-2
       zerod7 = 1.0d-7
       done = 1.0d0
       doneneg = -1.0d0
@@ -2261,7 +2269,7 @@ C
         aet = (gwet(ic,ir)+uzet)/area
 !        if ( aet < zerod30 ) aet = zerod30
         factor = ACCEL*(pet/aet - done)
-!        if( abs(AETITERGW(I,L)-AET) < zerod30 ) factor = 0.0
+        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
 !        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*pet*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
@@ -2277,56 +2285,6 @@ C
       demandgw_uzf = doneneg*QONLY(L)
       end function demandgw_uzf
 !
-!      subroutine well_crop(l)
-!!     ******************************************************************
-!!     well_crop---- applied crop coefficient to ET coefficient
-!!     JH only is upported at this point
-!!     ******************************************************************
-!!     SPECIFICATIONS:
-!      USE GWFAWUMODULE
-!      USE PRMS_POTET_JH, ONLY: Jh_coef   !Jh_coef(i, Nowmonth)
-!      IMPLICIT NONE
-!! ----------------------------------------------------------------------
-!      !modules
-!      !arguments
-!      integer, intent(in) :: l
-!      !dummy
-!      DOUBLE PRECISION :: 
-!      integer :: i
-!! ----------------------------------------------------------------------
-!!
-!      DO L = 1, NWELLS
-!        DO I = 1, NUMCELLS(L)
-!          ihru = UZFROW(I,L)
-!        END DO
-!      END DO
-!      END SUBROUTINE well_crop
-!!
-!      subroutine sfr_crop(l)
-!!     ******************************************************************
-!!     sfr_crop---- applied crop coefficient to ET coefficient
-!!     JH only is upported at this point
-!!     ******************************************************************
-!!     SPECIFICATIONS:
-!      USE GWFAWUMODULE
-!      USE PRMS_POTET_JH, ONLY: Jh_coef   !Jh_coef(i, Nowmonth)
-!      IMPLICIT NONE
-!! ----------------------------------------------------------------------
-!      !modules
-!      !arguments
-!      integer, intent(in) :: l
-!      !dummy
-!      DOUBLE PRECISION :: 
-!      integer :: i
-!! ----------------------------------------------------------------------
-!!
-!      do k = 1, DVRCH(iseg)  !hrus per segement  
-!        hru_id = IRRROW(k,iseg)
-!        DO I = 1, NUMCELLS(L)
-!          ihru = UZFROW(I,L)
-!        END DO
-!      END DO
-!      END SUBROUTINE well_crop
 !
       double precision function demandgw_prms(l)
 !     ******************************************************************
@@ -2360,12 +2318,13 @@ C
       prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
       DO I = 1, NUMCELLS(L)
         ihru = UZFROW(I,L)
-        pet = KCROPWELL(K,ISEG)*potet(ihru)
+!        pet = KCROPWELL(K,ISEG)*potet(ihru)
+        pet = potet(ihru)
         aet = hru_actet(ihru)
         area = HRU_PERV(ihru)
 !        if ( aet < zerod30 ) aet = zerod2*pet
         factor = ACCEL*(pet/aet - done)
-!        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
+        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
 !        IF ( factor > dhundred ) factor = dhundred
 !
 ! convert PRMS ET deficit to MODFLOW flow
@@ -2385,7 +2344,7 @@ C
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
-      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW
+      USE GWFSFRMODULE, ONLY: DVRSFLW,SGOTFLW
       USE GWFAWUMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
@@ -2418,7 +2377,7 @@ C
             UNIT = TSSWUNIT(I)
             L = TSSWNUM(I)
             Q = demand(L)
-            QQ = SEG(2,L)
+            QQ = DVRSFLW(L)
             QQQ = QQQ + SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                      Q, QQ, QQQ)
@@ -2544,7 +2503,8 @@ C
               ELSE
                 hru_id = UZFROW(J,L)
                 area = hru_perv(hru_id)
-                pet = KCROPSFR(J,L)*potet(hru_id)
+!                pet = KCROPSFR(J,L)*potet(hru_id)
+                pet = potet(hru_id)
                 aet = hru_actet(hru_id)   !need to add GW ET here  
               END IF
               pettot = pettot + pet
@@ -2602,34 +2562,6 @@ C
     2 format(E20.10,3I10,3E20.10)
       return
       end subroutine timeseries
-!
-!      subroutine UZFIRRDEMANDSET()
-!!     ******************************************************************
-!!     irrdemand---- sets initial crop demand to PET
-!!     ******************************************************************
-!!     SPECIFICATIONS:
-!!      USE GWFUZFMODULE, ONLY: PETRATE
-!      USE GWFAWUMODULE, ONLY: DVRCH,IRRROW,IRRCOL,NUMIRRSFRSP,IRRSEG
-!      USE GWFSFRMODULE, ONLY: SEG
-!      USE GLOBAL,     ONLY: DELR, DELC
-!      IMPLICIT NONE
-!! ----------------------------------------------------------------------
-!      DOUBLE PRECISION :: area
-!      integer :: k,iseg,ic,ir,i
-!! ----------------------------------------------------------------------
-!!
-!      do i = 1, NUMIRRSFRSP
-!        iseg = IRRSEG(i)
-!        do k = 1, DVRCH(iseg)
-!           ic = IRRCOL(k,iseg)
-!           ir = IRRROW(k,iseg)
-!           area = delr(ic)*delc(ir)
-!           SEG(2,iseg) = 0.0d0
-!        end do
-!      end do
-!      return
-!      end subroutine UZFIRRDEMANDSET
-! ----------------------------------------------------------------------
 C
 !      subroutine APPLYKCROP()
 !!     ******************************************************************
