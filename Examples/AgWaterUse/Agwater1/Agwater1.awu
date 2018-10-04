@@ -1,23 +1,23 @@
 # AWU options
 options
 etdemand 1000.
-irrigation_sfr 1 6
+irrigation_diversion 1 6
 supplemental_well 6 1 
 irrigation_well 6 1 
 maxwells 6  
-sfrlist -2 
+diversionlist -2 
 welllist -2
 wellirrlist -2
-sfrirrlist -2
+diversionirrlist -2
 timeseries_well
-timeseries_sfr
-timeseries_sfret
+timeseries_diversion
+timeseries_diversionet
 end
 # AWU time series
 time series
 well 5 105   
-sfr 9 107      
-sfret 9 108
+diversion 9 107      
+diversionet 9 108
 end
 # AWU well list
 well list
@@ -30,7 +30,7 @@ well list
 end
 # AWU stress period
 stress period 1
-IRRSFR
+IRRdiversion
 0
 IRRWELL
 0
@@ -38,7 +38,7 @@ SUPWELL
 0
 END
 stress period 2
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -46,7 +46,7 @@ SUPWELL
 -1
 END
 stress period 3
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -54,7 +54,7 @@ SUPWELL
 -1
 END
 stress period 4
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -62,7 +62,7 @@ SUPWELL
 -1
 END
 stress period 5
-IRRSFR
+IRRdiversion
 1                         NUMIRRSEGSP       
 9 6                       SEGID NUMCELLSEG 
 6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
@@ -101,7 +101,7 @@ SUPWELL
 9 1.0 
 end
 stress period 6     
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -109,7 +109,7 @@ SUPWELL
 -1     
 END
 stress period 7
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -117,7 +117,7 @@ SUPWELL
 -1
 END
 stress period 8
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -125,7 +125,7 @@ SUPWELL
 -1
 END
 stress period 9
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -133,7 +133,7 @@ SUPWELL
 -1
 END
 stress period 10
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -141,7 +141,7 @@ SUPWELL
 -1
 END
 stress period 11
-IRRSFR
+IRRdiversion
 0
 IRRWELL
 0
@@ -149,7 +149,7 @@ SUPWELL
 0
 END
 stress period 12
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -157,7 +157,7 @@ SUPWELL
 -1
 END
 stress period 13
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -165,7 +165,7 @@ SUPWELL
 -1
 END 
 stress period 14
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -173,7 +173,7 @@ SUPWELL
 -1
 END
 stress period 15
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -181,7 +181,7 @@ SUPWELL
 -1
 END
 stress period 16
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -189,7 +189,7 @@ SUPWELL
 -1
 END
 stress period 17
-IRRSFR
+IRRdiversion
 1                         NUMIRRSEGSP       
 9 6                       SEGID NUMCELLSEG 
 6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
@@ -228,7 +228,7 @@ SUPWELL
 9 1.0
 end
 stress period 18
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -236,7 +236,7 @@ SUPWELL
 -1
 END
 stress period 19
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -244,7 +244,7 @@ SUPWELL
 -1
 END
 stress period 20
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -252,7 +252,7 @@ SUPWELL
 -1
 END
 stress period 21
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -260,7 +260,7 @@ SUPWELL
 -1
 END
 stress period 22
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -268,7 +268,7 @@ SUPWELL
 -1
 END
 stress period 23
-IRRSFR
+IRRdiversion
 0
 IRRWELL
 0
@@ -276,7 +276,7 @@ SUPWELL
 0
 END
 stress period 24
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -284,7 +284,7 @@ SUPWELL
 -1
 END
 stress period 25
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
@@ -292,7 +292,7 @@ SUPWELL
 -1
 END
 stress period 26
-IRRSFR
+IRRdiversion
 -1
 IRRWELL
 -1
