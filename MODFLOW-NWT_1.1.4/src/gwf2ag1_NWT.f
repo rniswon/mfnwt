@@ -1348,7 +1348,7 @@ C
             DO I = 1, NUMSW - 1
               IF (  UNIT == TSSWUNIT(I) ) ITEST = 1
             END DO               
-            IF ( ITEST /= 1 ) CALL WRITE_HEADER('DIVERSION',NUMSW)
+            IF ( ITEST /= 1 ) CALL WRITE_HEADER('DIV',NUMSW)
             IF ( SGNM > NSEGDIMTEMP ) THEN
               WRITE(IOUT,*) 'Bad segment number for AWU time series. '
               CALL USTOP('Bad segment number for AWU time series.')
@@ -1459,7 +1459,7 @@ C      character(len=30)  :: text1        = 'AWU DIVERSION Time Series'
 C      character(len=30)  :: text2        = 'AWU WELL Time Series'
 C     ------------------------------------------------------------------  
         select case (TSTYPE)
-          case('DIVERSION')
+          case('DIV')
             UNIT = TSSWUNIT(NUM)
             SGNM = TSSWNUM(NUM)
             WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DUTY SW-DIVERSION ',
@@ -2465,7 +2465,7 @@ C
             IF ( TSGWNUM(I) == L ) THEN
               UNIT = TSGWUNIT(I)
               Q = QONLY(L)
-              QQ = WELL(NWELVL,L)
+              QQ = -1.0*WELL(NWELVL,L)
               QQQ = 0.0
               CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                              Q, QQ, QQQ)
@@ -2564,7 +2564,7 @@ C
         DO L=1, NWELLS
           UNIT = TSGWALLUNIT
           Q = Q + QONLY(L)
-          QQ = QQ + WELL(NWELVL,L)
+          QQ = QQ + -1.0*WELL(NWELVL,L)
           QQQ = 0.0
         END DO
         CALL timeseries(unit, Kkper, Kkstp, TOTIM, J, 
