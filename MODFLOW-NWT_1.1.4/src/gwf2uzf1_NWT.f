@@ -433,6 +433,8 @@ cdep changed allocation of UZOLSFLX 7/30/08
       ALLOCATE (UZOLSFLX(NCOL,NROW))
       UZOLSFLX = 0.0D0
       ALLOCATE (HLDUZF(NCOL,NROW))
+      ALLOCATE (LANDLAYER(NCOL,NROW))
+      LANDLAYER = 1
       HLDUZF = 0.0D0
       ALLOCATE (IUZHOLD(2, NCOL*NROW))
       nrnc = 1
@@ -2618,6 +2620,7 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
           IF ( land.LT.0 ) land = ABS(land)
           IF ( land.EQ.0 ) land = 1
           IF ( ibnd.EQ.0 ) il = 0
+          LANDLAYER(IC,IR) = LAND
 C
 C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           IF ( ibnd.NE.0 .AND. il.EQ.0 ) THEN
@@ -3997,8 +4000,7 @@ C60----LOOP OVER GAGING STATIONS.
             ELSE
               il = 0
             END IF
-            IF ( il.GT.0 ) THEN
-              land = ABS(IUZFBND(iuzcol, iuzrow))
+              land = LANDLAYER(IUZCOL,IUZROW)
               IF ( land.GT.0 ) THEN
                 ghnw = HNEW(iuzcol, iuzrow, il)
                 celtop = BOTM(iuzcol, iuzrow, land-1) - 0.5 * SURFDEP
@@ -5788,6 +5790,7 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%FINFSAVE)
       DEALLOCATE (GWFUZFDAT(Igrid)%Isavefinf)
       DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
+      DEALLOCATE (GWFUZFDAT(Igrid)%landlayer)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5887,6 +5890,7 @@ C     ------------------------------------------------------------------
       FINFSAVE=>GWFUZFDAT(Igrid)%FINFSAVE
       ISAVEFINF=>GWFUZFDAT(Igrid)%ISAVEFINF
       ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
+      landlayer=>GWFUZFDAT(Igrid)%landlayer
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -5987,5 +5991,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%FINFSAVE=>FINFSAVE
       GWFUZFDAT(Igrid)%Isavefinf=>Isavefinf
       GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
+      GWFUZFDAT(Igrid)%landlayer=>landlayer
 C
       END SUBROUTINE SGWF2UZF1PSV
