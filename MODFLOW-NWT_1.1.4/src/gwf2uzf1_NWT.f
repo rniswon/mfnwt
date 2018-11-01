@@ -2639,7 +2639,6 @@ C6------PRINT WARNING WHEN NUZTOP IS 1 OR 2 AND ALL LAYERS ARE INACTIVE.
           IF ( land.LT.0 ) land = ABS(land)
           IF ( land.EQ.0 ) land = 1
           IF ( ibnd.EQ.0 ) il = 0
-          LANDLAYER(IC,IR) = LAND
 C
 C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           IF ( ibnd.NE.0 .AND. il.EQ.0 ) THEN
@@ -2669,6 +2668,7 @@ C7------PRINT WARNING WHEN NUZTOP IS 3 AND ALL LAYERS ARE INACTIVE.
           IF ( land.LT.il ) land = il  ! moved this into check for lake cell RGN 6/14/17
           END IF
         END IF
+        LANDLAYER(IC,IR) = LAND
         IF ( il.GT.0 .AND. VKS(ic, ir).GT.NEARZERO ) THEN
           IF ( IBOUND(ic, ir, il).GT.0 ) THEN
             h = HNEW(ic, ir, il)
