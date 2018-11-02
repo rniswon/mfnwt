@@ -4000,6 +4000,7 @@ C60----LOOP OVER GAGING STATIONS.
             ELSE
               il = 0
             END IF
+            IF ( il.GT.0 ) THEN
               land = LANDLAYER(IUZCOL,IUZROW)
               IF ( land.GT.0 ) THEN
                 ghnw = HNEW(iuzcol, iuzrow, il)
