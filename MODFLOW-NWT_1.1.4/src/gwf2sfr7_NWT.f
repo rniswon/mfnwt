@@ -2035,6 +2035,7 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             WRITE(iout,9031)
             numval = ISFRLIST(2,i)
             iunitnum = ISFRLIST(3,i)
+            REWIND(iunitnum)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
             DO j = 1, numval
               LLOC = 1
               CALL URDCOM(iunitnum,IOUT,LINE)

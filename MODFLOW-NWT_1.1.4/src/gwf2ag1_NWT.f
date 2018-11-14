@@ -1,4 +1,4 @@
-      MODULE GWFAWUMODULE
+      MODULE GWFAGMODULE
 ! from well package
         INTEGER,SAVE,POINTER  :: NWELLS,MXWELL,NWELVL,NPWEL,IPRWEL
         INTEGER,SAVE,POINTER  :: IWELLCB,IRDPSI,NNPWEL,NAUX,ISFRCB
@@ -37,7 +37,7 @@
         REAL,              SAVE, DIMENSION(:,:), POINTER ::VBVLAG
         CHARACTER(LEN=20), SAVE, DIMENSION(:),   POINTER ::VBNMAG
         INTEGER, SAVE, POINTER  ::MSUMAG
-! AWU orig
+! AG orig
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER ::DIVERSIONSEG
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
@@ -79,18 +79,18 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROPDIVERSION,KCROPWELL  !(crop coefficient)
         REAL,   SAVE,  DIMENSION(:),  POINTER:: DEMAND,SUPACT
         REAL,   SAVE,  DIMENSION(:),  POINTER:: ACTUAL
-      END MODULE GWFAWUMODULE
+      END MODULE GWFAGMODULE
 
 
-      SUBROUTINE GWF2AWU7AR(IN,IUNITSFR,IUNITNWT)
+      SUBROUTINE GWF2AG7AR(IN,IUNITSFR,IUNITNWT)
 C     ******************************************************************
-C     ALLOCATE ARRAY STORAGE FOR AWU PACKAGE
+C     ALLOCATE ARRAY STORAGE FOR AG PACKAGE
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,IFREFM
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY:NSEGDIM
       USE PRMS_MODULE, ONLY: PRMS_flag
       IMPLICIT NONE
@@ -99,7 +99,7 @@ C        ARGUMENTS
       integer,intent(in) :: IN,IUNITSFR,IUNITNWT
 C     ------------------------------------------------------------------
 C        VARIABLES
-!      CHARACTER(len=16) :: text        = ' AWU PACKAGE '
+!      CHARACTER(len=16) :: text        = ' AG PACKAGE '
       CHARACTER(len=200) :: LINE
       INTEGER :: MXACTWSUP,MXACTWIRR,NUMSUPHOLD,NUMIRRHOLD
       INTEGER :: MAXSEGSHOLD,NUMCOLS,NUMROWS,MAXCELLSHOLD,NUMCELLSHOLD
@@ -162,13 +162,13 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
-    1 FORMAT(1X,/1X,'AWU -- AWU PACKAGE FOR NWT VERSION 1.1.3, ',
+    1 FORMAT(1X,/1X,'AG -- AG PACKAGE FOR NWT VERSION 1.1.3, ',
      1' 8/01/2017 INPUT READ FROM UNIT ',I4)
 C
 C
 C2-------CHECK FOR KEYWORDS.  
 C
-      CALL PARSEAWU7OPTIONS(In, Iout, Iunitnwt)
+      CALL PARSEAG7OPTIONS(In, Iout, Iunitnwt)
       NNPWEL = MXWELL
 C
 C3-------ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
@@ -217,7 +217,7 @@ C7------ALLOCATE SPACE FOR THE WELL DATA.
       IF(MXWELL.LT.1) THEN
          WRITE(IOUT,17)
    17    FORMAT(1X,
-     1'No wells active in the AWU Package')
+     1'No wells active in the AG Package')
          MXWELL = 1
       END IF
       ALLOCATE (WELL(NWELVL,MXWELL))
@@ -278,7 +278,7 @@ C
       KCROPWELL = 0.0
       NUMSUPWELLSEG = 0
 C
-C-------allocate for DIVERSION AWUptions
+C-------allocate for DIVERSION AGptions
       IF ( NUMIRRDIVERSION > 0 ) THEN
         ALLOCATE (DVRCH(NSEGDIMTEMP))
         ALLOCATE (DVEFF(MAXCELLSDIVERSION,NSEGDIMTEMP))
@@ -316,15 +316,15 @@ C6------RETURN
       RETURN
       END SUBROUTINE
 C
-      SUBROUTINE PARSEAWU7OPTIONS(IN,IOUT,IUNITNWT)
+      SUBROUTINE PARSEAG7OPTIONS(IN,IOUT,IUNITNWT)
 C     ******************************************************************
-C     READ AWU OPTIONS
+C     READ AG OPTIONS
 C     ******************************************************************
 C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IUNIT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE PRMS_MODULE,  ONLY:PRMS_flag
       USE GWFUZFMODULE, ONLY:IETFLG
       IMPLICIT NONE
@@ -337,7 +337,7 @@ C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I
       logical :: found,option,found1,found2
       real :: R
-      character(len=16)  :: text        = 'AWU'
+      character(len=16)  :: text        = 'AG'
       character(len=200) :: line
 C     ------------------------------------------------------------------
 C
@@ -580,13 +580,13 @@ C
         if ( found ) backspace(in)
       IF ( NUMIRRWEL > MXWELL) THEN
         WRITE(IOUT,*) 'THE VALUE SPECIFIED FOR NUMIRRWEL: ',NUMIRRWEL,
-     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AWU WELLS: ',MXWELL
-        CALL USTOP('NUMIRRWEL IS GREATER THAN MAX AWU WELLS')
+     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AG WELLS: ',MXWELL
+        CALL USTOP('NUMIRRWEL IS GREATER THAN MAX AG WELLS')
       END IF
       IF ( NUMSUP > MXWELL) THEN
         WRITE(IOUT,*) 'THE VALUE SPECIFIED FOR NUMSUP: ',NUMSUP,
-     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AWU WELLS: ',MXWELL
-        CALL USTOP(' NUMSUP IS GREATER THAN MAX AWU WELLS')
+     +  'IS GREATER THAN THE MAXIMUM NUMBER OF AG WELLS: ',MXWELL
+        CALL USTOP(' NUMSUP IS GREATER THAN MAX AG WELLS')
       END IF
 C
    29 FORMAT(1X,'NEGATIVE PUMPING RATES WILL BE REDUCED IF HEAD '/
@@ -623,15 +623,15 @@ C
       END SUBROUTINE     
 C
 C
-      SUBROUTINE GWF2AWU7RP(IN,IUNITSFR,KPER)
+      SUBROUTINE GWF2AG7RP(IN,IUNITSFR,KPER)
 C     ******************************************************************
-C     READ AWU DATA FOR A STRESS PERIOD
+C     READ AG DATA FOR A STRESS PERIOD
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,NCOL,NROW,NLAY,IFREFM
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: ISTRM,NSTRM,NSS
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -643,7 +643,7 @@ C        VARIABLES:
 C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
       INTEGER I, ITMP
-      character(len=22)  :: text      = 'AWU STRESS PERIOD DATA'
+      character(len=22)  :: text      = 'AG STRESS PERIOD DATA'
       character(len=17)  :: text1     = 'IRRIGATION STREAM'
       character(len=16)  :: text2     = 'IRRIGATION WELL'
       character(len=16)  :: text3     = 'SUPPLEMENTAL WELL'
@@ -664,7 +664,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
       found4 = .false.
 C
-C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DATA).
+C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AG DATA).
       IF ( KPER.EQ.1 ) THEN
         CALL URDCOM(In, IOUT, line)
         LLOC=1
@@ -684,11 +684,11 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
               DO L=1,NNPWEL
                 IF ( WELL(4,L) > 0.0 ) THEN
                   WRITE(IOUT,*)
-                  WRITE(IOUT,*) 'ERROR: MAX AWU PUMPING RATE IN LIST',
+                  WRITE(IOUT,*) 'ERROR: MAX AG PUMPING RATE IN LIST',
      +                        ' IS POSITIVE AND SHOULD BE NEGATIVE.',
      +                        ' MODEL STOPPING'
                   WRITE(IOUT,*)
-                  CALL USTOP('ERROR: MAX AWU PUMPING RATE IN LIST IS POS
+                  CALL USTOP('ERROR: MAX AG PUMPING RATE IN LIST IS POS
      +ITIVE AND SHOULD BE NEGATIVE. MODEL STOPPING')
                 END IF
               END DO
@@ -722,11 +722,11 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
      +                      TABUNIT(J))
                   IF ( TRATE > 0.0 ) THEN
                     WRITE(IOUT,*)
-                    WRITE(IOUT,*) 'ERROR: MAX AWU PUMPING RATE IN LIST',
+                    WRITE(IOUT,*) 'ERROR: MAX AG PUMPING RATE IN LIST',
      +                        ' IS POSITIVE AND SHOULD BE NEGATIVE.',
      +                        ' MODEL STOPPING'
                     WRITE(IOUT,*)
-                  CALL USTOP('ERROR: MAX AWU PUMPING RATE IN LIST IS POS
+                  CALL USTOP('ERROR: MAX AG PUMPING RATE IN LIST IS POS
      +ITIVE AND SHOULD BE NEGATIVE. MODEL STOPPING')
                   END IF
                   TABTIME(II,TABID(J)) = TTIME
@@ -740,9 +740,9 @@ C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DAT
      +                            trim(adjustl(char1))
             exit
           case default
-            WRITE(IOUT,*) 'Invalid AWU Input: '//LINE(ISTART:ISTOP)
+            WRITE(IOUT,*) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
      +                 //' Should be: '// trim(adjustl(CHAR1))
-            CALL USTOP('Invalid AWU Input: '//LINE(ISTART:ISTOP)
+            CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
      +                 //' Should be: '// trim(adjustl(CHAR1)))
           end select
           if ( found4 ) then
@@ -774,7 +774,7 @@ C
         END IF
       END IF
 C
-C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AWU DATA).
+C4-------READ AG OPTIONS DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AG DATA).
       FOUND = .FALSE.
       found1 = .FALSE.
       found2 = .FALSE.
@@ -927,14 +927,14 @@ C7------RETURN
       END
 C
 C
-      SUBROUTINE GWF2AWU7AD(IN,KPER)
+      SUBROUTINE GWF2AG7AD(IN,KPER)
 C     ******************************************************************
 C     UPDATE DEMANDS FOR NEW TIME STEP
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: NSS, SEG
       USE PRMS_MODULE, ONLY: PRMS_flag
       USE GLOBAL, ONLY: IUNIT
@@ -978,7 +978,7 @@ C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,IUNIT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS:
@@ -1086,7 +1086,7 @@ C
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:IOUT,IUNIT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE PRMS_MODULE,  ONLY:PRMS_flag
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -1179,9 +1179,9 @@ C
      +       'specified in stress period. ',/
      +       'Maximum cells and the number specified for stress '
      +       'period are: ',2i6)
-  106 FORMAT('***ERROR IN AWU PACKAGE*** cell row or column for ',
+  106 FORMAT('***ERROR IN AG PACKAGE*** cell row or column for ',
      +       'irrigation well specified as zero. Model stopping.')
-  107 FORMAT('***ERROR IN AWU PACKAGE*** HRU ID for ',
+  107 FORMAT('***ERROR IN AG PACKAGE*** HRU ID for ',
      +       'irrigation well specified as zero. Model stopping.')
 C
 C6------RETURN
@@ -1190,10 +1190,10 @@ C6------RETURN
 !
 ! ----------------------------------------------------------------------
 C
-C-------SUBROUTINE DIVERSIONAWUPTIONS
+C-------SUBROUTINE DIVERSIONAGPTIONS
       SUBROUTINE IRRDIVERSION(IN,IOUT,ITMP)
 C  READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GLOBAL,       ONLY: IUNIT
       USE PRMS_MODULE, ONLY: PRMS_flag
       IMPLICIT NONE
@@ -1284,20 +1284,20 @@ C
 ! 9005 FORMAT(1X,/1X,'****MODEL STOPPING**** ',
 !     +       'SFR2 PACKAGE MUST BE ACTIVE TO SIMULATE IRRIGATION ',
 !     +        'FROM SEGEMENTS')
- 9006 FORMAT(' ***Warning in AWU*** ',/
+ 9006 FORMAT(' ***Warning in AG*** ',/
      +       'Fraction of diversion for each cell in group does '/,
      +       'does not sum to one. Sum = ',E15.5)
- 9007 FORMAT('***Error in AWU*** cell row or column for irrigation',
+ 9007 FORMAT('***Error in AG*** cell row or column for irrigation',
      +       'cell specified as zero. Model stopping.')
- 9008 FORMAT('***Error in AWU*** maximum number of irrigation ',
+ 9008 FORMAT('***Error in AG*** maximum number of irrigation ',
      +       'segments is less than the number specified in ',
      +       'stress period. ',/ 
      +       'Maximum segments and the number specified are: ',2i6)
- 9009 FORMAT('***Error in AWU*** maximum number of irrigation ',
+ 9009 FORMAT('***Error in AG*** maximum number of irrigation ',
      +       'cells is less than the number specified in ',
      +       'stress period. ',/ 
      +       'Maximum cells and the number specified are: ',2i6)
- 9010 FORMAT('***Error in AWU*** HRU_ID for irrigation',
+ 9010 FORMAT('***Error in AG*** HRU_ID for irrigation',
      +       'cell specified as zero. Model stopping.')
 C11-----RETURN.
       RETURN
@@ -1309,7 +1309,7 @@ C
 C-------SUBROUTINE TSREAD
       SUBROUTINE TSREAD(IN,IOUT)
 C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GLOBAL,       ONLY: IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
@@ -1321,7 +1321,7 @@ C     ------------------------------------------------------------------
       INTEGER intchk, Iostat, LLOC,ISTART,ISTOP,I,SGNM,UNIT,WLNM
       INTEGER ISTARTSAVE,ITEST,NUMGWETALL,NUMGWALL
       real :: R
-      character(len=16)  :: text        = 'AWU'
+      character(len=16)  :: text        = 'AG'
       character(len=17)  :: char1     = 'TIME SERIES'
       character(len=200) :: line
 C     ------------------------------------------------------------------  
@@ -1350,8 +1350,8 @@ C
             END DO               
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('DIV',NUMSW)
             IF ( SGNM > NSEGDIMTEMP ) THEN
-              WRITE(IOUT,*) 'Bad segment number for AWU time series. '
-              CALL USTOP('Bad segment number for AWU time series.')
+              WRITE(IOUT,*) 'Bad segment number for AG time series. '
+              CALL USTOP('Bad segment number for AG time series.')
             END IF
           case('WELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,WLNM,R,IOUT,IN)
@@ -1365,8 +1365,8 @@ C
             END DO
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('WEL',NUMGW)
             IF ( WLNM > MXWELL ) THEN
-              WRITE(IOUT,*) 'Bad well number for AWU time series. '
-              CALL USTOP('Bad well number for AWU time series.')
+              WRITE(IOUT,*) 'Bad well number for AG time series. '
+              CALL USTOP('Bad well number for AG time series.')
             END IF
           case('DIVERSIONET')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,SGNM,R,IOUT,IN)
@@ -1380,8 +1380,8 @@ C
             END DO               
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('SET',NUMSWET)
             IF ( SGNM > NSEGDIMTEMP ) THEN
-              WRITE(IOUT,*) 'Bad segment number for AWU time series. '
-              CALL USTOP('Bad segment number for AWU time series.')
+              WRITE(IOUT,*) 'Bad segment number for AG time series. '
+              CALL USTOP('Bad segment number for AG time series.')
             END IF
           case('WELLET')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,WLNM,R,IOUT,IN)
@@ -1395,8 +1395,8 @@ C
             END DO
             IF ( ITEST /= 1 ) CALL WRITE_HEADER('GET',NUMGWET)
             IF ( WLNM > MXWELL ) THEN
-              WRITE(IOUT,*) 'Bad well number for AWU ET time series. '
-              CALL USTOP('Bad well number for AWU ET time series.')
+              WRITE(IOUT,*) 'Bad well number for AG ET time series. '
+              CALL USTOP('Bad well number for AG ET time series.')
             END IF
           case('WELLETALL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,UNIT,R,IOUT,IN)
@@ -1413,9 +1413,9 @@ C
      +                            trim(adjustl(char1))
             exit
           case default
-            WRITE(IOUT,*) 'Invalid AWU Input: '//LINE(ISTART:ISTOP)
+            WRITE(IOUT,*) 'Invalid AG Input: '//LINE(ISTART:ISTOP)
      +                 //' Should be: '// trim(adjustl(CHAR1))
-            CALL USTOP('Invalid AWU Input: '//LINE(ISTART:ISTOP)
+            CALL USTOP('Invalid AG Input: '//LINE(ISTART:ISTOP)
      +                 //' Should be: '// trim(adjustl(CHAR1)))
         end select
         CALL URDCOM(In, IOUT, line)
@@ -1429,13 +1429,13 @@ C11-----output number of files activated for time series output.
       write(iout,8)NUMSWET
       write(iout,9)NUMGWET + NUMGWETALL
 C
-    6 FORMAT(' A total number of ',i10,' AWU output time series files '
+    6 FORMAT(' A total number of ',i10,' AG output time series files '
      +       'were activated for SURFACE WATER ')
-    7 FORMAT(' A total number of ',i10,' AWU output time series files '
+    7 FORMAT(' A total number of ',i10,' AG output time series files '
      +       'were activated for GROUNDWATER ')
-    8 FORMAT(' A total number of ',i10,' AWU output time series files '
+    8 FORMAT(' A total number of ',i10,' AG output time series files '
      +       'were activated for SURFACE WATER ET')
-    9 FORMAT(' A total number of ',i10,' AWU output time series files '
+    9 FORMAT(' A total number of ',i10,' AG output time series files '
      +       'were activated for GROUNDWATER ET')
 
 C11-----RETURN.
@@ -1445,7 +1445,7 @@ C
 C-------SUBROUTINE WRITE_HEADER
       SUBROUTINE WRITE_HEADER(TSTYPE,NUM)
 C  READ SEGMENTS AND WELLS WITH TIME SERIES OUTPUT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     ARGUMENTS
@@ -1455,8 +1455,8 @@ C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
       integer :: UNIT,SGNM,WLNM
-C      character(len=30)  :: text1        = 'AWU DIVERSION Time Series'
-C      character(len=30)  :: text2        = 'AWU WELL Time Series'
+C      character(len=30)  :: text1        = 'AG DIVERSION Time Series'
+C      character(len=30)  :: text2        = 'AG WELL Time Series'
 C     ------------------------------------------------------------------  
         select case (TSTYPE)
           case('DIV')
@@ -1487,7 +1487,7 @@ C     ------------------------------------------------------------------
             
             
 C
-      SUBROUTINE GWF2AWU7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
+      SUBROUTINE GWF2AG7FM(Kkper, Kkstp, Kkiter, Iunitnwt)
 C     ******************************************************************
 C     CALCULATE APPLIED IRRIGATION, DIVERISONS, AND PUMPING
 C     ******************************************************************
@@ -1497,7 +1497,7 @@ C     ------------------------------------------------------------------
       USE GLOBAL,       ONLY:DELR,DELC,IBOUND,HNEW,LBOTM,BOTM,
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM,DELT
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
@@ -1680,7 +1680,7 @@ C3------RETURN
       RETURN
       END
 C
-      SUBROUTINE GWF2AWU7BD(kkstp,kkper,Iunitnwt)
+      SUBROUTINE GWF2AG7BD(kkstp,kkper,Iunitnwt)
 C     ******************************************************************
 C     CALCULATE FLOWS FOR AG OPTIONS (DIVERSIONS AND PUMPING)
 C     ******************************************************************
@@ -1691,7 +1691,7 @@ C     ------------------------------------------------------------------
      1                      IBOUND,HNEW,BUFF,BOTM,LBOTM
       USE GWFBASMODULE,ONLY:ICBCFL,IAUXSV,DELT,PERTIM,TOTIM,
      1                      VBNM,VBVL,MSUM,IBUDFL
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, SEG, IDIVAR, 
      1                        DVRSFLW
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
@@ -1716,7 +1716,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION :: SMOOTHQ,bbot,ttop,hh
       DOUBLE PRECISION :: Qp,QQ,Qsave,dQp
       DOUBLE PRECISION :: DONENEG, prms_inch2mf_q
-      DATA TEXT1 /'           AWU WELLS'/
+      DATA TEXT1 /'           AG WELLS'/
       DATA TEXT2 /'  DIVERSION SEGMENTS'/
       DATA TEXT3 /'       SW IRRIGATION'/
       DATA TEXT4 /'       GW IRRIGATION'/
@@ -1724,7 +1724,7 @@ C     ------------------------------------------------------------------
       DATA TEXT6 /'       GW RETURN FLOW'/
       DATA TEXT7 /'    SYSTEM LOSSES SW'/
       DATA TEXT8 /'    SYSTEM LOSSES GW'/
-      DATA TEXT9 /'       AWU WELLS'/
+      DATA TEXT9 /'       AG WELLS'/
 C     ------------------------------------------------------------------
       ZERO=0.0D0
       DONE=1.0D0
@@ -2076,19 +2076,19 @@ C18-------SW EFFICIENCY (GAINS/LOSSES)
       VBNMAG(MSUMAG)=TEXT7
       MSUMAG = MSUMAG + 1
       IF(IBUDFL.NE.0)
-     1CALL SGWF2AWU7V(MSUMAG,VBNMAG,VBVLAG,KKSTP,KKPER,IOUT,BUDPERC)
+     1CALL SGWF2AG7V(MSUMAG,VBNMAG,VBVLAG,KKSTP,KKPER,IOUT,BUDPERC)
 C
    61 FORMAT(1X,/1X,A,'   PERIOD ',I4,'   STEP ',I3)
-   62 FORMAT(1X,'AWU WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
+   62 FORMAT(1X,'AG WELL ',I6,'   LAYER ',I3,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    63 FORMAT(1X,'SEGMENT ',I6,'   RATE ',1PG15.6)
-   64 FORMAT(1X,'AWU WELL ',I6,'   ROW ',I5,'   COL ',I5,
+   64 FORMAT(1X,'AG WELL ',I6,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    65 FORMAT(1X,'SEGMENT ',I6,'   ROW ',I5,'   COL ',I5,
      1      '   RATE ',1PG15.6)
    66 FORMAT(1X,'SEGMENT ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
-   67 FORMAT(1X,'AWU WELL ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
-  300 FORMAT(' AWU WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
+   67 FORMAT(1X,'AG WELL ',I6,'   HRU ',I5,'   RATE ',1PG15.6)
+  300 FORMAT(' AG WELLS WITH REDUCED PUMPING FOR STRESS PERIOD ',I5,
      1      ' TIME STEP ',I5)
   400 FORMAT('   LAY   ROW   COL         APPL.Q          ACT.Q',
      1       '        GW-HEAD       CELL-BOT')
@@ -2106,7 +2106,7 @@ C
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE,VKS,Isurfkreject,
      +                        surfk
       USE GWFSFRMODULE, ONLY: SEG,DVRSFLW,IDIVAR,SGOTFLW,STRM
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -2188,7 +2188,7 @@ C
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFSFRMODULE, ONLY: SEG,SGOTFLW,IDIVAR,STRM
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
@@ -2262,7 +2262,7 @@ C
 !     ******************************************************************
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
@@ -2321,7 +2321,7 @@ C
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
@@ -2375,7 +2375,7 @@ C
 !     SPECIFICATIONS:
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
       USE GWFSFRMODULE, ONLY: DVRSFLW,SGOTFLW
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GLOBAL,     ONLY: DELR, DELC
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
@@ -2576,10 +2576,10 @@ C
 C
       subroutine timeseries(unit, Kkper, Kkstp, time, id, qd, q, qq)
 !     ******************************************************************
-!     timeseries---- write AWU water use time series for SW and GW use
+!     timeseries---- write AG water use time series for SW and GW use
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !arguments
@@ -2599,7 +2599,7 @@ C     ******************************************************************
 C     SMOOTHLY REDUCES PUMPING TO ZERO FOR DEWATERED CONDITIONS
 C     ******************************************************************
 ! h is the depth 
-      USE GWFAWUMODULE,ONLY:PSIRAMP
+      USE GWFAGMODULE,ONLY:PSIRAMP
       IMPLICIT NONE
       DOUBLE PRECISION s, aa, bb, x
       DOUBLE PRECISION cof1, cof2, cof3, Qp
@@ -2634,7 +2634,7 @@ C     LINEARLY INTERPOLATE PUMPING RATE FROM TABFILE
 C     ******************************************************************
 C     FUNCTION LINEARLY INTERPOLATES BETWEEN TWO VALUES
 C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
-      USE GWFAWUMODULE
+      USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 !ARGUMENTS
@@ -2692,7 +2692,7 @@ C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
       RETURN
       END FUNCTION RATETERPQ
 C
-      SUBROUTINE SGWF2AWU7V(MSUM,VBNMAG,VBVLAG,KSTP,KPER,IOUT,BUDPERC)
+      SUBROUTINE SGWF2AG7V(MSUM,VBNMAG,VBVLAG,KSTP,KPER,IOUT,BUDPERC)
 C     ******************************************************************
 C     PRINT VOLUMETRIC BUDGET
 C     ******************************************************************
@@ -2852,9 +2852,9 @@ C
 C
       END
 C
-      SUBROUTINE GWF2AWU7DA()
-C  Deallocate AWU MEMORY
-      USE GWFAWUMODULE
+      SUBROUTINE GWF2AG7DA()
+C  Deallocate AG MEMORY
+      USE GWFAGMODULE
 C
         DEALLOCATE(NUMSUP)
         DEALLOCATE(NUMSUPSP)
