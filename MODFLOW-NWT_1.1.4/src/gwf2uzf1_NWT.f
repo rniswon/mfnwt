@@ -186,7 +186,7 @@ C     ------------------------------------------------------------------
       NPP = 0
       UNITRECH = 0
       UNITDIS = 0
-      LAYNUM = 0
+      LAYNUM = 1  !11/20/2018 From Eric, causes zero access in buff
       SMOOTHET = 0.0D0
       smooth = 0.0
       UZFRESTART = 0
