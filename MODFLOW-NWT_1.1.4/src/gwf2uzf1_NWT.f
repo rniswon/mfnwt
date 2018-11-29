@@ -186,7 +186,7 @@ C     ------------------------------------------------------------------
       NPP = 0
       UNITRECH = 0
       UNITDIS = 0
-      LAYNUM = 0
+      LAYNUM = 1           ! 11/20/2018: Originally LAYNUM=0, but crashed in BD when writing to cbc (Patterened after RCH)
       SMOOTHET = 0.0D0
       smooth = 0.0
       UZFRESTART = 0
@@ -1690,9 +1690,9 @@ cupdate
      +                        (UZTHST(1, l)-thtrcell)*
      +                        (BOTM(ic,ir,uzlay-1)-HNEW(ic, ir, uzlay))
                         ELSE
-                          GRIDSTOR(ic, ir, uzlay) = 
-     +                        (THTS(IC, IR)-thtrcell)*
-     +                        (BOTM(ic,ir,uzlay-1)-BOTM(ic,ir,uzlay))
+                          GRIDSTOR(ic, ir, uzlay) = 0.0
+!     +                        (THTS(IC, IR)-thtrcell)*
+!     +                        (BOTM(ic,ir,uzlay-1)-BOTM(ic,ir,uzlay))
                         END IF
                       END DO
                     END IF
