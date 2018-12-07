@@ -8422,7 +8422,8 @@ C
 C
 C-------SUBROUTINE SFR2MODSIM
 C
-      SUBROUTINE SFR2MODSIM(EXCHANGE, Diversions, IDIVERT, Nsegshold)
+      SUBROUTINE SFR2MODSIM(EXCHANGE, Diversions, IDIVERT, Nsegshold, 
+     +                      Timestep, KITER)
 C     *******************************************************************
 C-------- MARCH 8, 2017
 C     COMPUTE NET ACCRETION/DEPLETION OVER A SEGMENT FOR MODSIM.
@@ -8439,7 +8440,7 @@ C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
-      INTEGER,          INTENT(IN)    :: Nsegshold
+      INTEGER,          INTENT(IN)    :: Nsegshold, Timestep, KITER
       DOUBLE PRECISION, INTENT(INOUT) :: EXCHANGE(NSS)
       DOUBLE PRECISION, INTENT(INOUT) :: Diversions(Nsegshold) 
       INTEGER,          INTENT(IN)    :: IDIVERT(Nsegshold)
@@ -8478,11 +8479,20 @@ C4------IF FIRST REACH IN SEGMENT THEN SET FLOWIN
         IF ( REACHNUMINSEG == 1 ) FLOWIN = STRM(10,L)
 C
 C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
-          IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
-            FLOWOUT = STRM(9,L)
-            EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + (FLOWOUT - FLOWIN)*DELT 
-          END IF
-        END DO
+        IF ( REACHNUMINSEG == ISEG(4,ISTSG) ) THEN
+          FLOWOUT = STRM(9,L)
+          EXCHANGE(ISTSG) = EXCHANGE(ISTSG) + (FLOWOUT - FLOWIN)*DELT
+        END IF
+      END DO
+C
+C6----GENERATE SOME DEBUG 'WATCHER' FILES
+      OPEN(223, FILE='SFR_DEBUG_outs.TXT')
+      WRITE(223,334) Timestep, KITER, (STRM(9,II), II=1, NSTRM)
+  334 FORMAT(I5,1X,I5,1X,4909E17.10)
+      OPEN(224, FILE='SFR_DEBUG_ins.TXT')
+      WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
+  335 FORMAT(I5,1X,I5,1X,4909E17.10)
+
 C
 C8----RETURN.
       RETURN
@@ -8496,7 +8506,7 @@ C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION
 C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR
+      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -8521,6 +8531,9 @@ C4------APPLY DIVERSION AMOUNT TO SFR SEGMENT INFLOW.
 C         
           IF ( ABS(IDIVAR(1, ISEG)) > 0 ) THEN
             SEG(2,iseg) = Diversions(ISEG)/DELT
+            IF ( IDIVAR(1,iseg).LT.0 ) THEN
+              FXLKOT(iseg) = SEG(2, iseg)
+            END IF
           END IF
         END DO
 C

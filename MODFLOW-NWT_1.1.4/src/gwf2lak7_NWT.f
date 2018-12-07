@@ -165,7 +165,7 @@ C  SET NLAKES ARRAY VARIABLE TO NLAKES IF NLAKES GREATER THAN 0.
 !     ALLOCATE (VOLOLDD(NLAKESAR), VOLOLD(NLAKES), VOLINIT(NLAKES))
       ALLOCATE (STGITER(NLAKESAR))
       ALLOCATE (LAKSEEP(NCOL,NROW),DEADPOOLVOL(NLAKESAR),
-     +          RELEASABLE_STOR(NLAKESAR))
+     +          RELEASABLE_STOR(NLAKESAR), MXLKVOLF(NLAKESAR))
       STGNEW = 0.0D0
       STGOLD = 0.0D0
       STGOLD2 = 0.0D0
@@ -175,6 +175,7 @@ C  SET NLAKES ARRAY VARIABLE TO NLAKES IF NLAKES GREATER THAN 0.
       RUNF = 0.0D0
       RUNOFF = 0.0D0
       DEADPOOLVOL = 0.0
+      MXLKVOLF = 0.0
       RELEASABLE_STOR = 0.0
 Cdep initialized VOLOLD and VOLINIT  6/4/2009 (VOLOLD is single precision)
 !     VOLOLD = 0.0
@@ -2975,7 +2976,7 @@ C    -------------------------------------------------------------------
       USE GWFLAKMODULE, ONLY: NLAKES, NTRB, NDV, ITRB, IDIV, IRK, RAMP,
      +                        DEADPOOLVOL
       USE GLOBAL,       ONLY: IOUT, NODES
-      USE GWFSFRMODULE, ONLY: NSS, IDIVAR, IOTSG, SEG,  ISEG
+      USE GWFSFRMODULE, ONLY: NSS, IDIVAR, IOTSG, SEG, ISEG, CLOSEZERO
       DOUBLE PRECISION :: SPILL,V
       DOUBLE PRECISION VOLTERP
       EXTERNAL VOLTERP
@@ -3022,8 +3023,14 @@ C---  Stream Outflow from Lakes
         IF(IRK(2,LAKE).GT.NDV) NDV = IRK(2,LAKE)
 C CALCULATE DEAD POOL STORAGE
         SPILL = SEG(8,LSEG) + RAMP
-        V = VOLTERP(SPILL,LAKE)   
-        DEADPOOLVOL(LAKE) = V
+        V = VOLTERP(SPILL,LAKE)
+C---   Account for multiple diversions out of a lake
+        IF(V.GT.CLOSEZERO) THEN
+          IF(V.LT.DEADPOOLVOL(LAKE).OR.
+     +            DEADPOOLVOL(LAKE).LT.CLOSEZERO) THEN
+            DEADPOOLVOL(LAKE) = V
+          ENDIF
+        ENDIF
         WRITE(IOUT,*)
         WRITE(IOUT,9008)LAKE,V
         WRITE(IOUT,*)
@@ -4068,8 +4075,9 @@ C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
      +                        STGNEW,PRECIP,EVAP,RUNF,RUNOFF,WITHDRW,
-     +                        SEEP,DEADPOOLVOL,RELEASABLE_STOR
-      USE GWFSFRMODULE, ONLY: IDIVAR
+     +                        SEEP,DEADPOOLVOL,RELEASABLE_STOR,IDIV, 
+     +                        BOTTMS,MXLKVOLF
+      USE GWFSFRMODULE, ONLY: IDIVAR, SEG, STRM, STROUT, FXLKOT
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -4086,23 +4094,26 @@ C     -------------------------------------------------------------------
 C     -------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -------------------------------------------------------------------
-      INTEGER LAKE, M, LAK_ID
+      INTEGER LAKE, M, LAK_ID, INODE
       DOUBLE PRECISION DELTAQ
 C     -------------------------------------------------------------------
 C
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
+      OPEN(222, FILE='LAKE_DEBUG_.TXT')
       DO LAKE=1,NLAKES
         DELTAQ = (SURFIN(LAKE) - SURFOT(LAKE))*DELT
         DELTAVOL(LAKE) = VOL(LAKE) - VOLOLDD(LAKE) - DELTAQ
         LAKEVOL(LAKE) = VOL(LAKE)
+        INODE=IDIV(LAKE,1)
+        IF(INODE.EQ.0) INODE=1
         WRITE(222,333)LAKE,PRECIP(LAKE),EVAP(LAKE),
-     1            RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
-     2              SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE),
-     3         Diversions(18), Diversions(19)
+     1     RUNF(LAKE),RUNOFF(LAKE),WITHDRW(LAKE),SURFIN(LAKE),
+     2     SURFOT(LAKE),SEEP(LAKE),VOL(LAKE),VOLOLDD(LAKE),
+     3     SEG(8,INODE),BOTTMS(LAKE),STGNEW(LAKE),Diversions(505)    ! SEG(8,)=BotLake
       END DO
-  333 FORMAT(I5,12E15.7)
+  333 FORMAT(I5,14E15.7)
 C
 C-----UPDATE RELEASABLE STORAGE ARRAY RETURNED TO MODSIM FOR RESETTING POTENTIAL RELEASE AMOUNT
       DO LAKE=1,NLAKES
@@ -4115,9 +4126,21 @@ C-----LOOP OVER REACHES AND OVERRIDE LAKE RELEASES IF WATER LIMITED
         DO M = 1, Nsegshold
           IF (IDIVAR(1,M).LT.0) THEN
             LAK_ID = ABS(IDIVAR(1,M))
-            !IF ((RELEASABLE_STOR(LAK_ID) / DELT).LT.Diversions(M)) THEN
-              Diversions(M) = RELEASABLE_STOR(LAK_ID) / DELT
-            !ENDIF
+            ! The following bit of code added to handle stress period 54
+            IF (VOL(LAK_ID).GT.MXLKVOLF(LAK_ID).AND.
+     &          .NOT.MXLKVOLF(LAK_ID).LT.0.0) THEN
+              Diversions(M) = (VOL(LAK_ID) - MXLKVOLF(LAK_ID)) / DELT
+            !INODE = IDIV(LAKE,IDV)
+C           THE FOLLOWING CONDITION WILL BE TRIGGERED WHEN NEAR DEADPOOL STORAGE
+C           CHECKS WHAT'S AVAILABLE AGAINST WHAT MODSIM IS ASKING FOR ("Diversions")
+            ELSEIF((RELEASABLE_STOR(LAK_ID)/DELT).LT.Diversions(M)) THEN
+              Diversions(M)=RELEASABLE_STOR(LAK_ID) / DELT
+             !Diversions(M)=MAX((RELEASABLE_STOR(LAK_ID)/DELT),FXLKOT(M))
+      ! NEED TODO: Look into "/ DELT", could be an issue in Deschutes where seconds are used.
+      ! Need to check this calculation by hand to make sure units are as expected for MODSIM
+   !          Diversions(M) = (RELEASABLE_STOR(LAK_ID) / DELT) + 
+   !  &                       FXLKOT(M)
+            ENDIF
           ENDIF
         ENDDO
       ENDIF
@@ -4127,7 +4150,7 @@ C5------RETURN.
       END SUBROUTINE LAK2MODSIM
 C
 C-------SUBROUTINE LAK2MODSIM, But directly callable by MODSIM
-      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL) 
+      SUBROUTINE LAK2MODSIM_InitLakes(DELTAVOL,LAKEVOL, MXLKVOL) 
      &                           BIND(C,NAME="LAK2MODSIM_InitLakes")
       
       !DEC$ ATTRIBUTES DLLEXPORT :: LAK2MODSIM_InitLakes
@@ -4137,7 +4160,7 @@ C     SET VOLUMES, SFR INFLOWS, AND SFR OUTFLOWS FOR MODSIM
 !--------MARCH 8, 2017
 C     *******************************************************************
       USE GWFLAKMODULE, ONLY: NLAKES, SURFIN, SURFOT, VOLOLDD, VOL,
-     +                        STGNEW, DEADPOOLVOL
+     +                        STGNEW, DEADPOOLVOL, MXLKVOLF
       USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 C     -------------------------------------------------------------------
@@ -4145,7 +4168,8 @@ C     SPECIFICATIONS:
 C     -------------------------------------------------------------------
 C     ARGUMENTS
       DOUBLE PRECISION, INTENT(INOUT) :: DELTAVOL(NLAKES), 
-     +                                   LAKEVOL(NLAKES)
+     +                                   LAKEVOL(NLAKES),
+     +                                   MXLKVOL(NLAKES)
 C      INTEGER, INTENT(IN) :: KITER,KSTP,KPER
 C     -------------------------------------------------------------------
 !      INTEGER 
@@ -4156,6 +4180,10 @@ C     -------------------------------------------------------------------
       INTEGER LAKE
 C     -------------------------------------------------------------------
 C
+C0----FILL A NEW VARIABLE CALLED MXLKVOLF CONTAINING THE MODSIM MAX LAKE STORAGE
+      DO LAKE=1, NLAKES
+        MXLKVOLF(LAKE) = MXLKVOL(LAKE)
+      ENDDO
 C
 C1-------SET FLOWS IN AND OUT OF LAKES AND CHANGE IN LAKE VOLUME.
 C
@@ -4201,6 +4229,7 @@ Cdep  deallocate SURFDEPTH 3/3/2009
       DEALLOCATE (GWFLAKDAT(IGRID)%RAMP)
       DEALLOCATE (GWFLAKDAT(IGRID)%DEADPOOLVOL)
       DEALLOCATE (GWFLAKDAT(IGRID)%RELEASABLE_STOR)
+      DEALLOCATE (GWFLAKDAT(IGRID)%MXLKVOLF)
       DEALLOCATE (GWFLAKDAT(IGRID)%MXLKND)
       DEALLOCATE (GWFLAKDAT(IGRID)%LKNODE)
       DEALLOCATE (GWFLAKDAT(IGRID)%ICMX)
@@ -4343,6 +4372,7 @@ Cdep  added SURFDEPTH 3/3/2009
       RAMP=>GWFLAKDAT(IGRID)%RAMP
       DEADPOOLVOL=>GWFLAKDAT(IGRID)%DEADPOOLVOL
       RELEASABLE_STOR=>GWFLAKDAT(IGRID)%RELEASABLE_STOR
+      MXLKVOLF=>GWFLAKDAT(IGRID)%MXLKVOLF
       ICS=>GWFLAKDAT(IGRID)%ICS
       NCNCVR=>GWFLAKDAT(IGRID)%NCNCVR
       LIMERR=>GWFLAKDAT(IGRID)%LIMERR
@@ -4493,6 +4523,7 @@ Cdep  Added SURFDEPTH 3/3/2009
       GWFLAKDAT(IGRID)%RAMP=>RAMP
       GWFLAKDAT(IGRID)%DEADPOOLVOL=>DEADPOOLVOL
       GWFLAKDAT(IGRID)%RELEASABLE_STOR=>RELEASABLE_STOR
+      GWFLAKDAT(IGRID)%MXLKVOLF=>MXLKVOLF
       GWFLAKDAT(IGRID)%ICS=>ICS
       GWFLAKDAT(IGRID)%NCNCVR=>NCNCVR
       GWFLAKDAT(IGRID)%LIMERR=>LIMERR
