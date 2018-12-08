@@ -15,12 +15,15 @@ C     ******************************************************************
       FUNCTION ICHKSTRBOT(self)
       type (check_bot), intent(in) :: self
       INTEGER JRCH,IRCH,KRCH,JSEG,ISEG,ICHKSTRBOT
+      REAL UHC
       ICHKSTRBOT = 0
       KRCH = ISTRM(1,self%IRCHNUM)
       IRCH = ISTRM(2,self%IRCHNUM)
       JRCH = ISTRM(3,self%IRCHNUM)
       JSEG = ISTRM(4,self%IRCHNUM)
       ISEG = ISTRM(5,self%IRCHNUM)
+      UHC = STRM(6,self%IRCHNUM)
+      IF ( UHC > 1.0e-20 ) THEN
       IF ( self%LTYPE.GT.0  .AND. IBOUND(JRCH,IRCH,KRCH).GT.0 ) THEN 
         IF ( STRM(4, self%IRCHNUM)-BOTM(JRCH,IRCH,LBOTM(KRCH))
      +                                      .LT.-1.0E-12 ) THEN
@@ -34,6 +37,7 @@ C     ******************************************************************
      +                STRM(4, self%IRCHNUM),BOTM(JRCH,IRCH,LBOTM(KRCH))
           ICHKSTRBOT = 1
         END IF
+      END IF
       END IF
       IF ( self%IFLAG.GT.0 .AND. self%IRCHNUM.EQ.NSTRM ) THEN
         WRITE(self%IUNIT,*)' MODEL STOPPING DUE TO REACH ALTITUDE ERROR'
@@ -2031,6 +2035,7 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
             WRITE(iout,9031)
             numval = ISFRLIST(2,i)
             iunitnum = ISFRLIST(3,i)
+            REWIND(iunitnum)   !IN CASE FILES ARE REUSED FOR MULTIPLE WELLS
             DO j = 1, numval
               LLOC = 1
               CALL URDCOM(iunitnum,IOUT,LINE)
@@ -2055,7 +2060,7 @@ CC45-----READ TABLES FOR SPECIFIED INFLOWS
  9033 FORMAT('TABULAR INFLOWS WERE READ FOR SEGMENT ',I6,/
      +       'FROM FILE UNIT NUMBER ',I6,/)
  9031 FORMAT(10X,'TIMES',20X,'INFLOWS')
- 9032 FORMAT(5X,F20.10,1X,F20.10)
+ 9032 FORMAT(5X,E20.10,1X,E20.10)
 C
  900  RETURN
       END SUBROUTINE GWF2SFR7RP
@@ -8276,9 +8281,14 @@ C     ------------------------------------------------------------------
 !!     +                        SEG, FXLKOT, IDIVAR, CLOSEZERO
       USE GLOBAL, ONLY: IOUT
       IMPLICIT NONE
+C        ARGUMENTS
+      INTEGER, INTENT(IN) ::Iunitlak, IGRID
+C     ------------------------------------------------------------------
+C        VARIABLES
+C     ------------------------------------------------------------------
       EXTERNAL FLOWTERP
       REAL FLOWTERP
-      INTEGER i, iseg, Iunitlak, istsg, lk, IGRID
+      INTEGER istsg, lk
 C     ------------------------------------------------------------------
 C
 C
