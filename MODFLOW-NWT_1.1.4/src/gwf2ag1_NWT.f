@@ -64,6 +64,7 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMCELLS
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::NUMSEGS
         INTEGER,          SAVE,              POINTER   ::ETDEMANDFLAG
+        INTEGER,          SAVE,              POINTER   ::TRIGGERFLAG
 ! from SFR
         INTEGER, SAVE, POINTER :: NUMIRRDIVERSION,UNITIRRDIVERSION
         INTEGER, SAVE, POINTER :: MAXCELLSDIVERSION,NUMIRRDIVERSIONSP
@@ -136,7 +137,7 @@ C     ------------------------------------------------------------------
       ALLOCATE(MAXVAL,NUMSUP,NUMIRRWEL,UNITSUP,MAXCELLSWEL)
       ALLOCATE(NUMSUPSP,MAXSEGS,NUMIRRWELSP)
       ALLOCATE(ETDEMANDFLAG,NUMIRRDIVERSION,NUMIRRDIVERSIONSP)
-      ALLOCATE (MAXCELLSDIVERSION)
+      ALLOCATE (MAXCELLSDIVERSION,TRIGGERFLAG)
       NWELLS=0
       NNPWEL=0
       MXWELL=0
@@ -159,6 +160,7 @@ C     ------------------------------------------------------------------
       ETDEMANDFLAG = 0
       NUMIRRDIVERSION = 0
       NUMIRRDIVERSIONSP = 0
+      TRIGGERFLAG = 0
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE(IOUT,1)IN
@@ -550,6 +552,31 @@ C
      +                //' UZF1 IETFLG must not be zero for this option')
                 END IF
               END IF
+          case('TRIGGER')
+              TRIGGERFLAG = 1
+              WRITE(iout,*)
+              WRITE(IOUT,'(A)')' IRRIGATION WILL OCCUR FOR A SET '//
+     +        'PERIOD WHEN ET DEFICIT DROPS BELOW THRESHOLD'
+              WRITE(iout,*)
+              IF ( PRMS_flag == 1 .or. IUNIT(55) > 0 ) found2 = .true.
+              IF ( .not. found2 ) THEN
+                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+     +                //' PRMS or UZF1 must be active for this option'
+                CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+     +                //' PRMS or UZF1 must be active for this option')
+              END IF
+              IF ( IUNIT(55) > 0 .AND. PRMS_flag == 0 ) THEN
+                IF ( IETFLG == 0 ) THEN
+                   WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+     +                //' UZF1 IETFLG must not be zero for this option'
+                   CALL USTOP('Invalid '//trim(adjustl(text))
+     +                   //' Option: '//LINE(ISTART:ISTOP)
+     +                //' UZF1 IETFLG must not be zero for this option')
+                END IF
+              END IF
         case ('END')
          write(iout,'(/1x,a)') 'END PROCESSING '//
      +            trim(adjustl(text)) //' OPTIONS'
@@ -644,7 +671,7 @@ C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
       INTEGER I, ITMP
       character(len=22)  :: text      = 'AG STRESS PERIOD DATA'
-      character(len=17)  :: text1     = 'IRRIGATION STREAM'
+      character(len=17)  :: text1     = 'IRRIGATION SEGMENT'
       character(len=16)  :: text2     = 'IRRIGATION WELL'
       character(len=16)  :: text3     = 'SUPPLEMENTAL WELL'
       character(len=16)  :: text4     = 'IRRDIVERSION'
@@ -1002,7 +1029,7 @@ C1----INACTIVATE ALL IRRIGATION WELLS.
         SUPWELVAR = 0
         NUMSEGS = 0
         DIVERSIONSEG = 0
-        PCTSUP =0.0
+        PCTSUP = 0.0
         RETURN
       END IF
 C
@@ -1095,7 +1122,7 @@ C     ARGUMENTS:
 C     ------------------------------------------------------------------
 C     VARIABLES:
       CHARACTER(LEN=200)::LINE
-      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL
+      INTEGER :: IERR, LLOC, ISTART, ISTOP, J, ISPWL, IDUM
       INTEGER :: NMSG, K, IRWL, NMCL
       REAL :: R
 C     ------------------------------------------------------------------
@@ -1142,8 +1169,8 @@ C---READ NEW IRRIGATION WELL DATA
           NUMCELLS(IRWL) = NMCL
           IF ( PRMS_flag == 1 ) then   !uzfrow stores hru number for gsflow
             DO K = 1, NMCL
-              READ(IN,*)UZFROW(K,IRWL),IRRFACT(K,IRWL),
-     +                IRRPCT(K,IRWL)                                      !,KCROPWELL(K,IRWL)
+              READ(IN,*)UZFROW(K,IRWL),IDUM,IRRFACT(K,IRWL),                ! Specify 2 values hruid and dum
+     +                  IRRPCT(K,IRWL)                                      !,KCROPWELL(K,IRWL)
             END DO
             DO K = 1, NUMCELLS(IRRWELVAR(J))
               IF ( UZFROW(K,IRRWELVAR(J))==0 ) THEN
@@ -1203,7 +1230,7 @@ C     ARGUMENTS
 C     ------------------------------------------------------------------
 C     VARIABLES
 C     ------------------------------------------------------------------
-      INTEGER LLOC,ISTART,ISTOP,J,SGNM,NMCL,K
+      INTEGER LLOC,ISTART,ISTOP,J,SGNM,NMCL,K, IDUM
       REAL R 
       DOUBLE PRECISION :: totdum
       CHARACTER(LEN=200)::LINE
@@ -1249,7 +1276,7 @@ C
             DVRCH(SGNM) = NMCL
             IF ( PRMS_flag == 1 ) then   !irrrow stores hru number for gsflow
               DO K=1,NMCL                
-                READ(IN,*)IRRROW(K,SGNM),DVEFF(K,SGNM),
+                READ(IN,*)IRRROW(K,SGNM),idum,DVEFF(K,SGNM),          ! specify hruid and dummy
      +                    DVRPERC(K,SGNM)                             !,KCROPDIVERSION(K,SGNM)
               END DO
               totdum  = 0.0
