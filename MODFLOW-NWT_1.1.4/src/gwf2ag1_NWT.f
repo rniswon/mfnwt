@@ -41,6 +41,8 @@
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER ::DIVERSIONSEG
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFROW
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
+        REAL,             SAVE, DIMENSION(:), POINTER ::IRRPERIODWELL
+        REAL,             SAVE, DIMENSION(:), POINTER ::IRRPERIODSEG
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERSW
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERGW
         REAL,             SAVE, DIMENSION(:,:),   POINTER ::WELLIRRUZF
@@ -182,6 +184,7 @@ C
       ALLOCATE(TSSWETNUM(NSEGDIMTEMP),TSGWETNUM(MXWELL))
       ALLOCATE(SUPSEG(NSEGDIMTEMP))
       ALLOCATE(LASTREACH(NSEGDIMTEMP))
+      ALLOCATE(IRRPERIODWELL(MXWELL),IRRPERIODSEG(NSEGDIMTEMP)
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -191,6 +194,9 @@ C
       TSGWETNUM = 0
       SUPSEG = 0.0
       LASTREACH = 0
+      IRRPERIODWELL = 0.0
+      IRRPERIODSEG = 0.0
+      
 C
 C4------READ TS
       IF ( TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR. 
@@ -1160,6 +1166,7 @@ C---READ NEW IRRIGATION WELL DATA
           LLOC = 1
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,i,R,IOUT,In)
           IF ( NMCL > MAXCELLSWEL )THEN
             WRITE(IOUT,*)
             WRITE(IOUT,105)MAXCELLSWEL,NMCL
@@ -1167,6 +1174,7 @@ C---READ NEW IRRIGATION WELL DATA
           END IF
           IRRWELVAR(J) = IRWL
           NUMCELLS(IRWL) = NMCL
+          IRRPERIODWELL(IRWL) = R
           IF ( PRMS_flag == 1 ) then   !uzfrow stores hru number for gsflow
             DO K = 1, NMCL
               READ(IN,*)UZFROW(K,IRWL),IDUM,IRRFACT(K,IRWL),                ! Specify 2 values hruid and dum
