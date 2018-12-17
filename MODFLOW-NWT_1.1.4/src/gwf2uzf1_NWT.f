@@ -4030,7 +4030,7 @@ C60----LOOP OVER GAGING STATIONS.
                 ginfltr = UZOLSFLX(iuzcol, iuzrow)*
      +                  DELC(iuzrow)*DELR(iuzcol)
                 gaplinfltr = FINF(iuzcol, iuzrow)
-                if ( IUNIT(2) > 0  .AND. IUNIT(66) > 0 ) then
+                if ( IUNIT(66) > 0 ) then
                   if ( NUMIRRWEL > 0 )  
      +                 gaplinfltr = gaplinfltr + 
      +                 WELLIRRUZF(iuzcol, iuzrow)
