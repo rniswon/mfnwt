@@ -1690,9 +1690,9 @@ cupdate
      +                        (UZTHST(1, l)-thtrcell)*
      +                        (BOTM(ic,ir,uzlay-1)-HNEW(ic, ir, uzlay))
                         ELSE
-                          GRIDSTOR(ic, ir, uzlay) = 
-     +                        (THTS(IC, IR)-thtrcell)*
-     +                        (BOTM(ic,ir,uzlay-1)-BOTM(ic,ir,uzlay))
+                          GRIDSTOR(ic, ir, uzlay) = 0.0
+!     +                        (THTS(IC, IR)-thtrcell)*
+!     +                        (BOTM(ic,ir,uzlay-1)-BOTM(ic,ir,uzlay))
                         END IF
                       END DO
                     END IF
