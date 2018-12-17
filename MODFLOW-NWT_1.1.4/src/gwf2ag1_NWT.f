@@ -43,6 +43,8 @@
         INTEGER,          SAVE, DIMENSION(:,:),   POINTER     ::UZFCOL
         REAL,             SAVE, DIMENSION(:), POINTER ::IRRPERIODWELL
         REAL,             SAVE, DIMENSION(:), POINTER ::IRRPERIODSEG
+        REAL,             SAVE, DIMENSION(:),POINTER ::TRIGGERPERIODWELL
+        REAL,             SAVE, DIMENSION(:),POINTER ::TRIGGERPERIODSEG
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERSW
         REAL,             SAVE, DIMENSION(:,:),   POINTER :: AETITERGW
         REAL,             SAVE, DIMENSION(:,:),   POINTER ::WELLIRRUZF
@@ -185,6 +187,7 @@ C
       ALLOCATE(SUPSEG(NSEGDIMTEMP))
       ALLOCATE(LASTREACH(NSEGDIMTEMP))
       ALLOCATE(IRRPERIODWELL(MXWELL),IRRPERIODSEG(NSEGDIMTEMP)
+      ALLOCATE(TRIGGERPERIODWELL(MXWELL),TRIGGERPERIODSEG(NSEGDIMTEMP))
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -196,6 +199,8 @@ C
       LASTREACH = 0
       IRRPERIODWELL = 0.0
       IRRPERIODSEG = 0.0
+      TRIGGERPERIODWELL = 0.0
+      TRIGGERPERIODSEG = 0.0
       
 C
 C4------READ TS
@@ -2290,6 +2295,80 @@ C
 300   continue
       return
       end subroutine demandconjunctive_prms
+      
+      subroutine demandtrigger_prms()
+!     ******************************************************************
+!     demandtrigger---- triggers and sets irrigation demand
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW,IDIVAR,STRM
+      USE GWFAGMODULE
+      USE GWFBASMODULE, ONLY: DELT
+      USE PRMS_BASIN, ONLY: HRU_PERV
+      USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
+      USE PRMS_CLIMATEVARS, ONLY: POTET
+      USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch
+      IMPLICIT NONE
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      !dummy
+      DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
+      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+     +                    aettotal,dhundred,prms_inch2mf_q,FMAXFLOW
+      integer :: k,iseg,hru_id,i
+! ----------------------------------------------------------------------
+!
+      zerod30 = 1.0d-30
+      zerod2 = 1.0d-2
+      done = 1.0d0
+      dhundred = 100.0d0
+      dzero = 0.0d0
+      prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
+C
+C1------loop over diversion segments that supply irrigation
+C
+      do 300 i = 1, NUMIRRDIVERSIONSP
+        iseg = IRRSEG(i)
+        IF ( DEMAND(iseg) < zerod30 ) goto 300
+        finfsum = dzero
+C
+C1------loop over hrus irrigated by diversion
+C
+        do k = 1, DVRCH(iseg)
+           hru_id = IRRROW(k,iseg)
+           area = hru_perv(hru_id)
+!           pet = KCROPDIVERSION(K,ISEG)*potet(hru_id)
+           pet = potet(hru_id)
+           aet = hru_actet(hru_id)
+!           if ( aet < zerod30 ) aet = zerod30
+           factor = ACCEL*(pet/aet - done)
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+!           IF ( FACTOR > dhundred ) FACTOR = dhundred
+! convert PRMS ET deficit to MODFLOW flow
+           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
+           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
+           !dum = pet
+           !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
+           !pettotal = pettotal + pet
+           !aettotal = aettotal + aet
+           AETITERSW(K,ISEG) = AET
+        end do
+!        write(222,*)pet,aet,factor,SUPACT(iseg)
+C
+C1------set diversion to demand
+C
+      SEG(2,iseg) = SUPACT(iseg)
+C
+C1------limit diversion to water right
+C
+       k = IDIVAR(1,ISEG)
+      fmaxflow = STRM(9,LASTREACH(K))
+      IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
+      if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+300   continue
+      return
+      end subroutine demandtrigger_prms
 C
       double precision function demandgw_uzf(l,kper,kstp,kiter,time)
 !     ******************************************************************
