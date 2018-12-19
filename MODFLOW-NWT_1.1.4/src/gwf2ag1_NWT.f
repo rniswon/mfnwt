@@ -1171,7 +1171,7 @@ C---READ NEW IRRIGATION WELL DATA
           LLOC = 1
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,IRWL,R,IOUT,IN)
           CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NMCL,R,IOUT,IN)
-          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,i,R,IOUT,In)
+!          CALL URWORD(LINE,LLOC,ISTART,ISTOP,3,i,R,IOUT,In)
           IF ( NMCL > MAXCELLSWEL )THEN
             WRITE(IOUT,*)
             WRITE(IOUT,105)MAXCELLSWEL,NMCL
@@ -1179,7 +1179,7 @@ C---READ NEW IRRIGATION WELL DATA
           END IF
           IRRWELVAR(J) = IRWL
           NUMCELLS(IRWL) = NMCL
-          IRRPERIODWELL(IRWL) = R
+ !         IRRPERIODWELL(IRWL) = R
           IF ( PRMS_flag == 1 ) then   !uzfrow stores hru number for gsflow
             DO K = 1, NMCL
               READ(IN,*)UZFROW(K,IRWL),IDUM,IRRFACT(K,IRWL),                ! Specify 2 values hruid and dum
