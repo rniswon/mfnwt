@@ -1,4 +1,4 @@
-# AWU options
+# AG options
 options
 etdemand 1000.
 irrigation_diversion 1 6
@@ -13,13 +13,13 @@ timeseries_well
 timeseries_diversion
 timeseries_diversionet
 end
-# AWU time series
+# AG time series
 time series
 well 5 105   
 diversion 9 107      
 diversionet 9 108
 end
-# AWU well list
+# AG well list
 well list
          1         6         4    -10.00
          1         6         5    -10.00
@@ -28,7 +28,7 @@ well list
          1         8         4    -10.00
          1         8         5    -10.00
 end
-# AWU stress period
+# AG stress period
 stress period 1
 IRRdiversion
 0
@@ -64,7 +64,7 @@ END
 stress period 5
 IRRdiversion
 1                         NUMIRRSEGSP       
-9 6                       SEGID NUMCELLSEG 
+9 6 0.0 0.0                       #SEGID NUMCELLSEG IRRPERIODSEG TRIGGERFACTSEG 
 6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
 6 5 0.0 0.16667 
 7 4 0.0 0.16667 
@@ -73,7 +73,7 @@ IRRdiversion
 8 5 0.0 0.16667 
 IRRWELL
 6
-1 1                       IRRWELLLID NUMCELLWELL 
+1 1  0.0 0.0                     #IRRWELLLID NUMCELLWELL IRRPERIODWELL TRIGGERPERIODWELL 
 6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
 2 1
 6 5 0.0 1.0 
@@ -88,17 +88,17 @@ IRRWELL
 SUPWELL
 6                        NUMSUPWELLLSP
 1 1                      SUPWELLLNUM   NUMSEGWELL
-9 1.0                    SEGWELLID    PCTSUP             
+9 1.0 1.0                  #SEGWELLID FACSUP FACSUPMAX             
 2 1 
-9 1.0 
+9 1.0 1.0 
 3 1 
-9 1.0 
+9 1.0 1.0 
 4 1 
-9 1.0 
+9 1.0 1.0 
 5 1 
-9 1.0 
+9 1.0 1.0 
 6 1 
-9 1.0 
+9 1.0 1.0 
 end
 stress period 6     
 IRRdiversion
@@ -191,7 +191,7 @@ END
 stress period 17
 IRRdiversion
 1                         NUMIRRSEGSP       
-9 6                       SEGID NUMCELLSEG 
+9 6 0.0 0.0                       #SEGID NUMCELLSEG IRRPERIODSEG TRIGGERFACTSEG 
 6 4 0.0 0.16667           IRRROW IRRCOL EFF_FACT FIELD_FACT
 6 5 0.0 0.16667 
 7 4 0.0 0.16667 
@@ -200,7 +200,7 @@ IRRdiversion
 8 5 0.0 0.16667 
 IRRWELL
 6
-1 1                       IRRWELLLID NUMCELLWELL 
+1 1  0.0 0.0                     #IRRWELLLID NUMCELLWELL IRRPERIODWELL TRIGGERPERIODWELL 
 6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
 2 1
 6 5 0.0 1.0 
@@ -215,17 +215,17 @@ IRRWELL
 SUPWELL
 6                        NUMSUPWELLLSP
 1 1                      SUPWELLLNUM   NUMSEGWELL
-9 1.0                    SEGWELLID    PCTSUP             
+9 1.0 1.0                  #SEGWELLID FACSUP FACSUPMAX             
 2 1 
-9 1.0 
+9 1.0 1.0 
 3 1 
-9 1.0 
+9 1.0 1.0 
 4 1 
-9 1.0 
+9 1.0 1.0 
 5 1 
-9 1.0 
+9 1.0 1.0 
 6 1 
-9 1.0
+9 1.0 1.0
 end
 stress period 18
 IRRdiversion
