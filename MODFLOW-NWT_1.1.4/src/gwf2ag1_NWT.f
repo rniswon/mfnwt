@@ -690,9 +690,9 @@ C     ------------------------------------------------------------------
       CHARACTER(LEN=200)::LINE
       INTEGER I, ITMP
       character(len=22)  :: text      = 'AG STRESS PERIOD DATA'
-      character(len=17)  :: text1     = 'IRRIGATION SEGMENT'
+      character(len=18)  :: text1     = 'IRRIGATION SEGMENT'
       character(len=16)  :: text2     = 'IRRIGATION WELL'
-      character(len=16)  :: text3     = 'SUPPLEMENTAL WELL'
+      character(len=17)  :: text3     = 'SUPPLEMENTAL WELL'
       character(len=16)  :: text4     = 'IRRDIVERSION'
       character(len=16)  :: text5     = 'IRRWEL'
       character(len=16)  :: text6     = 'SUPWEL'
@@ -2395,7 +2395,7 @@ C
         aetseg(iseg) = aetseg(iseg) + aet
         factor = done
         if ( aetseg(iseg) > zerod30 ) factor = aetseg(iseg)/petseg(iseg)
-        WRITE(999,*)ISEG,petseg(iseg),aetseg(iseg),FACTOR
+!        WRITE(999,*)ISEG,petseg(iseg),aetseg(iseg),FACTOR
 C
 C1------set diversion to demand if in period or triggered
 C

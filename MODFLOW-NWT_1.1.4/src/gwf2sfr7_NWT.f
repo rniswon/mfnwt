@@ -3641,7 +3641,9 @@ C     ------------------------------------------------------------------
      +                 hld, fbcheck, totflwt, totdelstor, totuzstor,
      +                 thetas, epsilon, thr, qa, qb, qc, qd, awdth,
      +                 bwdth, gwflow, dvrsn, fbot, depthtr, strtop,
-     +                 dwdh, fact
+     +                 dwdh, fact, test !delete test
+      EXTERNAL FLOWTERP  !delete this
+      REAL FLOWTERP !delete this
       EXTERNAL CALC_XSA
       DOUBLE PRECISION CALC_XSA
 C     ------------------------------------------------------------------
@@ -8486,12 +8488,12 @@ C5------IF LAST REACH IN SEGMENT THEN SET FLOWOT
       END DO
 C
 C6----GENERATE SOME DEBUG 'WATCHER' FILES
-      OPEN(223, FILE='SFR_DEBUG_outs.TXT')
-      WRITE(223,334) Timestep, KITER, (STRM(9,II), II=1, NSTRM)
-  334 FORMAT(I5,1X,I5,1X,4909E17.10)
-      OPEN(224, FILE='SFR_DEBUG_ins.TXT')
-      WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
-  335 FORMAT(I5,1X,I5,1X,4909E17.10)
+  !    OPEN(223, FILE='SFR_DEBUG_outs.TXT')
+  !    WRITE(223,334) Timestep, KITER, (STRM(9,II), II=1, NSTRM)
+  !334 FORMAT(I5,1X,I5,1X,4909E17.10)
+  !    OPEN(224, FILE='SFR_DEBUG_ins.TXT')
+  !    WRITE(224,335) Timestep, KITER, (STRM(10,II), II=1, NSTRM)
+  !335 FORMAT(I5,1X,I5,1X,4909E17.10)
 
 C
 C8----RETURN.
@@ -8506,8 +8508,9 @@ C     APPLY DIVERSIONS/LAKE RELEASES CALCULATED BY MODSIM TO DIVERSION
 C     SEGMENTS.
 !--------MARCH 8, 2017
 C     *******************************************************************
-      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT
-      USE GWFBASMODULE, ONLY: DELT
+      USE GWFSFRMODULE, ONLY: NSS, SEG, IDIVAR, FXLKOT, SGOTFLW
+      USE GWFBASMODULE, ONLY: DELT,TOTIM   !delete totim
+      USE GWFAGMODULE, only:demand !delete this
       IMPLICIT NONE
 C     -------------------------------------------------------------------
 C     SPECIFICATIONS:
