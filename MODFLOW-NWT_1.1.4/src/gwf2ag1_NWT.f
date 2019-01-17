@@ -377,7 +377,7 @@ C
      +            trim(adjustl(text)) //' OPTIONS'
             found = .true.
             option = .true.
-! Create wells for supplemental pumping. Pumped amount will be equal to specified diversion minus actual in SFR2.
+! Create wells for supplemental pumping
         case('SUPPLEMENTAL_WELL')
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMSUP,R,IOUT,IN)
             CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXSEGS,R,IOUT,IN)
@@ -525,7 +525,7 @@ C
      +                   //' SUP or IRR wells required')
           end if
           found = .true.
-! Pumped water will be added as irrigation
+! Surface water will be added as irrigation
         case('IRRIGATION_DIVERSION')
        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,NUMIRRDIVERSION,R,IOUT,IN)  !#SEGMENTS
        CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,MAXCELLSDIVERSION,R,IOUT,IN)   !MAX NUMBER OF CELLS
@@ -993,6 +993,7 @@ C
 C     ------------------------------------------------------------------
 C
 C1-------RESET DEMAND IF IT CHANGES
+      DEMAND = 0.0
       DO i = 1, NUMIRRDIVERSION
         iseg = IRRSEG(i)
         if ( iseg>0 ) then
@@ -2340,7 +2341,7 @@ C
       USE GWFSFRMODULE, ONLY: SEG,SGOTFLW,IDIVAR,STRM,NSS
       USE GWFAGMODULE
       USE GWFUZFMODULE, ONLY: GWET,UZFETOUT,PETRATE
-      USE GWFBASMODULE, ONLY: DELT
+      USE GWFBASMODULE, ONLY: DELT,TOTIM
       USE PRMS_BASIN, ONLY: HRU_PERV
       USE PRMS_FLOWVARS, ONLY: SOIL_MOIST,HRU_ACTET
       USE PRMS_CLIMATEVARS, ONLY: POTET
@@ -2395,7 +2396,6 @@ C
         aetseg(iseg) = aetseg(iseg) + aet
         factor = done
         if ( aetseg(iseg) > zerod30 ) factor = aetseg(iseg)/petseg(iseg)
-!        WRITE(999,*)ISEG,petseg(iseg),aetseg(iseg),FACTOR
 C
 C1------set diversion to demand if in period or triggered
 C
@@ -2413,6 +2413,7 @@ C1------limit diversion to supply
 C
       k = IDIVAR(1,ISEG)
       fmaxflow = STRM(9,LASTREACH(K))
+    9 format(4e20.10)
       IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
 300   continue
       deallocate(petseg, aetseg)
