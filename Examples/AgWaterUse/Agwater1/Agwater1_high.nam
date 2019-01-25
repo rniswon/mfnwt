@@ -1,4 +1,4 @@
-LIST                  9 Agwater1.lst
+LIST                  9 Agwater1_high.lst
 BAS6                 75 Agwater1.ba6
 UPW                   7 Agwater1.upw
 DIS                   8 Agwater1.dis
@@ -8,13 +8,13 @@ SFR                  15 Agwater1.sfr
 GHB                  17 Agwater1.ghb
 UZF                  19 Agwater1.uzf
 GAGE                 32 Agwater1.gag
-data                 55 seg1.tab
+data                 55 seg1_high.tab
 data                 56 seg9.tab
 AG                  57 Agwater1.ag
 data                 62 Agwater1.hed 
-data                 105 Agwater1gw.ts5     
-data                 107 Agwater1SW.ts9 
-data                 108 Agwater1SW_ET.ts9 
+data                 105 Agwater1gw_high.ts5     
+data                 107 Agwater1SW_high.ts9 
+data                 108 Agwater1SW_ET_high.ts9 
 DATA(BINARY)         61 Agwater1.uzfot
 DATA(BINARY)         102 Agwater1cbc.unf
 DATA(BINARY)         103 welllist.unf
