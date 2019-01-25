@@ -21,12 +21,12 @@ diversionet 9 108
 end
 # AG well list
 well list
-         1         6         4    -10.00
-         1         6         5    -10.00
-         1         7         4    -10.00
-         1         7         5    -10.00
-         1         8         4    -10.00
-         1         8         5    -10.00
+         1         6         4    -5.00
+         1         6         5    -5.00
+         1         7         4    -5.00
+         1         7         5    -5.00
+         1         8         4    -5.00
+         1         8         5    -5.00
 end
 # AG stress period
 stress period 1
