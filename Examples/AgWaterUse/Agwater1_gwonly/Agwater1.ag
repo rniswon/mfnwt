@@ -1,4 +1,4 @@
-# AWU options
+# AG options
 options
 etdemand 1000.
 irrigation_well 6 1 
@@ -8,14 +8,14 @@ wellirrlist -2
 timeseries_well
 timeseries_wellet
 end
-# AWU time series
+# AG time series
 time series
 well 5 105
 wellet 5 106
 welletall 107
 wellall 108
 end
-# AWU well list
+# AG well list
 well list
          1         6         4    -10.00
          1         6         5    -10.00
@@ -24,7 +24,7 @@ well list
          1         8         4    -10.00
          1         8         5    -10.00
 end
-# AWU stress period
+# AG stress period
 stress period 1
 IRRWELL
 0
@@ -44,7 +44,7 @@ END
 stress period 5   April
 IRRWELL
 6
-1 1                       IRRWELLLID NUMCELLWELL 
+1 1  0.0 0.0           IRRWELLLID NUMCELLWELL IRRPERIODWELL TRIGGERPERIODWELL 
 6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
 2 1
 6 5 0.0 1.0 
@@ -104,7 +104,7 @@ END
 stress period 17    April
 IRRWELL
 6
-1 1                       IRRWELLLID NUMCELLWELL 
+1 1  0.0 0.0           IRRWELLLID NUMCELLWELL IRRPERIODWELL TRIGGERPERIODWELL 
 6 4 0.0 1.0               IRRROW IRRCOL EFF_FACT FIELD_FACT 
 2 1
 6 5 0.0 1.0 
