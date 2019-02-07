@@ -1519,7 +1519,7 @@ C     ------------------------------------------------------------------
           case('DIV')
             UNIT = TSSWUNIT(NUM)
             SGNM = TSSWNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-DUTY SW-DIVERSION ',
+          WRITE(UNIT,*)'TIME KPER KSTP SEGMENT SW-RIGHT SW-DIVERSION ',
      +                   'SUP-PUMPING'
           case('WEL')  
             UNIT = TSGWUNIT(NUM)
@@ -1528,14 +1528,14 @@ C     ------------------------------------------------------------------
           case('SET')
             UNIT = TSSWETUNIT(NUM)
             SGNM = TSSWETNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETo ETa NULL'
+            WRITE(UNIT,*)'TIME KPER KSTP SEGMENT ETww ETa NULL'
           case('GET')  
             UNIT = TSGWETUNIT(NUM)
             WLNM = TSGWETNUM(NUM)
-            WRITE(UNIT,*)'TIME KPER KSTP WELL ETo ETa NULL'
+            WRITE(UNIT,*)'TIME KPER KSTP WELL ETww ETa NULL'
           case('AL1')  
             UNIT = TSGWETALLUNIT
-            WRITE(UNIT,*)'TIME KPER KSTP NULL ETo ETa NULL'
+            WRITE(UNIT,*)'TIME KPER KSTP NULL ETww ETa NULL'
           case('AL2')  
             UNIT = TSGWALLUNIT
             WRITE(UNIT,*)'TIME KPER KSTP NULL GW-DEMAND GW-PUMPED NULL'
@@ -2463,7 +2463,7 @@ C
         aet = (gwet(ic,ir)+uzet)/area
 !        if ( aet < zerod30 ) aet = zerod30
         factor = ACCEL*(pet/aet - done)
-        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
+!        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
 !        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*pet*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
