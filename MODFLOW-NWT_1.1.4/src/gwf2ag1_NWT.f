@@ -2437,7 +2437,7 @@ C
       real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod1,zerod30,done,dzero,dum,dhundred,doneneg
       double precision :: zerod7
       integer :: iseg,ic,ir,i
       external :: RATETERPQ
@@ -2445,7 +2445,7 @@ C
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod1 = 1.0d-1
       zerod7 = 1.0d-7
       done = 1.0d0
       doneneg = -1.0d0
@@ -2463,7 +2463,7 @@ C
         aet = (gwet(ic,ir)+uzet)/area
 !        if ( aet < zerod30 ) aet = zerod30
         factor = ACCEL*(pet/aet - done)
-!        if( abs(AETITERGW(I,L)-AET) < zerod2*pet ) factor = 0.0
+!        if( abs(AETITERGW(I,L)-AET) < zerod1*pet ) factor = 0.0 !changing by less than 10%
 !        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*pet*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
