@@ -863,7 +863,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
      +                      Iunitchd, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
-      USE GLOBAL, ONLY:Iout,ISSFLG
+      USE GLOBAL, ONLY:Iout,ISSFLG !,HNEW,botm
 !!      USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Hcof, Rhs, Iout,botm,
 !!     +                 LBOTM, HOLD, HNEW, DELR, DELC, ISSFLG
 !!      USE GWFBASMODULE, ONLY:TOTIM, HNOFLO
@@ -1146,8 +1146,8 @@ C--Update heads.
           ELSE
             WRITE (Iout, 9002) II,itreal,n_iter,ichld,irhld,ilhld,fhead,
      +                   icfld,irfld,ilfld,fflux,RMS1
- !    +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
- !    +      BOTM(ichld,irhld,ilhld)
+!     +      HNEW(ichld,irhld,ilhld),BOTM(ichld,irhld,ilhld-1),
+!     +      BOTM(ichld,irhld,ilhld)
           END IF
         END IF
       END IF

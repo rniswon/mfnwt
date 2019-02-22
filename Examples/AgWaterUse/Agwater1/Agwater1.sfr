@@ -1,6 +1,6 @@
 #SFR2 Package input for Testing supplimental pumping and irrigation
 options
-tabfiles 2 759
+tabfiles 2 1446
 lossfactor 0.1
 end
 38   9  0  0  1.486  0.000001 -1  81
@@ -77,32 +77,56 @@ end
   9 1 0 2 0 0.0  0.0   0.0E-08  0.0E-08 0.030 
    0.0000  3.  1079.  4.  
    0.0000  3.  1078.  4.
-1 26 55
-9 759 56
--1  0  0                                                           Stress period  2
--1  0  0                                                           Stress period  3
--1  0  0                                                           Stress period  4
--1  0  0                                                           Stress period  5
--1  0  0                                                           Stress period  6
--1  0  0                                                           Stress period  7
--1  0  0                                                           Stress period  8
--1  0  0                                                           Stress period  9
--1  0  0                                                           Stress period 10
--1  0  0                                                           Stress period 11
--1  0  0                                                           Stress period 12
--1  0  0                                                           Stress period 13 
--1  0  0                                                           Stress period 14
--1  0  0                                                           Stress period 15
--1  0  0                                                           Stress period 16
--1  0  0                                                           Stress period 17
--1  0  0                                                           Stress period 18
--1  0  0                                                           Stress period 19
--1  0  0                                                           Stress period 20
--1  0  0                                                           Stress period 21
--1  0  0                                                           Stress period 22
--1  0  0                                                           Stress period 23
--1  0  0                                                           Stress period 24
--1  0  0                                                           Stress period 25
+1 51 55
+9 1446 56
+-1 0 0 Stress period 2
+-1 0 0 Stress period 3
+-1 0 0 Stress period 4
+-1 0 0 Stress period 5
+-1 0 0 Stress period 6
+-1 0 0 Stress period 7
+-1 0 0 Stress period 8
+-1 0 0 Stress period 9
+-1 0 0 Stress period 10
+-1 0 0 Stress period 11
+-1 0 0 Stress period 12
+-1 0 0 Stress period 13
+-1 0 0 Stress period 14
+-1 0 0 Stress period 15
+-1 0 0 Stress period 16
+-1 0 0 Stress period 17
+-1 0 0 Stress period 18
+-1 0 0 Stress period 19
+-1 0 0 Stress period 20
+-1 0 0 Stress period 21
+-1 0 0 Stress period 22
+-1 0 0 Stress period 23
+-1 0 0 Stress period 24
+-1 0 0 Stress period 25
+-1 0 0 Stress period 26
+-1 0 0 Stress period 27
+-1 0 0 Stress period 28
+-1 0 0 Stress period 29
+-1 0 0 Stress period 30
+-1 0 0 Stress period 31
+-1 0 0 Stress period 32
+-1 0 0 Stress period 33
+-1 0 0 Stress period 34
+-1 0 0 Stress period 35
+-1 0 0 Stress period 36
+-1 0 0 Stress period 37
+-1 0 0 Stress period 38
+-1 0 0 Stress period 39
+-1 0 0 Stress period 40
+-1 0 0 Stress period 41
+-1 0 0 Stress period 42
+-1 0 0 Stress period 43
+-1 0 0 Stress period 44
+-1 0 0 Stress period 45
+-1 0 0 Stress period 46
+-1 0 0 Stress period 47
+-1 0 0 Stress period 48
+-1 0 0 Stress period 49
 
 
 
