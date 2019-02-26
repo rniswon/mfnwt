@@ -2573,7 +2573,7 @@ C
             L = TSSWNUM(I)
             Q = demand(L)
             QQ = DVRSFLW(L)
-            QQQ = QQQ + SUPSEG(L)
+            QQQ = SUPSEG(L)
             CALL timeseries(unit, Kkper, Kkstp, TOTIM, L, 
      +                      Q, QQ, QQQ)
           END DO
