@@ -29,6 +29,8 @@
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSSWETNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::TSGWETNUM
         INTEGER,          SAVE, DIMENSION(:),   POINTER     ::LASTREACH
+        INTEGER,          SAVE, DIMENSION(:),   POINTER     ::seglist
+        INTEGER,          SAVE,                 POINTER     ::numseglist
         REAL,             SAVE,                 POINTER     ::PSIRAMP
         REAL,             SAVE,                 POINTER     ::ACCEL
         INTEGER,          SAVE,                 POINTER     ::IUNITRAMP
@@ -192,6 +194,7 @@ C
       ALLOCATE(IRRPERIODWELL(MXWELL),IRRPERIODSEG(NSEGDIMTEMP))
       ALLOCATE(TRIGGERPERIODWELL(MXWELL),TRIGGERPERIODSEG(NSEGDIMTEMP))
       ALLOCATE(TIMEINPERIODWELL(MXWELL),TIMEINPERIODSEG(NSEGDIMTEMP))
+      ALLOCATE(seglist(NSEGDIMTEMP),numseglist)
       TSSWNUM = 0
       TSGWNUM = 0
       QONLY = 0.0
@@ -207,6 +210,8 @@ C
       TRIGGERPERIODSEG = 0.0
       TIMEINPERIODWELL = 0.0
       TIMEINPERIODSEG = 1E30
+      seglist = 0
+      numseglist = 0
       
 C
 C4------READ TS
@@ -699,24 +704,70 @@ C     ------------------------------------------------------------------
       character(len=16)  :: text7     = 'STRESS PERIOD'
       character(len=16)  :: text8     = 'END'
       character(len=16)  :: char1     = 'WELL LIST'
+      character(len=16)  :: char2     = 'SEGMENT LIST'
 
       INTEGER LLOC,ISTART,ISTOP,ISTARTSAVE
-      INTEGER J,II,KPER2,L,MATCH,NUMTABS
-      INTEGER istsg, nreach, istsgold
+      INTEGER J,II,KPER2,L,MATCH,NUMTABS,is
+      INTEGER istsg, nreach, istsgold, ISEG
       logical :: FOUND
-      logical :: found1,found2,found3,found4
+      logical :: found1,found2,found3,found4,found5
       REAL :: R,TTIME,TRATE
       CHARACTER*6 CWELL
 C     ------------------------------------------------------------------
       found4 = .false.
+      found5 = .false.
+      is=0
+      ISEG = 0
 C
-C1----READ WELL INFORMATION DATA FOR STRESS PERIOD (OR FLAG SAYING REUSE AG DATA).
+C1----READ SEGMENT AND WELL LIST DATA (OR FLAG SAYING REUSE AG DATA).
       IF ( KPER.EQ.1 ) THEN
+! READ SEGMENT LIST
         CALL URDCOM(In, IOUT, line)
         LLOC=1
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
         ISTARTSAVE = ISTART
         CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        select case (LINE(ISTARTSAVE:ISTOP))
+        case('SEGMENT LIST') 
+          found5 = .true.
+          write(iout,'(/1x,a)') 'PROCESSING '//
+     +                    trim(adjustl(CHAR2)) //''
+          do
+            CALL URDCOM(In, IOUT, line)
+            LLOC=1
+            CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+            select case (LINE(ISTART:ISTOP))
+            case ('END')
+              write(iout,'(/1x,a)') 'FINISHED READING '//
+     +                            trim(adjustl(char2))
+              exit
+            case default
+              LLOC=1
+              CALL URWORD(LINE,LLOC,ISTART,ISTOP,2,ISEG,R,IOUT,IN)
+              if ( iseg < 1 ) then
+                WRITE(IOUT,*)
+                WRITE(IOUT,*) 'ERROR: INVALID SEGMENT VALUE',
+     +                        ' CHECK AG SEGMENT LIST INPUT.',
+     +                        ' MODEL STOPPING'
+                WRITE(IOUT,*)
+                CALL USTOP('ERROR: INVALID SEGMENT VALUE
+     +CHECK AG SEGMENT LIST INPUT. MODEL STOPPING')
+              else
+                is = is + 1
+                seglist(is)=iseg
+                numseglist = is
+              end if
+            end select
+          end do
+        end select
+! READ WELL LIST 
+        if ( found5 ) then
+          CALL URDCOM(In, IOUT, line)
+          LLOC=1
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+          ISTARTSAVE = ISTART
+          CALL URWORD(LINE,LLOC,ISTART,ISTOP,1,I,R,IOUT,IN)
+        end if
         do 
           select case (LINE(ISTARTSAVE:ISTOP))
           case('WELL LIST')
@@ -1007,13 +1058,19 @@ C1-------RESET DEMAND IF IT CHANGES
           SUPACT(ISEG) = 0.0
         END IF
       END DO
+C1-------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+      IF ( ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0 ) THEN
+        DO i = 1, NUMSEGLIST
+          SEG(2, SEGLIST(i)) =  0.0
+        END DO
+      END IF
 C2------RESET SAVED AET FROM LAST ITERATION
       AETITERSW = 0.0
       AETITERGW = 0.0
       QONLY = 0.0
 !      CALL UZFIRRDEMANDSET()
 C
-C6------RETURN
+C4------RETURN
       RETURN
       END
 !
@@ -1555,7 +1612,7 @@ C     ------------------------------------------------------------------
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM,DELT
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW,SEG
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: PRMS_flag
@@ -1649,7 +1706,6 @@ C5------CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
               IF ( FMIN < ZERO ) FMIN = ZERO
               SUP = SUP + FMIN
             END DO
-
             SUPFLOW(L) = SUPFLOW(L) - SUP / dble(NUMSUPWELLSEG(L))
 C
 C6------CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
@@ -2395,7 +2451,7 @@ C
         petseg(iseg) = petseg(iseg) + pet
         aetseg(iseg) = aetseg(iseg) + aet
         factor = done
-        if ( aetseg(iseg) > zerod30 ) factor = aetseg(iseg)/petseg(iseg)
+        if ( petseg(iseg) > zerod30 ) factor = aetseg(iseg)/petseg(iseg)
 C
 C1------set diversion to demand if in period or triggered
 C
@@ -3100,6 +3156,8 @@ C
       DEALLOCATE(TRIGGERPERIODSEG)
       DEALLOCATE (TIMEINPERIODWELL)
       DEALLOCATE (TIMEINPERIODSEG)
+      DEALLOCATE (SEGLIST)
+      DEALLOCATE (NUMSEGLIST)
 C
       RETURN
       END
