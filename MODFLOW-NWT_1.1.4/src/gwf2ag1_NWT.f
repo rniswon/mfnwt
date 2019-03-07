@@ -87,7 +87,7 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVRPERC  !(Percentage of diversion applied to each cell)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: DVEFF  !(store efficiency factor)
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROPDIVERSION,KCROPWELL  !(crop coefficient)
-        REAL,   SAVE,  DIMENSION(:),  POINTER:: DEMAND,SUPACT
+        REAL,   SAVE,  DIMENSION(:),  POINTER:: DEMAND,SUPACT,SUPACTOLD
         REAL,   SAVE,  DIMENSION(:),  POINTER:: ACTUAL
       END MODULE GWFAGMODULE
 
@@ -263,7 +263,7 @@ C
           MAXSEGSHOLD = 1
       END IF
       ALLOCATE (DEMAND(NSEGDIMTEMP),ACTUAL(NSEGDIMTEMP))
-      ALLOCATE (SUPACT(NSEGDIMTEMP))   
+      ALLOCATE (SUPACT(NSEGDIMTEMP),SUPACTOLD(NSEGDIMTEMP))   
       IF ( NUMIRRHOLD.EQ.0 ) THEN
         MAXCELLSHOLD = 1
         NUMIRRHOLD = 1
@@ -336,6 +336,7 @@ C-------allocate for DIVERSION AGptions
       IDVFLG = 0     
       DEMAND = 0.0
       SUPACT = 0.0
+      SUPACTOLD = 0.0
       ACTUAL = 0.0
 C
 C6------RETURN
@@ -1056,6 +1057,7 @@ C1-------RESET DEMAND IF IT CHANGES
 !            IF ( ETDEMANDFLAG > 0 ) segment_transfer(ISEG) = 0.0
           end if
           SUPACT(ISEG) = 0.0
+          SUPACTOLD(ISEG) = 0.0
         END IF
       END DO
 C1-------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
@@ -2249,13 +2251,14 @@ C
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
       double precision :: zerod7,zerod30,done,dzero,dum,pettotal, 
-     +                    aettotal,dhundred,fmaxirr,fmaxflow,zerod2
+     +                    aettotal,dhundred,fmaxirr,fmaxflow,zerod3,
+     +                    dedt,aetold,aetnew,det,dq,detdq
       integer :: k,iseg,ic,ir,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
       zerod7 = 1.0d-7
-      zerod2 = 1.0d-2
+      zerod3 = 1.0d-3
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -2269,6 +2272,9 @@ C1b-------Update demand as max flow is segment
 C
         IF ( DEMAND(iseg) < zerod30 ) goto 300
         finfsum = dzero
+        dedt = 0.0d0
+        aetold = 0.0d0
+        aetnew = 0.0d0
 C
 C1------loop over cells irrigated diversion
 C
@@ -2279,21 +2285,34 @@ C
            pet = PETRATE(ic,ir)
            uzet = uzfetout(ic,ir)/DELT
            aet = (gwet(ic,ir)+uzet)/area
-!           if ( aet < zerod30 ) aet = zerod30
-           factor = ACCEL*(pet/aet - done)
-           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*PET ) factor = 0.0
+           if ( pet < zerod30 ) pet = zerod30
+ !          factor = ACCEL*(pet/aet - done)
+!           factor = (pet/aet - done)
+           factor = accel*(pet - aet)/pet
+           if (factor < dzero ) factor = dzero
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod3*PET ) factor = 0.0
 !           IF ( FACTOR > dhundred ) FACTOR = dhundred
-           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
-           if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
+!           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area
+           SUPACT(iseg) = SUPACT(iseg) + factor*area
            dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
 !           pettotal = pettotal + pet
 !           aettotal = aettotal + aet
+           aetold = aetold + AETITERSW(K,ISEG)*area
+           aetnew = aetnew + aet*area
            AETITERSW(K,ISEG) = AET
         end do
+        
 C
 C1------set diversion to demand
 C
+!      det = aetnew - aetold
+!      dq = SUPACT(ISEG) - SUPACTOLD(ISEG)
+!      if ( dq > zerod30 ) dq = zerod30
+!      if ( det > zerod30 ) det = zerod30
+!      detdq = det/dq
+!      SUPACTOLD(ISEG) = SUPACT(ISEG)
+!      SUPACT(iseg) = SUPACT(iseg) + SUPACT(ISEG)/detdq
       SEG(2,iseg) = SUPACT(iseg)
 C
 C1------limit diversion to water right and flow in river
@@ -2332,13 +2351,13 @@ C
       !arguments
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
-      double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
+      double precision :: zerod3,zerod30,done,dzero,dum,pettotal, 
      +                    aettotal,dhundred,prms_inch2mf_q,FMAXFLOW
       integer :: k,iseg,hru_id,i
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod3 = 1.0d-3
       done = 1.0d0
       dhundred = 100.0d0
       dzero = 0.0d0
@@ -2359,12 +2378,12 @@ C
 !           pet = KCROPDIVERSION(K,ISEG)*potet(hru_id)
            pet = potet(hru_id)
            aet = hru_actet(hru_id)
-!           if ( aet < zerod30 ) aet = zerod30
-           factor = ACCEL*(pet/aet - done)
-           if( abs(AETITERSW(K,ISEG)-AET) < zerod2*pet ) factor = 0.0
+           if ( pet < zerod30 ) pet = zerod30
+           factor = accel*(pet - aet)/pet
+           if( abs(AETITERSW(K,ISEG)-AET) < zerod3*pet ) factor = 0.0
 !           IF ( FACTOR > dhundred ) FACTOR = dhundred
 ! convert PRMS ET deficit to MODFLOW flow
-           SUPACT(iseg) = SUPACT(iseg) + factor*pet*area*prms_inch2mf_q
+           SUPACT(iseg) = SUPACT(iseg) + factor*area*prms_inch2mf_q
            if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
            !dum = pet
            !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
@@ -2493,7 +2512,7 @@ C
       real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod1,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
       double precision :: zerod7
       integer :: iseg,ic,ir,i
       external :: RATETERPQ
@@ -2501,7 +2520,7 @@ C
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod1 = 1.0d-1
+      zerod3 = 1.0d-3
       zerod7 = 1.0d-7
       done = 1.0d0
       doneneg = -1.0d0
@@ -2517,11 +2536,12 @@ C
         pet = PETRATE(ic,ir)
         uzet = uzfetout(ic,ir)/DELT
         aet = (gwet(ic,ir)+uzet)/area
-!        if ( aet < zerod30 ) aet = zerod30
-        factor = ACCEL*(pet/aet - done)
-!        if( abs(AETITERGW(I,L)-AET) < zerod1*pet ) factor = 0.0 !changing by less than 10%
+        if ( pet < zerod30 ) pet = zerod30
+        factor = accel*(pet - aet)/pet
+        if ( factor < dzero ) factor = dzero
+        if( abs(AETITERGW(I,L)-AET) < zerod3*pet ) factor = 0.0 !changing by less than 0.1%
 !        IF ( FACTOR > dhundred ) FACTOR = dhundred
-        QONLY(L) = QONLY(L) + factor*pet*area
+        QONLY(L) = QONLY(L) + factor*area
         if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
         if ( QONLY(L) > doneneg*Q ) QONLY(L) = doneneg*Q
         dum = pet
@@ -2554,12 +2574,12 @@ C
       integer, intent(in) :: l
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q
-      double precision :: zerod2,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
       integer :: i,ihru,K,ISEG
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod2 = 1.0d-2
+      zerod3 = 1.0d-3
       done = 1.0d0
       doneneg = -1.0d0
       dhundred = 100.0d0
@@ -2572,14 +2592,14 @@ C
         pet = potet(ihru)
         aet = hru_actet(ihru)
         area = HRU_PERV(ihru)
-!        if ( aet < zerod30 ) aet = zerod2*pet
-        factor = ACCEL*(pet/aet - done)
-        if( abs(AETITERGW(I,L)-aet) < zerod2*pet ) factor = 0.0
+        if ( pet < zerod30 ) pet = zerod30
+        factor = accel*(pet - aet)/pet
+        if( abs(AETITERGW(I,L)-aet) < zerod3*pet ) factor = 0.0
 !        IF ( factor > dhundred ) factor = dhundred
 !
 ! convert PRMS ET deficit to MODFLOW flow
 !
-        QONLY(L) = QONLY(L) + factor*pet*area*prms_inch2mf_q
+        QONLY(L) = QONLY(L) + factor*area*prms_inch2mf_q
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
         AETITERGW(I,L) = AET

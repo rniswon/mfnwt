@@ -1,6 +1,6 @@
 # AG options
 options
-etdemand 100.
+etdemand 1.
 irrigation_diversion 1 6
 supplemental_well 6 1 
 irrigation_well 6 1 
@@ -25,12 +25,12 @@ segment list
 end
 # AG well list
 well list
-         1         6         4    -5.00
-         1         6         5    -5.00
-         1         7         4    -5.00
-         1         7         5    -5.00
-         1         8         4    -5.00
-         1         8         5    -5.00
+         1         6         4    -50.00
+         1         6         5    -50.00
+         1         7         4    -50.00
+         1         7         5    -50.00
+         1         8         4    -50.00
+         1         8         5    -50.00
 end
 # AG stress period
 stress period 1
