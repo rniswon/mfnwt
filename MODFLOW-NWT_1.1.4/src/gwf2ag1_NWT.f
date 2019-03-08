@@ -2512,7 +2512,7 @@ C
       real, intent(in) :: time
       !dummy
       DOUBLE PRECISION :: factor, area, uzet, aet, pet, finfsum, fks
-      double precision :: zerod3,zerod30,done,dzero,dum,dhundred,doneneg
+      double precision :: zerod1,zerod30,done,dzero,dum,dhundred,doneneg
       double precision :: zerod7
       integer :: iseg,ic,ir,i
       external :: RATETERPQ
@@ -2520,7 +2520,7 @@ C
 ! ----------------------------------------------------------------------
 !
       zerod30 = 1.0d-30
-      zerod3 = 1.0d-3
+      zerod1 = 1.0d-1
       zerod7 = 1.0d-7
       done = 1.0d0
       doneneg = -1.0d0
@@ -2539,10 +2539,10 @@ C
         if ( pet < zerod30 ) pet = zerod30
         factor = accel*(pet - aet)/pet
         if ( factor < dzero ) factor = dzero
-        if( abs(AETITERGW(I,L)-AET) < zerod3*pet ) factor = 0.0 !changing by less than 0.1%
+        if( abs(AETITERGW(I,L)-AET) < zerod1*pet ) factor = 0.0 !changing by less than 0.1%
 !        IF ( FACTOR > dhundred ) FACTOR = dhundred
         QONLY(L) = QONLY(L) + factor*area
-        if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
+!        if ( QONLY(L) < zerod30 ) QONLY(L) = 0.0
         if ( QONLY(L) > doneneg*Q ) QONLY(L) = doneneg*Q
         dum = pet
 !if ( KCROP(K,ISEG) > zerod30 ) dum = pet/KCROP(K,ISEG)   !need this for PRMS
