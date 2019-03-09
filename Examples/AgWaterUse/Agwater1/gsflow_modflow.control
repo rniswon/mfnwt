@@ -38,7 +38,7 @@ modflow_time_zero
 modflow_name
 1
 4
-.\Agwater1_low.nam
+.\Agwater1_high.nam
 ####
 print_debug
 1
