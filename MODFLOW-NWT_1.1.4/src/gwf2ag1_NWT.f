@@ -1661,7 +1661,7 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
         IF ( PRMS_flag == 0 ) THEN
           CALL demandconjunctive_uzf(kkper,kkstp,kkiter)
         ELSE
-          CALL demandconjunctive_prms()
+          CALL demandconjunctive_prms(kkiter)
         END IF
       END IF
       IF ( TRIGGERFLAG > 0 ) THEN
@@ -1722,7 +1722,7 @@ C7------CALCULATE ETDEMAND IF NOT SUPPLEMENTAL WELL.
               IF ( PRMS_flag == 0 ) THEN
                 QQ = demandgw_uzf(l,kkper,kkstp,kkiter,time)
               ELSE
-                QQ = demandgw_prms(l)  
+                QQ = demandgw_prms(l,kkiter)  
               END IF
             END IF
             IF ( QQ < Q ) QQ = Q
@@ -2301,7 +2301,8 @@ C
         aetold = AETITERSW(ISEG)
         sup = SUPACT(ISEG)
         supold = SUPACTOLD(ISEG)
-        factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold)
+        factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
+     +                      kiter)
         SUPACTOLD(ISEG) = SUPACT(ISEG)
         AETITERSW(ISEG) = aettotal
         SUPACT(iseg) = SUPACT(iseg) + factor       
@@ -2329,7 +2330,7 @@ C
 !
 !
 C
-      subroutine demandconjunctive_prms()
+      subroutine demandconjunctive_prms(kiter)
 !     ******************************************************************
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
@@ -2345,6 +2346,7 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
+      integer, intent(in) :: kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
       double precision :: zerod3,zerod30,done,dzero,dum,pettotal, 
@@ -2386,7 +2388,8 @@ C
         aetold = AETITERSW(ISEG)
         sup = SUPACT(ISEG)
         supold = SUPACTOLD(ISEG)
-        factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold)
+        factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
+     +                      kiter)
         SUPACTOLD(ISEG) = SUPACT(ISEG)
         AETITERSW(ISEG) = aettotal
         SUPACT(iseg) = SUPACT(iseg) + factor*prms_inch2mf_q
@@ -2402,6 +2405,7 @@ C
         fmaxflow = STRM(9,LASTREACH(K))
         IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
         if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+      
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -2546,7 +2550,8 @@ C
       aetold = AETITERSW(ISEG)
       sup = SUPACT(ISEG)
       supold = SUPACTOLD(ISEG)
-      factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold)
+      factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
+     +         kiter)
       SUPACTOLD(ISEG) = SUPACT(ISEG)
       AETITERSW(ISEG) = aettotal
       QONLY(L) = QONLY(L) + factor
@@ -2555,7 +2560,7 @@ C
       end function demandgw_uzf
 !
 !
-      double precision function demandgw_prms(l)
+      double precision function demandgw_prms(l,kiter)
 !     ******************************************************************
 !     demandgw---- sums up irrigation demand using ET deficit for gw
 !     ******************************************************************
@@ -2570,7 +2575,7 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
-      integer, intent(in) :: l
+      integer, intent(in) :: l, kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, prms_inch2mf_q,
      +                    dedt,aetold,aetnew,det,dq,detdq,etdif,ettest,
@@ -2600,7 +2605,8 @@ C
       aetold = AETITERSW(ISEG)
       sup = SUPACT(ISEG)
       supold = SUPACTOLD(ISEG)
-      factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold)
+      factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
+     +                    kiter)
       SUPACTOLD(ISEG) = SUPACT(ISEG)
       AETITERSW(ISEG) = aettotal   
       QONLY(L) = QONLY(L) + factor*prms_inch2mf_q
@@ -2609,19 +2615,21 @@ C
       end function demandgw_prms
 !
       double precision function set_factor(aetold,pettotal,aettotal,
-     +                                     accel,sup,supold)
+     +                                     accel,sup,supold,kiter)
 !     ******************************************************************
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
+      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
       !arguments
       double precision, intent(in) :: aetold,pettotal,aettotal,accel,
      +                                sup,supold
+      integer, intent(in) :: kiter
       !dummy
-      DOUBLE PRECISION :: factor,zerod3,zerod7,dzero,etdif
+      DOUBLE PRECISION :: factor,zerod3,zerod7,dzero,etdif,det,dq
 ! ----------------------------------------------------------------------
 !
       zerod3 = 1.0d-3
@@ -2630,23 +2638,16 @@ C
       set_factor = dzero
       factor = dzero
       etdif = accel*(pettotal - aettotal)
-      !ettest = delt*etdif/pettotal
       factor = etdif
-        !if ( kiter == 1 ) then
-        !  factor = etdif
-        !else
-        !  det = (aettotal - aetold)/DELT
-        !  if ( det > dzero ) then
-        !    dq = sup - supold
-        !    if ( ettest < zerod7 ) then
-        !      factor = dzero
-        !    else
-        !      factor = dq*etdif/det
-        !    end if
-        !  else
-        !    factor = etdif
-        !  end if
-        !end if
+        if ( kiter == 1 ) then
+          factor = etdif
+        else
+          det = (aettotal - aetold)/DELT
+          if ( det > dzero ) then
+            dq = sup - supold
+            factor = dq*etdif/det
+          end if
+        end if
       if (factor < dzero ) factor = dzero
       if ( aettotal-aetold < zerod3 ) factor = 0.0
       set_factor = factor
