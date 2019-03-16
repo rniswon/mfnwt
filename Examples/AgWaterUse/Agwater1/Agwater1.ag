@@ -1,6 +1,6 @@
 # AG options
 options
-etdemand 100.
+etdemand 1.
 irrigation_diversion 1 6
 supplemental_well 6 1 
 irrigation_well 6 1 

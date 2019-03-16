@@ -2620,7 +2620,6 @@ C
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFBASMODULE, ONLY: DELT
       IMPLICIT NONE
 ! ----------------------------------------------------------------------
       !modules
@@ -2632,8 +2631,6 @@ C
       DOUBLE PRECISION :: factor,zerod3,zerod7,dzero,etdif,det,dq
 ! ----------------------------------------------------------------------
 !
-      zerod3 = 1.0d-3
-      zerod7 = 1.0d-7
       dzero = 0.0d0
       set_factor = dzero
       factor = dzero
@@ -2642,14 +2639,14 @@ C
         if ( kiter == 1 ) then
           factor = etdif
         else
-          det = (aettotal - aetold)/DELT
+          det = (aettotal - aetold)
           if ( det > dzero ) then
             dq = sup - supold
             factor = dq*etdif/det
           end if
         end if
       if (factor < dzero ) factor = dzero
-      if ( aettotal-aetold < zerod3 ) factor = 0.0
+!      if ( aettotal-aetold < zerod3 ) factor = 0.0
       set_factor = factor
       end function set_factor
 !
