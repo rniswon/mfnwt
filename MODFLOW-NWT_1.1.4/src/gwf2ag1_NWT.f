@@ -89,6 +89,7 @@
         REAL,   SAVE,  DIMENSION(:,:),POINTER:: KCROPDIVERSION,KCROPWELL  !(crop coefficient)
         REAL,   SAVE,  DIMENSION(:),  POINTER:: DEMAND,SUPACT,SUPACTOLD
         REAL,   SAVE,  DIMENSION(:),  POINTER:: ACTUAL
+        REAL,   SAVE,  DIMENSION(:),  POINTER:: ACTUALOLD
       END MODULE GWFAGMODULE
 
 
@@ -263,6 +264,7 @@ C
           MAXSEGSHOLD = 1
       END IF
       ALLOCATE (DEMAND(NSEGDIMTEMP),ACTUAL(NSEGDIMTEMP))
+      ALLOCATE(ACTUALOLD(NSEGDIMTEMP))
       ALLOCATE (SUPACT(NSEGDIMTEMP),SUPACTOLD(NSEGDIMTEMP))   
       IF ( NUMIRRHOLD.EQ.0 ) THEN
         MAXCELLSHOLD = 1
@@ -338,6 +340,7 @@ C-------allocate for DIVERSION AGptions
       SUPACT = 0.0
       SUPACTOLD = 0.0
       ACTUAL = 0.0
+      ACTUALOLD = 0.0
 C
 C6------RETURN
       RETURN
@@ -1052,13 +1055,15 @@ C1-------RESET DEMAND IF IT CHANGES
         if ( iseg>0 ) then
           if ( IUNIT(44) > 0 ) then
             DEMAND(ISEG) = SEG(2, ISEG)
-            IF ( ETDEMANDFLAG > 0 ) SEG(2, ISEG) = 0.0
+            IF ( ETDEMANDFLAG > 0 ) SEG(2, ISEG) = 0.0            
           elseif ( PRMS_flag == 1 ) then
 !            DEMAND(ISEG) = segment_transfer(ISEG)
 !            IF ( ETDEMANDFLAG > 0 ) segment_transfer(ISEG) = 0.0
           end if
           SUPACT(ISEG) = 0.0
           SUPACTOLD(ISEG) = 0.0
+          ACTUAL(ISEG) = 0.0
+          ACTUALOLD(ISEG) = 0.0
         END IF
       END DO
 C1-------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
@@ -1615,7 +1620,8 @@ C     ------------------------------------------------------------------
      +                       RHS
       USE GWFBASMODULE, ONLY:TOTIM,DELT
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW,SEG
+      USE GWFSFRMODULE, ONLY: SGOTFLW, NSTRM, ISTRM, IDIVAR, DVRSFLW,
+     +                        SEG, STRM
       USE GWFUPWMODULE, ONLY: LAYTYPUPW
       USE GWFNWTMODULE, ONLY: A, IA, Heps, Icell
       USE PRMS_MODULE, ONLY: PRMS_flag
@@ -1633,7 +1639,7 @@ C     ------------------------------------------------------------------
       REAL :: RATETERPQ,TIME
       DOUBLE PRECISION :: Qp,Hh,Ttop,Bbot,dQp,SMOOTHQ,QSW,NEARZERO,QQ
       DOUBLE PRECISION :: demandgw_uzf, demandgw_prms, mf_q2prms_inch
-      INTEGER :: ihru
+      INTEGER :: ihru, k
       
 C      
 C     ------------------------------------------------------------------
@@ -1649,7 +1655,7 @@ C1-----INITIALIZE LOCAL VARIABLES
       DIVERSIONIRRUZF = ZERO 
       DIVERSIONIRRPRMS = ZERO
       SUPFLOW = ZERO
-      ACTUAL = ZERO
+!      ACTUALOLD = ZERO
       Qp = ZERO
       Q = ZERO
       QQ = ZERO
@@ -1667,6 +1673,17 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
       IF ( TRIGGERFLAG > 0 ) THEN
         CALL demandtrigger()
       END IF
+C
+C2B-----SAVE OLD SUPPLEMENTAL PUMPING
+      DO L=1, NWELLS
+        DO I = 1, NUMSEGS(L)
+          J = DIVERSIONSEG(I,L) 
+          ACTUALOLD(J)  = ACTUAL(J)
+        END DO
+      END DO
+C
+C2C----SRT CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
+      ACTUAL = ZERO
 C
 C3------SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
       DO L=1, NWELLS
@@ -1691,18 +1708,17 @@ C5------CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
           IF ( NUMSEGS(L) > 0 ) THEN
             DO I = 1, NUMSEGS(L)
               J = DIVERSIONSEG(I,L)
+              k = IDIVAR(1,J)
+              QSW = STRM(9,LASTREACH(K))
               IF ( ETDEMANDFLAG > 0 ) THEN
-                FMIN = SUPACT(J)
-                QSW = DVRSFLW(J)   
+                FMIN = SUPACT(J)  
               ELSE IF (TRIGGERFLAG > 0 ) then 
                 QSW = ZERO
                 FMIN = ZERO
                 IF ( TIMEINPERIODSEG(J) < IRRPERIODSEG(J) ) THEN
-                  QSW = DVRSFLW(J)
                   FMIN = DEMAND(J)  
                 END IF
               ELSE
-                QSW = DVRSFLW(J)
                 FMIN = DEMAND(J)  
               END IF
               FMIN = FRACSUP(I,L)*(FRACSUPMAX(I,L)*FMIN - QSW)
@@ -1873,6 +1889,7 @@ C     ------------------------------------------------------------------
       TOTDIVERSIONCELLS=0
       TIME = TOTIM
       ACTUAL = ZERO
+      ACTUALOLD = ZERO
       SUP = ZERO
       MSUMAG = 1
       IBD1=0
@@ -2275,10 +2292,11 @@ C1------loop over diversion segments that supply irrigation
 C
       do 300 i = 1, NUMIRRDIVERSIONSP
         iseg = IRRSEG(i)
+        factor = dzero
 C
-C1b-------Update demand as max flow is segment
+C1b-------Update demand as max flow in segment
 C
-        IF ( DEMAND(iseg) < zerod30 ) goto 300
+        IF ( DEMAND(iseg) < zerod7 ) goto 300
         finfsum = dzero
         dedt = dzero
         aetold = dzero
@@ -2299,12 +2317,12 @@ C
            aettotal = aettotal + aet
         end do
         aetold = AETITERSW(ISEG)
-        sup = SUPACT(ISEG)
-        supold = SUPACTOLD(ISEG)
+        sup = DVRSFLW(iseg) + ACTUAL(ISEG)
+        supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
      +                      kiter)
-        SUPACTOLD(ISEG) = SUPACT(ISEG)
         AETITERSW(ISEG) = aettotal
+        SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + factor       
 C
 C1------set diversion to demand
@@ -2316,11 +2334,12 @@ C
         k = IDIVAR(1,ISEG)
         fmaxflow = STRM(9,LASTREACH(K))
         IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
-        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
+        IF ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
         
-!      write(888,333)kper,kstp,kiter,SEG(2,iseg),
-!     +   DVRSFLW(iseg),demand(ISEG),factor,pettotal,aettotal
-!333   format(3i5,6e20.10)
+      write(888,333)kper,kstp,kiter,SEG(2,iseg),
+     +DVRSFLW(iseg),demand(ISEG),factor,pettotal,aettotal,sup-supold,
+     +DVRSFLW(iseg),SUPACTOLD(ISEG),ACTUAL(ISEG),ACTUALOLD(ISEG)
+333   format(3i5,11e20.10)
       
 300   continue
       return
@@ -2335,7 +2354,7 @@ C
 !     demandconjunctive---- sums up irrigation demand using ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
-      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW,IDIVAR,STRM
+      USE GWFSFRMODULE, ONLY: SEG,SGOTFLW,IDIVAR,STRM,DVRSFLW
       USE GWFAGMODULE
       USE GWFBASMODULE, ONLY: DELT
       USE PRMS_BASIN, ONLY: HRU_PERV
@@ -2349,7 +2368,7 @@ C
       integer, intent(in) :: kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
-      double precision :: zerod3,zerod30,done,dzero,dum,pettotal, 
+      double precision :: zerod3,zerod7,done,dzero,dum,pettotal, 
      +                    aettotal,dhundred,prms_inch2mf_q,FMAXFLOW,
      +                    dedt,aetold,aetnew,det,dq,detdq,etdif,ettest,
      +                    supold,sup
@@ -2358,7 +2377,7 @@ C
       double precision :: set_factor
 ! ----------------------------------------------------------------------
 !
-      zerod30 = 1.0d-30
+      zerod7 = 1.0d-7
       zerod3 = 1.0d-3
       done = 1.0d0
       dhundred = 100.0d0
@@ -2370,8 +2389,9 @@ C
       do 300 i = 1, NUMIRRDIVERSIONSP
         pettotal = DZERO
         aettotal = DZERO
+        factor = DZERO
         iseg = IRRSEG(i)
-        IF ( DEMAND(iseg) < zerod30 ) goto 300
+        IF ( DEMAND(iseg) < zerod7 ) goto 300
         finfsum = dzero
 C
 C1------loop over hrus irrigated by diversion
@@ -2386,12 +2406,12 @@ C
         end do
 ! convert PRMS ET deficit to MODFLOW flow
         aetold = AETITERSW(ISEG)
-        sup = SUPACT(ISEG)
-        supold = SUPACTOLD(ISEG)
+        sup = DVRSFLW(iseg) + ACTUAL(ISEG)
+        supold = SUPACTOLD(ISEG) + ACTUALOLD(ISEG)
         factor = set_factor(aetold,pettotal,aettotal,accel,sup,supold,
      +                      kiter)
-        SUPACTOLD(ISEG) = SUPACT(ISEG)
         AETITERSW(ISEG) = aettotal
+        SUPACTOLD(ISEG) = DVRSFLW(iseg)
         SUPACT(iseg) = SUPACT(iseg) + factor*prms_inch2mf_q
         if ( SUPACT(iseg) < dzero ) SUPACT(iseg) = dzero
 C
@@ -2404,8 +2424,7 @@ C
         k = IDIVAR(1,ISEG)
         fmaxflow = STRM(9,LASTREACH(K))
         IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
-        if ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
-      
+        IF ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
 300   continue
       return
       end subroutine demandconjunctive_prms
@@ -2632,21 +2651,26 @@ C
 ! ----------------------------------------------------------------------
 !
       dzero = 0.0d0
+      zerod7 = 1.0d-7
       set_factor = dzero
       factor = dzero
       etdif = accel*(pettotal - aettotal)
+      if ( etdif < zerod7 ) then
+          set_factor = dzero
+          return
+      end if
       factor = etdif
+      det = (aettotal - aetold)
+      dq = sup - supold
         if ( kiter == 1 ) then
           factor = etdif
         else
-          det = (aettotal - aetold)
-          if ( det > dzero ) then
-            dq = sup - supold
-            factor = dq*etdif/det
-          end if
+          if ( abs(det) > dzero ) factor = dq*etdif/det
+          if ( det <= zerod7 ) factor = dzero
         end if
-      if (factor < dzero ) factor = dzero
-!      if ( aettotal-aetold < zerod3 ) factor = 0.0
+      if (factor <= dzero ) factor = etdif
+      write(999,333)kiter,factor,dq,det,etdif
+333   format(i5,4e20.10)
       set_factor = factor
       end function set_factor
 !
@@ -3189,6 +3213,7 @@ C
       DEALLOCATE (MAXCELLSDIVERSION)
       DEALLOCATE (DEMAND)
       DEALLOCATE (ACTUAL)
+      DEALLOCATE (ACTUALOLD)
       DEALLOCATE (SUPACT)
       DEALLOCATE (NUMIRRWELSP)
       DEALLOCATE (TSSWUNIT)
