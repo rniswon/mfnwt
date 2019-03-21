@@ -2336,10 +2336,10 @@ C
         IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
         IF ( SEG(2,iseg) > demand(ISEG) ) SEG(2,iseg) = demand(ISEG)
         
-      write(888,333)kper,kstp,kiter,SEG(2,iseg),
-     +DVRSFLW(iseg),demand(ISEG),factor,pettotal,aettotal,sup-supold,
-     +DVRSFLW(iseg),SUPACTOLD(ISEG),ACTUAL(ISEG),ACTUALOLD(ISEG)
-333   format(3i5,11e20.10)
+!      write(888,333)kper,kstp,kiter,SEG(2,iseg),
+!     +DVRSFLW(iseg),demand(ISEG),factor,pettotal,aettotal,sup-supold,
+!     +DVRSFLW(iseg),SUPACTOLD(ISEG),ACTUAL(ISEG),ACTUALOLD(ISEG)
+!333   format(3i5,11e20.10)
       
 300   continue
       return
@@ -2647,12 +2647,14 @@ C
      +                                sup,supold
       integer, intent(in) :: kiter
       !dummy
-      DOUBLE PRECISION :: factor,zerod3,zerod7,dzero,etdif,det,dq
+      DOUBLE PRECISION :: factor,zerod3,zerod7,dzero,etdif,det,dq,
+     +                    zerod30
 ! ----------------------------------------------------------------------
 !
       dzero = 0.0d0
       zerod7 = 1.0d-7
       set_factor = dzero
+      zerod30 = 1.0d-30
       factor = dzero
       etdif = accel*(pettotal - aettotal)
       if ( etdif < zerod7 ) then
@@ -2666,11 +2668,11 @@ C
           factor = etdif
         else
           if ( abs(det) > dzero ) factor = dq*etdif/det
-          if ( det <= zerod7 ) factor = dzero
+          if ( det <= zerod30 ) factor = dzero
         end if
       if (factor <= dzero ) factor = etdif
-      write(999,333)kiter,factor,dq,det,etdif
-333   format(i5,4e20.10)
+!      write(999,333)kiter,factor,dq,det,etdif
+!333   format(i5,4e20.10)
       set_factor = factor
       end function set_factor
 !
