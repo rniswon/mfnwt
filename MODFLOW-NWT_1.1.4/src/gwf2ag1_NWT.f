@@ -2521,6 +2521,7 @@ C
       k = IDIVAR(1,ISEG)
       fmaxflow = STRM(9,LASTREACH(K))
       IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
+      write(999,*)iseg,petseg(iseg),aetseg(iseg),SEG(2,iseg)
 300   continue
       deallocate(petseg, aetseg)
       return
@@ -2587,9 +2588,9 @@ C
           factor = 0.0
       end if
       demandgw_uzf = doneneg*QONLY(L)
-      if(l==2)write(888,333)kper,kstp,kiter,
-     +aettotal,aetold,pettotal,factor,QONLY(l),QONLYOLD(l),sumvks
-333   format(3i5,7e20.10)
+!      if(l==2)write(888,333)kper,kstp,kiter,
+!     +aettotal,aetold,pettotal,factor,QONLY(l),QONLYOLD(l),sumvks
+!333   format(3i5,7e20.10)
       end function demandgw_uzf
 !
 !
@@ -2684,8 +2685,8 @@ C
         if ( abs(det) > dzero ) factor = dq*etdif/det
         if ( det <= zerod30 ) factor = dzero
       end if
-      if(l==2)write(999,333)l,kiter,factor,dq,det,etdif
-333   format(2i5,4e20.10)
+!      if(l==2)write(999,333)l,kiter,factor,dq,det,etdif
+!333   format(2i5,4e20.10)
       set_factor = factor
       end function set_factor
 !
