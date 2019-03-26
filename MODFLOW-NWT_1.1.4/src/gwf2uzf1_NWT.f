@@ -169,7 +169,6 @@ C     ------------------------------------------------------------------
       NUMCELLS = NCOL*NROW
       TOTCELLS = NUMCELLS*NLAY
       IPRCNT = 0
-      ETOFH_FLAG = 0
       ALLOCATE (LAYNUM(NCOL,NROW))
       ALLOCATE (NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM)
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
@@ -410,8 +409,10 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       SEEPOUT = 0.0
       EXCESPP = 0.0
       REJ_INF = 0.0
-      AIR_ENTRY = -16.0
-      H_ROOT = -15000.0
+      AIR_ENTRY = 0.0
+      H_ROOT = 0.0
+!      AIR_ENTRY = -16.0
+!      H_ROOT = -15000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
       IUZLIST = 0
       ALLOCATE (NWAVST(NUZCL,NUZRW))
@@ -1037,6 +1038,14 @@ C     ------------------------------------------------------------------
             WRITE(IOUT,'(A)')
      +            ' A SQUARE ET FUNCTION WILL BE USED TO SIMULATE GW ET'
             WRITE(iout,*)
+          case('CAPILLARYUZET')
+            ETOFH_FLAG = 1
+            WRITE(iout,*)
+            WRITE(IOUT,'(A)')
+     +            'AIR ENTRY PRESSURE AND ROOT PRESSURE WILL BE ',
+     +            'SPECIFIED BY USER AND UZ ET WILL BE SIMULATED ',
+     +            'AS PRESSURE-HEAD DEPENDENT'
+            WRITE(iout,*)
           case('NOSURFLEAK')
             Iseepsupress = 1
             WRITE(iout,*)
@@ -1298,11 +1307,13 @@ C     -----------------------------------------------------------------
       DOUBLE PRECISION thick, surfpotet, top
       INTEGER ic, iflginit, il, ilay, ill, ir, iss, jk, l, ncck,
      +        nrck, nuzf, ll, uzlay, land, nlayp1
-      CHARACTER(LEN=24) aname(4)
+      CHARACTER(LEN=24) aname(6)
       DATA aname(1)/' AREAL INFILTRATION RATE'/
       DATA aname(2)/'                 ET RATE'/
       DATA aname(3)/'     ET EXTINCTION DEPTH'/
       DATA aname(4)/'EXTINCTION WATER CONTENT'/
+      DATA aname(5)/'      AIR ENTRY PRESSURE'/
+      DATA aname(6)/'           ROOT PRESSURE'/
 C     -----------------------------------------------------------------
       nlayp1 = NLAY + 1
 C
@@ -1478,38 +1489,62 @@ C         CONTENT.
               END DO
             END DO
           END IF
+C
+C11-----READ AIR ENTRY PRESSURE HEAD IF CAPILLARYUZET IS SPECIFIED
+C         IN OPTIONS BLOCK.
+          IF ( ETOFH_FLAG == 1 ) THEN
+            READ (In, *) nuzf
+            IF ( nuzf.LT.0 ) THEN
+              WRITE (IOUT, 9013) Kkper
+ 9013         FORMAT (/1X, 'USING AIR ENTRY PRESSURE FROM PREVIOUS',
+     +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
+            ELSE
+C
+C12-----READ IN ARRAY FOR AIR ENTRY PRESSURE.
+              CALL U2DREL(AIR_ENTRY, aname(5), NROW, NCOL, 0, In, IOUT)
+            END IF
+            READ (In, *) nuzf
+            IF ( nuzf.LT.0 ) THEN
+              WRITE (IOUT, 9015) Kkper
+ 9015         FORMAT (/1X, 'USING ROOT PRESSURE HEAD FROM PREVIOUS',
+     +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
+            ELSE            
+C12-----READ IN ARRAY FOR ROOT PRESSURE HEAD.
+              CALL U2DREL(H_ROOT, aname(6), NROW, NCOL, 0, In, IOUT)
+            END IF
+          END IF
         END IF
       END IF
 C13B-----SEARCH FOR UPPERMOST ACTIVE CELL.
       IF ( NUZTOP.NE.4 ) THEN ! rsr, 5/30/2018 don't need to do for NUZTOP = 4
-      DO ir = 1, NROW
-        DO ic = 1, NCOL
-          IF ( IUZFBND(ic, ir).NE.0 ) THEN
-            il = 0
-            IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
-              il = ABS(IUZFBND(ic, ir))
-              IF ( il.GT.0 ) THEN
-                IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
-              ELSE
-                il = 0
-              END IF
-              IF ( IL.EQ.0 ) IUZFBND(ic, ir) = 0
-            ELSE IF ( NUZTOP.EQ.3 ) THEN
-              ill = 1
+        DO ir = 1, NROW
+          DO ic = 1, NCOL
+            IF ( IUZFBND(ic, ir).NE.0 ) THEN
               il = 0
-              DO WHILE ( ill.LT.nlayp1 )
-                IF ( IBOUND(ic, ir, ill).GT.0 ) THEN
-                  il = ill
-                  EXIT
-                ELSE IF ( IBOUND(ic, ir, ill).LT.0 ) THEN
-                  EXIT
+              IF ( NUZTOP.EQ.1 .OR. NUZTOP.EQ.2 ) THEN
+                il = ABS(IUZFBND(ic, ir))
+                IF ( il.GT.0 ) THEN
+                  IF ( IBOUND(ic, ir, il).LT.1 ) il = 0
+                ELSE
+                  il = 0
                 END IF
-                ill = ill + 1
-              END DO
+                IF ( IL.EQ.0 ) IUZFBND(ic, ir) = 0
+              ELSE IF ( NUZTOP.EQ.3 ) THEN
+                ill = 1
+                il = 0
+                DO WHILE ( ill.LT.nlayp1 )
+                  IF ( IBOUND(ic, ir, ill).GT.0 ) THEN
+                    il = ill
+                    EXIT
+                  ELSE IF ( IBOUND(ic, ir, ill).LT.0 ) THEN
+                    EXIT
+                  END IF
+                  ill = ill + 1
+                END DO
+              END IF
             END IF
-          END IF
+          END DO
         END DO
-      END DO
       END IF
 C
 C14------INITIALIZE UNSATURATED ZONE IF ACTIVE.
@@ -2161,6 +2196,9 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END IF
                 surflux = finfact
                 oldsflx = UZOLSFLX(ic, ir)
+      if(ir==6.and.ic==4.and.kkper==6.and.kkstp==28.and.kkiter==100)then
+      write(777,*)kkiter,surflux,totetact
+      end if
                 DO ik = 1, idelt
                   totflux = 0.0D0
                   etact = 0.0D0
@@ -5707,12 +5745,9 @@ C
       !**********************
       STAR = (THO-THTR)/(THSAT-THTR) 
       LAMBDA = 2.0/(EPS-3.0)   
+      CAPH=0.0
       IF ( STAR.GT.ZEROD15 ) THEN
-        IF ( THO-THSAT.LT.ZEROD15 ) THEN
-          CAPH = HA*STAR**(-1.0/LAMBDA)
-        ELSE
-          CAPH = 0.0
-        END IF
+        IF ( THO-THSAT.LT.ZEROD15 ) CAPH = HA*STAR**(-1.0/LAMBDA)
       END IF 
       END FUNCTION CAPH
 ! ----------------------------------------------------------------------
