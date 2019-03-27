@@ -1679,7 +1679,7 @@ C2------IF DEMAND BASED ON ET DEFICIT THEN CALCULATE VALUES
         END IF
       END IF
       IF ( TRIGGERFLAG > 0 ) THEN
-        CALL demandtrigger()
+        CALL demandtrigger(kkper,kkstp,kkiter)
       END IF
 C
 C2B-----SAVE OLD SUPPLEMENTAL PUMPING
@@ -2439,7 +2439,7 @@ C
       return
       end subroutine demandconjunctive_prms
       
-      subroutine demandtrigger()
+      subroutine demandtrigger(kper,kstp,kiter)
 !     ******************************************************************
 !     demandtrigger---- triggers and sets irrigation demand
 !     ******************************************************************
@@ -2457,6 +2457,7 @@ C
 ! ----------------------------------------------------------------------
       !modules
       !arguments
+      integer, intent(in) :: kper,kstp,kiter
       !dummy
       DOUBLE PRECISION :: factor, area, aet, pet, finfsum, fks
       double precision :: zerod2,zerod30,done,dzero,dum,pettotal, 
@@ -2521,7 +2522,11 @@ C
       k = IDIVAR(1,ISEG)
       fmaxflow = STRM(9,LASTREACH(K))
       IF ( SEG(2,iseg) > fmaxflow ) SEG(2,iseg) = fmaxflow
-      write(999,*)iseg,petseg(iseg),aetseg(iseg),SEG(2,iseg)
+  !    if (kper==22.and.kstp==19)then
+  !    write(999,344)iseg,petseg(iseg),aetseg(iseg),SEG(2,iseg),factor,
+  !   +           TRIGGERPERIODSEG(ISEG)
+  !    end if
+  !344 format(i5,5e20.10)
 300   continue
       deallocate(petseg, aetseg)
       return
@@ -2742,6 +2747,8 @@ C-----Total ET for all cells irrigated by each diversion
 C
       if ( TSACTIVESWET ) then
           do I = 1, NUMSWET
+            aettot = 0.0
+            pettot = 0.0
             UNIT = TSSWETUNIT(I)
             iseg = TSSWETNUM(I)
             do k = 1, DVRCH(iseg)  !cells per segement
@@ -2799,6 +2806,8 @@ C
         pettot = 0.0
         IF ( TSACTIVEGWET ) THEN
           DO I = 1, NUMGWET
+            pettot = 0.0
+            aettot = 0.0
             IF ( TSGWETNUM(I) == L ) THEN
               UNIT = TSGWETUNIT(I)
               do J = 1, NUMCELLS(L)
