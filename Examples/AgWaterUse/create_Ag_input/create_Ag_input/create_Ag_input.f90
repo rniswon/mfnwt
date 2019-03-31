@@ -34,8 +34,8 @@
     open(2,file='template.out')
     open(3,file='junk.out')
     open(4,file='ag_hrus.in')
-    open(5,file='jh_coef_month_low.in')
-!    open(5,file='jh_coef_month_high.in')
+!    open(5,file='jh_coef_month_low.in')
+    open(5,file='jh_coef_month_high.in')
     open(6,file='jh_coef.out')
 !
 !   read ag hru ids

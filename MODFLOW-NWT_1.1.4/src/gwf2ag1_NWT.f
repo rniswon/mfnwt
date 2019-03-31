@@ -2863,9 +2863,8 @@ C
               ELSE
                 hru_id = UZFROW(J,L)
                 area = hru_perv(hru_id)
-!                pet = KCROPDIVERSION(J,L)*potet(hru_id)
                 pet = potet(hru_id)
-                aet = hru_actet(hru_id)   !need to add GW ET here  
+                aet = hru_actet(hru_id) 
               END IF
               pettot = pettot + pet
               aettot = aettot + aet
