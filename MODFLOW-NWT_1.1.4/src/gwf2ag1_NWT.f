@@ -2593,9 +2593,9 @@ C
           factor = 0.0
       end if
       demandgw_uzf = doneneg*QONLY(L)
-!      if(l==2)write(888,333)kper,kstp,kiter,
-!     +aettotal,aetold,pettotal,factor,QONLY(l),QONLYOLD(l),sumvks
-!333   format(3i5,7e20.10)
+!      write(888,333)kper,kstp,kiter,l,
+!     +aettotal,QONLY(l)
+!333   format(4i5,2e20.10)
       end function demandgw_uzf
 !
 !
