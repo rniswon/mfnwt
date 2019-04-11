@@ -2196,9 +2196,9 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END IF
                 surflux = finfact
                 oldsflx = UZOLSFLX(ic, ir)
-      if(ir==6.and.ic==4.and.kkper==6.and.kkstp==28.and.kkiter==100)then
-      write(777,*)kkiter,surflux,totetact
-      end if
+      !if(ir==6.and.ic==4.and.kkper==5.and.kkstp==2)then
+      !write(777,*)kkiter,surflux,totetact
+      !end if
                 DO ik = 1, idelt
                   totflux = 0.0D0
                   etact = 0.0D0

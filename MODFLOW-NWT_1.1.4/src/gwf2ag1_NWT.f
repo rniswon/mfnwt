@@ -1717,7 +1717,8 @@ C5------CALCULATE SUPPLEMENTAL PUMPING IF SUP WELL.
             DO I = 1, NUMSEGS(L)
               J = DIVERSIONSEG(I,L)
               k = IDIVAR(1,J)
-              QSW = STRM(9,LASTREACH(K))
+!              QSW = STRM(9,LASTREACH(K))
+              QSW = SEG(2,J)
               IF ( ETDEMANDFLAG > 0 ) THEN
                 FMIN = SUPACT(J)  
               ELSE IF (TRIGGERFLAG > 0 ) then 
@@ -1809,7 +1810,9 @@ C APPLY IRRIGATION FROM SW DIVERSIONS
           DO icount = 1, DVRCH(istsg)   !THESE VARS COULD BE DIMENSIONED NUMIRRDIVERSION TO SAVE MEMORY
             irr = IRRROW(icount,istsg)
             icc = IRRCOL(icount,istsg)
-            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+!            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+            dvt = seg(2,istsg)*DVRPERC(ICOUNT,istsg)
+            if ( dvt < zero ) dvt = 0.0
             dvt = dvt/(DELR(icc)*DELC(irr))
 Convert irrigation for UZF to a rate per unit area
             DIVERSIONIRRUZF(icc, irr) = DIVERSIONIRRUZF(icc, irr) + 
@@ -1818,7 +1821,8 @@ Convert irrigation for UZF to a rate per unit area
         ELSE
           DO icount = 1, DVRCH(istsg)   
 !            IHRU = IRRROW(icount,istsg)
-            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+!            dvt = SGOTFLW(istsg)*DVRPERC(ICOUNT,istsg)
+            dvt = (seg(2,istsg)-actual(istsg))*DVRPERC(ICOUNT,istsg)
             dvt = (1.0-DVEFF(ICOUNT,istsg))*dvt
 ! Keep irrigation for PRMS as volume
           DIVERSIONIRRPRMS(icount,l) = DIVERSIONIRRPRMS(icount,l) + dvt
@@ -2690,7 +2694,7 @@ C
         if ( abs(det) > dzero ) factor = dq*etdif/det
         if ( det <= zerod30 ) factor = dzero
       end if
-!      if(l==2)write(999,333)l,kiter,factor,dq,det,etdif
+!      write(999,333)l,kiter,factor,dq,det,etdif
 !333   format(2i5,4e20.10)
       set_factor = factor
       end function set_factor
