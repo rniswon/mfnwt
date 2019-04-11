@@ -105,7 +105,7 @@ CONSTANT   0.2                          EXTWC
 1                                       NUZF5     STRESS PERIOD  1
 CONSTANT   -1.1                         AIR ENTRY STRESS PERIOD  1
 1                                       NUZF6     STRESS PERIOD  1
-CONSTANT   -30.0                         ROOT PRESSURE
+CONSTANT   -75.0                         ROOT PRESSURE
 1 NUZF1 STRESS PERIOD 2 January
 INTERNAL 1.00E-10 (10F4.0) 0 FINF STRESS PERIOD 2
 1 2 0 0 0 0 0 0 0 0

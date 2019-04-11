@@ -99,7 +99,7 @@ INTERNAL   1.000E-10 (10F4.0)    0      FINF     STRESS PERIOD  1
  1                                      NUZF2    STRESS PERIOD  1
 CONSTANT      1.0E-08                   PET      STRESS PERIOD  1
  1                                      NUZF3    STRESS PERIOD  1
-CONSTANT      1.0                      EXTDPTH  STRESS PERIOD  1
+CONSTANT      0.5                      EXTDPTH  STRESS PERIOD  1
  1                                      NUZF4    STRESS PERIOD  1
 CONSTANT   0.2                          EXTWC  
 1                                       NUZF5     STRESS PERIOD  1
