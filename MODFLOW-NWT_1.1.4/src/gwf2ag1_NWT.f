@@ -2694,8 +2694,8 @@ C
         if ( abs(det) > dzero ) factor = dq*etdif/det
         if ( det <= zerod30 ) factor = dzero
       end if
-!      write(999,333)l,kiter,factor,dq,det,etdif
-!333   format(2i5,4e20.10)
+!      write(999,333)l,kiter,factor,dq,det,pettotal,aettotal
+!333   format(2i5,5e20.10)
       set_factor = factor
       end function set_factor
 !
