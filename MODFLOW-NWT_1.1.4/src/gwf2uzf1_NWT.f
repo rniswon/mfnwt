@@ -402,8 +402,10 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       ALLOCATE (SEEPOUT(NCOL,NROW), EXCESPP(NCOL,NROW))
       IF ( ETOFH_FLAG.GT.0 ) THEN
         ALLOCATE (AIR_ENTRY(NCOL,NROW), H_ROOT(NCOL,NROW))
+        ALLOCATE (ROOTACT(NCOL,NROW))
       ELSE
         ALLOCATE (AIR_ENTRY(1,1), H_ROOT(1,1))
+        ALLOCATE (ROOTACT(1,1))
       END IF
       ALLOCATE (REJ_INF(NCOL,NROW))
       SEEPOUT = 0.0
@@ -411,6 +413,7 @@ C7------ALLOCATE SPACE FOR ARRAYS AND INITIALIZE.
       REJ_INF = 0.0
       AIR_ENTRY = 0.0
       H_ROOT = 0.0
+      ROOTACT = 1.0
 !      AIR_ENTRY = -16.0
 !      H_ROOT = -15000.0
       ALLOCATE (IUZLIST(4, NUZGAGAR))
@@ -1307,13 +1310,14 @@ C     -----------------------------------------------------------------
       DOUBLE PRECISION thick, surfpotet, top
       INTEGER ic, iflginit, il, ilay, ill, ir, iss, jk, l, ncck,
      +        nrck, nuzf, ll, uzlay, land, nlayp1
-      CHARACTER(LEN=24) aname(6)
+      CHARACTER(LEN=24) aname(7)
       DATA aname(1)/' AREAL INFILTRATION RATE'/
       DATA aname(2)/'                 ET RATE'/
       DATA aname(3)/'     ET EXTINCTION DEPTH'/
       DATA aname(4)/'EXTINCTION WATER CONTENT'/
       DATA aname(5)/'      AIR ENTRY PRESSURE'/
       DATA aname(6)/'           ROOT PRESSURE'/
+      DATA aname(7)/'           ROOT ACTIVITY'/
 C     -----------------------------------------------------------------
       nlayp1 = NLAY + 1
 C
@@ -1511,6 +1515,15 @@ C12-----READ IN ARRAY FOR AIR ENTRY PRESSURE.
             ELSE            
 C12-----READ IN ARRAY FOR ROOT PRESSURE HEAD.
               CALL U2DREL(H_ROOT, aname(6), NROW, NCOL, 0, In, IOUT)
+            END IF
+            READ (In, *) nuzf
+            IF ( nuzf.LT.0 ) THEN
+              WRITE (IOUT, 9016) Kkper
+ 9016         FORMAT (/1X, 'USING ROOT ACTIVITY FROM PREVIOUS',
+     +              ' STRESS PERIOD. CURRENT PERIOD IS: ', I7)
+            ELSE            
+C12-----READ IN ARRAY FOR ROOT PRESSURE HEAD.
+              CALL U2DREL(ROOTACT, aname(7), NROW, NCOL, 0, In, IOUT)
             END IF
           END IF
         END IF
@@ -5025,7 +5038,7 @@ C     REMOVE WATER FROM UNSATURATED ZONE CAUSED BY EVAPOTRANSPIRATION
 C     ******************************************************************
       USE GWFUZFMODULE, ONLY: NWAV, NEARZERO, ZEROD6, RTSOLUTE, GRIDET,
      +                        Closezero, AIR_ENTRY, H_ROOT, ZEROD15,
-     +                        ZEROD9, ZEROD7,ETOFH_FLAG
+     +                        ZEROD9, ZEROD7,ETOFH_FLAG, ROOTACT
       USE GLOBAL,       ONLY: NLAY, BOTM, IOUT
 !!      USE GLOBAL,       ONLY: NLAY, LBOTM, BOTM, IOUT
       IMPLICIT NONE
@@ -5051,7 +5064,7 @@ C     ------------------------------------------------------------------
       DIMENSION depth2(Nwv), theta2(Nwv), flux2(Nwv), speed2(Nwv)
       DOUBLE PRECISION feps, ftheta1, ftheta2, depthinc, depthsave
       DOUBLE PRECISION ghdif, fm1, totalwc, totalwc1, HA, FKTHO, HROOT
-      DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom, etoutold
+      DOUBLE PRECISION HCAP, PET, FACTOR, THO, bottom, etoutold, ROOT
       double precision zerod2, zerod4, zerod5, zerod10, done, zerod30
       INTEGER ihold, ii, inck, itrwaveyes, j, jhold, jk, kj, kk, numadd,
      +        ltrail2(Nwv), itrwave2(Nwv), icheckwilt, icheckitr, jkp1,
@@ -5075,9 +5088,11 @@ C1------INITIALIZE VARIABLES.
       eps_m1 = DBLE(Eps) - done
       HA = dzero
       HROOT = dzero
+      ROOT = dzero
       IF ( ETOFH_FLAG.GT.0 ) THEN
         HA = AIR_ENTRY(ic,ir)
         HROOT = H_ROOT(ic,ir)
+        ROOT = ROOTACT(ic,ir)
       END IF
       icheckwilt = 0
       thetaout = Etime*Rateud
@@ -5132,7 +5147,7 @@ C2------ONE WAVE IN PROFILE THAT IS SHALLOWER THAN ET EXTINCTION DEPTH.
             THO = Theta(Jpnt)
             FKTHO = Flux(Jpnt)
             HCAP = CAPH(Thetar,THO,Thetas,HA,Eps)
-            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP)
+            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP,ROOT)
           END IF 
           IF ( (Theta(Jpnt)-thetaout).GT.Thetar+Wiltwc ) THEN
             Theta(Jpnt) = Theta(Jpnt) - thetaout
@@ -5150,7 +5165,7 @@ C         DEPTH.
             THO = Theta(jpntm1+Numwaves)
             FKTHO = Flux(jpntm1+Numwaves)
             HCAP = CAPH(Thetar,THO,Thetas,HA,Eps)
-            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP)
+            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP,ROOT)
           END IF 
           IF ( Theta(jpntm1+Numwaves)-thetaout.GT.Thetar+Wiltwc ) THEN
             Theta(Jpnt+Numwaves) = Theta(jpntm1+Numwaves) - thetaout
@@ -5188,7 +5203,7 @@ C4------ONLY ONE WAVE IS DEEPER THAN ET EXTINCTION DEPTH.
             THO = Theta(jpntp1)
             FKTHO = Flux(jpntp1)
             HCAP = CAPH(Thetar,THO,Thetas,HA,Eps)
-            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP)
+            thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP,ROOT)
           END IF
           IF ( (Theta(Jpnt)-thetaout).GT.Thetar+Wiltwc ) THEN
             IF ( thetaout.GT.NEARZERO ) THEN
@@ -5345,7 +5360,7 @@ C9------ALL WAVES SHALLOWER THAN ET EXTINCTION DEPTH.
               THO = Theta(kk)
               FKTHO = Flux(kk)
               HCAP = CAPH(Thetar,THO,Thetas,HA,Eps)
-              thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP)
+              thetaout = Rate_ET_Z(FACTOR,FKTHO,HROOT,HCAP,ROOT)
             END IF
             inck = 0
             IF ( Itrwave(kk+1).EQ.0 ) THEN
@@ -5730,10 +5745,10 @@ C
       END DO
       END SUBROUTINE INITARRAY
 !      
-      DOUBLE PRECISION FUNCTION Rate_ET_Z(FACTOR,FKTHO,HROOT,H)
+      DOUBLE PRECISION FUNCTION Rate_ET_Z(FACTOR,FKTHO,HROOT,H,ROOT)
       ! Arguments
-      DOUBLE PRECISION FKTHO,HROOT,H,FACTOR
-      Rate_ET_Z = FACTOR*FKTHO*(H-HROOT)
+      DOUBLE PRECISION FKTHO,HROOT,H,FACTOR,ROOT
+      Rate_ET_Z = ROOT*FACTOR*FKTHO*(H-HROOT)
       IF ( Rate_ET_Z.LT.0.0 ) Rate_ET_Z = 0.0
       RETURN
       END FUNCTION Rate_ET_Z
@@ -5842,7 +5857,6 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%TOTRUNOFF)
       DEALLOCATE (GWFUZFDAT(Igrid)%FBINS)
       DEALLOCATE (GWFUZFDAT(Igrid)%SEEPOUT)
-      DEALLOCATE (GWFUZFDAT(Igrid)%AIR_ENTRY)
       DEALLOCATE (GWFUZFDAT(Igrid)%EXCESPP)
       DEALLOCATE (GWFUZFDAT(Igrid)%VKS)
       DEALLOCATE (GWFUZFDAT(Igrid)%EPS)
@@ -5898,6 +5912,9 @@ C     ------------------------------------------------------------------
       DEALLOCATE (GWFUZFDAT(Igrid)%ETOFH_FLAG)
       DEALLOCATE (GWFUZFDAT(Igrid)%UZFRESTART)
       DEALLOCATE (GWFUZFDAT(Igrid)%LANDLAYER)
+      DEALLOCATE (GWFUZFDAT(Igrid)%AIR_ENTRY)
+      DEALLOCATE (GWFUZFDAT(Igrid)%H_ROOT)
+      DEALLOCATE (GWFUZFDAT(Igrid)%ROOTACT)
 C
       END SUBROUTINE GWF2UZF1DA
 C
@@ -5944,7 +5961,6 @@ C     ------------------------------------------------------------------
       TOTRUNOFF=>GWFUZFDAT(Igrid)%TOTRUNOFF
       FBINS=>GWFUZFDAT(Igrid)%FBINS
       SEEPOUT=>GWFUZFDAT(Igrid)%SEEPOUT
-      AIR_ENTRY=>GWFUZFDAT(Igrid)%AIR_ENTRY
       EXCESPP=>GWFUZFDAT(Igrid)%EXCESPP
       VKS=>GWFUZFDAT(Igrid)%VKS
       EPS=>GWFUZFDAT(Igrid)%EPS
@@ -5999,6 +6015,9 @@ C     ------------------------------------------------------------------
       ETOFH_FLAG=>GWFUZFDAT(Igrid)%ETOFH_FLAG 
       UZFRESTART=>GWFUZFDAT(Igrid)%UZFRESTART
       LANDLAYER=>GWFUZFDAT(Igrid)%LANDLAYER
+      AIR_ENTRY=>GWFUZFDAT(Igrid)%AIR_ENTRY
+      H_ROOT=>GWFUZFDAT(Igrid)%H_ROOT
+      ROOTACT=>GWFUZFDAT(Igrid)%ROOTACT
 C
       END SUBROUTINE SGWF2UZF1PNT
 C
@@ -6045,7 +6064,6 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%TOTRUNOFF=>TOTRUNOFF
       GWFUZFDAT(Igrid)%FBINS=>FBINS
       GWFUZFDAT(Igrid)%SEEPOUT=>SEEPOUT
-      GWFUZFDAT(Igrid)%AIR_ENTRY=>AIR_ENTRY
       GWFUZFDAT(Igrid)%EXCESPP=>EXCESPP
       GWFUZFDAT(Igrid)%VKS=>VKS
       GWFUZFDAT(Igrid)%EPS=>EPS
@@ -6101,5 +6119,8 @@ C     ------------------------------------------------------------------
       GWFUZFDAT(Igrid)%ETOFH_FLAG=>ETOFH_FLAG
       GWFUZFDAT(Igrid)%UZFRESTART=>UZFRESTART
       GWFUZFDAT(Igrid)%LANDLAYER=>LANDLAYER
+      GWFUZFDAT(Igrid)%AIR_ENTRY=>AIR_ENTRY
+      GWFUZFDAT(Igrid)%H_ROOT=>H_ROOT
+      GWFUZFDAT(Igrid)%ROOTACT=>ROOTACT
 C
       END SUBROUTINE SGWF2UZF1PSV
