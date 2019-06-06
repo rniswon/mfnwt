@@ -300,8 +300,8 @@ ax.xaxis.set_ticks(np.arange(start, end, 90.0))
 handles, labels = ax.get_legend_handles_labels()
 rf.legend(ax, handles, labels, bbox_to_anchor=(.9, 0.4))
 
-plt.tight_layout()
-plt.savefig('WR_irrig_allowed.pdf')
+#plt.tight_layout()
+#plt.savefig('WR_irrig_allowed.pdf')
 
 # blow up the fonts for this demo
 plt.rcParams['xtick.labelsize'] = 8
