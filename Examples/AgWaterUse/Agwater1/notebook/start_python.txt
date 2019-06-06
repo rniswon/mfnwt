@@ -1,0 +1,22 @@
+open ananonda prompt
+conda env list
+activate py34
+activate base
+
+pip install packagename
+pip uninstall packagename
+conda install packagename
+
+change dir to folder location with python package
+if there is setup.py
+python setup.py install
+#Everything above must be run outside python in anaconda prompt
+
+to find the package you are using :
+
+#this is in the python command window by typing python
+import packagename
+packagname.__file__
+
+Use specific python from batch file or dos window opened from where the script is located
+C:\Users\rniswon\AppData\Local\Continuum\miniconda2\python.exe script.py
