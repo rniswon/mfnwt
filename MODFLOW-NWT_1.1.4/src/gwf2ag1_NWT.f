@@ -116,8 +116,7 @@
       REAL :: R
       ! - -----------------------------------------------------------------
       !
-      !1 - -ALLOCATE ALLOCATE CONSTANTS AND FLAGS
-      !
+      !1 - --- ALLOCATE ALLOCATE CONSTANTS AND FLAGS
       ALLOCATE (VBVLAG(4, 10), VBNMAG(10), MSUMAG)
       ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUX)
       ALLOCATE (WELAUX(20))
@@ -172,19 +171,16 @@
       NUMIRRDIVERSIONSP = 0
       TRIGGERFLAG = 0
       !
-      !2 - -IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
-      !
+      !2 - --- IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE (IOUT, 1) IN
 1     FORMAT(1X, /1X, 'AG -- AG PACKAGE FOR NWT VERSION 1.1.3, ',
      +     ' 8/01/2017 INPUT READ FROM UNIT ', I4)
       !
-      !3 - ------CHECK FOR KEYWORDS.
-      !
+      !3 - --- CHECK FOR KEYWORDS.
       CALL PARSEAG7OPTIONS(In, Iout, Iunitnwt)
       NNPWEL = MXWELL
       !
-      !4 - -ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
-      !
+      !4 - --- ALLOCATE ARRAYS FOR TIME SERIES OUTPUT
       IF (IUNITSFR > 0) NSEGDIMTEMP = NSEGDIM
       ALLOCATE (TSSWUNIT(NSEGDIMTEMP), TSGWUNIT(MXWELL), QONLY(MXWELL))
       ALLOCATE (QONLYOLD(MXWELL))
@@ -216,15 +212,12 @@
       TIMEINPERIODSEG = 1E30
       SEGLIST = 0
       NUMSEGLIST = 0
-
       !
-      !5 - -ALLOCATE TIME SERIES VARIABLES
-      !
+      !5 - --- ALLOCATE TIME SERIES VARIABLES
       IF (TSACTIVEGW .OR. TSACTIVESW .OR. TSACTIVEGWET .OR.
      +    TSACTIVESWET) CALL TSREAD(IN, IOUT)
       !
-      !6 - -ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
-      !
+      !6 - --- ALLOCATE VARIABLES FOR TIME SERIES WELL INPUT RATES
       NUMTABHOLD = NUMTAB
       IF (NUMTABHOLD .EQ. 0) NUMTABHOLD = 1
       ALLOCATE (TABTIME(MAXVAL, NUMTABHOLD))
@@ -240,13 +233,11 @@
       TABID = 0
       TABUNIT = 0
       !
-      !7 - -THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
-      !7 - -CELL - BY - CELL FLOW.
-      !
+      !7 - --- THERE ARE FOUR INPUT VALUES PLUS ONE LOCATION FOR
+      !7 - --- CELL - BY - CELL FLOW.
       NWELVL = 5 + NAUX
       !
-      !8 - -----ALLOCATE SPACE FOR THE WELL DATA
-      !
+      !8 - ---ALLOCATE SPACE FOR THE WELL DATA
       IF (MXWELL .LT. 1) THEN
          WRITE (IOUT, 17)
 17       FORMAT(1X,
@@ -255,8 +246,7 @@
       END IF
       ALLOCATE (WELL(NWELVL, MXWELL))
       !
-      !9 - -ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
-      !
+      !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
       NUMSUPHOLD = NUMSUP
       MXACTWSUP = MXWELL
       MXACTWIRR = MXWELL
@@ -316,8 +306,7 @@
       KCROPWELL = 0.0
       NUMSUPWELLSEG = 0
       !
-      !10 - -ALLOCATE VARIABLES FOR DIVERSIONS
-      !
+      !10 - --- ALLOCATE VARIABLES FOR DIVERSIONS
       IF (NUMIRRDIVERSION > 0) THEN
          ALLOCATE (DVRCH(NSEGDIMTEMP))
          ALLOCATE (DVEFF(MAXCELLSDIVERSION, NSEGDIMTEMP))
@@ -352,8 +341,6 @@
       SUPACTOLD = 0.0
       ACTUAL = 0.0
       ACTUALOLD = 0.0
-      !
-      !11 - -RETURN
       RETURN
       END SUBROUTINE
       !
@@ -398,7 +385,7 @@
             found = .true.
             option = .true.
             !
-            !1 - -CREATE WELL FOR SUPPLEMENTAL PUMPING
+            !1 - ---CREATE WELL FOR SUPPLEMENTAL PUMPING
             !
          case ('SUPPLEMENTAL_WELL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, 
@@ -420,8 +407,8 @@
             WRITE (IOUT, *)
             found1 = .true.
             found = .true.
-            !
-            !2 - -Pumped water will be added as irrigation
+                !
+                !2 - ---PUMPED WATER WILL BE APPLIED AS IRRIGATION
          case ('IRRIGATION_WELL')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMIRRWEL, 
      +                  R, IOUT, IN)
@@ -434,7 +421,8 @@
             WRITE (IOUT, *)
             found = .true.
             found1 = .true.
-            ! Max number of SUP and IRR wells
+            !
+            !3 - --- MAX NUMBER OF SUP OR IRR WELLS
          case ('MAXWELLS')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, MXWELL, 
      +                  R, IOUT, IN)
@@ -442,74 +430,86 @@
             WRITE (IOUT, *)
             WRITE (IOUT, 36) MXWELL
             WRITE (IOUT, *)
-            ! Option to output list for wells
+            !
+            !4 - --- Option to output list for wells
          case ('WELLLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 37) IWELLCB
             WRITE (IOUT, *)
-            ! Option to output list for wells
+            !
+            !5 - --- Option to output list for wells
          case ('WELLCBC')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IWELLCBU, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 37) IWELLCBU
             WRITE (IOUT, *)
-            ! Option to output list for segments
+            !
+            !6 - --- Option to output list for segments
          case ('DIVERSIONLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, ISFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 37) ISFRCB
             WRITE (IOUT, *)
-            ! Option to output list for irrigation segments
+            !
+            !7 - --- Option to output list for irrigation segments
          case ('DIVERSIONIRRLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRSFRCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 37) IRRSFRCB
             WRITE (IOUT, *)
-            ! Option to output list for irrigation wells
+            !
+            !8 - --- Option to output list for irrigation wells
          case ('WELLIRRLIST')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, IRRWELLCB, 
      +                  R, IOUT, IN)
             WRITE (IOUT, *)
             WRITE (IOUT, 37) IRRWELLCB
             WRITE (IOUT, *)
-            ! Option to output time series by SW right
+            !
+            !9 - --- Option to output time series by SW right
          case ('TIMESERIES_DIVERSION')
             TSACTIVESW = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 39)
             WRITE (IOUT, *)
-            ! Option to output time series by GW right
+            !
+            !10 - --- Option to output time series by GW right
          case ('TIMESERIES_WELL')
             TSACTIVEGW = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 40)
             WRITE (IOUT, *)
-            ! Option to output time series by SW right
+            !
+            !11 - --- Option to output time series by SW right
          case ('TIMESERIES_DIVERSIONET')
             TSACTIVESWET = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 39)
             WRITE (IOUT, *)
-            ! Option to output time series by GW right
+            !
+            !12 - --- Option to output time series by GW right
          case ('TIMESERIES_WELLET')
             TSACTIVEGWET = .TRUE.
             WRITE (IOUT, *)
             WRITE (IOUT, 40)
             WRITE (IOUT, *)
-            ! Option to turn off writing to LST file
+            !
+            !13 - --- Option to turn off writing to LST file
          case ('NOPRINT')
             IPRWEL = 0
             WRITE (IOUT, *)
             WRITE (IOUT, 38)
             WRITE (IOUT, *)
-            ! REDUCING PUMPING FOR DRY CELLS
+            !
+            !14 - --- REDUCING PUMPING FOR DRY CELLS
          case ('PHIRAMP')
-         ! CHECK THAT THERE ARE SUP OR IRR WELLS FIRST
+         !
+         !15 - --- CHECK THAT THERE ARE SUP OR IRR WELLS FIRST
             if (found1) then
                CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, PSIRAMP, 
      +                     IOUT, IN)
@@ -535,7 +535,8 @@
      +                       //' SUP or IRR wells required')
             end if
             found = .true.
-            ! SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
+            !
+            !16 - --- SPEICYING PUMPING RATES AS TIMES SERIES INPUT FILE FOR EACH WELL
          case ('TABFILES')
             if (found1) then
                CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, NUMTAB, R, 
@@ -562,7 +563,8 @@
      +                       //' SUP or IRR wells required')
             end if
             found = .true.
-         ! Surface water will be added as irrigation
+         !
+         !17 - --- Surface water will be added as irrigation
          case ('IRRIGATION_DIVERSION')
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 2, 
      +                  NUMIRRDIVERSION, R, IOUT, IN)
@@ -648,8 +650,9 @@
      +        //' Option: '//LINE(ISTART:ISTOP))
 
             elseif (Iostat .ne. 0) then
-               ! Not an integer.  Likely misspelled or unsupported
-               ! so terminate here.
+               !
+               !18 - --- Not an integer.  Likely misspelled or unsupported
+               !18 - --- so terminate here.
                WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +              //' Option: '//LINE(ISTART:ISTOP)
                CALL USTOP('Invalid '//trim(adjustl(text))
@@ -707,6 +710,7 @@
 41    FORMAT(1X, ' IRRIGATION RATE ADJUSTMENT FACTOR WAS'
      +  , ' SET EQUAL TO.', F10.3)
       END SUBROUTINE
+      !
       SUBROUTINE GWF2AG7RP(IN, IUNITSFR, KPER)
       !******************************************************************
       ! READ AG DATA FOR A STRESS PERIOD
@@ -752,9 +756,8 @@
       is = 0
       ISEG = 0
       !
-      !1 - ---READ SEGMENT AND WELL LIST DATA(OR FLAG SAYING REUSE AG DATA) .
+      !1 - ---READ SEGMENT AND WELL LIST DATA (OR FLAG SAYING REUSE AG DATA)
       IF (KPER .EQ. 1) THEN
-         ! READ SEGMENT LIST
          CALL URDCOM(In, IOUT, line)
          LLOC = 1
          CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
@@ -794,7 +797,7 @@
                end select
             end do
          end select
-         ! READ WELL LIST
+         !2 - ---READ WELL LIST
          if (found5) then
             CALL URDCOM(In, IOUT, line)
             LLOC = 1
@@ -887,7 +890,7 @@
             end if
          end do
          !
-         !3 - -----PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
+         !3 - ---PRINT NUMBER OF WELLS USED FOR SUP OR IRR.
          NWELLS = MXWELL
          CWELL = ' WELLS'
          IF (NWELLS .EQ. 1) CWELL = ' WELL '
@@ -896,8 +899,7 @@
 100      FORMAT(1X, /1X, '****MODEL STOPPING**** ',
      +      'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')
          !
-         ! - ------DETERMINE MASTER REACH NUMBER FOR LAST REACH IN EACH SEGMENT
-         !
+         !4 - ---DETERMINE MASTER REACH NUMBER FOR LAST REACH IN EACH SEGMENT
          IF (IUNITSFR > 0) THEN
             istsg = 1
             DO l = 1, NSTRM
@@ -909,7 +911,7 @@
          END IF
       END IF
       !
-      !4 - ------READ AG OPTIONS DATA FOR STRESS PERIOD(OR FLAG SAYING REUSE AG DATA) .
+      !5 - ---READ AG OPTIONS DATA FOR STRESS PERIOD(OR FLAG SAYING REUSE AG DATA) .
       FOUND = .FALSE.
       found1 = .FALSE.
       found2 = .FALSE.
@@ -1002,7 +1004,7 @@
             END IF
          case default
             !
-            !5 - -------NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
+            !6 - ---NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
             WRITE (IOUT, *) 'Invalid '//trim(adjustl(text))
      +                  //' Option: '//LINE(ISTART:ISTOP)
             CALL USTOP('Invalid '//trim(adjustl(text))
@@ -1020,7 +1022,7 @@
 !           if ( kper == 1 ) then
 !             if(.not. found1 .or. .not. found2 .or. .not. found3) then
 !C
-!C6-------- NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
+      !2 - ---NO KEYWORDS FOUND DURING FIRST STRESS PERIOD SO TERMINATE
 !                WRITE(IOUT,*)
 !                WRITE(IOUT,*) 'Invalid '//trim(adjustl(text))
 !     +                   //' Option: '//LINE(ISTART:ISTOP)
@@ -1058,8 +1060,6 @@
 8     FORMAT(1X, /
      +       1X, 'NO SUPWEL OR REUSING SUPWEL DATA ',
      +       'FROM LAST STRESS PERIOD')
-      !
-      !7 - -----RETURN
       RETURN
       END
 !
@@ -1096,20 +1096,18 @@
             ACTUAL(ISEG) = 0.0
          END IF
       END DO
-      !1 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
+      !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
          DO i = 1, NUMSEGLIST
             SEG(2, SEGLIST(i)) = 0.0
          END DO
       END IF
-      !2 - -----RESET SAVED AET FROM LAST ITERATION
+      !3 - -----RESET SAVED AET FROM LAST ITERATION
       DIVERSIONIRRUZF = 0.0
       DIVERSIONIRRPRMS = 0.0
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
       QONLY = 0.0
-      !
-      !4 - -----RETURN
       RETURN
       END
 !
@@ -1134,11 +1132,10 @@
       REAL :: R
       ! - -----------------------------------------------------------------
       !
-      !
       !1 - ---REUSE VALUES FROM PREVIOUS STRESS PERIOD.
       IF (ITMP < 0) RETURN
       !
-      !1 - ---INACTIVATE ALL IRRIGATION WELLS.
+      !2 - ---INACTIVATE ALL IRRIGATION WELLS.
       IF (ITMP == 0) THEN
          NUMSUPSP = 0
          NUMSEGS = 0
@@ -1150,10 +1147,7 @@
          RETURN
       END IF
       !
-      !2 - --INITIALIZE AG VARIABLES TO ZERO.
-      !
-      !2 - -----READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
-      !
+      !3 - ---READ LIST OF DIVERSION SEGEMENTS FOR CALCALATING SUPPLEMENTAL PUMPING
       IERR = 0
       NUMSUPSP = ITMP
       IF (NUMSUPSP > NUMSUP) THEN
@@ -1204,8 +1198,7 @@
 106   FORMAT('***Error in SUP WEL*** cell row or column number for '
      + , 'supplemental well specified as zero. Model stopping')
       !
-      !3 - --------CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
-      !
+      !4 - ---CALCULATE THE NUMBER OF SUPWELLS ASSOCIATED WITH A DIVERSION SEGEMENT
       NUMSUPWELLSEG = 1
       DO L = 1, NUMSUPSP
          DO LL = L + 1, NUMSUPSP
@@ -1217,9 +1210,6 @@
      +         NUMSUPWELLSEG(L) = NUMSUPWELLSEG(L) + 1
          END DO
       END DO
-
-      !
-      !4 - -----RETURN
       RETURN
       END
 !
@@ -1246,7 +1236,7 @@
       ! - -----------------------------------------------------------------
       !
       !
-      !1 - ---REUSE VALUES FROM PREVIOUS STRESS PERIOD.
+      !1 - --REUSE VALUES FROM PREVIOUS STRESS PERIOD.
       IF (ITMP < 0) RETURN
       !
       !2 - --INITIALIZE AG VARIABLES TO ZERO.
@@ -1257,17 +1247,17 @@
       IRRROW_GW = 0
       IRRCOL_GW = 0
       !
-      !1 - ---INACTIVATE ALL IRRIGATION WELLS.
+      !3 - --INACTIVATE ALL IRRIGATION WELLS.
       IF (ITMP == 0) THEN
          NUMIRRWELSP = 0
          RETURN
       END IF
       !
-      ! - --READ NEW IRRIGATION WELL DATA
+      !4 - --READ NEW IRRIGATION WELL DATA
       IERR = 0
       NUMIRRWELSP = ITMP
-      ! READ LIST OF IRRIGATION CELLS FOR EACH WELL
       !
+      !5 - --READ LIST OF IRRIGATION CELLS FOR EACH WELL
       IF (NUMIRRWELSP > NUMIRRWEL) THEN
          WRITE (IOUT, *)
          WRITE (IOUT, 104) NUMIRRWEL, NUMIRRWELSP
@@ -1289,7 +1279,7 @@
          NUMCELLS(IRWL) = NMCL
          IRRPERIODWELL(IRWL) = IPRW
          TRIGGERPERIODWELL(IRWL) = TRPW
-         IF (PRMS_flag == 1) then   !IRRROW_GW stores hru number for gsflow
+         IF (PRMS_flag == 1) then   
             DO K = 1, NMCL
                READ (IN, *) IRRROW_GW(K, IRWL), IDUM, IRRFACT(K, IRWL),
      +                      IRRFIELDFACT(K, IRWL)
@@ -1331,16 +1321,15 @@
      +       'irrigation well specified as zero. Model stopping.')
 107   FORMAT('***ERROR IN AG PACKAGE*** HRU ID for ',
      +       'irrigation well specified as zero. Model stopping.')
-      !
-      !6 - -----RETURN
       RETURN
       END
 !
 ! ----------------------------------------------------------------------
 !
-! - ------SUBROUTINE DIVERSIONAGPTIONS
       SUBROUTINE IRRDIVERSION(IN, IOUT, ITMP)
+      !******************************************************************
       ! READ DIVERSION SEGMENT DATA FOR EACH STRESS PERIOD
+      !******************************************************************
       USE GWFAGMODULE
       USE GLOBAL, ONLY: IUNIT
       USE PRMS_MODULE, ONLY: PRMS_flag
@@ -1360,22 +1349,21 @@
       !1 - ---REUSE VALUES FROM PREVIOUS STRESS PERIOD.
       IF (ITMP < 0) RETURN
       !
-      !2 - --INITIALIZE AG VARIABLES TO ZERO.
+      !2 - ---INITIALIZE AG VARIABLES TO ZERO.
       DVRPERC = 0.0
       DVEFF = 0.0
       IRRSEG = 0
       IRRROW_SW = 0
       IRRCOL_SW = 0
       DVRCH = 0
-      !1 - ---INACTIVATE ALL IRRIGATION SEGMENTS.
+      !
+      !3 - ---INACTIVATE ALL IRRIGATION SEGMENTS.
       IF (ITMP == 0) THEN
          NUMIRRDIVERSIONSP = 0
          RETURN
       END IF
       !
-      !1
-      ! - ---READ IRRIGATION SEGEMENT INFORMATION.
-      !
+      !4 - ---READ IRRIGATION SEGEMENT INFORMATION.
       NUMIRRDIVERSIONSP = ITMP
       IF (NUMIRRDIVERSIONSP > NUMIRRDIVERSION) THEN
          WRITE (IOUT, *)
@@ -1401,7 +1389,7 @@
             DVRCH(SGNM) = NMCL
             IRRPERIODSEG(SGNM) = IRRPER
             TRIGGERPERIODSEG(SGNM) = IRRTRGR
-            IF (PRMS_flag == 1) then   !IRRROW_SW stores hru number for gsflow
+            IF (PRMS_flag == 1) then
                DO K = 1, NMCL
                   READ (IN, *) IRRROW_SW(K, SGNM), idum, DVEFF(K, SGNM),
      +                         DVRPERC(K, SGNM)           
@@ -1450,7 +1438,6 @@
      +       'Maximum cells and the number specified are: ', 2i6)
 9010  FORMAT('***Error in AG*** HRU_ID for irrigation',
      +       'cell specified as zero. Model stopping.')
-      !11 - ----RETURN.
       RETURN
       END
 !
