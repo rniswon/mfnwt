@@ -3641,9 +3641,7 @@ C     ------------------------------------------------------------------
      +                 hld, fbcheck, totflwt, totdelstor, totuzstor,
      +                 thetas, epsilon, thr, qa, qb, qc, qd, awdth,
      +                 bwdth, gwflow, dvrsn, fbot, depthtr, strtop,
-     +                 dwdh, fact, test !delete test
-      EXTERNAL FLOWTERP  !delete this
-      REAL FLOWTERP !delete this
+     +                 dwdh, fact
       EXTERNAL CALC_XSA
       DOUBLE PRECISION CALC_XSA
 C     ------------------------------------------------------------------
@@ -4128,7 +4126,7 @@ C
 ! EDM calc x-sectional area of channel for LMT w/ SFR mass routine
 !  First, need some terms to send to CALC_XSA
             qlat = (runof + runoff + precip - etstr)/strlen
-            qa = STRM(25,l)
+            qa = STRM(10,l)
             qb = STRM(9,l)
             IF ( icalc.EQ.3 ) THEN
               cdpth = SEG(9, istsg)
@@ -4136,6 +4134,13 @@ C
               awdth = SEG(14, istsg)
               bwdth = SEG(15, istsg)
             END IF
+! EDM bug fix 4/25/2019: In the case where an upstream diversion diverts all flow,
+!                        STRM(10,l) will be 0, but flow can still be exiting the
+!                        reach (accumulated overland runoff, gw discharge) and 
+!                        X-sectional area should still be calculated and passed to ftl
+            IF(qa.EQ.0.0 .AND. STRM(25,l).GT.0.0) THEN
+              qa = STRM(25,l)
+            ENDIF
             STRM(31,l) = CALC_XSA(qa,qcnst,cdpth,awdth,fdpth,bwdth,
      +                            icalc,slope,istsg,nreach,itstr,width,
      +                            depthtr)
