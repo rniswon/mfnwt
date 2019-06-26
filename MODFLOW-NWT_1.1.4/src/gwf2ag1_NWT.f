@@ -1090,6 +1090,9 @@
          iseg = IRRSEG(i)
          if (iseg > 0) then
             if (IUNIT(44) > 0) then
+               ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
+               ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
+               ! contains the TABFILE values at this point.
                DEMAND(ISEG) = SEG(2, ISEG)
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
                TOTAL = TOTAL + DEMAND(ISEG)
