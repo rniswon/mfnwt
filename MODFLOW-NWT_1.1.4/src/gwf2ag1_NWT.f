@@ -1080,16 +1080,19 @@
       INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i
+      DOUBLE PRECISION :: TOTAL
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = 0.0
+      TOTAL = 0.0
       DO i = 1, NUMIRRDIVERSION
          iseg = IRRSEG(i)
          if (iseg > 0) then
             if (IUNIT(44) > 0) then
                DEMAND(ISEG) = SEG(2, ISEG)
                IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+               TOTAL = TOTAL + DEMAND(ISEG)
             elseif (PRMS_flag == 1) then
             end if
             SUPACT(ISEG) = 0.0
@@ -1108,6 +1111,8 @@
       WELLIRRUZF = 0.0
       WELLIRRPRMS = 0.0
       QONLY = 0.0
+      OPEN(999,FILE='DEMAND.OUT')
+      WRITE(999,*)KPER,TOTAL
       RETURN
       END
 !
@@ -1699,7 +1704,7 @@
          END DO
       END DO
       !
-      !2C - ---SRT CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
+      !2C - ---SET CUMULATIVE SUP PUMPING TO ZERO EACH ITERATION
       ACTUAL = ZERO
       !
       !3 - -----SET MAX PUMPING RATE OR IRR DEMAND FOR GW.
@@ -1745,6 +1750,7 @@
                SUPFLOW(L) = SUPFLOW(L) - SUP/dble(NUMSUPWELLSEG(L))
                !
                !6 - -----CHECK IF SUPPLEMENTARY PUMPING RATE EXCEEDS MAX ALLOWABLE RATE IN TABFILE
+               !
                IF (SUPFLOW(L) < Q) SUPFLOW(L) = Q
                Q = SUPFLOW(L)
                QONLY(L) = DONENEG*Q
@@ -1766,7 +1772,7 @@
             END IF
             !
             !8 - -----IF THE CELL IS VARIABLE HEAD THEN SUBTRACT Q FROM
-            ! THE RHS ACCUMULATOR.
+            ! - ------THE RHS ACCUMULATOR.
             IF (IUNITNWT .NE. 0) THEN
                IF (LAYTYPUPW(il) .GT. 0) THEN
                   Hh = HNEW(ic, ir, il)
@@ -1776,6 +1782,7 @@
                   RHS(IC, IR, IL) = RHS(IC, IR, IL) - Qp
                   !
                   !8 - -----Derivative for RHS
+                  !
                   ij = Icell(IC, IR, IL)
                   A(IA(ij)) = A(IA(ij)) + dQp*Q
                ELSE
@@ -1788,13 +1795,16 @@
             END IF
             !
             !9 - -----SET ACTUAL SUPPLEMENTAL PUMPING BY DIVERSION FOR IRRIGATION.
+            !
             SUP = 0.0
             DO I = 1, NUMSEGS(L)  ! need to test when multiple segs supported by single well
                J = DIVERSIONSEG(I, L)
                SUP = SUP - Qp
                ACTUAL(J) = ACTUAL(J) + SUP
             END DO
+            !
             !10------APPLY IRRIGATION FROM WELLS
+            !
             IF (PRMS_flag == 0) THEN
                DO I = 1, NUMCELLS(L)
                   SUBVOL = -(DONE - IRRFACT(I, L))*Qp*IRRFIELDFACT(I, L)
