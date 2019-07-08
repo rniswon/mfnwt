@@ -3509,7 +3509,7 @@ C75-----STORE FLOWS NEEDED FOR SENSITIVITIES. - ERB
               SFRQ(2, l) = (qc + qd)/2.0
               SFRQ(3, l) = flobot
               SFRQ(5, l) = qc
-            END IF
+      END IF
 C
 C76-----ADD TERMS TO RHS AND HCOF IF FLOBOT IS NOT ZERO.
           IF ( irt.EQ.numdelt ) THEN
