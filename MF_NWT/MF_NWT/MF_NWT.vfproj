@@ -35,7 +35,7 @@
 				<Tool Name="VFPostBuildEventTool"/>
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Release|x64">
-				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" FloatingPointExceptionHandling="fpe0" FloatingPointModel="source" FloatingPointExceptionsModel="enable"/>
+				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" FloatingPointModel="source" FloatingPointExceptionsModel="enable"/>
 				<Tool Name="VFLinkerTool" LinkIncremental="linkIncrementalYes" SuppressStartupBanner="true" SubSystem="subSystemConsole"/>
 				<Tool Name="VFResourceCompilerTool"/>
 				<Tool Name="VFMidlTool" SuppressStartupBanner="true" TargetEnvironment="midlTargetAMD64"/>

@@ -23,7 +23,7 @@ python_exe = sys.executable
 
 # calculate number of lines in file can be any gage file
 num_lines = 0
-with open(r"..\Agwater1SW_high.ts9", 'r') as f:
+with open(r".\output\Agwater1SW_high.ts9", 'r') as f:
     for line in f:
         num_lines += 1
 
@@ -39,7 +39,7 @@ enddate.append(datetime.date(2018, 9, 30))
 
 # calculate number of lines in file
 num_lines = 0
-with open(r"..\seg1_high.tab", 'r') as f:
+with open(r".\output\seg1_high.tab", 'r') as f:
     for line in f:
         num_lines += 1
 
@@ -51,8 +51,8 @@ for i in range(0, nummonths):
     date_list.append(datetime.date(2014, 10, 1)+relativedelta(months=i))
 
 #open segment 1 tabfile
-fname1 = open(r"..\seg1_high.tab","r")
-fname2 = open(r"..\seg1_low.tab","r")
+fname1 = open(r".\output\seg1_high.tab","r")
+fname2 = open(r".\output\seg1_low.tab","r")
 
 seg1_high, seg1_low, date_plot = [], [], []
     
@@ -101,7 +101,7 @@ rf.legend(ax, handles, labels, bbox_to_anchor=(.9, 0.7))
 plt.savefig('Fig5.png',dpi=300)
 
 #open irrigation segment file again to read lines
-fname = open(r"..\Agwater1SW_high.ts9","r")
+fname = open(r".\output\Agwater1SW_high.ts9","r")
 #set firstline for headers
 firstline=fname.readline()
 # store all data from file in lines
@@ -154,7 +154,7 @@ header.append(firstline.split()[5])
 header.append(firstline.split()[6])
 
 #open irrigation segment file again to read lines
-fname = open(r"..\Agwater1SW_low.ts9","r")
+fname = open(r".\output\Agwater1SW_low.ts9","r")
 #set firstline for headers
 firstline=fname.readline()
 # store all data from file in lines
@@ -194,7 +194,7 @@ print(y1_low_cum[len(y1_low_cum)-1]/2)
 print(y4_low_cum[len(y4_low_cum)-1]/2)
 
 #open SW ET file to read lines
-fname = open(r"..\Agwater1SW_ET_high.ts9","r")
+fname = open(r".\output\Agwater1SW_ET_high.ts9","r")
 #set firstline for headers
 firstlineet=fname.readline()
 # set headers for plot legend
@@ -240,7 +240,7 @@ print(y1et_high_cum[len(y1_high_cum)-1]/2)
 print(y2et_high_cum[len(y4_high_cum)-1]/2)
 
 #open SW ET file to read lines
-fname = open(r"..\Agwater1SW_ET_low.ts9","r")
+fname = open(r".\output\Agwater1SW_ET_low.ts9","r")
 #set firstline for headers
 firstlineet=fname.readline()
 # store all data from file in lines
