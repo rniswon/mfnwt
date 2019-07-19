@@ -761,9 +761,7 @@ C     OF TIME TO CACULATE SPECIFIED PUMPING RATES.
       ELSE
 ! Find table value before beginning of time step.
         DO WHILE ( I.LE.NVAL-1 )
-          IF ( TIMEBEG-TABTIME(I,INUM).LE.CLOSEZERO ) THEN
-            EXIT
-          ELSEIF ( TIMEBEG-TABTIME(I+1,INUM).LE.CLOSEZERO ) THEN
+          IF ( TIMEBEG-TABTIME(I+1,INUM).LE.CLOSEZERO ) THEN
             EXIT
           ELSE
             I = I + 1
