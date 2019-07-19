@@ -995,7 +995,6 @@ c
             ELSE
               call xmdprecd(a, bb, epsrn, ia, ja, nja, numactive,
      [                      level, ierr)
-
 cmi
 C
             ENDIF                                                     

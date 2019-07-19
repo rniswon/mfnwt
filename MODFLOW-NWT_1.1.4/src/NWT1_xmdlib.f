@@ -2001,17 +2001,17 @@ c
 c
 c     scatter solution
 c
-c      do i = 1, nblack
-c        x( RBorder(i) ) = soln(i)
-c      enddo
-       x( RBorder(1:nblack) ) = soln(1:nblack)
+c      do i = 1, nblack               !rgn
+c        x( RBorder(i) ) = soln(i)    !rgn
+c      enddo                          !rgn
+       do i = 1, nblack               !rgn
+         x( RBorder(i) ) = soln(i)    !rgn
+       end do                         !rgn
 
 c     recover red nodes
-
       if (nred > 0) then
         call xmdgtred(a, x, b, ia, ja, RBorder(nblack+1), nja, n, nred)
       endif
-
 c     deallocate ( soln )
       end subroutine xmdsolv
 
