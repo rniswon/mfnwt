@@ -18,6 +18,66 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
+o Version 1.1.5 09/01/2019:
+
+Well (WEL) package
+• Character variable text was initialized in PARSEWELLOPTIONS
+• A bug was fixed that was setting IUNITRAMP to default value; an 
+incorrect write statement was stating that PSIRAMP was also changed; 
+however, it was not changing from user-specified value. The default 
+value for PSIRAMP was changed to 0.10.
+
+Unsatuated-Zone Flow (UZF1) Package
+• A new option was included for specifying the layer to which UZF 
+recharge is added (NUZTOP=4). If NUZTOP is specified as 4, then 
+the values of IUZFBND are used to define the top of the unsaturated 
+zone, and recharge is added to the uppermost layer in a column that 
+contains a water table. The layer to which recharge is added is updated 
+at the beginning of each new time step and is held constant during a 
+time step.
+• A small bug was fixed that was causing the counter on trailing waves 
+to be off by one. This bug only affected model in very rare cases; but, 
+this bug could cause the model to stop suddenly.
+• The calculation for total applied runoff that is output to the UZF gage 
+file option 4 was incorrect. This variable only is used for gage file 
+output and does not affect any other calculated values.
+
+Lake (LAK) Package
+• The interval for which derivatives are smoothed to zero in the calculation 
+of specified outflows from lakes was changed from a constant to a variable. 
+
+Basic (BAS) Package
+• The size of character variables was increased to print larger words to the 
+LIST file budget table.
+
+Link-MT3DMS (LMT) Package
+• A change was made to make diversions from the last reach of a segment, rather 
+than the first reach as was incorrectly assumed.
+• Bug fix to prevent specification of linker file in both the name file and the 
+LMT input file.  This was creating a potential for conflicting unit numbers
+• Bug fix in LMT that was wrongly listing the first reach of IUPSEG as the 
+'from' node when it should have been using the last reach of the IUPSEG as 
+the node from which flow is diverted to the diversion segment.
+• Bug fix for writing cross-sectional area to linker file for MT3D-USGS.  
+Previously, when a diversion diverts all flow, the code was using the wrong 
+variable for flow for calculating stream cross-sectional area.
+
+Gage Package
+• A minor output problem occurred when writing output for lakes when the Lake 
+Package input specified RNF as a negative value, which is used as a flag, and 
+OUTTYPE = 1, 3, or 4. The Gage output file incorrectly included the negative 
+value rather than the actual computed value of runoff to the lake. This problem 
+was corrected. The model user does not need to do anything differently. Note, 
+all model calculations were correct (and not affected by the fix) and that correct 
+values for runoff to a lake were always printed in the main output (listing) file.
+
+Upstream Weighting (UPW) Package
+• A warning was added indicating that IPHDRY is set to 1 (print HDRY) and
+observation packages are active. IPHDRY should be set to zero because
+if IPHDY is set to 1 then observation values could erroneously be
+calculated using HDRY.
+
+
 o Version 1.1.4 04/01/2018:
 
 Well (WEL) package
