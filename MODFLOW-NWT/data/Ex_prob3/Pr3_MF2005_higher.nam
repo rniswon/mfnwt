@@ -1,0 +1,9 @@
+# MODFLOW-2005 Name File
+# Problem 3 
+LIST  7 .\Ex_prob3\Pr3_MF2005_higher.lst
+BAS6  1 .\Ex_prob3\Pr3.bas
+DIS  10 .\Ex_prob3\Pr3.dis
+LPF  11 .\Ex_prob3\Pr3.lpf
+RCH  18 .\Ex_prob3\Pr3_higher.rch
+PCG  13 .\Ex_prob3\Pr3.pcg
+OC   22 .\Ex_prob3\Pr3.oc

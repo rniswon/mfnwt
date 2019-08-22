@@ -1,0 +1,8 @@
+LIST                  1 .\Ex_prob2\Pr2MF2005.LST
+BAS6                  2 .\Ex_prob2\Pr2.BA6
+DIS                  10 .\Ex_prob2\Pr2.DIS
+RCH                  18 .\Ex_prob2\Pr2.RCH
+OC                   20 .\Ex_prob2\Pr2.OC
+DATA(BINARY)         32 .\Ex_prob2\Pr2MF2005.BUD
+PCG                  35 .\Ex_prob2\Pr2.PCG
+LPF                  34 .\Ex_prob2\Pr2.LPF
