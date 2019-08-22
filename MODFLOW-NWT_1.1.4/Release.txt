@@ -20,6 +20,12 @@ only and does not imply endorsement by the U.S. Government.
 
 o Version 1.1.5 09/01/2019:
 
+Streamflow Routing (SFR2) Package
+• A check was added to allow stream reaches to have altitudes below the 
+cell bottom if streambed K (UHC) is zero.
+• Capability was added to allow a single tabfile to specify flows into 
+multiple stream reaches.
+
 Well (WEL) package
 • Character variable text was initialized in PARSEWELLOPTIONS
 • A bug was fixed that was setting IUNITRAMP to default value; an 
@@ -41,10 +47,16 @@ this bug could cause the model to stop suddenly.
 • The calculation for total applied runoff that is output to the UZF gage 
 file option 4 was incorrect. This variable only is used for gage file 
 output and does not affect any other calculated values.
+• A new option was added to simulate root uptake from the unsaturated zone.
+This aption simulates root water uptake using a capillary gradient between
+a user specified root pressure and the simulated capillary pressure in the
+root zone. This formulation is documented in Lappala and others (1987).
 
 Lake (LAK) Package
 • The interval for which derivatives are smoothed to zero in the calculation 
 of specified outflows from lakes was changed from a constant to a variable. 
+• The dead pool storage for a lake (volume of water below lowest outflow reach)
+is calculated and printed to the main listing file.
 
 Basic (BAS) Package
 • The size of character variables was increased to print larger words to the 
@@ -76,6 +88,10 @@ Upstream Weighting (UPW) Package
 observation packages are active. IPHDRY should be set to zero because
 if IPHDY is set to 1 then observation values could erroneously be
 calculated using HDRY.
+
+Lappala, E. G., Healy, R. W., & Weeks, E. P. (1987). Documentation of computer 
+program VS2D to solve the equations of fluid flow in variably saturated porous 
+media. Water-Resour. Invest. Rep, 83, 4099.
 
 
 o Version 1.1.4 04/01/2018:
