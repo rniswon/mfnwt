@@ -12,7 +12,7 @@
 !C------------------------------------------------------------------
       SUBROUTINE GMRES7AR(IN)
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.4, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.1.5, 9/10/2019
 
       USE GLOBAL, ONLY: IOUT,STRT,IBOUND
       USE GMRESMODULE
