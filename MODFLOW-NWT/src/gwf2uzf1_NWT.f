@@ -5649,7 +5649,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION fm, avwat, delstor
+      DOUBLE PRECISION fm, avwat, delstor, ZEROD9
       DOUBLE PRECISION totalwc, ghdif, depthinc, depthsave
       INTEGER kknt, jj, jk, j, iset, nwavm1, iret, kkntm1, Nwv
 C     ------------------------------------------------------------------
@@ -5662,6 +5662,7 @@ C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
           iret = 0
           delstor = 0.0
           depthsave = 0.0D0
+          ZEROD9 = 1.0d0-9
           Cellflux(land) = finfact
           DO kknt =land, NLAY
             IF ( IUZFBND(Nuzc, Nuzr).GT.0 .AND. IUZFOPT.GT.0 ) THEN
