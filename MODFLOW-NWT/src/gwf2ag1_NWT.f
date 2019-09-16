@@ -1821,6 +1821,10 @@
                ACTUAL(J) = ACTUAL(J) + SUP
             END DO
             !
+            !9b - -----SET ACTUAL PUMPING FOR NON SUP IRRIGATION WELLS.
+            !
+            Qonly(L) = DONENEG*Q
+            !
             !10------APPLY IRRIGATION FROM WELLS
             !
             IF (PRMS_flag == 0) THEN
@@ -2754,7 +2758,7 @@
       supold = QONLYOLD(l)
       factor = set_factor(l, aetold, pettotal, aettotal, sup, supold,
      +                    kiter)
-      SUPACTOLD(l) = SUPACT(l)
+      QONLYOLD(l) = QONLY(L)
       AETITERGW(l) = aettotal
       QONLY(L) = QONLY(L) + factor
       if (QONLY(L) < dzero) QONLY(L) = dzero
@@ -2931,6 +2935,7 @@
                         ELSE
                            hru_id = IRRROW_GW(J, L)
                            area = hru_perv(hru_id)
+                  prms_inch2mf_q = done/(DELT*Mfl2_to_acre*Mfl_to_inch)
                            pet = potet(hru_id)*area*prms_inch2mf_q
                            aet = hru_actet(hru_id)*area*prms_inch2mf_q   !need to add GW ET here
                         END IF
