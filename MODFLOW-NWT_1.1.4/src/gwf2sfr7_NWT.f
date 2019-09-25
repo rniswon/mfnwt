@@ -12,6 +12,7 @@ C     ******************************************************************
       end type check_bot      
       public check_bot
       CONTAINS
+      
       FUNCTION ICHKSTRBOT(self)
       type (check_bot), intent(in) :: self
       INTEGER JRCH,IRCH,KRCH,JSEG,ISEG,ICHKSTRBOT
