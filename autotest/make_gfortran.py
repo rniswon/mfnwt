@@ -43,13 +43,14 @@ if __name__ == "__main__":
     
     args.subdirs = False
 
-    # args.makefile = False
+    args.makefile = False
 
     #call main -- note that this form allows main to be called
     #from python as a function.
 
     pymake.pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
                        args.expedite, args.dryrun, False, args.debug, 
-                       args.subdirs, "--static", args.arch, args.makefile)
+                       args.subdirs, "--static", syslibs="-lc", arch=args.arch,
+                       makefile=args.makefile)
 
     shutil.rmtree(srcdir)
