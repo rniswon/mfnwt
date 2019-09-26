@@ -57,5 +57,6 @@ script:
 - echo pyshp; python -c "import shapefile; print(shapefile.__version__)"
 - echo nosetests version; nosetests --version
 - cd autotest
-- chmod u+x make_linux_gfortran.sh 
+- chmod u+x make_linux_gfortran.sh
+- sed -i -e 's/\r$//' make_linux_gfortran.sh 
 - ./make_linux_gfortran.sh
