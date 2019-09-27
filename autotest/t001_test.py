@@ -1,5 +1,6 @@
 import os
 import sys
+from subprocess import Popen
 import platform
 import shutil
 import flopy as fp
@@ -56,7 +57,7 @@ def external_files(model, ows, f):
     _, foo = os.path.split(f)
     shutil.copyfile(os.path.join(iws, f), os.path.join(ows, foo))
 
-"""
+
 def do_model(model):
     model_ws, name = os.path.split(model)
     if name in ("swi2ex4sww.nam", "SWRSample05-nwt.nam"):
@@ -91,18 +92,66 @@ def do_model(model):
     except:
         success = False
     assert success, ismfnwt
-"""
+
+
+def run_model(argv, model_ws):
+    import subprocess as sp
+    silent = False
+    normal_msg = 'normal termination'
+    buff = []
+    report = False
+    success = False
+
+    proc = sp.Popen(argv, stdout=sp.PIPE,
+                    stderr=sp.STDOUT, cwd=model_ws)
+    while True:
+        line = proc.stdout.readline()
+        c = line.decode('utf-8')
+        if c != '':
+            for msg in normal_msg:
+                if msg in c.lower():
+                    success = True
+                    break
+            c = c.rstrip('\r\n')
+            if not silent:
+                print('{}'.format(c))
+            if report:
+                buff.append(c)
+        else:
+            break
+    return success, buff
+
 
 def test_pwd():
     wd = os.getcwd()
     _, cur = os.path.split(wd)
-    assert cur == "temp", os.getcwd()
+    assert cur == "autotest", os.getcwd()
 
 
-def test_mfnwt():
+def test_mfnwt_exists():
     list, dirs, files = os.walk(".")
     if nwt_exe not in list[-1]:
         assert False, list[-1]
+
+
+def test_popen_mfnwt():
+    model = models[0]
+    model_ws, name = os.path.split(model)
+    model_ws, _ = os.path.split(model_ws)
+    shutil.copyfile(model, os.path.join(model_ws, name))
+    ml = fp.modflow.Modflow.load(name,
+                                 exe_name=nwt_exe,
+                                 model_ws=model_ws,
+                                 check=False)
+    # remove the temporary name file
+    os.remove(os.path.join(model_ws, name))
+    ml.change_model_ws(out_dir)
+    ml.write_input()
+
+    argv = [nwt_exe, name]
+    success = run_model(argv, out_dir)
+    assert success
+
 
 """
 def test_run_model():
@@ -113,4 +162,7 @@ def test_run_model():
 
 
 if __name__ == "__main__":
-    test_mfnwt()
+    test_pwd()
+    test_mfnwt_exists()
+    test_popen_mfnwt()
+    # do_model(models[0])
