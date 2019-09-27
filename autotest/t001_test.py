@@ -6,6 +6,12 @@ import flopy as fp
 
 print(os.getcwd())
 
+nwt_exe = "mfnwt"
+if platform.system().lower() == "windows":
+    nwt_exe = "mfnwt.exe"
+
+ismfnwt = fp.which(nwt_exe)
+
 data_dir = os.path.join("..", "MODFLOW-NWT", "data")
 out_dir = os.path.join(".", "temp")
 
@@ -50,7 +56,7 @@ def external_files(model, ows, f):
     _, foo = os.path.split(f)
     shutil.copyfile(os.path.join(iws, f), os.path.join(ows, foo))
 
-
+"""
 def do_model(model):
     model_ws, name = os.path.split(model)
     if name in ("swi2ex4sww.nam", "SWRSample05-nwt.nam"):
@@ -60,12 +66,6 @@ def do_model(model):
         model_ws, _ = os.path.split(model_ws)
         shutil.copyfile(model, os.path.join(model_ws, name))
         copyfile = True
-
-    nwt_exe = "mfnwt"
-    if platform.system().lower() == "windows":
-        nwt_exe = "mfnwt.exe"
-
-    ismfnwt = fp.which(nwt_exe)
 
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=nwt_exe,
@@ -91,19 +91,26 @@ def do_model(model):
     except:
         success = False
     assert success, ismfnwt
-
+"""
 
 def test_pwd():
-    print(os.getcwd())
-    assert False, os.getcwd()
+    wd = os.getcwd()
+    _, cur = os.path.split(wd)
+    assert cur == "temp", os.getcwd()
 
 
+def test_mfnwt():
+    list, dirs, files = os.walk(".")
+    if nwt_exe not in list[-1]:
+        assert False, list[-1]
+
+"""
 def test_run_model():
     for model in models:
         yield do_model, model
     return
+"""
 
 
 if __name__ == "__main__":
-    for model in models:
-        do_model(model)
+    test_mfnwt()
