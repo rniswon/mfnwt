@@ -85,8 +85,11 @@ def do_model(model):
         ml.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
 
     ml.write_input()
-    success, _ = ml.run_model()
-    assert success
+    try:
+        success, _ = ml.run_model()
+    except:
+        success = False
+    assert success, ismfnwt
 
 
 def test_pwd():
