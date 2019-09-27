@@ -63,7 +63,7 @@ def do_model(model):
         model_ws, _ = os.path.split(model_ws)
         shutil.copyfile(model, os.path.join(model_ws, name))
         copyfile = True
-    print(name)
+
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=exe_name,
                                  model_ws=model_ws,
@@ -81,11 +81,15 @@ def do_model(model):
 
         external_fnames = ml.external_fnames
         ml.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
-        print('break')
 
     ml.write_input()
     success, _ = ml.run_model()
     assert success
+
+
+def test_pwd():
+    print(os.getcwd())
+    assert False
 
 
 def test_run_model():
