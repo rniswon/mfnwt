@@ -8,6 +8,7 @@ def test_setup():
     if os.path.isdir(tempdir):
         shutil.rmtree(tempdir)
     os.mkdir(tempdir)
+    shutil.copyfile('mfnwt', os.path.join('temp', 'mfnwt'))
     return
 
 
