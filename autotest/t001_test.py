@@ -6,7 +6,7 @@ import flopy as fp
 
 exe_name = "mfnwt.exe"
 if sys.platform != "win32":
-    exe_name = "mfnwt"
+    exe_name = "./mfnwt"
 
 data_dir = os.path.join("..", "MODFLOW-NWT", "data")
 out_dir = os.path.join(".", "temp")
