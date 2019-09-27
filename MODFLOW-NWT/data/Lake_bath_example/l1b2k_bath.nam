@@ -11,3 +11,4 @@ LAK  16 .\Lake_bath_example\l1b2k_bath.lak
 DIS  14 .\Lake_bath_example\l1b2k_bath.dis
 FHB  21 .\Lake_bath_example\l1b2k_bath.fhb
 DATA 22 .\Lake_bath_example\lak1b_bath.txt
+DATA(BINARY) 18 .\Lake_bath_example\lak1b_bath.hds

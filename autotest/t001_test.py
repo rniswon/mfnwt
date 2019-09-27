@@ -135,9 +135,9 @@ def test_pwd():
 
 
 def test_mfnwt_exists():
-    list, dirs, files = os.walk(".")
-    if nwt_exe not in list[-1]:
-        assert False, list[-1]
+    flist, dir0, dir1, foo = os.walk(".")
+    if nwt_exe not in flist[-1]:
+        assert False, flist[-1]
 
 
 def test_run_model():
