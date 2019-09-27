@@ -5,9 +5,11 @@ import flopy as fp
 
 print(os.getcwd())
 
-exe_name = "mfnwt.exe"
+nwt_exe = "mfnwt.exe"
 if sys.platform != "win32":
-    exe_name = "mfnwt"
+    nwt_exe = "mfnwt"
+
+ismfnwt = fp.which(nwt_exe)
 
 data_dir = os.path.join("..", "MODFLOW-NWT", "data")
 out_dir = os.path.join(".", "temp")
@@ -65,7 +67,7 @@ def do_model(model):
         copyfile = True
 
     ml = fp.modflow.Modflow.load(name,
-                                 exe_name=exe_name,
+                                 exe_name=nwt_exe,
                                  model_ws=model_ws,
                                  check=False)
     # remove the temporary name file
