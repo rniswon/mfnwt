@@ -20,7 +20,7 @@ out_dir = os.path.join(".", "temp")
 # add new models here to the test scenarios!
 model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Ex_prob1b", "Pr1b_MFNWT.nam"),
-              os.path.join("Ex_prob2", "pr2MFNWT.nam"),
+              os.path.join("Ex_prob2", "Pr2MFNWT.nam"),
               os.path.join("Ex_prob3", "Pr3_MFNWT_higher.nam"),
               os.path.join("Ex_prob3", "Pr3_MFNWT_lower.nam"),
               os.path.join("Lake_bath_example", "l1b2k_bath.nam"),
