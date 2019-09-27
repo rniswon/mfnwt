@@ -7,7 +7,7 @@ import flopy as fp
 
 print(os.getcwd())
 
-nwt_exe = "mfnwt"
+nwt_exe = 'mfnwt'
 if platform.system().lower() == "windows":
     nwt_exe = "mfnwt.exe"
 
