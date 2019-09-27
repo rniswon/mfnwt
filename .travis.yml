@@ -1,6 +1,7 @@
 language: python
 os: linux
 dist: xenial
+sudo: false
 compiler: gcc
 services:
 - xvfb
