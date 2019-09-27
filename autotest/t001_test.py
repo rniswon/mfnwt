@@ -102,8 +102,13 @@ def run_model(argv, model_ws):
     report = False
     success = False
 
-    proc = sp.Popen(argv, stdout=sp.PIPE,
-                    stderr=sp.STDOUT, cwd=model_ws)
+    if platform.system().lower() != "windows":
+        proc = sp.Popen(argv, stdout=sp.PIPE,
+                        stderr=sp.STDOUT, cwd=model_ws,
+                        shell=True)
+    else:
+        proc = sp.Popen(argv, stdout=sp.PIPE,
+                        stderr=sp.STDOUT, cwd=model_ws)
     while True:
         line = proc.stdout.readline()
         c = line.decode('utf-8')
