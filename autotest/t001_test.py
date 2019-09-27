@@ -1,15 +1,10 @@
 import os
 import sys
+import platform
 import shutil
 import flopy as fp
 
 print(os.getcwd())
-
-nwt_exe = "mfnwt.exe"
-if sys.platform != "win32":
-    nwt_exe = "mfnwt"
-
-ismfnwt = fp.which(nwt_exe)
 
 data_dir = os.path.join("..", "MODFLOW-NWT", "data")
 out_dir = os.path.join(".", "temp")
@@ -65,6 +60,12 @@ def do_model(model):
         model_ws, _ = os.path.split(model_ws)
         shutil.copyfile(model, os.path.join(model_ws, name))
         copyfile = True
+
+    nwt_exe = "mfnwt"
+    if platform.system().lower() == "windows":
+        nwt_exe = "mfnwt.exe"
+
+    ismfnwt = fp.which(nwt_exe)
 
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=nwt_exe,
