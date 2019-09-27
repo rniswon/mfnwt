@@ -88,13 +88,17 @@ def do_model(model):
 
     ml.write_input()
     try:
-        success, _ = ml.run_model()
+        if platform.system().lower() == 'windows':
+            success, _ = ml.run_model()
+        else:
+            argv = [nwt_exe, name]
+            success, _ = run_model_linux(argv, out_dir)
     except:
         success = False
     assert success, ismfnwt
 
 
-def run_model(argv, model_ws):
+def run_model_linux(argv, model_ws):
     import subprocess as sp
     silent = False
     normal_msg = 'normal termination'
@@ -102,13 +106,10 @@ def run_model(argv, model_ws):
     report = False
     success = False
 
-    if platform.system().lower() != "windows":
-        proc = sp.Popen(argv, stdout=sp.PIPE,
-                        stderr=sp.STDOUT, cwd=model_ws,
-                        shell=True)
-    else:
-        proc = sp.Popen(argv, stdout=sp.PIPE,
-                        stderr=sp.STDOUT, cwd=model_ws)
+    proc = sp.Popen(argv, stdout=sp.PIPE,
+                    stderr=sp.STDOUT, cwd=model_ws,
+                    shell=True)
+
     while True:
         line = proc.stdout.readline()
         c = line.decode('utf-8')
@@ -139,35 +140,14 @@ def test_mfnwt_exists():
         assert False, list[-1]
 
 
-def test_popen_mfnwt():
-    model = models[0]
-    model_ws, name = os.path.split(model)
-    model_ws, _ = os.path.split(model_ws)
-    shutil.copyfile(model, os.path.join(model_ws, name))
-    ml = fp.modflow.Modflow.load(name,
-                                 exe_name=nwt_exe,
-                                 model_ws=model_ws,
-                                 check=False)
-    # remove the temporary name file
-    os.remove(os.path.join(model_ws, name))
-    ml.change_model_ws(out_dir)
-    ml.write_input()
-
-    argv = [nwt_exe, name]
-    success = run_model(argv, out_dir)
-    assert success
-
-
-"""
 def test_run_model():
     for model in models:
         yield do_model, model
     return
-"""
 
 
 if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
-    test_popen_mfnwt()
+    test_run_model()
     # do_model(models[0])
