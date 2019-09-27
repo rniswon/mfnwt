@@ -1,2 +1,2 @@
 gfortran --version
-python make_gfortran.py -fc gfortran -sd -mc -mf ../MODFLOW-NWT/src mfnwt
+python make_gfortran.py -fc gfortran -sd -mc ../MODFLOW-NWT/src mfnwt

@@ -89,7 +89,7 @@ def do_model(model):
 
 def test_pwd():
     print(os.getcwd())
-    assert False
+    assert False, os.getcwd()
 
 
 def test_run_model():
