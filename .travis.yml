@@ -61,7 +61,6 @@ script:
 - chmod u+x make_linux_gfortran.sh
 - sed -i -e 's/\r$//' make_linux_gfortran.sh
 - ./make_linux_gfortran.sh
-- chmod 775 mfnwt
 - cd ..
 - nosetests -v --with-id --with-timer -w ./autotest
 - cd autotest
