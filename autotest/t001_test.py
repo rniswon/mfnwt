@@ -95,44 +95,10 @@ def do_model(model):
                                  model_ws=out_dir,
                                  check=False)
     try:
-        # if platform.system().lower() == 'windows':
         success, _ = ml.run_model()
-        # else:
-        #     argv = [nwt_exe, name]
-        #     success, _ = run_model_linux(argv, out_dir)
     except:
         success = False
     assert success, ismfnwt
-
-
-def run_model_linux(argv, model_ws):
-    import subprocess as sp
-    silent = False
-    normal_msg = 'normal termination'
-    buff = []
-    report = False
-    success = False
-
-    proc = sp.Popen(argv, stdout=sp.PIPE,
-                    stderr=sp.STDOUT, cwd=model_ws,
-                    shell=True)
-
-    while True:
-        line = proc.stdout.readline()
-        c = line.decode('utf-8')
-        if c != '':
-            for msg in normal_msg:
-                if msg in c.lower():
-                    success = True
-                    break
-            c = c.rstrip('\r\n')
-            if not silent:
-                print('{}'.format(c))
-            if report:
-                buff.append(c)
-        else:
-            break
-    return success, buff
 
 
 def test_pwd():
@@ -157,4 +123,3 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     test_run_model()
-    # do_model(models[0])
