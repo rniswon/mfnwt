@@ -95,11 +95,11 @@ def do_model(model):
                                  model_ws=out_dir,
                                  check=False)
     try:
-        if platform.system().lower() == 'windows':
-            success, _ = ml.run_model()
-        else:
-            argv = [nwt_exe, name]
-            success, _ = run_model_linux(argv, out_dir)
+        # if platform.system().lower() == 'windows':
+        success, _ = ml.run_model()
+        # else:
+        #     argv = [nwt_exe, name]
+        #     success, _ = run_model_linux(argv, out_dir)
     except:
         success = False
     assert success, ismfnwt
