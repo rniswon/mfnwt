@@ -97,6 +97,7 @@ def do_model(model):
         else:
             argv = [nwt_exe, name]
             success, _ = run_model_linux(argv, out_dir)
+            assert False
     except:
         success = False
     assert success, ismfnwt
