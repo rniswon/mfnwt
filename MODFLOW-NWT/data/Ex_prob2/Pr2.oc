@@ -19,7 +19,7 @@ PERIOD   2 STEP    2
     print HEAD
     print budget 
 	SAVE HEAD
-PERIOD   2 STEP    10
+PERIOD   3 STEP    1
     SAVE BUDGET
     print HEAD
 	SAVE HEAD
