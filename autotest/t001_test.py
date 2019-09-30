@@ -87,6 +87,10 @@ def do_model(model):
         ml.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
 
     ml.write_input()
+    ml = fp.modflow.Modflow.load(name,
+                                 exe_name=nwt_exe,
+                                 model_ws=out_dir,
+                                 check=False)
     try:
         if platform.system().lower() == 'windows':
             success, _ = ml.run_model()
