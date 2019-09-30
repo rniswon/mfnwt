@@ -31,8 +31,8 @@ def validate(sim_array, valid_array):
 
 
 def do_compare_formatted_head_file(output):
-    files = [f for f in os.listdir(t_dir)
-             if os.path.isfile(os.path.join(t_dir, f))]
+    files = [f for f in os.listdir(".")
+             if os.path.isfile(os.path.join(f))]
     assert False, files
 
     sim = fp.utils.FormattedHeadFile(os.path.join(t_dir, output))
