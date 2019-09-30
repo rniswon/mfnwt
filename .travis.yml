@@ -64,3 +64,5 @@ script:
 - chmod 775 mfnwt
 - cd ..
 - nosetests -v --with-id --with-timer -w ./autotest
+- cd autotest
+- ls -la
