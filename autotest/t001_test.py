@@ -7,9 +7,12 @@ import flopy as fp
 
 print(os.getcwd())
 
-nwt_exe = 'mfnwt'
+nwt_exe_name = 'mfnwt'
 if platform.system().lower() == "windows":
-    nwt_exe = "mfnwt.exe"
+    nwt_exe_name = "mfnwt.exe"
+
+nwt_exe = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                       nwt_exe_name)
 
 ismfnwt = fp.which(nwt_exe)
 
@@ -97,7 +100,6 @@ def do_model(model):
         else:
             argv = [nwt_exe, name]
             success, _ = run_model_linux(argv, out_dir)
-            assert False
     except:
         success = False
     assert success, ismfnwt
@@ -141,7 +143,7 @@ def test_pwd():
 
 def test_mfnwt_exists():
     flist, dir0, dir1, foo = os.walk(".")
-    if nwt_exe not in flist[-1]:
+    if nwt_exe_name not in flist[-1]:
         assert False, flist[-1]
 
 
