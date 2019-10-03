@@ -31,7 +31,7 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("SWR_data_files", "SWRSample05",
                            "SWRSample05-nwt.nam"),
               os.path.join("UZF_cap_ET", "UZF_cap_ET.nam"),
-              os.path.join("UZF_testoptions", "UZFtestoptions.nam")
+              os.path.join("Uzf_testoptions", "UZFtestoptions.nam")
               ]
 
 models = [os.path.join(data_dir, model) for model in model_name]
