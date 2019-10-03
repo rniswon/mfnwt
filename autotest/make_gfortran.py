@@ -9,6 +9,7 @@ except:
     raise Exception()
 import os
 import shutil
+import platform
 
 
 def copytree(src, dst, symlinks=False, ignore=None):
@@ -26,21 +27,22 @@ def cleanup(srcdir, tempdir):
     Method to copy source code and cleanup the mfnwt code base
     for gfortran compilation.
     """
-    if not os.path.exists(tempdir):
-        os.makedirs(tempdir)
+    if os.path.isdir(tempdir):
+        shutil.rmtree(tempdir)
+    os.makedirs(tempdir)
     copytree(srcdir, "./temp")
     os.remove(os.path.join(tempdir, "Irestart.f"))
     return tempdir
-              
+
 
 if __name__ == "__main__":
 
     args = pymake.pymake.parser()
 
     srcdir = args.srcdir
-    
+
     srcdir = cleanup(srcdir, "./temp")
-    
+
     args.subdirs = False
 
     args.makefile = False
@@ -49,7 +51,7 @@ if __name__ == "__main__":
     #from python as a function.
 
     pymake.pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
-                       args.expedite, args.dryrun, False, args.debug, 
+                       args.expedite, args.dryrun, False, args.debug,
                        args.subdirs, "--static", syslibs="-lc", arch=args.arch,
                        makefile=args.makefile)
 

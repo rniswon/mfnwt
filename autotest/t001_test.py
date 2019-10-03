@@ -1,6 +1,4 @@
 import os
-import sys
-from subprocess import Popen
 import platform
 import shutil
 import flopy as fp
@@ -29,11 +27,11 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Lake_bath_example", "l1b2k_bath.nam"),
               os.path.join("Sfr2weltab", "Sfr2weltab.nam"),
               os.path.join("SFR_LAK_floodplain", "SFR_LAK_floodplain.nam"),
-              # os.path.join("SWI_data_files", "swi2ex4sww.nam"), # says invalid flow package
+              # os.path.join("SWI_data_files", "swi2ex4sww.nam"),  # says invalid flow package
               os.path.join("SWR_data_files", "SWRSample05",
                            "SWRSample05-nwt.nam"),
               os.path.join("UZF_cap_ET", "UZF_cap_ET.nam"),
-              #os.path.join("UZF_testoptions", "UZFtestoptions.nam"), # output to 61 broken
+              os.path.join("UZF_testoptions", "UZFtestoptions.nam")
               ]
 
 models = [os.path.join(data_dir, model) for model in model_name]
@@ -51,7 +49,8 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                         os.path.join("ref",
                                                      "ConstantStage.dat")),
                 "UZF_cap_ET.nam": (os.path.join("input", "seg1.tab"),
-                                   os.path.join("input", "seg9.tab")),}
+                                   os.path.join("input", "seg9.tab")),
+                "UZFtestoptions.nam": ()}
 
 
 def external_files(model, ows, f):
@@ -94,10 +93,10 @@ def do_model(model):
                                  exe_name=nwt_exe,
                                  model_ws=out_dir,
                                  check=False)
-    try:
-        success, _ = ml.run_model()
-    except:
-        success = False
+    # try:
+    success, _ = ml.run_model()
+    # except:
+    #     success = False
     assert success, ismfnwt
 
 
@@ -108,9 +107,9 @@ def test_pwd():
 
 
 def test_mfnwt_exists():
-    flist, dir0, dir1, foo = os.walk(".")
-    if nwt_exe_name not in flist[-1]:
-        assert False, flist[-1]
+    flist = os.listdir(".")
+    if nwt_exe_name not in flist:
+        assert False, flist
 
 
 def test_run_model():
@@ -122,4 +121,5 @@ def test_run_model():
 if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
-    test_run_model()
+    # test_run_model()
+    do_model(models[-1])
