@@ -1,0 +1,14 @@
+#
+#HEADTOL  FLUXTOL MAXITEROUT THICKFACT   LINMETH    IPRNWT     IBOTAV                OPTIONS  [DBDTHETA]  [DBDKAPPA] [DBDGAMMA] [MOMFACT] [BACKFLAG] [MAXBACKITER] [BACKTOL] [BACKREDUCE]
+# [IACL] [NORDER]    [LEVEL]   [NORTH] [IREDSYS] [RRCTOLS] [IDROPTOL]   [EPSRN]  [HCLOSEXMD] [MXITERXMD]
+     1.0e-3  10.0         300    1.0e-8         2         1          1 SPECIFIED     CONTINUE        0.94     0.00001      0.000       0.0          0            50       1.5         0.2
+       1        0          0         7         1       0.0          1  5.0E-3         1.0e-3         200   XMD
+
+
+
+
+
+
+
+
+

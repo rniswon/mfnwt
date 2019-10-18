@@ -1,0 +1,15 @@
+#UZF Testproblem 1 from UZF1 documentation report
+LIST              26  .\UZF_testproblem1\Prob1.lst
+DIS               11  .\UZF_testproblem1\Prob1.dis 
+BAS6               8  .\UZF_testproblem1\Prob1.bas 
+OC                 9  .\UZF_testproblem1\Prob1.oc 
+UPW               12  .\UZF_testproblem1\Prob1.upw 
+NWT               13  .\UZF_testproblem1\Prob1.nwt 
+SFR               15  .\UZF_testproblem1\Prob1.sfr 
+UZF               14  .\UZF_testproblem1\Prob1.uzf
+GAGE              16  .\UZF_testproblem1\Prob1.gag 
+DATA              58  .\UZF_testproblem1\UZFinfiltra.out
+DATA              80  .\UZF_testproblem1\Prob1_gageseg12.out
+DATA              81  .\UZF_testproblem1\Prob1_gageseg13.out
+DATA              82  .\UZF_testproblem1\Prob1_gageseg14.out
+DATA              83  .\UZF_testproblem1\Prob1_gageseg15.out
