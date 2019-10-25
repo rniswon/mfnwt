@@ -3,46 +3,46 @@
                             VERSION 1.1.5 09/10/2019
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
- LIST FILE: swi2ex4sww_64.lst
+ LIST FILE: .\SWI_data_files\swi2ex4sww_64.lst
                          UNIT    2
 
- OPENING swi2ex4sww.dis
+ OPENING .\SWI_data_files\swi2ex4sww.dis
  FILE TYPE:DIS   UNIT   11   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.bas
+ OPENING .\SWI_data_files\swi2ex4sww.bas
  FILE TYPE:BAS6   UNIT   13   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.ghb
+ OPENING .\SWI_data_files\swi2ex4sww.ghb
  FILE TYPE:GHB   UNIT   23   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.wel
+ OPENING .\SWI_data_files\swi2ex4sww.wel
  FILE TYPE:WEL   UNIT   20   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.upw
+ OPENING .\SWI_data_files\swi2ex4sww.upw
  FILE TYPE:UPW   UNIT   15   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.swi
+ OPENING .\SWI_data_files\swi2ex4sww.swi
  FILE TYPE:SWI2   UNIT   29   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.zta
+ OPENING .\SWI_data_files\swi2ex4sww.zta
  FILE TYPE:DATA(BINARY)   UNIT   55   STATUS:REPLACE
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.oc
+ OPENING .\SWI_data_files\swi2ex4sww.oc
  FILE TYPE:OC   UNIT   14   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.hds
+ OPENING .\SWI_data_files\swi2ex4sww.hds
  FILE TYPE:DATA(BINARY)   UNIT   51   STATUS:REPLACE
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- OPENING swi2ex4sww.nwt
+ OPENING .\SWI_data_files\swi2ex4sww.nwt
  FILE TYPE:NWT   UNIT   27   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
@@ -47715,6 +47715,6 @@
          TOTAL TIME 7.25328E+09 1.20888E+08 2.01480E+06  83950.      229.84    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/10/15 15:54:05
- Elapsed run time: 53.905 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/10/25  8:42:40
+ Elapsed run time: 44.062 Seconds
 
