@@ -1,4 +1,4 @@
-LIST           7 .\SWR_data_files\SWRSample05\Results\SWRSample05.lst
+LIST           7 .\SWR_data_files\SWRSample05\results\SWRSample05.lst
 BAS6           1 .\SWR_data_files\SWRSample05\SWRSample05.bas
 DIS           29 .\SWR_data_files\SWRSample05\SWRSample05.dis
 UPW           11 .\SWR_data_files\SWRSample05\SWRSample05.upw
