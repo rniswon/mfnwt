@@ -6,3 +6,4 @@ UPW                  33 .\Ex_prob1b\Pr1b.UPW
 RCH                  34 .\Ex_prob1b\Pr1b.RCH
 OC                   35 .\Ex_prob1b\Pr1b.OC
 DATA(BINARY)         50 .\Ex_prob1b\Pr1bMFNWT.BUD
+DATA                 51 .\Ex_prob1b\Pr1bMFNWT.out
