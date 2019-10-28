@@ -62,11 +62,13 @@ def external_files(model, ows, f):
 
 def do_model(model):
     model_ws, name = os.path.split(model)
-    if name in ("swi2ex4sww.nam", "SWRSample05-nwt.nam"):
+    if name in ("swi2ex4sww.nam",):
         copyfile = False
     else:
         # need to trick flopy....
         model_ws, _ = os.path.split(model_ws)
+        if name in ("SWRSample05-nwt.nam",):
+            model_ws, _ = os.path.split(model_ws)
         shutil.copyfile(model, os.path.join(model_ws, name))
         copyfile = True
 
@@ -122,4 +124,4 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-1])
+    do_model(models[-3])
