@@ -8,9 +8,9 @@ UZF           18 .\SWR_data_files\SWRSample05\SWRSample05.UZF
 GHB           16 .\SWR_data_files\SWRSample05\SWRSample05.ghb
 SWR           61 .\SWR_data_files\SWRSample05\SWRSample05.swr
 DATA         201 .\SWR_data_files\SWRSample05\ref\ConstantStage.dat
-DATA         102 .\SWR_data_files\SWRSample05\Results\SWRSample05_Stage.csv
-DATA(BINARY) 101 .\SWR_data_files\SWRSample05\Results\SWRSample05_GroupFlow.flow
-DATA(BINARY) 103 .\SWR_data_files\SWRSample05\Results\SWRSample05_QAQ.bin
-DATA(BINARY) 111 .\SWR_data_files\SWRSample05\Results\SWRSample05.hds
-DATA         301 .\SWR_data_files\SWRSample05\Results\SWRSample05.riv
-DATA         302 .\SWR_data_files\SWRSample05\Results\SWRSample05.cnv
+DATA         102 .\SWR_data_files\SWRSample05\results\SWRSample05_Stage.csv
+DATA(BINARY) 101 .\SWR_data_files\SWRSample05\results\SWRSample05_GroupFlow.flow
+DATA(BINARY) 103 .\SWR_data_files\SWRSample05\results\SWRSample05_QAQ.bin
+DATA(BINARY) 111 .\SWR_data_files\SWRSample05\results\SWRSample05.hds
+DATA         301 .\SWR_data_files\SWRSample05\results\SWRSample05.riv
+DATA         302 .\SWR_data_files\SWRSample05\results\SWRSample05.cnv
