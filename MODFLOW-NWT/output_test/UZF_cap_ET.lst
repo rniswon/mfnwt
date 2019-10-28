@@ -1,120 +1,120 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                             VERSION 1.1.4 4/01/2018
+                            VERSION 1.1.5 09/10/2019
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
- LIST FILE: ./output/UZF_cap_ET.lst
+ LIST FILE: ./UZF_cap_ET/output/UZF_cap_ET.lst
                          UNIT    9
 
- OPENING ./input/UZF_cap_ET.ba6
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.ba6
  FILE TYPE:BAS6   UNIT   75   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.upw
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.upw
  FILE TYPE:UPW   UNIT    7   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.dis
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.dis
  FILE TYPE:DIS   UNIT    8   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.nwt
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.nwt
  FILE TYPE:NWT   UNIT   13   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.oc
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.oc
  FILE TYPE:OC   UNIT   14   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.sfr
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.sfr
  FILE TYPE:SFR   UNIT   15   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.ghb
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.ghb
  FILE TYPE:GHB   UNIT   17   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.uzf
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.uzf
  FILE TYPE:UZF   UNIT   19   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/UZF_cap_ET.gag
+ OPENING ./UZF_cap_ET/input/UZF_cap_ET.gag
  FILE TYPE:GAGE   UNIT   32   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/seg1.tab
+ OPENING ./UZF_cap_ET/input/seg1.tab
  FILE TYPE:DATA   UNIT   55   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./input/seg9.tab
+ OPENING ./UZF_cap_ET/input/seg9.tab
  FILE TYPE:DATA   UNIT   56   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.hed
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.hed
  FILE TYPE:DATA   UNIT   62   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.uzfot
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.uzfot
  FILE TYPE:DATA(BINARY)   UNIT   61   STATUS:UNKNOWN
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.unf
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.unf
  FILE TYPE:DATA(BINARY)   UNIT  102   STATUS:UNKNOWN
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.uzf1
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.uzf1
  FILE TYPE:DATA   UNIT   65   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.uzf2
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.uzf2
  FILE TYPE:DATA   UNIT   66   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.uzf3
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.uzf3
  FILE TYPE:DATA   UNIT   67   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.uzf4
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.uzf4
  FILE TYPE:DATA   UNIT   68   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.flw
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.flw
  FILE TYPE:DATA   UNIT   81   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg1
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg1
  FILE TYPE:DATA   UNIT   83   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg2
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg2
  FILE TYPE:DATA   UNIT   84   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg3
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg3
  FILE TYPE:DATA   UNIT   85   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg4
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg4
  FILE TYPE:DATA   UNIT   86   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg5
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg5
  FILE TYPE:DATA   UNIT   87   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg6
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg6
  FILE TYPE:DATA   UNIT   88   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg7
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg7
  FILE TYPE:DATA   UNIT   89   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- OPENING ./output/UZF_cap_ET.sg8
+ OPENING ./UZF_cap_ET/output/UZF_cap_ET.sg8
  FILE TYPE:DATA   UNIT   90   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.4, 4/01/2018 INPUT READ FROM UNIT   75
+ BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT   75
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -300,7 +300,7 @@
  # Test Problem 3 for MODFLOW-NWT
  #HEADTOL  FLUXTOL MAXITEROUT THICKFACT LINMETH IPRNWT IBOTAV OPTIONS DBDREDUCE DBDINCREASE DBDGAMMA MOMFACT BACKFLAG MAXBACKITER BACKTOL BACKREDUCE
 
- NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
+ NWT1 -- Newton Solver, VERSION 1.1.5, 9/10/2019
          INPUT READ FROM UNIT 13
 
  SPECIFIED OPTION:
@@ -334,7 +334,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.4, 4/01/2018
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.5, 9/10/2019
          INPUT READ FROM UNIT  7
 
  #Layer-Property Flow Package input for test simulation 2
@@ -637,7 +637,7 @@ SELECTED MODEL CELLS ARE:
 
 
 
-   9 GAGING STATIONS WERE SPECIFIED.
+   8 GAGING STATIONS WERE SPECIFIED.
      (Lakes are identified by a negative value of the Lake Number)
      RECORDS WILL BE WRITTEN TO SEPARATE OUTPUT FILES REPRESENTED BY FOLLOWING UNIT NUMBERS:
 
@@ -651,7 +651,6 @@ SELECTED MODEL CELLS ARE:
        6       6       5      88       4
        7       7       3      89       4
        8       8       6      90       4
-       9       9       1      91       5
 
 
 
@@ -34216,6 +34215,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    30 STRESS PERIOD   
          TOTAL TIME 1.26325E+08 2.10542E+06  35090.      1462.1      4.0030    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/07/17 16:21:40
- Elapsed run time:  5.695 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/10/25  8:31:31
+ Elapsed run time:  5.650 Seconds
 

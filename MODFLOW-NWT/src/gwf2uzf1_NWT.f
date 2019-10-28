@@ -1882,7 +1882,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2, ILACTIVE
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1897,10 +1897,12 @@ C       FOR BEGINNING OF EACH TIME STEP
             IF ( ibnd*ibnd > 0 ) THEN
               ill = NLAY
               il = ILL
+              ilactive = 0
               DO WHILE ( ill > 0 )
                 IF ( IBOUND(IC,IR,ILL) > 0 ) THEN
                   S1 = HNEW(ic, ir, ill) - BOTM(ic, ir, ill)
                   S2 = ZEROD15
+                  if ( ilactive == 0 ) ilactive = ill
                   IF ( ill < NLAY) THEN  
                     IF ( IBOUND(IC,IR,ILL+1) > 0 ) S2 = 
      +                        HNEW(ic, ir, ill+1) - BOTM(ic, ir, ill)
@@ -1910,6 +1912,8 @@ C       FOR BEGINNING OF EACH TIME STEP
                 END IF
                 ill = ill - 1
               END DO
+              IF ( IBOUND(IC,IR,IL) == 0 .AND. ilactive > 0 ) 
+     +                                          il = ilactive
               IF ( IBOUND(IC,IR,IL) == 0 ) THEN
                 WRITE (IOUT, 9012) il,ir,ic
  9012   FORMAT (1X, '---ERROR---UZF cell connected to inactive cells ', 
@@ -2204,6 +2208,9 @@ C5------CALL UZFLOW TO ROUTE WAVES FOR LATEST ITERATION.
                 END IF
                 surflux = finfact
                 oldsflx = UZOLSFLX(ic, ir)
+      !if(ir==6.and.ic==4.and.kkper==5.and.kkstp==2)then
+      !write(777,*)kkiter,surflux,totetact
+      !end if
                 DO ik = 1, idelt
                   totflux = 0.0D0
                   etact = 0.0D0
@@ -2463,7 +2470,6 @@ C     ******************************************************************
      +                        VBNM, VBVL, HNOFLO, HDRY
       USE GWFLAKMODULE, ONLY: LKARR1, STGNEW, LAKSEEP
       USE GWFSFRMODULE, ONLY: FNETSEEP
-!!      USE GWFSFRMODULE, ONLY: RECHSAVE  !MADE A UZF VARIABLE
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -5625,7 +5631,7 @@ C     ------------------------------------------------------------------
 C
 C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
 !        IF ( il.GT.0 ) THEN
-          ZEROD9 = 1.0d-9
+          ZEROD9 = 1.0d0-9
           ghdif = celtop - H
           totalwc = 0.0
           iset = 1
@@ -5744,7 +5750,54 @@ C
         IF ( THO-THSAT.LT.ZEROD15 ) CAPH = HA*STAR**(-1.0/LAMBDA)
       END IF 
       END FUNCTION CAPH
+! ----------------------------------------------------------------------
+
+      function unsat_stor(d1,uzthst,uzdpst,ic,ir,nwav)
+!     ******************************************************************
+!     unsat_stor---- sums up mobile water over depth interval
+!     ******************************************************************
+!     SPECIFICATIONS:
+      USE GWFUZFMODULE, ONLY:NWAVST
+! ----------------------------------------------------------------------
+      !modules
+      !arguments
+      DOUBLE PRECISION, intent(inout) :: d1
+      DOUBLE PRECISION, intent(inout) :: uzthst(NWAV), uzdpst(NWAV)
+      ! -- dummy
+      DOUBLE PRECISION :: fm, unsat_stor
+      integer :: j, k,nwavm1,jj, numwaves
+! ----------------------------------------------------------------------
+      fm = 0.0d0
+      DEM30 = 1.0d-30
+      numwaves = NWAVST(ic, ir)
+      j = numwaves + 1
+      k = numwaves
+      nwavm1 = k-1
+      if ( d1 > uzdpst(1) ) d1 = uzdpst(1)
+      !
+      !find deepest wave above depth d1, counter held as j
+      do while ( k > 0 )
+        if ( uzdpst(k) - d1 < -DEM30) j = k
+          k = k - 1
+      end do
+      if ( j > numwaves ) then
+        fm = fm + (uzthst(numwaves)-thtr)*d1
+      elseif ( numwaves > 1 ) then
+        if ( j > 1 ) then
+          fm = fm + (uzthst(j-1)-thtr)*(d1-uzdpst(j))
+        end if
+        do jj = j, nwavm1
+          fm = fm + (uzthst(jj)-thtr)*(uzdpst(jj)-uzdpst(jj+1))
+        end do
+        fm = fm + (uzthst(numwaves)-thtr)*(uzdpst(numwaves))
+      else
+        fm = fm + (uzthst(1)-thtr)*d1
+      end if
+      unsat_stor = fm
+      end function unsat_stor
+!
 C
+! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)
 C    Deallocate UZF DATA. 
