@@ -124,4 +124,4 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-1])
+    do_model(models[-3])
