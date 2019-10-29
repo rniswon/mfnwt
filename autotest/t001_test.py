@@ -27,7 +27,7 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Lake_bath_example", "l1b2k_bath.nam"),
               os.path.join("Sfr2weltab", "Sfr2weltab.nam"),
               os.path.join("SFR_LAK_floodplain", "SFR_LAK_floodplain.nam"),
-              # os.path.join("SWI_data_files", "swi2ex4sww.nam"),  # says invalid flow package
+              os.path.join("SWI_data_files", "swi2ex4sww.nam"),  # says invalid flow package
               os.path.join("SWR_data_files", "SWRSample05",
                            "SWRSample05-nwt.nam"),
               os.path.join("UZF_cap_ET", "UZF_cap_ET.nam"),
@@ -62,7 +62,7 @@ def external_files(model, ows, f):
 
 def do_model(model):
     model_ws, name = os.path.split(model)
-    if name in ("swi2ex4sww.nam",):
+    if name in ("test",):
         copyfile = False
     else:
         # need to trick flopy....
@@ -124,4 +124,4 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-3])
+    do_model(models[-1])
