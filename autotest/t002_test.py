@@ -17,7 +17,7 @@ formatted = ("Pr1aMFNWT.out",
              "Pr3_higher.out",
              "Pr3_lower.out",
              "SFR_LAK_floodplainhd.out",
-             # "Sfr2weltab.out",
+             "Sfr2weltab.out",
              "UZFtestoptions.out")
 
 
