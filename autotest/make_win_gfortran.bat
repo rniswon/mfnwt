@@ -1,4 +1,4 @@
 set PATH=%PATH%;C:\MinGW\bin
 gfortran --version
-make_gfortran.py -fc gfortran -sd -mc ..\MODFLOW-NWT\src mfnwt.exe 
+C:\Users\rniswon\AppData\Local\Continuum\miniconda3\envs\gsflow\python.exe make_gfortran.py -fc gfortran -sd -mc ..\MODFLOW-NWT\src mfnwt.exe 
 pause
