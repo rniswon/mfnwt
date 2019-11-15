@@ -27,6 +27,8 @@ def validate(sim_array, valid_array):
     failure = np.where(np.abs(validate) > 0.01)
     if failure[0].size > 0:
         check = abs(validate) * sim_array
+        check[np.isinf(check)] = 0.
+        check[np.isnan(check)] = 0
         if np.max(check) < 0.5:
             return False
         else:
