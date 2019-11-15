@@ -3480,7 +3480,7 @@ C
       USE GWFBASMODULE,ONLY:DELT
       USE LMTMODULE,   ONLY:IUZFFLOWS,IGWET
       USE GWFUZFMODULE,ONLY:SEEPOUT,IUZHOLD,numcells,IUZFBND,RTSOLFL,
-     &                      NUZTOP,GWET,UZFLWT,IETFLG
+     &                      NUZTOP,GWET,UZFLWT,IETFLG,LAYNUM
 C
       IMPLICIT NONE
 C
@@ -3534,7 +3534,7 @@ C--MANIPULATE IUZFRCH
                 IUZFRCH(J,I)=1
               ELSEIF(NUZTOP.EQ.2) THEN ! Recharge to and discharge from the layer specified in IUZFBND
                 IUZFRCH(J,I)=IUZFBND(J,I)
-                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))
+                BUFF(J,I,1)=BUFF(J,I,IUZFBND(J,I))  !Not sure about this line (RGN 11/6/2019)
               ENDIF
             ENDIF
           ENDDO
@@ -3555,6 +3555,11 @@ C--MANIPULATE IUZFRCH
             ENDDO
           ENDDO
         ENDDO
+      ELSE IF(NUZTOP.EQ.4) THEN
+        K=LAYNUM(J,I)
+        IF (IBOUND(J,I,K).GT.0) THEN
+          IUZFRCH(J,I)= K
+        END IF
       ENDIF
 C
 C--WRITE AN IDENTIFYING HEADER

@@ -29,7 +29,13 @@ DEL /S *.flw
 DEL /S *.lg*
 DEL /S *.sg*
 DEL /S *.gg*
-DEL /S *.uzf*
+DEL  .\UZF_cap_ET\output\*.uzf*
+DEL  .\SFR_LAK_floodplain\output\*.uzf*
+DEL  .\Uzf_testoptions\*.uzf1
+DEL  .\Uzf_testoptions\*.uzf2
+DEL  .\Uzf_testoptions\*.uzf3
+DEL  .\Uzf_testoptions\*.uzf4
+DEL  .\Uzf_testoptions\*.uzfot
 DEL /S *.out*
 DEL /S *.cnv
 DEL /S *.hds
