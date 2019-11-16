@@ -10,8 +10,8 @@
 *.out
 *.app
 
-!.\MODFLOW-NWT\bin\MODFLOW-NWT.exe
-!.\MODFLOW-NWT\bin\MODFLOW-NWT_64.exe
+!MODFLOW-NWT\bin\MODFLOW-NWT.exe
+!MODFLOW-NWT\bin\MODFLOW-NWT_64.exe
 
 # MODFLOW output files
 *.hobs
