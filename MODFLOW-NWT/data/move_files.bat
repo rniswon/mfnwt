@@ -37,6 +37,10 @@ DEL  .\Uzf_testoptions\*.uzf2
 DEL  .\Uzf_testoptions\*.uzf3
 DEL  .\Uzf_testoptions\*.uzf4
 DEL  .\Uzf_testoptions\*.uzfot
+DEL  .\UZF_testproblem1\*.uzf1
+DEL  .\UZF_testproblem1\*.uzf2
+DEL  .\UZF_testproblem1\*.uzf3
+DEL  .\UZF_testproblem1\*.uzf4
 DEL  .\UZF_testproblem2\*.uzf1
 DEL  .\UZF_testproblem2\*.uzf2
 DEL  .\UZF_testproblem2\*.uzf3

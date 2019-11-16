@@ -30,6 +30,10 @@
  FILE TYPE:OC   UNIT   22   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
+ OPENING .\Ex_prob3\Pr3_higher.out
+ FILE TYPE:DATA   UNIT   30   STATUS:UNKNOWN
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
  BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT    1
  
  MODFLOW was compiled using mixed precision
@@ -2036,6 +2040,8 @@
  # Test Problem 3 for UPW Package and NWT Solver
 
  OUTPUT CONTROL IS SPECIFIED ONLY AT TIME STEPS FOR WHICH OUTPUT IS DESIRED
+ HEADS WILL BE SAVED WITH FORMAT: (15F10.2)           
+ SAVED HEADS WILL BE LABELED
  HEAD PRINT FORMAT CODE IS  12    DRAWDOWN PRINT FORMAT CODE IS   0
  HEADS WILL BE SAVED ON UNIT   30    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # NWT Input File
@@ -2802,6 +2808,7 @@
 
  OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
     PRINT HEAD FOR ALL LAYERS
+    SAVE HEAD FOR ALL LAYERS
 1
               HEAD IN LAYER   1 AT END OF TIME STEP   1 IN STRESS PERIOD    1
   ---------------------------------------------------------------------------
@@ -3455,6 +3462,8 @@
         51.70       51.73       51.75       51.78       51.80       51.82       51.85       51.88       51.91       51.94    
         51.97       52.02       52.07       52.12       52.17       52.24       52.32       52.39       52.48       52.57    
         52.65       52.74       52.83       52.92       53.00       53.08       53.15       53.21       53.27       53.32    
+
+ HEAD WILL BE SAVED ON UNIT   30 AT END OF TIME STEP    1, STRESS PERIOD    1
 1
   VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
   ------------------------------------------------------------------------------
@@ -3495,6 +3504,6 @@
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/10/25  9:53:51
- Elapsed run time:  0.153 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:56:04
+ Elapsed run time:  0.424 Seconds
 

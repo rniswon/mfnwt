@@ -2036,6 +2036,8 @@
  # Test Problem 3 for UPW Package and NWT Solver
 
  OUTPUT CONTROL IS SPECIFIED ONLY AT TIME STEPS FOR WHICH OUTPUT IS DESIRED
+ HEADS WILL BE SAVED WITH FORMAT: (15F10.2)           
+ SAVED HEADS WILL BE LABELED
  HEAD PRINT FORMAT CODE IS  12    DRAWDOWN PRINT FORMAT CODE IS   0
  HEADS WILL BE SAVED ON UNIT   30    DRAWDOWNS WILL BE SAVED ON UNIT    0
 
@@ -24238,6 +24240,7 @@
 
  OUTPUT CONTROL FOR STRESS PERIOD    1   TIME STEP    1
     PRINT HEAD FOR ALL LAYERS
+    SAVE HEAD FOR ALL LAYERS
 1
               HEAD IN LAYER   1 AT END OF TIME STEP   1 IN STRESS PERIOD    1
   ---------------------------------------------------------------------------
@@ -24891,6 +24894,8 @@
        -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.    
        -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.    
        -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.      -9999.    
+
+ HEAD WILL BE SAVED ON UNIT   30 AT END OF TIME STEP    1, STRESS PERIOD    1
 1
   VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD   1
   ------------------------------------------------------------------------------
@@ -24931,6 +24936,6 @@
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/10/25  9:53:46
- Elapsed run time:  5.437 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:55:51
+ Elapsed run time:  8.460 Seconds
 
