@@ -22,6 +22,7 @@
 ..\bin\MODFLOW-NWT_64.exe .\SWI_data_files\swi2ex4sww_64.nam
 ..\bin\MODFLOW-NWT.exe .\SWR_data_files\SWRSample05\SWRSample05-nwt.nam
 ..\bin\MODFLOW-NWT_64.exe .\SWR_data_files\SWRSample05\SWRSample05-nwt_64.nam
+..\bin\MODFLOW-NWT.exe    .\UZF_testproblem2\UZFtest2.nam
 
 ECHO.
 ECHO Run complete. Please press enter when you want to continue.

@@ -7,7 +7,6 @@
 *_genmod.f90
 
 # Executables
-*.exe
 *.out
 *.app
 

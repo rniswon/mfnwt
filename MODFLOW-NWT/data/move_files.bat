@@ -22,6 +22,7 @@ MOVE /Y .\SWR_data_files\SWRSample05\results\SWRSample05_64.lst ..\output_test_6
 MOVE /Y .\UZF_cap_ET\output\UZF_cap_ET.lst ..\output_test
 MOVE /Y .\Uzf_testoptions\UZFtestoptions.lst ..\output_test
 MOVE /Y .\UZF_testproblem1\Prob1.lst ..\output_test
+MOVE /Y .\UZF_testproblem2\UZFtest2.lst ..\output_test
 
 DEL /S *.lst
 DEL /S *.bud
@@ -36,6 +37,11 @@ DEL  .\Uzf_testoptions\*.uzf2
 DEL  .\Uzf_testoptions\*.uzf3
 DEL  .\Uzf_testoptions\*.uzf4
 DEL  .\Uzf_testoptions\*.uzfot
+DEL  .\UZF_testproblem2\*.uzf1
+DEL  .\UZF_testproblem2\*.uzf2
+DEL  .\UZF_testproblem2\*.uzf3
+DEL  .\UZF_testproblem2\*.uzf4
+DEL  .\UZF_testproblem2\*.uzfot
 DEL /S *.out*
 DEL /S *.cnv
 DEL /S *.hds

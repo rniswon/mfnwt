@@ -146,7 +146,7 @@ the same unformatted file structure.
 
 D. TESTING
 
-Twelve sample problems with MODFLOW-NWT data sets are provided to verify that 
+Thirteen sample problems with MODFLOW-NWT data sets are provided to verify that 
 MODFLOW-NWT is correctly installed and running on the system.  The sample 
 problems also may be looked at as examples of how to use the program. Five of 
 the test problems (Pr1a, Pr1b, Pr2, Pr3_lower (32 bit and 64 bit), and  
@@ -161,10 +161,11 @@ tabular time series input files for pumping rates. Another test problem
 others (2006) to provide as example of the new input options for UZF. Another test 
 problem (SFR_LAK_floodplain) was created that combines the SFR2, LAK7, and UZF1 packages   
 to demonstrate how the lake package can be used to simulate floodplains adjacent 
-to streams. Another test problem was added that was documented as test problem 1
-in Niswonger and others (2006). These test problems can be run using either the 
-32-bit or 64-bit versions of the MODFLOW-NWT executable. Saved results for these  
+to streams. Two additional test problems were added that was documented as test problem 1
+and Test Problem 2 in Niswonger and others (2006). These test problems can be run using  
+either the 32-bit or 64-bit versions of the MODFLOW-NWT executable. Saved results for these  
 simulations are included in the Output_test and Output_test_64 directories for comparison.
+All test problems can be run at once by executing the file run_all.bat in the data directory.
 
 E. COMPILING
 
