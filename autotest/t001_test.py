@@ -38,7 +38,8 @@ models = [os.path.join(data_dir, model) for model in model_name]
 
 has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                 "Sfr2weltab.nam": ("weltab1.txt",
-                                   "weltab2.txt"),
+                                   "weltab2.txt",
+                                   "Sfr2weltab.wel"),
                 "SFR_LAK_floodplain.nam": (os.path.join("input",
                                            "SFR_LAK_floodplain_bath.txt"),
                                            os.path.join("input",
@@ -49,7 +50,8 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                         os.path.join("ref",
                                                      "ConstantStage.dat")),
                 "UZF_cap_ET.nam": (os.path.join("input", "seg1.tab"),
-                                   os.path.join("input", "seg9.tab")),
+                                   os.path.join("input", "seg9.tab"),
+                                   os.path.join("input", "UZF_cap_ET.uzf")),
                 "UZFtestoptions.nam": ()}
 
 
@@ -72,10 +74,37 @@ def do_model(model):
         shutil.copyfile(model, os.path.join(model_ws, name))
         copyfile = True
 
-    ml = fp.modflow.Modflow.load(name,
-                                 exe_name=nwt_exe,
-                                 model_ws=model_ws,
-                                 check=False)
+        if platform.system().lower() != "windows":
+            # fix paths for linux!
+            with open(os.path.join(model_ws, name)) as foo:
+                s = ""
+                for line in foo:
+                    s += line
+                s.replace("\\", "/")
+            with open(os.path.join(model_ws, name), "w") as foo:
+                foo.write(s)
+
+    if name == "Sfr2weltab.nam":
+        # need to avoid loading WEL file due to tabfiles
+        ml = fp.modflow.Modflow.load(name,
+                                     exe_name=nwt_exe,
+                                     model_ws=model_ws,
+                                     check=False,
+                                     load_only=["DIS", "GHB", "BAS6", "UPW",
+                                                "NWT", "OC", "SFR", "GAGE"])
+    elif name == "UZF_cap_ET.nam":
+        # need to avoid loading UZF file for now until PR to update flopy
+        ml = fp.modflow.Modflow.load(name,
+                                     exe_name=nwt_exe,
+                                     model_ws=model_ws,
+                                     check=False,
+                                     load_only=["DIS", "GHB", "BAS6", "UPW",
+                                                "NWT", "OC", "SFR", "GAGE"])
+    else:
+        ml = fp.modflow.Modflow.load(name,
+                                     exe_name=nwt_exe,
+                                     model_ws=model_ws,
+                                     check=False)
     # remove the temporary name file
     if copyfile:
         os.remove(os.path.join(model_ws, name))
@@ -91,6 +120,22 @@ def do_model(model):
         ml.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
 
     ml.write_input()
+
+    # fix the name files that we can't load a package with in flopy
+    if name == "Sfr2Weltab.nam":
+        with open(os.path.join(out_dir, name)) as foo:
+            tmp = [line for line in foo]
+        with open(os.path.join(out_dir, name), "w") as foo:
+            foo.writelines(tmp)
+            foo.write("WEL   91   Sfr2weltab.wel")
+
+    elif name == "UZF_cap_ET.nam":
+        with open(os.path.join(out_dir, name)) as foo:
+            tmp = [line for line in foo]
+        with open(os.path.join(out_dir, name), "w") as foo:
+            foo.writelines(tmp)
+            foo.write("UZF   19  UZF_cap_ET.uzf")
+
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=nwt_exe,
                                  model_ws=out_dir,
@@ -124,4 +169,4 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-1])
+    do_model(models[-2])
