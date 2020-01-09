@@ -1,7 +1,0 @@
-# MODFLOW2000 Evapotranspiration Package
-PARAMETER  0
- 3 50
- 1 1 1 1
-    OPEN/CLOSE  ..\external_files\arrays\evt\et_surf.dat       1.0 (FREE)   -1  ET SURFACE
-    OPEN/CLOSE  ..\external_files\arrays\evt\ss_et.dat         1.0 (FREE)   -1  ET RATE
-    OPEN/CLOSE  ..\external_files\arrays\evt\et_extdepth.dat   1.0 (FREE)   -1  ET DEPTH

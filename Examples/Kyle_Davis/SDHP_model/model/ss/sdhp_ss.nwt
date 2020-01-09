@@ -1,4 +1,0 @@
-# headtol fluxtol maxiterout thickfact linmeth iprnwt ibotav options             dbdtheta dbdkappa dbdgamma momfact backflag maxbackiter backtol backreduce	
-  4.0e-3  2000.0  1000       1.0e-5    2       2      1      SPECIFIED CONTINUE  0.5      1.0e-4   0.1      1.0e-5  0        20          10     0.5	
-# iacl norder level north iredsys rrctols idroptol epsrn   hclosexmd mxiterxmd 
-  1    0      3     7     0       1.0e-4  1        1.0e-4  0.1       30

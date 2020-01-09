@@ -1,5 +1,0 @@
-# MODFLOW2000 Recharge Package
-PARAMETER  0
- 3 50
- 1 1
- OPEN/CLOSE   ..\external_files\rch\ss_rch.dat   2.0   (FREE)   -1     RECHARGE RATE

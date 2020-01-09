@@ -1,5 +1,0 @@
-..\..\output\output_1.1.3.ss\output__hmss.ss_1.1.3_zbud ZBLST CSV CSV2
-..\..\output\output_1.1.3.ss\output___hmss.cbb
-Steady-state Humboldt River MODFLOW-NWT Model Budgets
-.\zbud.nam
-a
