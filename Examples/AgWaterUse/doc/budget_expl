@@ -1,0 +1,41 @@
+ VOLUMETRIC BUDGET FOR ENTIRE MODEL AT END OF TIME STEP    1, STRESS PERIOD 301                                          
+ ------------------------------------------------------------------------------                                          
+                                                                                                                         
+    CUMULATIVE VOLUMES      L**3       RATES FOR THIS TIME STEP      L**3/T                                              
+    ------------------                 ------------------------                                                          
+                                                                                                                         
+          IN:                                      IN:                                                                   
+          ---                                      ---                                                                   
+              AG WELLS  =  4588932608.0000                 AG WELLS  =           0.0000                                 
+     DIVERSION SEGMENTS =  3024622336.0000        DIVERSION SEGMENTS =     2280555.2500  
+## The lines above are total water removed from divesion segments and groundwater, 
+## respectively, also called the net irrigation water requirement                                
+          GW IRRIGATION =           0.0000             GW IRRIGATION =           0.0000                                  
+          SW IRRIGATION =           0.0000             SW IRRIGATION =           0.0000       
+## The lines above are groundwater and surface water return flows that occur after 
+## irrigation is applied = (1-eff)*(irrigation delivered). This is an out, so always zero here
+       SYSTEM LOSSES GW =           0.0000          SYSTEM LOSSES GW =           0.0000                                  
+       SYSTEM LOSSES SW =        5192.8140          SYSTEM LOSSES SW =           0.0000    
+## System losses are groundwater and surface water inflows as canal leakage or overland runnoff 
+## added to irrigation water between diversion and field                           
+                                                                                                                         
+               TOTAL IN =  7613559808.0000                  TOTAL IN =     2280555.2500                                  
+                                                                                                                         
+         OUT:                                     OUT:                                                                   
+         ----                                     ----                                                                   
+              AG WELLS  =           0.0000                 AG WELLS  =           0.0000                                  
+     DIVERSION SEGMENTS =           0.0000        DIVERSION SEGMENTS =           0.0000   
+## The lines above are always zero because they are inputs to the irrigation supply                               
+          GW IRRIGATION =   620414272.0000             GW IRRIGATION =           0.0000                                  
+          SW IRRIGATION =   744954240.0000             SW IRRIGATION =      561681.4375 
+## The lines above are groundwater and surface water return flows that occur after 
+## irrigation is applied = (1-eff)*(irrigation delivered)                       
+       SYSTEM LOSSES GW =  3968446976.0000          SYSTEM LOSSES GW =           0.0000                                  
+       SYSTEM LOSSES SW =  2279634176.0000          SYSTEM LOSSES SW =     1718853.3750                                  
+## The lines above are the consumptive use of groundwater and surface water = eff*(irrigation delivered), 
+##and losses through the canals between diversions and field                                                                                                                          
+              TOTAL OUT =  7613449728.0000                 TOTAL OUT =     2280534.7500                                  
+                                                                                                                         
+               IN - OUT =      110080.0000                  IN - OUT =          20.5000                                  
+                                                                                                                         
+    PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00                                    
