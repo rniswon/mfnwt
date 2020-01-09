@@ -674,7 +674,8 @@ C     ******************************************************************
       USE GWFLAKMODULE, ONLY:NLAKES,RNF,VOL,STGNEW,PRECIP,EVAP,
      1                       SURFIN,SURFOT,WITHDRW,SUMCNN,DELH,TDELH,
      2                       VOLINIT,OVRLNDRNF,TSLAKERR,CMLAKERR,DELVOL,
-     3                       SEEPUZ     
+     3                       SEEPUZ,PRCPLK,BGAREA
+! above line modified by LFK 3/7/19
 C     ------------------------------------------------------------------
       DIMENSION CLAKE(NLAKES,NSOL)
 cdep 4/20/2009 dimensioned SEEP array to nlakes
@@ -705,6 +706,14 @@ C         CONCENTRATION OF EACH SOLUTE.
             PP = PRECIP(LK)*DELT
             ET = EVAP(LK)*DELT
             RUNF = RNF(LK)*DELT
+!lfk add 3/8/19
+            RUNFRT=RUNF
+            IF(RNF(LK).LT.0.0) THEN
+              RUNF =-RNF(LK)*PRCPLK(LK)*BGAREA(LK)*DELT
+              RUNFRT = RUNF/DELT
+C      RUNFRT IS THE RATE OF OVERLAND RUNOFF TO THE LAKE
+            END IF
+!
             SRIN = SURFIN(LK)*DELT
             SROT = SURFOT(LK)*DELT
             WDRW = WITHDRW(LK)*DELT
@@ -762,14 +771,18 @@ Cdep   4/20/2009 added lake seepage to unsaturated zone
                  CASE (4)
                  IF (IUNITUZF.LE.0) THEN
                    WRITE (IG3,404) GAGETM,STGNEW(LK),VOL(LK),VOLRATE,
-     *              PRECIP(LK),EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),
+!     *              PRECIP(LK),EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),
+     *              PRECIP(LK),EVAP(LK),RUNFRT,GWIN(LK),GWOUT(LK),
      *              SURFIN(LK),SURFOT(LK),WITHDRW(LK),FLUXIN,
      *              SUMCNN(LK),TSLAKERR(LK)
-                 ELSE
+!LFK  3/8/19 modify above because RNF can be negative
+                   ELSE
                    WRITE (IG3,407) GAGETM,STGNEW(LK),VOL(LK),VOLRATE,
-     *              PRECIP(LK),EVAP(LK),RNF(LK),OVRLNDRNF(LK),GWIN(LK),
+!     *              PRECIP(LK),EVAP(LK),RNF(LK),OVRLNDRNF(LK),GWIN(LK),
+     *              PRECIP(LK),EVAP(LK),RUNFRT,OVRLNDRNF(LK),GWIN(LK),
      *              GWOUT(LK),SEEPUZ(LK),SURFIN(LK),SURFOT(LK),
      *              WITHDRW(LK),FLUXIN,SUMCNN(LK),TSLAKERR(LK)
+!LFK  3/8/19 modify above because RNF can be negative
                  END IF
                  END SELECT
 C
@@ -823,8 +836,10 @@ C-LFK
 C-LFK                   WRITE (IG3,LFRMAT) GAGETM,STGNEW(LK),VOLRATE,
                    WRITE (IG3,LFRMAT) GAGETM,STGNEW(LK),VOL(LK),
      *             (CLAKE(LK,ISOL),ISOL=1,NSOL),VOLRATE,PRECIP(LK),
-     *             EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),SURFIN(LK),
+!     *             EVAP(LK),RNF(LK),GWIN(LK),GWOUT(LK),SURFIN(LK),
+     *             EVAP(LK),RUNFRT,GWIN(LK),GWOUT(LK),SURFIN(LK),
      *             SURFOT(LK),WITHDRW(LK),FLUXIN,SUMCNN(LK),TSLAKERR(LK)
+!LFK  3/8/19 modify above because RNF can be negative
                  END SELECT
                END IF
             END IF
