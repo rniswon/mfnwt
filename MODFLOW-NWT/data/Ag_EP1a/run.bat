@@ -1,3 +1,3 @@
-..\..\bin\gsflow.exe .\gsflow_modflow_high.control     
-..\..\bin\gsflow.exe .\gsflow_modflow_low.control
+..\..\bin\MODFLOW-NWT.exe .\Agwater1_high.nam    
+..\..\bin\MODFLOW-NWT.exe .\Agwater1_low.nam
 ..\..\bin\AgTest1A.exe
