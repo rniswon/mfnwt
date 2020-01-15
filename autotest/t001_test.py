@@ -27,11 +27,15 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Lake_bath_example", "l1b2k_bath.nam"),
               os.path.join("Sfr2weltab", "Sfr2weltab.nam"),
               os.path.join("SFR_LAK_floodplain", "SFR_LAK_floodplain.nam"),
-              os.path.join("SWI_data_files", "swi2ex4sww.nam"),  # says invalid flow package
+              os.path.join("SWI_data_files", "swi2ex4sww.nam"),
               os.path.join("SWR_data_files", "SWRSample05",
                            "SWRSample05-nwt.nam"),
               os.path.join("UZF_cap_ET", "UZF_cap_ET.nam"),
-              os.path.join("Uzf_testoptions", "UZFtestoptions.nam")
+              os.path.join("Uzf_testoptions", "UZFtestoptions.nam"),
+              os.path.join("Ag_EP1a", "Agwater1_high.nam"),
+              os.path.join("Ag_EP1a", "Agwater1_low.nam"),
+              os.path.join("Ag_EP1b", "Agwater1_high.nam"),
+              os.path.join("Ag_EP1b", "Agwater1_low.nam")
               ]
 
 models = [os.path.join(data_dir, model) for model in model_name]
@@ -52,7 +56,18 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                 "UZF_cap_ET.nam": (os.path.join("input", "seg1.tab"),
                                    os.path.join("input", "seg9.tab"),
                                    os.path.join("input", "UZF_cap_ET.uzf")),
-                "UZFtestoptions.nam": ()}
+                "UZFtestoptions.nam": (),
+                "Agwater1_high.nam": (os.path.join("input", "seg1_high.tab"),
+                                      os.path.join("input", "seg1.tab"),
+                                      os.path.join("input", "seg9.tab"),
+                                      os.path.join("input", "Agwater1.uzf"),
+                                      os.path.join("input", "Agwater1.ag")),
+                "Agwater1_low.nam": (os.path.join("input", "seg1_low.tab"),
+                                     os.path.join("input", 'seg1.tab'),
+                                     os.path.join("input", "seg9.tab"),
+                                     os.path.join("input", "Agwater1.uzf"),
+                                     os.path.join("input", "Agwater1.ag"))
+                }
 
 
 def external_files(model, ows, f):
@@ -64,7 +79,7 @@ def external_files(model, ows, f):
 
 def do_model(model):
     model_ws, name = os.path.split(model)
-    if name in ("test",):
+    if name in ("Agwater1_high.nam", "Agwater1_low.nam"):
         copyfile = False
     else:
         # need to trick flopy....
@@ -100,6 +115,16 @@ def do_model(model):
                                      check=False,
                                      load_only=["DIS", "GHB", "BAS6", "UPW",
                                                 "NWT", "OC", "SFR", "GAGE"])
+
+    elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
+        # avoid loading AG and UZF until AgOptions PR to flopy
+        ml = fp.modflow.Modflow.load(name,
+                                     exe_name=nwt_exe,
+                                     model_ws=model_ws,
+                                     check=False,
+                                     load_only=["BAS6", "DIS", "GAGE",
+                                                "GHB", "NWT", "OC", "SFR",
+                                                "UPW"])
     else:
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
@@ -114,7 +139,10 @@ def do_model(model):
     if name in has_external:
         ext_f = has_external[name]
         for f in ext_f:
-            external_files(model, out_dir, f)
+            try:
+                external_files(model, out_dir, f)
+            except FileNotFoundError:
+                pass
 
         external_fnames = ml.external_fnames
         ml.external_fnames = [os.path.split(p)[-1] for p in external_fnames]
@@ -136,10 +164,20 @@ def do_model(model):
             foo.writelines(tmp)
             foo.write("UZF   19  UZF_cap_ET.uzf")
 
+    elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
+        with open(os.path.join(out_dir, name)) as foo:
+            tmp = [line for line in foo]
+
+        with open(os.path.join(out_dir, name), "w") as foo:
+            foo.writelines(tmp)
+            foo.write("UZF  19  Agwater1.uzf\n")
+            foo.write("AG   57  Agwater1.ag\n")
+
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=nwt_exe,
                                  model_ws=out_dir,
-                                 check=False)
+                                 check=False,
+                                 forgive=True)
     # try:
     success, _ = ml.run_model()
     # except:
@@ -169,4 +207,4 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-2])
+    do_model(models[-1])
