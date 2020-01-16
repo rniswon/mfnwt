@@ -23,7 +23,6 @@ formatted = ("Pr1aMFNWT.out",
              "Agwater1a_low.hed",
              "Agwater1b_high.hed",
              "Agwater1b_low.hed",
-             "UZFinfiltra.out",
              "UZFtest2hd.out")
 
 

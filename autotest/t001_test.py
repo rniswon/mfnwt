@@ -36,7 +36,6 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Ag_EP1a", "Agwater1_low.nam"),
               os.path.join("Ag_EP1b", "Agwater1_high.nam"),
               os.path.join("Ag_EP1b", "Agwater1_low.nam"),
-              os.path.join("UZF_testproblem1", "Prob1.nam"),
               os.path.join("UZF_testproblem2", "UZFtest2.nam")]
 
 models = [os.path.join(data_dir, model) for model in model_name]
@@ -68,7 +67,6 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                      os.path.join("input", "seg9.tab"),
                                      os.path.join("input", "Agwater1.uzf"),
                                      os.path.join("input", "Agwater1.ag")),
-                "Prob1.nam" : ("Prob1.uzf",)
                 }
 
 
@@ -113,14 +111,6 @@ def do_model(model):
                                      load_only=["DIS", "GHB", "BAS6", "UPW",
                                                 "NWT", "OC", "SFR", "GAGE"])
 
-    elif name == "Prob1.nam":
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False,
-                                     load_only=["DIS", "BAS6", "UPW", "NWT",
-                                                "OC", "SFR", "GAGE"])
-
     else:
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
@@ -157,8 +147,6 @@ def do_model(model):
                 foo.write("WEL   91   Sfr2weltab.wel")
             elif name == "UZF_cap_ET.nam":
                 foo.write("UZF   19  UZF_cap_ET.uzf")
-            elif name == "Prob1.nam":
-                foo.write("UZF   14  Prob1.uzf")
             elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
                 foo.write("UZF  19  Agwater1.uzf\n")
                 foo.write("AG   57  Agwater1.ag\n")

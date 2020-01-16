@@ -62,5 +62,5 @@ script:
 - sed -i -e 's/\r$//' make_linux_gfortran.sh
 - ./make_linux_gfortran.sh
 - cd ..
-- travis_wait nosetests -v --with-id --with-timer -w ./autotest
+- nosetests -v --with-id --with-timer -w ./autotest
 - cd autotest
