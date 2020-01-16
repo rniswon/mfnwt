@@ -18,7 +18,12 @@ formatted = ("Pr1aMFNWT.out",
              "Pr3_lower.out",
              "SFR_LAK_floodplainhd.out",
              "Sfr2weltab.out",
-             "UZFtestoptions.out")
+             "UZFtestoptions.out",
+             "Agwater1a_high.hed",
+             "Agwater1a_low.hed",
+             "Agwater1b_high.hed",
+             "Agwater1b_low.hed",
+             "UZFtest2hd.out",)
 
 
 def validate(sim_array, valid_array):
