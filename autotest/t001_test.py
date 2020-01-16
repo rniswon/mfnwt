@@ -67,7 +67,7 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                      os.path.join("input", "seg9.tab"),
                                      os.path.join("input", "Agwater1.uzf"),
                                      os.path.join("input", "Agwater1.ag")),
-                }
+                "UZFtest2.nam": ("UZFTest2.uzf",)}
 
 
 def external_files(model, ows, f):
@@ -110,7 +110,14 @@ def do_model(model):
                                      check=False,
                                      load_only=["DIS", "GHB", "BAS6", "UPW",
                                                 "NWT", "OC", "SFR", "GAGE"])
-
+    elif name == "UZFtest2.nam":
+        ml = fp.modflow.Modflow.load(name,
+                                     exe_name=nwt_exe,
+                                     model_ws=model_ws,
+                                     check=False,
+                                     load_only=["DIS", "GHB", "BAS6", "UPW",
+                                                "NWT", "OC", "SFR", "GAGE",
+                                                "WEL"])
     else:
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
@@ -147,6 +154,8 @@ def do_model(model):
                 foo.write("WEL   91   Sfr2weltab.wel")
             elif name == "UZF_cap_ET.nam":
                 foo.write("UZF   19  UZF_cap_ET.uzf")
+            elif name == "UZFtest2.nam":
+                foo.write("UZF   19  UZFtest2.uzf")
             elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
                 foo.write("UZF  19  Agwater1.uzf\n")
                 foo.write("AG   57  Agwater1.ag\n")
@@ -187,4 +196,5 @@ if __name__ == "__main__":
     test_pwd()
     test_mfnwt_exists()
     # test_run_model()
-    do_model(models[-1])
+    for model in models:
+        do_model(model)

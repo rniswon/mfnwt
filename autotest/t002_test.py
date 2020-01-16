@@ -23,7 +23,7 @@ formatted = ("Pr1aMFNWT.out",
              "Agwater1a_low.hed",
              "Agwater1b_high.hed",
              "Agwater1b_low.hed",
-             "UZFtest2hd.out")
+             "UZFtest2hd.out",)
 
 
 def validate(sim_array, valid_array):
