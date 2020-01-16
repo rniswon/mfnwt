@@ -35,8 +35,9 @@ model_name = [os.path.join("Ex_prob1a", "Pr1a_MFNWT.nam"),
               os.path.join("Ag_EP1a", "Agwater1_high.nam"),
               os.path.join("Ag_EP1a", "Agwater1_low.nam"),
               os.path.join("Ag_EP1b", "Agwater1_high.nam"),
-              os.path.join("Ag_EP1b", "Agwater1_low.nam")
-              ]
+              os.path.join("Ag_EP1b", "Agwater1_low.nam"),
+              os.path.join("UZF_testproblem1", "Prob1.nam"),
+              os.path.join("UZF_testproblem2", "UZFtest2.nam")]
 
 models = [os.path.join(data_dir, model) for model in model_name]
 
@@ -66,7 +67,8 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                      os.path.join("input", 'seg1.tab'),
                                      os.path.join("input", "seg9.tab"),
                                      os.path.join("input", "Agwater1.uzf"),
-                                     os.path.join("input", "Agwater1.ag"))
+                                     os.path.join("input", "Agwater1.ag")),
+                "Prob1.nam" : ("Prob1.uzf",)
                 }
 
 
@@ -99,16 +101,11 @@ def do_model(model):
             with open(os.path.join(model_ws, name), "w") as foo:
                 foo.write(s)
 
-    if name == "Sfr2weltab.nam":
-        # need to avoid loading WEL file due to tabfiles
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False,
-                                     load_only=["DIS", "GHB", "BAS6", "UPW",
-                                                "NWT", "OC", "SFR", "GAGE"])
-    elif name == "UZF_cap_ET.nam":
-        # need to avoid loading UZF file for now until PR to update flopy
+    if name in ("Sfr2weltab.nam", "UZF_cap_ET.nam",
+                "Agwater1_high.nam", "Agwater1_low.nam"):
+        # Sfr2weltab: need to avoid loading WEL file due to tabfiles
+        # UZF_cap_ET: need to avoid for now unitl PR to update flopy
+        # Agwater1: avoid loading AG and UZF until AgOptions PR to flopy
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
                                      model_ws=model_ws,
@@ -116,15 +113,14 @@ def do_model(model):
                                      load_only=["DIS", "GHB", "BAS6", "UPW",
                                                 "NWT", "OC", "SFR", "GAGE"])
 
-    elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
-        # avoid loading AG and UZF until AgOptions PR to flopy
+    elif name == "Prob1.nam":
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
                                      model_ws=model_ws,
                                      check=False,
-                                     load_only=["BAS6", "DIS", "GAGE",
-                                                "GHB", "NWT", "OC", "SFR",
-                                                "UPW"])
+                                     load_only=["DIS", "BAS6", "UPW", "NWT",
+                                                "OC", "SFR", "GAGE"])
+
     else:
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
@@ -150,28 +146,24 @@ def do_model(model):
     ml.write_input()
 
     # fix the name files that we can't load a package with in flopy
-    if name == "Sfr2Weltab.nam":
+    if name in ("Sfr2Weltab.nam", "UZF_cap_ET.nam", "Prob1.nam",
+                "Agwater1_high.nam", "Agwater1_low.nam"):
         with open(os.path.join(out_dir, name)) as foo:
             tmp = [line for line in foo]
         with open(os.path.join(out_dir, name), "w") as foo:
             foo.writelines(tmp)
-            foo.write("WEL   91   Sfr2weltab.wel")
 
-    elif name == "UZF_cap_ET.nam":
-        with open(os.path.join(out_dir, name)) as foo:
-            tmp = [line for line in foo]
-        with open(os.path.join(out_dir, name), "w") as foo:
-            foo.writelines(tmp)
-            foo.write("UZF   19  UZF_cap_ET.uzf")
-
-    elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
-        with open(os.path.join(out_dir, name)) as foo:
-            tmp = [line for line in foo]
-
-        with open(os.path.join(out_dir, name), "w") as foo:
-            foo.writelines(tmp)
-            foo.write("UZF  19  Agwater1.uzf\n")
-            foo.write("AG   57  Agwater1.ag\n")
+            if name == "Sfr2Weltab.nam":
+                foo.write("WEL   91   Sfr2weltab.wel")
+            elif name == "UZF_cap_ET.nam":
+                foo.write("UZF   19  UZF_cap_ET.uzf")
+            elif name == "Prob1.nam":
+                foo.write("UZF   14  Prob1.uzf")
+            elif name in ("Agwater1_high.nam", "Agwater1_low.nam"):
+                foo.write("UZF  19  Agwater1.uzf\n")
+                foo.write("AG   57  Agwater1.ag\n")
+            else:
+                pass
 
     ml = fp.modflow.Modflow.load(name,
                                  exe_name=nwt_exe,
