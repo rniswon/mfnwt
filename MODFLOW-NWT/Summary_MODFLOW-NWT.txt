@@ -79,6 +79,9 @@ HISTORY
        
        MODFLOW-NWT Version 1.1.4 04/01/2018 - Also see the file
        ‘release.txt’ for additional release notes.
+       
+       MODFLOW-NWT Version 1.2.0 03/01/2020 - Also see the file
+       ‘release.txt’ for additional release notes.
         
 SYSTEM REQUIREMENTS
 
@@ -137,6 +140,10 @@ FUNTIONALITY
          RES -- Reservoir Package
          STR -- Stream Package
          SUB -- Subsidence Package
+         
+     Packages originally developed for MODFLOW-NWT
+     
+         AG -- Agricultural Water Use Package
 
 DOCUMENTATION
 

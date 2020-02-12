@@ -18,7 +18,11 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 NOTE: Any use of trade, product or firm names is for descriptive purposes
 only and does not imply endorsement by the U.S. Government.
 
-o Version 1.1.5 09/01/2019:
+o Version 1.2.0 03/01/2020:
+
+Agricultural (AG) Water Use Package
+• This is the first version of MODFLOW-NWT that includes this package.
+Refer to Niswonger (2020) for detailes.
 
 Streamflow Routing (SFR2) Package
 • A check was added to allow stream reaches to have altitudes below the 
@@ -1375,4 +1379,7 @@ Available online at http://pubs.er.usgs.gov/publication/tm6A37
 Niswonger, R.G., Prudic, D.E., and Regan, R.S., 2006, Documentation of the Unsaturated-Zone Flow (UZF1) 
 Package for modeling unsaturated flow between the land surface and the water table with MODFLOW-2005: 
 U.S. Geological Survey Techniques and Methods 6-A19, 62 p.  
-Available online at http://pubs.er.usgs.gov/publication/tm6A19                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+Available online at http://pubs.er.usgs.gov/publication/tm6A19    
+
+Niswonger, R. G. (2020). An Agricultural Water Use Package for MODFLOW and GSFLOW. Environmental Modelling & Software, 104617.
+https://www.sciencedirect.com/science/article/pii/S1364815219305080                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
