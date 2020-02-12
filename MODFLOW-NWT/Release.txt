@@ -8,7 +8,7 @@ This file describes changes introduced into MODFLOW-NWT with each official
 release; these changes may substantially affect users. Executable files for 
 personal computers are provided as well as the source code at the following URL:
 
-http://water.usgs.gov/ogw/modflow-nwt/
+http://water.usgs.gov/ogw/modflow-nwt/     
 
 MODFLOW Files: Up-to-date descriptions of the input requirements for all 
 MODFLOW-NWT Packages and Processes are provided in the Online Guide to 
