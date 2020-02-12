@@ -79,7 +79,7 @@ def external_files(model, ows, f):
 
 def do_model(model):
     model_ws, name = os.path.split(model)
-    if name in ("Agwater1_high.nam", "Agwater1_low.nam"):
+    if name in ('placeholder',):
         copyfile = False
     else:
         # need to trick flopy....
