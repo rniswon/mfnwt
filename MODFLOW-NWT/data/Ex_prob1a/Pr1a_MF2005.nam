@@ -5,3 +5,4 @@ PCG                  23 .\Ex_prob1a\Pr1a.PCG
 LPF                  33 .\Ex_prob1a\Pr1a.LPF
 OC                   34 .\Ex_prob1a\Pr1a.OC
 DATA(BINARY)         50 .\Ex_prob1a\Pr1aMF2005.BUD
+DATA                 51 .\Ex_prob1a\Pr1aMF2005.out

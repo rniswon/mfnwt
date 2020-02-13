@@ -7,3 +7,4 @@ LPF  11 .\Ex_prob3\Pr3.lpf
 RCH  18 .\Ex_prob3\Pr3_higher.rch
 PCG  13 .\Ex_prob3\Pr3.pcg
 OC   22 .\Ex_prob3\Pr3.oc
+data 30 .\Ex_prob3\head_mf2005_higher.out

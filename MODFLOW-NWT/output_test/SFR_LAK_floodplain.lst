@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.5 09/10/2019
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\SFR_LAK_floodplain\output\SFR_LAK_floodplain.lst
@@ -98,7 +98,7 @@
  FILE TYPE:DATA   UNIT  801   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT   75
+ BAS -- BASIC PACKAGE, VERSION 1.2.0, 3/01/2020 INPUT READ FROM UNIT   75
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -313,7 +313,7 @@
  HEADS WILL BE SAVED ON UNIT   58    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT
 
- NWT1 -- Newton Solver, VERSION 1.1.5, 9/10/2019
+ NWT1 -- Newton Solver, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT 13
 
  SPECIFIED OPTION:
@@ -347,7 +347,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.5, 9/10/2019
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT  7
 
  #Layer-Property Flow Package input for test simulation 2
@@ -467,7 +467,7 @@
   14    0.000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.2000       0.000    
   15    0.000       0.000      0.1000      0.1000      0.1000      0.1000       0.000       0.000       0.000       0.000    
 
- WEL -- WELL PACKAGE FOR NWT VERSION 1.1.4,  4/01/2018 INPUT READ FROM UNIT   16
+ WEL -- WELL PACKAGE FOR NWT VERSION 1.2.0,  3/01/2020 INPUT READ FROM UNIT   16
  #Well Package input for test simulation 2
  No named parameters
  MAXIMUM OF     10 ACTIVE WELLS AT ONE TIME
@@ -563,7 +563,7 @@
 
 
 
- UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4, 02/06/2012
+ UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.5, 09/10/2019
          INPUT READ FROM UNIT 19
  #UZF Package input for test simulation 2
  No named parameters
@@ -1407,35 +1407,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      567638.0625       HEAD DEP BOUNDS =           0.2160
-      STREAM LEAKAGE =   133575960.0000        STREAM LEAKAGE =          50.8280
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =     2220658.7500          UZF RECHARGE =           0.8450
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      567638.0625       HEAD DEP BOUNDS     =           0.2160
+      STREAM LEAKAGE     =   133575960.0000        STREAM LEAKAGE     =          50.8280
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =     2220658.7500          UZF RECHARGE     =           0.8450
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   136364256.0000              TOTAL IN =          51.8890
+                TOTAL IN =   136364256.0000                  TOTAL IN =          51.8890
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    52560000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =      753140.6875       HEAD DEP BOUNDS =           0.2866
-      STREAM LEAKAGE =    45359796.0000        STREAM LEAKAGE =          17.2602
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    37692156.0000                 GW ET =          14.3425
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    52560000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =      753140.6875       HEAD DEP BOUNDS     =           0.2866
+      STREAM LEAKAGE     =    45359796.0000        STREAM LEAKAGE     =          17.2602
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    37692156.0000                 GW ET     =          14.3425
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   136365088.0000             TOTAL OUT =          51.8893
+               TOTAL OUT =   136365088.0000                 TOTAL OUT =          51.8893
 
-            IN - OUT =        -832.0000              IN - OUT =      -3.1662E-04
+                IN - OUT =        -832.0000                  IN - OUT =      -3.1662E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -1724,35 +1724,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =      937158.0000               STORAGE =           5.3491
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      605417.9375       HEAD DEP BOUNDS =           0.2156
-      STREAM LEAKAGE =   141364448.0000        STREAM LEAKAGE =          44.4548
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =    10019248.0000          UZF RECHARGE =          44.5125
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      937158.0000               STORAGE     =           5.3491
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      605417.9375       HEAD DEP BOUNDS     =           0.2156
+      STREAM LEAKAGE     =   141364448.0000        STREAM LEAKAGE     =          44.4548
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =    10019248.0000          UZF RECHARGE     =          44.5125
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   152926272.0000              TOTAL IN =          94.5320
+                TOTAL IN =   152926272.0000                  TOTAL IN =          94.5320
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     8170435.5000               STORAGE =          46.6349
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    56064000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =      803380.3125       HEAD DEP BOUNDS =           0.2868
-      STREAM LEAKAGE =    48397216.0000        STREAM LEAKAGE =          17.3369
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    39492012.0000                 GW ET =          10.2731
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     8170435.5000               STORAGE     =          46.6349
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    56064000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =      803380.3125       HEAD DEP BOUNDS     =           0.2868
+      STREAM LEAKAGE     =    48397216.0000        STREAM LEAKAGE     =          17.3369
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    39492012.0000                 GW ET     =          10.2731
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   152927040.0000             TOTAL OUT =          94.5317
+               TOTAL OUT =   152927040.0000                 TOTAL OUT =          94.5317
 
-            IN - OUT =        -768.0000              IN - OUT =       3.6621E-04
+                IN - OUT =        -768.0000                  IN - OUT =       3.6621E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -1983,35 +1983,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     4585553.5000               STORAGE =           5.4981
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      756117.1250       HEAD DEP BOUNDS =           0.2148
-      STREAM LEAKAGE =   172024704.0000        STREAM LEAKAGE =          43.0093
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =    40012356.0000          UZF RECHARGE =          41.3871
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     4585553.5000               STORAGE     =           5.4981
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      756117.1250       HEAD DEP BOUNDS     =           0.2148
+      STREAM LEAKAGE     =   172024704.0000        STREAM LEAKAGE     =          43.0093
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =    40012356.0000          UZF RECHARGE     =          41.3871
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   217378720.0000              TOTAL IN =          90.1094
+                TOTAL IN =   217378720.0000                  TOTAL IN =          90.1094
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    38765176.0000               STORAGE =          41.5577
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    70080000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     1004592.1250       HEAD DEP BOUNDS =           0.2873
-      STREAM LEAKAGE =    60798772.0000        STREAM LEAKAGE =          17.9047
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    46730728.0000                 GW ET =          10.3593
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    38765176.0000               STORAGE     =          41.5577
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    70080000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     1004592.1250       HEAD DEP BOUNDS     =           0.2873
+      STREAM LEAKAGE     =    60798772.0000        STREAM LEAKAGE     =          17.9047
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    46730728.0000                 GW ET     =          10.3593
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   217379264.0000             TOTAL OUT =          90.1091
+               TOTAL OUT =   217379264.0000                 TOTAL OUT =          90.1091
 
-            IN - OUT =        -544.0000              IN - OUT =       3.0518E-04
+                IN - OUT =        -544.0000                  IN - OUT =       3.0518E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -2257,35 +2257,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     7075143.5000               STORAGE =           0.9386
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      943990.3125       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =   212130272.0000        STREAM LEAKAGE =          47.7098
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =    74159920.0000          UZF RECHARGE =          37.3116
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     7075143.5000               STORAGE     =           0.9386
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      943990.3125       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =   212130272.0000        STREAM LEAKAGE     =          47.7098
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =    74159920.0000          UZF RECHARGE     =          37.3116
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   294309312.0000              TOTAL IN =          86.1744
+                TOTAL IN =   294309312.0000                  TOTAL IN =          86.1744
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    72834640.0000               STORAGE =          37.0327
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    87600000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     1256872.0000       HEAD DEP BOUNDS =           0.2884
-      STREAM LEAKAGE =    76773296.0000        STREAM LEAKAGE =          18.4233
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    55844908.0000                 GW ET =          10.4300
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    72834640.0000               STORAGE     =          37.0327
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    87600000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     1256872.0000       HEAD DEP BOUNDS     =           0.2884
+      STREAM LEAKAGE     =    76773296.0000        STREAM LEAKAGE     =          18.4233
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    55844908.0000                 GW ET     =          10.4300
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   294309728.0000             TOTAL OUT =          86.1743
+               TOTAL OUT =   294309728.0000                 TOTAL OUT =          86.1743
 
-            IN - OUT =        -416.0000              IN - OUT =       5.3406E-05
+                IN - OUT =        -416.0000                  IN - OUT =       5.3406E-05
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -2573,35 +2573,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     7906789.5000               STORAGE =           0.7925
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1131621.0000       HEAD DEP BOUNDS =           0.2141
-      STREAM LEAKAGE =   252996688.0000        STREAM LEAKAGE =          46.3647
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   105142520.0000          UZF RECHARGE =          33.4508
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     7906789.5000               STORAGE     =           0.7925
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1131621.0000       HEAD DEP BOUNDS     =           0.2141
+      STREAM LEAKAGE     =   252996688.0000        STREAM LEAKAGE     =          46.3647
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   105142520.0000          UZF RECHARGE     =          33.4508
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   367177632.0000              TOTAL IN =          80.8221
+                TOTAL IN =   367177632.0000                  TOTAL IN =          80.8221
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   102396352.0000               STORAGE =          31.1503
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   105120000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     1509948.0000       HEAD DEP BOUNDS =           0.2892
-      STREAM LEAKAGE =    93094584.0000        STREAM LEAKAGE =          18.7541
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    65050344.0000                 GW ET =          10.6178
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   102396352.0000               STORAGE     =          31.1503
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   105120000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     1509948.0000       HEAD DEP BOUNDS     =           0.2892
+      STREAM LEAKAGE     =    93094584.0000        STREAM LEAKAGE     =          18.7541
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    65050344.0000                 GW ET     =          10.6178
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   367171232.0000             TOTAL OUT =          80.8113
+               TOTAL OUT =   367171232.0000                 TOTAL OUT =          80.8113
 
-            IN - OUT =        6400.0000              IN - OUT =       1.0796E-02
+                IN - OUT =        6400.0000                  IN - OUT =       1.0796E-02
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.01
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.01
 
 
 
@@ -2890,35 +2890,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     7987995.5000               STORAGE =           0.4635
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1169129.6250       HEAD DEP BOUNDS =           0.2141
-      STREAM LEAKAGE =   261110560.0000        STREAM LEAKAGE =          46.3120
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   111020712.0000          UZF RECHARGE =          33.5513
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     7987995.5000               STORAGE     =           0.4635
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1169129.6250       HEAD DEP BOUNDS     =           0.2141
+      STREAM LEAKAGE     =   261110560.0000        STREAM LEAKAGE     =          46.3120
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   111020712.0000          UZF RECHARGE     =          33.5513
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   381288384.0000              TOTAL IN =          80.5409
+                TOTAL IN =   381288384.0000                  TOTAL IN =          80.5409
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   109532320.0000               STORAGE =          40.7304
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   106872000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     1560635.6250       HEAD DEP BOUNDS =           0.2893
-      STREAM LEAKAGE =    96392760.0000        STREAM LEAKAGE =          18.8252
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    66924288.0000                 GW ET =          10.6960
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   109532320.0000               STORAGE     =          40.7304
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   106872000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     1560635.6250       HEAD DEP BOUNDS     =           0.2893
+      STREAM LEAKAGE     =    96392760.0000        STREAM LEAKAGE     =          18.8252
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    66924288.0000                 GW ET     =          10.6960
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   381282016.0000             TOTAL OUT =          80.5409
+               TOTAL OUT =   381282016.0000                 TOTAL OUT =          80.5409
 
-            IN - OUT =        6368.0000              IN - OUT =      -2.2888E-05
+                IN - OUT =        6368.0000                  IN - OUT =      -2.2888E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -3149,35 +3149,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     8227683.5000               STORAGE =           0.2189
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1319255.3750       HEAD DEP BOUNDS =           0.2144
-      STREAM LEAKAGE =   294191424.0000        STREAM LEAKAGE =          48.2444
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   133088496.0000          UZF RECHARGE =          30.2159
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     8227683.5000               STORAGE     =           0.2189
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1319255.3750       HEAD DEP BOUNDS     =           0.2144
+      STREAM LEAKAGE     =   294191424.0000        STREAM LEAKAGE     =          48.2444
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   133088496.0000          UZF RECHARGE     =          30.2159
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   436826880.0000              TOTAL IN =          78.8935
+                TOTAL IN =   436826880.0000                  TOTAL IN =          78.8935
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   135934000.0000               STORAGE =          36.6653
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   113880000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     1763611.1250       HEAD DEP BOUNDS =           0.2899
-      STREAM LEAKAGE =   109711032.0000        STREAM LEAKAGE =          19.0945
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    75531784.0000                 GW ET =          12.8438
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   135934000.0000               STORAGE     =          36.6653
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   113880000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     1763611.1250       HEAD DEP BOUNDS     =           0.2899
+      STREAM LEAKAGE     =   109711032.0000        STREAM LEAKAGE     =          19.0945
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    75531784.0000                 GW ET     =          12.8438
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   436820416.0000             TOTAL OUT =          78.8934
+               TOTAL OUT =   436820416.0000                 TOTAL OUT =          78.8934
 
-            IN - OUT =        6464.0000              IN - OUT =       9.9182E-05
+                IN - OUT =        6464.0000                  IN - OUT =       9.9182E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -3423,35 +3423,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     8855125.0000               STORAGE =           0.9156
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1507170.3750       HEAD DEP BOUNDS =           0.2146
-      STREAM LEAKAGE =   334686496.0000        STREAM LEAKAGE =          45.1358
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   158133248.0000          UZF RECHARGE =          27.0968
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     8855125.0000               STORAGE     =           0.9156
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1507170.3750       HEAD DEP BOUNDS     =           0.2146
+      STREAM LEAKAGE     =   334686496.0000        STREAM LEAKAGE     =          45.1358
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   158133248.0000          UZF RECHARGE     =          27.0968
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   503182048.0000              TOTAL IN =          73.3628
+                TOTAL IN =   503182048.0000                  TOTAL IN =          73.3628
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   165202320.0000               STORAGE =          30.9752
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   122640000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     2017819.3750       HEAD DEP BOUNDS =           0.2904
-      STREAM LEAKAGE =   126551232.0000        STREAM LEAKAGE =          19.2980
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    86764192.0000                 GW ET =          12.7991
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   165202320.0000               STORAGE     =          30.9752
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   122640000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     2017819.3750       HEAD DEP BOUNDS     =           0.2904
+      STREAM LEAKAGE     =   126551232.0000        STREAM LEAKAGE     =          19.2980
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    86764192.0000                 GW ET     =          12.7991
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   503175552.0000             TOTAL OUT =          73.3627
+               TOTAL OUT =   503175552.0000                 TOTAL OUT =          73.3627
 
-            IN - OUT =        6496.0000              IN - OUT =       3.0518E-05
+                IN - OUT =        6496.0000                  IN - OUT =       3.0518E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -3743,35 +3743,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     9878641.0000               STORAGE =           0.4190
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1695164.3750       HEAD DEP BOUNDS =           0.2146
-      STREAM LEAKAGE =   373541632.0000        STREAM LEAKAGE =          44.9533
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   179968064.0000          UZF RECHARGE =          23.4979
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     9878641.0000               STORAGE     =           0.4190
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1695164.3750       HEAD DEP BOUNDS     =           0.2146
+      STREAM LEAKAGE     =   373541632.0000        STREAM LEAKAGE     =          44.9533
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   179968064.0000          UZF RECHARGE     =          23.4979
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   565083520.0000              TOTAL IN =          69.0848
+                TOTAL IN =   565083520.0000                  TOTAL IN =          69.0848
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   189933648.0000               STORAGE =          26.6261
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   131400000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     2272381.7500       HEAD DEP BOUNDS =           0.2907
-      STREAM LEAKAGE =   143532496.0000        STREAM LEAKAGE =          19.4373
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    97938488.0000                 GW ET =          12.7307
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   189933648.0000               STORAGE     =          26.6261
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   131400000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     2272381.7500       HEAD DEP BOUNDS     =           0.2907
+      STREAM LEAKAGE     =   143532496.0000        STREAM LEAKAGE     =          19.4373
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    97938488.0000                 GW ET     =          12.7307
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   565076992.0000             TOTAL OUT =          69.0848
+               TOTAL OUT =   565076992.0000                 TOTAL OUT =          69.0848
 
-            IN - OUT =        6528.0000              IN - OUT =      -2.2888E-05
+                IN - OUT =        6528.0000                  IN - OUT =      -2.2888E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4120,35 +4120,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    10167526.0000               STORAGE =           0.3187
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1883145.1250       HEAD DEP BOUNDS =           0.2146
-      STREAM LEAKAGE =   412921952.0000        STREAM LEAKAGE =          44.7508
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   202338480.0000          UZF RECHARGE =          29.5077
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    10167526.0000               STORAGE     =           0.3187
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1883145.1250       HEAD DEP BOUNDS     =           0.2146
+      STREAM LEAKAGE     =   412921952.0000        STREAM LEAKAGE     =          44.7508
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   202338480.0000          UZF RECHARGE     =          29.5077
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   627311104.0000              TOTAL IN =          74.7918
+                TOTAL IN =   627311104.0000                  TOTAL IN =          74.7918
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   214538512.0000               STORAGE =          31.5291
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   140160000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     2527543.5000       HEAD DEP BOUNDS =           0.2919
-      STREAM LEAKAGE =   160995024.0000        STREAM LEAKAGE =          20.2409
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   109083144.0000                 GW ET =          12.7284
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   214538512.0000               STORAGE     =          31.5291
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   140160000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     2527543.5000       HEAD DEP BOUNDS     =           0.2919
+      STREAM LEAKAGE     =   160995024.0000        STREAM LEAKAGE     =          20.2409
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   109083144.0000                 GW ET     =          12.7284
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   627304192.0000             TOTAL OUT =          74.7903
+               TOTAL OUT =   627304192.0000                 TOTAL OUT =          74.7903
 
-            IN - OUT =        6912.0000              IN - OUT =       1.4572E-03
+                IN - OUT =        6912.0000                  IN - OUT =       1.4572E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -4394,35 +4394,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    10377340.0000               STORAGE =           0.2115
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2071074.1250       HEAD DEP BOUNDS =           0.2145
-      STREAM LEAKAGE =   452512000.0000        STREAM LEAKAGE =          45.3591
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   227036176.0000          UZF RECHARGE =          27.8285
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    10377340.0000               STORAGE     =           0.2115
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2071074.1250       HEAD DEP BOUNDS     =           0.2145
+      STREAM LEAKAGE     =   452512000.0000        STREAM LEAKAGE     =          45.3591
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   227036176.0000          UZF RECHARGE     =          27.8285
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   691996608.0000              TOTAL IN =          73.6135
+                TOTAL IN =   691996608.0000                  TOTAL IN =          73.6135
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   241102192.0000               STORAGE =          29.9893
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   148920000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     2783861.5000       HEAD DEP BOUNDS =           0.2930
-      STREAM LEAKAGE =   178989168.0000        STREAM LEAKAGE =          20.7111
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   120193328.0000                 GW ET =          12.6189
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   241102192.0000               STORAGE     =          29.9893
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   148920000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     2783861.5000       HEAD DEP BOUNDS     =           0.2930
+      STREAM LEAKAGE     =   178989168.0000        STREAM LEAKAGE     =          20.7111
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   120193328.0000                 GW ET     =          12.6189
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   691988608.0000             TOTAL OUT =          73.6123
+               TOTAL OUT =   691988608.0000                 TOTAL OUT =          73.6123
 
-            IN - OUT =        8000.0000              IN - OUT =       1.1673E-03
+                IN - OUT =        8000.0000                  IN - OUT =       1.1673E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -4716,35 +4716,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    11354570.0000               STORAGE =           1.7616
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2258881.0000       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =   489991712.0000        STREAM LEAKAGE =          41.0995
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   255085088.0000          UZF RECHARGE =          33.2556
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    11354570.0000               STORAGE     =           1.7616
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2258881.0000       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =   489991712.0000        STREAM LEAKAGE     =          41.0995
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   255085088.0000          UZF RECHARGE     =          33.2556
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   758690240.0000              TOTAL IN =          76.3311
+                TOTAL IN =   758690240.0000                  TOTAL IN =          76.3311
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   269416736.0000               STORAGE =          32.4161
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   157680000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     3040940.7500       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =   197356640.0000        STREAM LEAKAGE =          21.1049
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   131186616.0000                 GW ET =          12.5135
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   269416736.0000               STORAGE     =          32.4161
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   157680000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     3040940.7500       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =   197356640.0000        STREAM LEAKAGE     =          21.1049
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   131186616.0000                 GW ET     =          12.5135
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   758680896.0000             TOTAL OUT =          76.3283
+               TOTAL OUT =   758680896.0000                 TOTAL OUT =          76.3283
 
-            IN - OUT =        9344.0000              IN - OUT =       2.7847E-03
+                IN - OUT =        9344.0000                  IN - OUT =       2.7847E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5093,35 +5093,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    24978578.0000               STORAGE =          14.4703
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2446524.5000       HEAD DEP BOUNDS =           0.2141
-      STREAM LEAKAGE =   534717248.0000        STREAM LEAKAGE =          59.1231
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   281659392.0000          UZF RECHARGE =          34.5098
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    24978578.0000               STORAGE     =          14.4703
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2446524.5000       HEAD DEP BOUNDS     =           0.2141
+      STREAM LEAKAGE     =   534717248.0000        STREAM LEAKAGE     =          59.1231
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   281659392.0000          UZF RECHARGE     =          34.5098
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   843801728.0000              TOTAL IN =         108.3174
+                TOTAL IN =   843801728.0000                  TOTAL IN =         108.3174
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   299032512.0000               STORAGE =          45.3184
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   183960000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3298031.5000       HEAD DEP BOUNDS =           0.2929
-      STREAM LEAKAGE =   215403632.0000        STREAM LEAKAGE =          20.2974
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   142094720.0000                 GW ET =          12.4032
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   299032512.0000               STORAGE     =          45.3184
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   183960000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3298031.5000       HEAD DEP BOUNDS     =           0.2929
+      STREAM LEAKAGE     =   215403632.0000        STREAM LEAKAGE     =          20.2974
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   142094720.0000                 GW ET     =          12.4032
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   843788864.0000             TOTAL OUT =         108.3119
+               TOTAL OUT =   843788864.0000                 TOTAL OUT =         108.3119
 
-            IN - OUT =       12864.0000              IN - OUT =       5.4398E-03
+                IN - OUT =       12864.0000                  IN - OUT =       5.4398E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.01
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.01
 
 
 
@@ -5368,35 +5368,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    36827864.0000               STORAGE =           9.8062
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2633841.5000       HEAD DEP BOUNDS =           0.2135
-      STREAM LEAKAGE =   611712128.0000        STREAM LEAKAGE =         230.1860
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   323741664.0000          UZF RECHARGE =          60.9004
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    36827864.0000               STORAGE     =           9.8062
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2633841.5000       HEAD DEP BOUNDS     =           0.2135
+      STREAM LEAKAGE     =   611712128.0000        STREAM LEAKAGE     =         230.1860
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   323741664.0000          UZF RECHARGE     =          60.9004
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   974915456.0000              TOTAL IN =         301.1061
+                TOTAL IN =   974915456.0000                  TOTAL IN =         301.1061
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   378427104.0000               STORAGE =         256.6627
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   210240000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3555813.0000       HEAD DEP BOUNDS =           0.3022
-      STREAM LEAKAGE =   229458896.0000        STREAM LEAKAGE =           0.0000
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   152934944.0000                 GW ET =          12.5401
-     SURFACE LEAKAGE =      280440.9688       SURFACE LEAKAGE =           1.6007
+             STORAGE     =   378427104.0000               STORAGE     =         256.6627
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   210240000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3555813.0000       HEAD DEP BOUNDS     =           0.3022
+      STREAM LEAKAGE     =   229458896.0000        STREAM LEAKAGE     =           0.0000
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   152934944.0000                 GW ET     =          12.5401
+     SURFACE LEAKAGE     =      280440.9688       SURFACE LEAKAGE     =           1.6007
 
-           TOTAL OUT =   974897280.0000             TOTAL OUT =         301.1056
+               TOTAL OUT =   974897280.0000                 TOTAL OUT =         301.1056
 
-            IN - OUT =       18176.0000              IN - OUT =       4.8828E-04
+                IN - OUT =       18176.0000                  IN - OUT =       4.8828E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5652,35 +5652,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    50347744.0000               STORAGE =          49.1303
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2820819.5000       HEAD DEP BOUNDS =           0.2135
-      STREAM LEAKAGE =   867445056.0000        STREAM LEAKAGE =          76.8193
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   409397696.0000          UZF RECHARGE =         156.5565
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    50347744.0000               STORAGE     =          49.1303
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2820819.5000       HEAD DEP BOUNDS     =           0.2135
+      STREAM LEAKAGE     =   867445056.0000        STREAM LEAKAGE     =          76.8193
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   409397696.0000          UZF RECHARGE     =         156.5565
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1330011392.0000              TOTAL IN =         282.7196
+                TOTAL IN =  1330011392.0000                  TOTAL IN =         282.7196
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   647509184.0000               STORAGE =         188.4068
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   236520000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3849877.7500       HEAD DEP BOUNDS =           0.3346
-      STREAM LEAKAGE =   236370016.0000        STREAM LEAKAGE =          39.3806
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   165188544.0000                 GW ET =          14.5622
-     SURFACE LEAKAGE =    40554456.0000       SURFACE LEAKAGE =          10.0328
+             STORAGE     =   647509184.0000               STORAGE     =         188.4068
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   236520000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3849877.7500       HEAD DEP BOUNDS     =           0.3346
+      STREAM LEAKAGE     =   236370016.0000        STREAM LEAKAGE     =          39.3806
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   165188544.0000                 GW ET     =          14.5622
+     SURFACE LEAKAGE     =    40554456.0000       SURFACE LEAKAGE     =          10.0328
 
-           TOTAL OUT =  1329992192.0000             TOTAL OUT =         282.7170
+               TOTAL OUT =  1329992192.0000                 TOTAL OUT =         282.7170
 
-            IN - OUT =       19200.0000              IN - OUT =       2.5635E-03
+                IN - OUT =       19200.0000                  IN - OUT =       2.5635E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -6012,35 +6012,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    72953240.0000               STORAGE =          18.8934
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3007876.7500       HEAD DEP BOUNDS =           0.2136
-      STREAM LEAKAGE =   930053824.0000        STREAM LEAKAGE =          67.7883
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   507619840.0000          UZF RECHARGE =          89.9353
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    72953240.0000               STORAGE     =          18.8934
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3007876.7500       HEAD DEP BOUNDS     =           0.2136
+      STREAM LEAKAGE     =   930053824.0000        STREAM LEAKAGE     =          67.7883
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   507619840.0000          UZF RECHARGE     =          89.9353
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1513634816.0000              TOTAL IN =         176.8306
+                TOTAL IN =  1513634816.0000                  TOTAL IN =         176.8306
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   787807744.0000               STORAGE =         132.3200
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   236520000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4135220.0000       HEAD DEP BOUNDS =           0.3213
-      STREAM LEAKAGE =   264113568.0000        STREAM LEAKAGE =          28.6221
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   177869808.0000                 GW ET =          14.3832
-     SURFACE LEAKAGE =    43166060.0000       SURFACE LEAKAGE =           1.1878
+             STORAGE     =   787807744.0000               STORAGE     =         132.3200
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   236520000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4135220.0000       HEAD DEP BOUNDS     =           0.3213
+      STREAM LEAKAGE     =   264113568.0000        STREAM LEAKAGE     =          28.6221
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   177869808.0000                 GW ET     =          14.3832
+     SURFACE LEAKAGE     =    43166060.0000       SURFACE LEAKAGE     =           1.1878
 
-           TOTAL OUT =  1513612416.0000             TOTAL OUT =         176.8344
+               TOTAL OUT =  1513612416.0000                 TOTAL OUT =         176.8344
 
-            IN - OUT =       22400.0000              IN - OUT =      -3.7231E-03
+                IN - OUT =       22400.0000                  IN - OUT =      -3.7231E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6278,35 +6278,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    89859664.0000               STORAGE =          13.5449
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3195044.0000       HEAD DEP BOUNDS =           0.2137
-      STREAM LEAKAGE =   993095744.0000        STREAM LEAKAGE =         103.2534
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   565584448.0000          UZF RECHARGE =          53.5079
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    89859664.0000               STORAGE     =          13.5449
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3195044.0000       HEAD DEP BOUNDS     =           0.2137
+      STREAM LEAKAGE     =   993095744.0000        STREAM LEAKAGE     =         103.2534
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   565584448.0000          UZF RECHARGE     =          53.5079
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1651734784.0000              TOTAL IN =         170.5199
+                TOTAL IN =  1651734784.0000                  TOTAL IN =         170.5199
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   891999808.0000               STORAGE =         144.4457
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   236520000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4411883.5000       HEAD DEP BOUNDS =           0.3143
-      STREAM LEAKAGE =   284452928.0000        STREAM LEAKAGE =          10.0585
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   190495536.0000                 GW ET =          14.5968
-     SURFACE LEAKAGE =    43835728.0000       SURFACE LEAKAGE =           1.1059
+             STORAGE     =   891999808.0000               STORAGE     =         144.4457
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   236520000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4411883.5000       HEAD DEP BOUNDS     =           0.3143
+      STREAM LEAKAGE     =   284452928.0000        STREAM LEAKAGE     =          10.0585
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   190495536.0000                 GW ET     =          14.5968
+     SURFACE LEAKAGE     =    43835728.0000       SURFACE LEAKAGE     =           1.1059
 
-           TOTAL OUT =  1651715968.0000             TOTAL OUT =         170.5212
+               TOTAL OUT =  1651715968.0000                 TOTAL OUT =         170.5212
 
-            IN - OUT =       18816.0000              IN - OUT =      -1.3275E-03
+                IN - OUT =       18816.0000                  IN - OUT =      -1.3275E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6586,35 +6586,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   103876280.0000               STORAGE =          14.5059
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3382470.7500       HEAD DEP BOUNDS =           0.2141
-      STREAM LEAKAGE =  1120974976.0000        STREAM LEAKAGE =         185.6139
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   599261824.0000          UZF RECHARGE =          31.9692
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   103876280.0000               STORAGE     =          14.5059
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3382470.7500       HEAD DEP BOUNDS     =           0.2141
+      STREAM LEAKAGE     =  1120974976.0000        STREAM LEAKAGE     =         185.6139
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   599261824.0000          UZF RECHARGE     =          31.9692
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1827495552.0000              TOTAL IN =         232.3031
+                TOTAL IN =  1827495552.0000                  TOTAL IN =         232.3031
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1043611008.0000               STORAGE =         191.6605
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   236520000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4695550.5000       HEAD DEP BOUNDS =           0.3312
-      STREAM LEAKAGE =   285702848.0000        STREAM LEAKAGE =           0.0000
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   204100688.0000                 GW ET =          16.1910
-     SURFACE LEAKAGE =    52848312.0000       SURFACE LEAKAGE =          24.1217
+             STORAGE     =  1043611008.0000               STORAGE     =         191.6605
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   236520000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4695550.5000       HEAD DEP BOUNDS     =           0.3312
+      STREAM LEAKAGE     =   285702848.0000        STREAM LEAKAGE     =           0.0000
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   204100688.0000                 GW ET     =          16.1910
+     SURFACE LEAKAGE     =    52848312.0000       SURFACE LEAKAGE     =          24.1217
 
-           TOTAL OUT =  1827478528.0000             TOTAL OUT =         232.3044
+               TOTAL OUT =  1827478528.0000                 TOTAL OUT =         232.3044
 
-            IN - OUT =       17024.0000              IN - OUT =      -1.3123E-03
+                IN - OUT =       17024.0000                  IN - OUT =      -1.3123E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6960,35 +6960,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   121476304.0000               STORAGE =          19.2218
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3570146.0000       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =  1230200576.0000        STREAM LEAKAGE =          91.7635
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   620221184.0000          UZF RECHARGE =          19.8466
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   121476304.0000               STORAGE     =          19.2218
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3570146.0000       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =  1230200576.0000        STREAM LEAKAGE     =          91.7635
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   620221184.0000          UZF RECHARGE     =          19.8466
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1975468160.0000              TOTAL IN =         131.0462
+                TOTAL IN =  1975468160.0000                  TOTAL IN =         131.0462
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1136140928.0000               STORAGE =          70.7039
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   254040000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     4985607.0000       HEAD DEP BOUNDS =           0.3277
-      STREAM LEAKAGE =   295567776.0000        STREAM LEAKAGE =          16.9923
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   218647088.0000                 GW ET =          16.6532
-     SURFACE LEAKAGE =    66070208.0000       SURFACE LEAKAGE =           6.3700
+             STORAGE     =  1136140928.0000               STORAGE     =          70.7039
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   254040000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     4985607.0000       HEAD DEP BOUNDS     =           0.3277
+      STREAM LEAKAGE     =   295567776.0000        STREAM LEAKAGE     =          16.9923
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   218647088.0000                 GW ET     =          16.6532
+     SURFACE LEAKAGE     =    66070208.0000       SURFACE LEAKAGE     =           6.3700
 
-           TOTAL OUT =  1975451392.0000             TOTAL OUT =         131.0471
+               TOTAL OUT =  1975451392.0000                 TOTAL OUT =         131.0471
 
-            IN - OUT =       16768.0000              IN - OUT =      -9.3079E-04
+                IN - OUT =       16768.0000                  IN - OUT =      -9.3079E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -7228,35 +7228,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   141562704.0000               STORAGE =          21.8546
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3757873.5000       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =  1295619072.0000        STREAM LEAKAGE =          69.9650
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   634186752.0000          UZF RECHARGE =          14.2283
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   141562704.0000               STORAGE     =          21.8546
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3757873.5000       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =  1295619072.0000        STREAM LEAKAGE     =          69.9650
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   634186752.0000          UZF RECHARGE     =          14.2283
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2075126400.0000              TOTAL IN =         106.2622
+                TOTAL IN =  2075126400.0000                  TOTAL IN =         106.2622
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1180333184.0000               STORAGE =          43.8772
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   271560000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     5267986.0000       HEAD DEP BOUNDS =           0.3188
-      STREAM LEAKAGE =   316295168.0000        STREAM LEAKAGE =          24.0052
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   233135168.0000                 GW ET =          16.4592
-     SURFACE LEAKAGE =    68517232.0000       SURFACE LEAKAGE =           1.6005
+             STORAGE     =  1180333184.0000               STORAGE     =          43.8772
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   271560000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     5267986.0000       HEAD DEP BOUNDS     =           0.3188
+      STREAM LEAKAGE     =   316295168.0000        STREAM LEAKAGE     =          24.0052
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   233135168.0000                 GW ET     =          16.4592
+     SURFACE LEAKAGE     =    68517232.0000       SURFACE LEAKAGE     =           1.6005
 
-           TOTAL OUT =  2075108736.0000             TOTAL OUT =         106.2609
+               TOTAL OUT =  2075108736.0000                 TOTAL OUT =         106.2609
 
-            IN - OUT =       17664.0000              IN - OUT =       1.2665E-03
+                IN - OUT =       17664.0000                  IN - OUT =       1.2665E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -7542,35 +7542,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   154115840.0000               STORAGE =           7.4161
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3945580.2500       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =  1359315584.0000        STREAM LEAKAGE =          78.4941
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   645325952.0000          UZF RECHARGE =          11.8538
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   154115840.0000               STORAGE     =           7.4161
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3945580.2500       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =  1359315584.0000        STREAM LEAKAGE     =          78.4941
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   645325952.0000          UZF RECHARGE     =          11.8538
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2162702848.0000              TOTAL IN =          97.9782
+                TOTAL IN =  2162702848.0000                  TOTAL IN =          97.9782
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1216301696.0000               STORAGE =          41.8317
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   289080000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     5543373.0000       HEAD DEP BOUNDS =           0.3125
-      STREAM LEAKAGE =   334754816.0000        STREAM LEAKAGE =          18.2700
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   247543312.0000                 GW ET =          16.4677
-     SURFACE LEAKAGE =    69461544.0000       SURFACE LEAKAGE =           1.0965
+             STORAGE     =  1216301696.0000               STORAGE     =          41.8317
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   289080000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     5543373.0000       HEAD DEP BOUNDS     =           0.3125
+      STREAM LEAKAGE     =   334754816.0000        STREAM LEAKAGE     =          18.2700
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   247543312.0000                 GW ET     =          16.4677
+     SURFACE LEAKAGE     =    69461544.0000       SURFACE LEAKAGE     =           1.0965
 
-           TOTAL OUT =  2162684672.0000             TOTAL OUT =          97.9784
+               TOTAL OUT =  2162684672.0000                 TOTAL OUT =          97.9784
 
-            IN - OUT =       18176.0000              IN - OUT =      -1.9836E-04
+                IN - OUT =       18176.0000                  IN - OUT =      -1.9836E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -7891,35 +7891,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   157641344.0000               STORAGE =           2.7123
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4133263.5000       HEAD DEP BOUNDS =           0.2143
-      STREAM LEAKAGE =  1463717376.0000        STREAM LEAKAGE =         135.9674
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   656954112.0000          UZF RECHARGE =          13.1880
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   157641344.0000               STORAGE     =           2.7123
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4133263.5000       HEAD DEP BOUNDS     =           0.2143
+      STREAM LEAKAGE     =  1463717376.0000        STREAM LEAKAGE     =         135.9674
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   656954112.0000          UZF RECHARGE     =          13.1880
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2282446080.0000              TOTAL IN =         152.0819
+                TOTAL IN =  2282446080.0000                  TOTAL IN =         152.0819
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1311001088.0000               STORAGE =         122.5493
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   289080000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5821741.5000       HEAD DEP BOUNDS =           0.3251
-      STREAM LEAKAGE =   339800800.0000        STREAM LEAKAGE =           0.3683
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   262332672.0000                 GW ET =          17.3235
-     SURFACE LEAKAGE =    74392296.0000       SURFACE LEAKAGE =          11.5157
+             STORAGE     =  1311001088.0000               STORAGE     =         122.5493
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   289080000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5821741.5000       HEAD DEP BOUNDS     =           0.3251
+      STREAM LEAKAGE     =   339800800.0000        STREAM LEAKAGE     =           0.3683
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   262332672.0000                 GW ET     =          17.3235
+     SURFACE LEAKAGE     =    74392296.0000       SURFACE LEAKAGE     =          11.5157
 
-           TOTAL OUT =  2282428672.0000             TOTAL OUT =         152.0820
+               TOTAL OUT =  2282428672.0000                 TOTAL OUT =         152.0820
 
-            IN - OUT =       17408.0000              IN - OUT =      -9.1553E-05
+                IN - OUT =       17408.0000                  IN - OUT =      -9.1553E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -8148,35 +8148,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   163634288.0000               STORAGE =           3.8823
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4321043.0000       HEAD DEP BOUNDS =           0.2145
-      STREAM LEAKAGE =  1543516928.0000        STREAM LEAKAGE =          90.8528
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   666916480.0000          UZF RECHARGE =          10.8547
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   163634288.0000               STORAGE     =           3.8823
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4321043.0000       HEAD DEP BOUNDS     =           0.2145
+      STREAM LEAKAGE     =  1543516928.0000        STREAM LEAKAGE     =          90.8528
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   666916480.0000          UZF RECHARGE     =          10.8547
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2378388736.0000              TOTAL IN =         105.8043
+                TOTAL IN =  2378388736.0000                  TOTAL IN =         105.8043
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1371966720.0000               STORAGE =          67.4051
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   289080000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6105629.0000       HEAD DEP BOUNDS =           0.3232
-      STREAM LEAKAGE =   353826976.0000        STREAM LEAKAGE =          15.3491
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   277946848.0000                 GW ET =          18.1059
-     SURFACE LEAKAGE =    79445352.0000       SURFACE LEAKAGE =           4.6218
+             STORAGE     =  1371966720.0000               STORAGE     =          67.4051
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   289080000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6105629.0000       HEAD DEP BOUNDS     =           0.3232
+      STREAM LEAKAGE     =   353826976.0000        STREAM LEAKAGE     =          15.3491
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   277946848.0000                 GW ET     =          18.1059
+     SURFACE LEAKAGE     =    79445352.0000       SURFACE LEAKAGE     =           4.6218
 
-           TOTAL OUT =  2378371328.0000             TOTAL OUT =         105.8050
+               TOTAL OUT =  2378371328.0000                 TOTAL OUT =         105.8050
 
-            IN - OUT =       17408.0000              IN - OUT =      -7.8583E-04
+                IN - OUT =       17408.0000                  IN - OUT =      -7.8583E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -8450,35 +8450,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   168354576.0000               STORAGE =           7.4009
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4509026.5000       HEAD DEP BOUNDS =           0.2146
-      STREAM LEAKAGE =  1618294016.0000        STREAM LEAKAGE =          79.3790
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   675687744.0000          UZF RECHARGE =           9.5753
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   168354576.0000               STORAGE     =           7.4009
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4509026.5000       HEAD DEP BOUNDS     =           0.2146
+      STREAM LEAKAGE     =  1618294016.0000        STREAM LEAKAGE     =          79.3790
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   675687744.0000          UZF RECHARGE     =           9.5753
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2466845440.0000              TOTAL IN =          96.5699
+                TOTAL IN =  2466845440.0000                  TOTAL IN =          96.5699
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1425747840.0000               STORAGE =          55.7789
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   289080000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6387372.0000       HEAD DEP BOUNDS =           0.3198
-      STREAM LEAKAGE =   368976320.0000        STREAM LEAKAGE =          19.4449
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   293800576.0000                 GW ET =          18.0386
-     SURFACE LEAKAGE =    82836224.0000       SURFACE LEAKAGE =           2.9875
+             STORAGE     =  1425747840.0000               STORAGE     =          55.7789
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   289080000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6387372.0000       HEAD DEP BOUNDS     =           0.3198
+      STREAM LEAKAGE     =   368976320.0000        STREAM LEAKAGE     =          19.4449
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   293800576.0000                 GW ET     =          18.0386
+     SURFACE LEAKAGE     =    82836224.0000       SURFACE LEAKAGE     =           2.9875
 
-           TOTAL OUT =  2466828032.0000             TOTAL OUT =          96.5698
+               TOTAL OUT =  2466828032.0000                 TOTAL OUT =          96.5698
 
-            IN - OUT =       17408.0000              IN - OUT =       9.1553E-05
+                IN - OUT =       17408.0000                  IN - OUT =       9.1553E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -8821,35 +8821,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   176400816.0000               STORAGE =           8.8486
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4697086.5000       HEAD DEP BOUNDS =           0.2147
-      STREAM LEAKAGE =  1683154304.0000        STREAM LEAKAGE =          71.7535
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   683184768.0000          UZF RECHARGE =           8.4221
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   176400816.0000               STORAGE     =           8.8486
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4697086.5000       HEAD DEP BOUNDS     =           0.2147
+      STREAM LEAKAGE     =  1683154304.0000        STREAM LEAKAGE     =          71.7535
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   683184768.0000          UZF RECHARGE     =           8.4221
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2547437056.0000              TOTAL IN =          89.2389
+                TOTAL IN =  2547437056.0000                  TOTAL IN =          89.2389
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1461666176.0000               STORAGE =          38.6189
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   297840000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     6664443.0000       HEAD DEP BOUNDS =           0.3138
-      STREAM LEAKAGE =   387123328.0000        STREAM LEAKAGE =          20.9435
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   309528448.0000                 GW ET =          17.8948
-     SURFACE LEAKAGE =    84597344.0000       SURFACE LEAKAGE =           1.4674
+             STORAGE     =  1461666176.0000               STORAGE     =          38.6189
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   297840000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     6664443.0000       HEAD DEP BOUNDS     =           0.3138
+      STREAM LEAKAGE     =   387123328.0000        STREAM LEAKAGE     =          20.9435
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   309528448.0000                 GW ET     =          17.8948
+     SURFACE LEAKAGE     =    84597344.0000       SURFACE LEAKAGE     =           1.4674
 
-           TOTAL OUT =  2547419648.0000             TOTAL OUT =          89.2385
+               TOTAL OUT =  2547419648.0000                 TOTAL OUT =          89.2385
 
-            IN - OUT =       17408.0000              IN - OUT =       3.8147E-04
+                IN - OUT =       17408.0000                  IN - OUT =       3.8147E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -9089,35 +9089,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   179130528.0000               STORAGE =          11.9561
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4885157.5000       HEAD DEP BOUNDS =           0.2147
-      STREAM LEAKAGE =  1764934016.0000        STREAM LEAKAGE =          73.3156
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   690714816.0000          UZF RECHARGE =           8.2043
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   179130528.0000               STORAGE     =          11.9561
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4885157.5000       HEAD DEP BOUNDS     =           0.2147
+      STREAM LEAKAGE     =  1764934016.0000        STREAM LEAKAGE     =          73.3156
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   690714816.0000          UZF RECHARGE     =           8.2043
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2639664640.0000              TOTAL IN =          93.6908
+                TOTAL IN =  2639664640.0000                  TOTAL IN =          93.6908
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1514913408.0000               STORAGE =          40.0456
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   306600000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     6941988.0000       HEAD DEP BOUNDS =           0.3166
-      STREAM LEAKAGE =   398059808.0000        STREAM LEAKAGE =          22.1084
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   325349408.0000                 GW ET =          18.1080
-     SURFACE LEAKAGE =    87784264.0000       SURFACE LEAKAGE =           3.1115
+             STORAGE     =  1514913408.0000               STORAGE     =          40.0456
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   306600000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     6941988.0000       HEAD DEP BOUNDS     =           0.3166
+      STREAM LEAKAGE     =   398059808.0000        STREAM LEAKAGE     =          22.1084
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   325349408.0000                 GW ET     =          18.1080
+     SURFACE LEAKAGE     =    87784264.0000       SURFACE LEAKAGE     =           3.1115
 
-           TOTAL OUT =  2639648768.0000             TOTAL OUT =          93.6901
+               TOTAL OUT =  2639648768.0000                 TOTAL OUT =          93.6901
 
-            IN - OUT =       15872.0000              IN - OUT =       6.4850E-04
+                IN - OUT =       15872.0000                  IN - OUT =       6.4850E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -9403,35 +9403,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   187889552.0000               STORAGE =          10.1358
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5073219.5000       HEAD DEP BOUNDS =           0.2147
-      STREAM LEAKAGE =  1826971136.0000        STREAM LEAKAGE =          68.2935
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   697538944.0000          UZF RECHARGE =           7.5297
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   187889552.0000               STORAGE     =          10.1358
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5073219.5000       HEAD DEP BOUNDS     =           0.2147
+      STREAM LEAKAGE     =  1826971136.0000        STREAM LEAKAGE     =          68.2935
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   697538944.0000          UZF RECHARGE     =           7.5297
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2717472768.0000              TOTAL IN =          86.1737
+                TOTAL IN =  2717472768.0000                  TOTAL IN =          86.1737
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1547322368.0000               STORAGE =          34.7105
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   315360000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     7216530.0000       HEAD DEP BOUNDS =           0.3112
-      STREAM LEAKAGE =   416939104.0000        STREAM LEAKAGE =          21.7703
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   341202720.0000                 GW ET =          18.0716
-     SURFACE LEAKAGE =    89416040.0000       SURFACE LEAKAGE =           1.3093
+             STORAGE     =  1547322368.0000               STORAGE     =          34.7105
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   315360000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     7216530.0000       HEAD DEP BOUNDS     =           0.3112
+      STREAM LEAKAGE     =   416939104.0000        STREAM LEAKAGE     =          21.7703
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   341202720.0000                 GW ET     =          18.0716
+     SURFACE LEAKAGE     =    89416040.0000       SURFACE LEAKAGE     =           1.3093
 
-           TOTAL OUT =  2717456640.0000             TOTAL OUT =          86.1730
+               TOTAL OUT =  2717456640.0000                 TOTAL OUT =          86.1730
 
-            IN - OUT =       16128.0000              IN - OUT =       7.0190E-04
+                IN - OUT =       16128.0000                  IN - OUT =       7.0190E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -9749,35 +9749,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   195751936.0000               STORAGE =           8.4924
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5261277.5000       HEAD DEP BOUNDS =           0.2147
-      STREAM LEAKAGE =  1885737472.0000        STREAM LEAKAGE =          66.2468
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   704216128.0000          UZF RECHARGE =           7.3055
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   195751936.0000               STORAGE     =           8.4924
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5261277.5000       HEAD DEP BOUNDS     =           0.2147
+      STREAM LEAKAGE     =  1885737472.0000        STREAM LEAKAGE     =          66.2468
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   704216128.0000          UZF RECHARGE     =           7.3055
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2790966784.0000              TOTAL IN =          82.2594
+                TOTAL IN =  2790966784.0000                  TOTAL IN =          82.2594
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1584966656.0000               STORAGE =          41.4432
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   315360000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7486699.0000       HEAD DEP BOUNDS =           0.3067
-      STREAM LEAKAGE =   435699904.0000        STREAM LEAKAGE =          21.3043
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   357173216.0000                 GW ET =          18.3925
-     SURFACE LEAKAGE =    90263552.0000       SURFACE LEAKAGE =           0.8120
+             STORAGE     =  1584966656.0000               STORAGE     =          41.4432
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   315360000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7486699.0000       HEAD DEP BOUNDS     =           0.3067
+      STREAM LEAKAGE     =   435699904.0000        STREAM LEAKAGE     =          21.3043
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   357173216.0000                 GW ET     =          18.3925
+     SURFACE LEAKAGE     =    90263552.0000       SURFACE LEAKAGE     =           0.8120
 
-           TOTAL OUT =  2790950144.0000             TOTAL OUT =          82.2587
+               TOTAL OUT =  2790950144.0000                 TOTAL OUT =          82.2587
 
-            IN - OUT =       16640.0000              IN - OUT =       6.3324E-04
+                IN - OUT =       16640.0000                  IN - OUT =       6.3324E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10005,35 +10005,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   207138880.0000               STORAGE =          13.6083
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5449401.0000       HEAD DEP BOUNDS =           0.2148
-      STREAM LEAKAGE =  1937867392.0000        STREAM LEAKAGE =          57.0952
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   710077120.0000          UZF RECHARGE =           6.4269
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   207138880.0000               STORAGE     =          13.6083
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5449401.0000       HEAD DEP BOUNDS     =           0.2148
+      STREAM LEAKAGE     =  1937867392.0000        STREAM LEAKAGE     =          57.0952
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   710077120.0000          UZF RECHARGE     =           6.4269
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2860532992.0000              TOTAL IN =          77.3452
+                TOTAL IN =  2860532992.0000                  TOTAL IN =          77.3452
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1617420160.0000               STORAGE =          35.0251
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   315360000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7752818.0000       HEAD DEP BOUNDS =           0.3020
-      STREAM LEAKAGE =   455885888.0000        STREAM LEAKAGE =          23.1567
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   373387520.0000                 GW ET =          18.4964
-     SURFACE LEAKAGE =    90708696.0000       SURFACE LEAKAGE =           0.3636
+             STORAGE     =  1617420160.0000               STORAGE     =          35.0251
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   315360000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7752818.0000       HEAD DEP BOUNDS     =           0.3020
+      STREAM LEAKAGE     =   455885888.0000        STREAM LEAKAGE     =          23.1567
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   373387520.0000                 GW ET     =          18.4964
+     SURFACE LEAKAGE     =    90708696.0000       SURFACE LEAKAGE     =           0.3636
 
-           TOTAL OUT =  2860515072.0000             TOTAL OUT =          77.3439
+               TOTAL OUT =  2860515072.0000                 TOTAL OUT =          77.3439
 
-            IN - OUT =       17920.0000              IN - OUT =       1.3123E-03
+                IN - OUT =       17920.0000                  IN - OUT =       1.3123E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10307,35 +10307,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   218329344.0000               STORAGE =          12.6812
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5637579.0000       HEAD DEP BOUNDS =           0.2148
-      STREAM LEAKAGE =  1986465024.0000        STREAM LEAKAGE =          54.0570
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   715327616.0000          UZF RECHARGE =           5.7058
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   218329344.0000               STORAGE     =          12.6812
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5637579.0000       HEAD DEP BOUNDS     =           0.2148
+      STREAM LEAKAGE     =  1986465024.0000        STREAM LEAKAGE     =          54.0570
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   715327616.0000          UZF RECHARGE     =           5.7058
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  2925759488.0000              TOTAL IN =          72.6588
+                TOTAL IN =  2925759488.0000                  TOTAL IN =          72.6588
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1645978112.0000               STORAGE =          30.9066
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   315360000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8015294.5000       HEAD DEP BOUNDS =           0.2982
-      STREAM LEAKAGE =   475908864.0000        STREAM LEAKAGE =          22.8117
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   389550208.0000                 GW ET =          18.4510
-     SURFACE LEAKAGE =    90927936.0000       SURFACE LEAKAGE =           0.1901
+             STORAGE     =  1645978112.0000               STORAGE     =          30.9066
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   315360000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8015294.5000       HEAD DEP BOUNDS     =           0.2982
+      STREAM LEAKAGE     =   475908864.0000        STREAM LEAKAGE     =          22.8117
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   389550208.0000                 GW ET     =          18.4510
+     SURFACE LEAKAGE     =    90927936.0000       SURFACE LEAKAGE     =           0.1901
 
-           TOTAL OUT =  2925740288.0000             TOTAL OUT =          72.6576
+               TOTAL OUT =  2925740288.0000                 TOTAL OUT =          72.6576
 
-            IN - OUT =       19200.0000              IN - OUT =       1.2207E-03
+                IN - OUT =       19200.0000                  IN - OUT =       1.2207E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10678,35 +10678,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   244865328.0000               STORAGE =          34.3846
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5825797.5000       HEAD DEP BOUNDS =           0.2149
-      STREAM LEAKAGE =  2030904192.0000        STREAM LEAKAGE =          44.7209
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   719232128.0000          UZF RECHARGE =           4.2073
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   244865328.0000               STORAGE     =          34.3846
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5825797.5000       HEAD DEP BOUNDS     =           0.2149
+      STREAM LEAKAGE     =  2030904192.0000        STREAM LEAKAGE     =          44.7209
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   719232128.0000          UZF RECHARGE     =           4.2073
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3000827392.0000              TOTAL IN =          83.5278
+                TOTAL IN =  3000827392.0000                  TOTAL IN =          83.5278
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1658144512.0000               STORAGE =          11.6478
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   341640000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     8274852.0000       HEAD DEP BOUNDS =           0.2952
-      STREAM LEAKAGE =   495869536.0000        STREAM LEAKAGE =          22.8512
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   405830240.0000                 GW ET =          18.6228
-     SURFACE LEAKAGE =    91046288.0000       SURFACE LEAKAGE =           0.1077
+             STORAGE     =  1658144512.0000               STORAGE     =          11.6478
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   341640000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     8274852.0000       HEAD DEP BOUNDS     =           0.2952
+      STREAM LEAKAGE     =   495869536.0000        STREAM LEAKAGE     =          22.8512
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   405830240.0000                 GW ET     =          18.6228
+     SURFACE LEAKAGE     =    91046288.0000       SURFACE LEAKAGE     =           0.1077
 
-           TOTAL OUT =  3000805376.0000             TOTAL OUT =          83.5246
+               TOTAL OUT =  3000805376.0000                 TOTAL OUT =          83.5246
 
-            IN - OUT =       22016.0000              IN - OUT =       3.1586E-03
+                IN - OUT =       22016.0000                  IN - OUT =       3.1586E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10946,35 +10946,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   275875072.0000               STORAGE =          37.6231
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6014078.5000       HEAD DEP BOUNDS =           0.2150
-      STREAM LEAKAGE =  2067057920.0000        STREAM LEAKAGE =          37.6269
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   722677312.0000          UZF RECHARGE =           3.7030
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   275875072.0000               STORAGE     =          37.6231
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6014078.5000       HEAD DEP BOUNDS     =           0.2150
+      STREAM LEAKAGE     =  2067057920.0000        STREAM LEAKAGE     =          37.6269
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   722677312.0000          UZF RECHARGE     =           3.7030
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3071624192.0000              TOTAL IN =          79.1679
+                TOTAL IN =  3071624192.0000                  TOTAL IN =          79.1679
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1666512384.0000               STORAGE =           8.2548
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   367920000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     8532263.0000       HEAD DEP BOUNDS =           0.2931
-      STREAM LEAKAGE =   515427040.0000        STREAM LEAKAGE =          22.0447
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   422086816.0000                 GW ET =          18.4969
-     SURFACE LEAKAGE =    91120896.0000       SURFACE LEAKAGE =       7.4649E-02
+             STORAGE     =  1666512384.0000               STORAGE     =           8.2548
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   367920000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     8532263.0000       HEAD DEP BOUNDS     =           0.2931
+      STREAM LEAKAGE     =   515427040.0000        STREAM LEAKAGE     =          22.0447
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   422086816.0000                 GW ET     =          18.4969
+     SURFACE LEAKAGE     =    91120896.0000       SURFACE LEAKAGE     =       7.4649E-02
 
-           TOTAL OUT =  3071599360.0000             TOTAL OUT =          79.1642
+               TOTAL OUT =  3071599360.0000                 TOTAL OUT =          79.1642
 
-            IN - OUT =       24832.0000              IN - OUT =       3.7460E-03
+                IN - OUT =       24832.0000                  IN - OUT =       3.7460E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -11260,35 +11260,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   309907840.0000               STORAGE =          39.4148
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6202394.0000       HEAD DEP BOUNDS =           0.2150
-      STREAM LEAKAGE =  2097102336.0000        STREAM LEAKAGE =          32.8565
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   725689152.0000          UZF RECHARGE =           3.2761
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   309907840.0000               STORAGE     =          39.4148
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6202394.0000       HEAD DEP BOUNDS     =           0.2150
+      STREAM LEAKAGE     =  2097102336.0000        STREAM LEAKAGE     =          32.8565
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   725689152.0000          UZF RECHARGE     =           3.2761
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3138901760.0000              TOTAL IN =          75.7624
+                TOTAL IN =  3138901760.0000                  TOTAL IN =          75.7624
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1671920896.0000               STORAGE =           5.2116
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   394200000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     8788280.0000       HEAD DEP BOUNDS =           0.2918
-      STREAM LEAKAGE =   534533024.0000        STREAM LEAKAGE =          21.6866
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   438252576.0000                 GW ET =          18.5075
-     SURFACE LEAKAGE =    91178408.0000       SURFACE LEAKAGE =       6.0890E-02
+             STORAGE     =  1671920896.0000               STORAGE     =           5.2116
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   394200000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     8788280.0000       HEAD DEP BOUNDS     =           0.2918
+      STREAM LEAKAGE     =   534533024.0000        STREAM LEAKAGE     =          21.6866
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   438252576.0000                 GW ET     =          18.5075
+     SURFACE LEAKAGE     =    91178408.0000       SURFACE LEAKAGE     =       6.0890E-02
 
-           TOTAL OUT =  3138873344.0000             TOTAL OUT =          75.7583
+               TOTAL OUT =  3138873344.0000                 TOTAL OUT =          75.7583
 
-            IN - OUT =       28416.0000              IN - OUT =       4.1122E-03
+                IN - OUT =       28416.0000                  IN - OUT =       4.1122E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.01
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.01
 
 
 
@@ -11606,35 +11606,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   331803072.0000               STORAGE =          26.2247
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6390766.5000       HEAD DEP BOUNDS =           0.2151
-      STREAM LEAKAGE =  2126039552.0000        STREAM LEAKAGE =          30.0599
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   728506880.0000          UZF RECHARGE =           3.4560
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   331803072.0000               STORAGE     =          26.2247
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6390766.5000       HEAD DEP BOUNDS     =           0.2151
+      STREAM LEAKAGE     =  2126039552.0000        STREAM LEAKAGE     =          30.0599
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   728506880.0000          UZF RECHARGE     =           3.4560
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3192740352.0000              TOTAL IN =          59.9556
+                TOTAL IN =  3192740352.0000                  TOTAL IN =          59.9556
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1690309248.0000               STORAGE =          19.5888
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   394200000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     9043358.0000       HEAD DEP BOUNDS =           0.2908
-      STREAM LEAKAGE =   553423488.0000        STREAM LEAKAGE =          21.4962
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   454507648.0000                 GW ET =          18.5251
-     SURFACE LEAKAGE =    91227216.0000       SURFACE LEAKAGE =       5.2704E-02
+             STORAGE     =  1690309248.0000               STORAGE     =          19.5888
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   394200000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     9043358.0000       HEAD DEP BOUNDS     =           0.2908
+      STREAM LEAKAGE     =   553423488.0000        STREAM LEAKAGE     =          21.4962
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   454507648.0000                 GW ET     =          18.5251
+     SURFACE LEAKAGE     =    91227216.0000       SURFACE LEAKAGE     =       5.2704E-02
 
-           TOTAL OUT =  3192710656.0000             TOTAL OUT =          59.9536
+               TOTAL OUT =  3192710656.0000                 TOTAL OUT =          59.9536
 
-            IN - OUT =       29696.0000              IN - OUT =       1.9951E-03
+                IN - OUT =       29696.0000                  IN - OUT =       1.9951E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -11862,35 +11862,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   354020800.0000               STORAGE =          25.8682
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6579188.0000       HEAD DEP BOUNDS =           0.2151
-      STREAM LEAKAGE =  2151386624.0000        STREAM LEAKAGE =          27.2314
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   731452672.0000          UZF RECHARGE =           3.2959
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   354020800.0000               STORAGE     =          25.8682
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6579188.0000       HEAD DEP BOUNDS     =           0.2151
+      STREAM LEAKAGE     =  2151386624.0000        STREAM LEAKAGE     =          27.2314
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   731452672.0000          UZF RECHARGE     =           3.2959
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3243439360.0000              TOTAL IN =          56.6106
+                TOTAL IN =  3243439360.0000                  TOTAL IN =          56.6106
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1705843328.0000               STORAGE =          16.6254
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   394200000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     9297811.0000       HEAD DEP BOUNDS =           0.2903
-      STREAM LEAKAGE =   572187904.0000        STREAM LEAKAGE =          21.3773
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   470608224.0000                 GW ET =          18.2677
-     SURFACE LEAKAGE =    91270384.0000       SURFACE LEAKAGE =       4.7336E-02
+             STORAGE     =  1705843328.0000               STORAGE     =          16.6254
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   394200000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     9297811.0000       HEAD DEP BOUNDS     =           0.2903
+      STREAM LEAKAGE     =   572187904.0000        STREAM LEAKAGE     =          21.3773
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   470608224.0000                 GW ET     =          18.2677
+     SURFACE LEAKAGE     =    91270384.0000       SURFACE LEAKAGE     =       4.7336E-02
 
-           TOTAL OUT =  3243407360.0000             TOTAL OUT =          56.6080
+               TOTAL OUT =  3243407360.0000                 TOTAL OUT =          56.6080
 
-            IN - OUT =       32000.0000              IN - OUT =       2.6817E-03
+                IN - OUT =       32000.0000                  IN - OUT =       2.6817E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -12166,35 +12166,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   377600384.0000               STORAGE =          26.9871
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6767635.0000       HEAD DEP BOUNDS =           0.2151
-      STREAM LEAKAGE =  2173021440.0000        STREAM LEAKAGE =          23.7596
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   734219584.0000          UZF RECHARGE =           3.0247
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   377600384.0000               STORAGE     =          26.9871
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6767635.0000       HEAD DEP BOUNDS     =           0.2151
+      STREAM LEAKAGE     =  2173021440.0000        STREAM LEAKAGE     =          23.7596
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   734219584.0000          UZF RECHARGE     =           3.0247
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  3291609088.0000              TOTAL IN =          53.9866
+                TOTAL IN =  3291609088.0000                  TOTAL IN =          53.9866
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1719192576.0000               STORAGE =          14.3924
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   394200000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     9551870.0000       HEAD DEP BOUNDS =           0.2899
-      STREAM LEAKAGE =   590872384.0000        STREAM LEAKAGE =          21.3022
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   486448704.0000                 GW ET =          17.9546
-     SURFACE LEAKAGE =    91310136.0000       SURFACE LEAKAGE =       4.4350E-02
+             STORAGE     =  1719192576.0000               STORAGE     =          14.3924
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   394200000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     9551870.0000       HEAD DEP BOUNDS     =           0.2899
+      STREAM LEAKAGE     =   590872384.0000        STREAM LEAKAGE     =          21.3022
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   486448704.0000                 GW ET     =          17.9546
+     SURFACE LEAKAGE     =    91310136.0000       SURFACE LEAKAGE     =       4.4350E-02
 
-           TOTAL OUT =  3291575552.0000             TOTAL OUT =          53.9835
+               TOTAL OUT =  3291575552.0000                 TOTAL OUT =          53.9835
 
-            IN - OUT =       33536.0000              IN - OUT =       3.0556E-03
+                IN - OUT =       33536.0000                  IN - OUT =       3.0556E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.01
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.01
 
 
 
@@ -13823,35 +13823,35 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP   120 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   756569280.0000               STORAGE =          17.0909
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =    10726999.0000       HEAD DEP BOUNDS =           0.2153
-      STREAM LEAKAGE =  2582764288.0000        STREAM LEAKAGE =          22.3486
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =   764067200.0000          UZF RECHARGE =           0.9389
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   756569280.0000               STORAGE     =          17.0909
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =    10726999.0000       HEAD DEP BOUNDS     =           0.2153
+      STREAM LEAKAGE     =  2582764288.0000        STREAM LEAKAGE     =          22.3486
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =   764067200.0000          UZF RECHARGE     =           0.9389
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  4114127872.0000              TOTAL IN =          40.5937
+                TOTAL IN =  4114127872.0000                  TOTAL IN =          40.5937
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =  1841167616.0000               STORAGE =           2.8525
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   394200000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =    14872236.0000       HEAD DEP BOUNDS =           0.2891
-      STREAM LEAKAGE =   983640896.0000        STREAM LEAKAGE =          21.5458
-       LAKE  SEEPAGE =           0.0000         LAKE  SEEPAGE =           0.0000
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   787577024.0000                 GW ET =          15.7993
-     SURFACE LEAKAGE =    92603384.0000       SURFACE LEAKAGE =           0.1056
+             STORAGE     =  1841167616.0000               STORAGE     =           2.8525
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   394200000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =    14872236.0000       HEAD DEP BOUNDS     =           0.2891
+      STREAM LEAKAGE     =   983640896.0000        STREAM LEAKAGE     =          21.5458
+       LAKE  SEEPAGE     =           0.0000         LAKE  SEEPAGE     =           0.0000
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   787577024.0000                 GW ET     =          15.7993
+     SURFACE LEAKAGE     =    92603384.0000       SURFACE LEAKAGE     =           0.1056
 
-           TOTAL OUT =  4114061312.0000             TOTAL OUT =          40.5923
+               TOTAL OUT =  4114061312.0000                 TOTAL OUT =          40.5923
 
-            IN - OUT =       66560.0000              IN - OUT =       1.4000E-03
+                IN - OUT =       66560.0000                  IN - OUT =       1.4000E-03
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -13866,6 +13866,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP   120 STRESS PERIOD   
          TOTAL TIME 4.99320E+07 8.32200E+05  13870.      577.92      1.5822    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:54:46
- Elapsed run time:  2.389 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/12 16:02:23
+ Elapsed run time:  1.985 Seconds
 

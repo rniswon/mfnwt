@@ -33,6 +33,7 @@
         INTEGER, SAVE, DIMENSION(:), POINTER :: SEGLIST
         INTEGER, SAVE, POINTER :: NUMSEGLIST
         REAL, SAVE, POINTER :: PSIRAMP
+        REAL, SAVE, POINTER :: ACCEL
         INTEGER, SAVE, POINTER :: IUNITRAMP
         INTEGER, SAVE, POINTER :: NUMTAB
         INTEGER, SAVE, POINTER :: MAXVAL
@@ -120,7 +121,7 @@
       ALLOCATE (NWELLS, MXWELL, NWELVL, IWELLCB, ISFRCB, NAUX)
       ALLOCATE (WELAUX(20))
       ALLOCATE (IRRWELLCB, IRRSFRCB, IWELLCBU)
-      ALLOCATE (PSIRAMP, IUNITRAMP)
+      ALLOCATE (PSIRAMP, IUNITRAMP, ACCEL)
       ALLOCATE (NUMTAB, MAXVAL, NPWEL, NNPWEL, IPRWEL)
       ALLOCATE (TSACTIVEGW, TSACTIVESW, NUMSW, NUMGW)
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
@@ -131,6 +132,7 @@
       VBVLAG = 0.0
       MSUMAG = 0
       PSIRAMP = 0.10
+      ACCEL = 1.0
       NUMTAB = 0
       MAXVAL = 1
       IPRWEL = 1
@@ -589,6 +591,9 @@
             WRITE (IOUT, *)
             found = .true.
          case ('ETDEMAND')
+            CALL URWORD(LINE, LLOC, ISTART, ISTOP, 3, I, R, 
+     +                     IOUT, IN)
+            if ( R > 0.0 ) ACCEL = R
             ETDEMANDFLAG = 1
             WRITE (iout, *)
             WRITE (IOUT, '(A)') ' AGRICULTURAL DEMANDS WILL BE '//
@@ -2769,6 +2774,7 @@
 !     updates diversion or pumping rate based on ET deficit
 !     ******************************************************************
 !     SPECIFICATIONS:
+      USE GWFAGMODULE
       IMPLICIT NONE
 ! -----------------------------------------
       !modules
@@ -2798,6 +2804,9 @@
          factor = dzero
       else if (abs(det) > dzero) then
          factor = dq*etdif/det
+      end if
+      if ( kiter > 1 ) then
+        if( factor > accel*etdif ) factor = accel*etdif
       end if
 !      open(222,file='debug.out')
 !      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
@@ -3384,5 +3393,6 @@
       DEALLOCATE(TIMEINPERIODSEG)
       DEALLOCATE(SEGLIST)
       DEALLOCATE(NUMSEGLIST)
+      DEALLOCATE(ACCEL)
       RETURN
       END

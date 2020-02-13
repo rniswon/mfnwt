@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.5 09/10/2019
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Sfr2weltab\Sfr2weltab.lst
@@ -86,7 +86,7 @@
  FILE TYPE:DATA   UNIT   90   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT   41
+ BAS -- BASIC PACKAGE, VERSION 1.2.0, 3/01/2020 INPUT READ FROM UNIT   41
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -302,7 +302,7 @@
  # Test Problem 3 for MODFLOW-NWT
  #HEADTOL  FLUXTOL MAXITEROUT THICKFACT LINMETH IPRNWT IBOTAV OPTIONS DBDREDUCE DBDINCREASE DBDGAMMA MOMFACT BACKFLAG MAXBACKITER BACKTOL BACKREDUCE
 
- NWT1 -- Newton Solver, VERSION 1.1.5, 9/10/2019
+ NWT1 -- Newton Solver, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT 43
 
  SPECIFIED OPTION:
@@ -336,7 +336,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.5, 9/10/2019
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT 42
 
  # LPF Package input file for hypothetical test simulation
@@ -363,7 +363,7 @@
 
            SPECIFIC YIELD =  0.200000     FOR LAYER   1
 
- WEL -- WELL PACKAGE FOR NWT VERSION 1.1.4,  4/01/2018 INPUT READ FROM UNIT   91
+ WEL -- WELL PACKAGE FOR NWT VERSION 1.2.0,  3/01/2020 INPUT READ FROM UNIT   91
  # header lines
  # header lines
  No named parameters
@@ -1153,27 +1153,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     2051264.8750               STORAGE =           4.8762
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2051264.8750               STORAGE     =           4.8762
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-            TOTAL IN =     2051264.8750              TOTAL IN =           4.8762
+                TOTAL IN =     2051264.8750                  TOTAL IN =           4.8762
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       5.5412E-08               STORAGE =       1.5200E-13
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =      713216.1250                 WELLS =           2.8400
-     HEAD DEP BOUNDS =     1338048.6250       HEAD DEP BOUNDS =           2.0362
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =       5.5412E-08               STORAGE     =       1.5200E-13
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =      713216.1250                 WELLS     =           2.8400
+     HEAD DEP BOUNDS     =     1338048.6250       HEAD DEP BOUNDS     =           2.0362
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =     2051264.7500             TOTAL OUT =           4.8762
+               TOTAL OUT =     2051264.7500                 TOTAL OUT =           4.8762
 
-            IN - OUT =           0.1250              IN - OUT =           0.0000
+                IN - OUT =           0.1250                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -1793,27 +1793,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    10978528.0000               STORAGE =           3.5138
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =    10978528.0000               STORAGE     =           3.5138
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-            TOTAL IN =    10978528.0000              TOTAL IN =           3.5138
+                TOTAL IN =    10978528.0000                  TOTAL IN =           3.5138
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       9.6035E-08               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =     7361280.5000                 WELLS =           2.8400
-     HEAD DEP BOUNDS =     3617246.7500       HEAD DEP BOUNDS =           0.6738
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =       9.6035E-08               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =     7361280.5000                 WELLS     =           2.8400
+     HEAD DEP BOUNDS     =     3617246.7500       HEAD DEP BOUNDS     =           0.6738
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    10978527.0000             TOTAL OUT =           3.5138
+               TOTAL OUT =    10978527.0000                 TOTAL OUT =           3.5138
 
-            IN - OUT =           1.0000              IN - OUT =           0.0000
+                IN - OUT =           1.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -2554,27 +2554,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    19900326.0000               STORAGE =           3.3558
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =       41680.7617        STREAM LEAKAGE =       2.9173E-02
+             STORAGE     =    19900326.0000               STORAGE     =           3.3558
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =       41680.7617        STREAM LEAKAGE     =       2.9173E-02
 
-            TOTAL IN =    19942006.0000              TOTAL IN =           3.3850
+                TOTAL IN =    19942006.0000                  TOTAL IN =           3.3850
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       9.6035E-08               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    14878080.0000                 WELLS =           2.9000
-     HEAD DEP BOUNDS =     5063925.0000       HEAD DEP BOUNDS =           0.4850
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =       9.6035E-08               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    14878080.0000                 WELLS     =           2.9000
+     HEAD DEP BOUNDS     =     5063925.0000       HEAD DEP BOUNDS     =           0.4850
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    19942004.0000             TOTAL OUT =           3.3850
+               TOTAL OUT =    19942004.0000                 TOTAL OUT =           3.3850
 
-            IN - OUT =           2.0000              IN - OUT =           0.0000
+                IN - OUT =           2.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -3308,27 +3308,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    26409886.0000               STORAGE =           2.4496
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =      276727.2812        STREAM LEAKAGE =           0.1131
+             STORAGE     =    26409886.0000               STORAGE     =           2.4496
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =      276727.2812        STREAM LEAKAGE     =           0.1131
 
-            TOTAL IN =    26686614.0000              TOTAL IN =           2.5627
+                TOTAL IN =    26686614.0000                  TOTAL IN =           2.5627
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       56556.4570               STORAGE =       1.5513E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    20424958.0000                 WELLS =           2.1400
-     HEAD DEP BOUNDS =     6205101.5000       HEAD DEP BOUNDS =           0.4072
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =       56556.4570               STORAGE     =       1.5513E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    20424958.0000                 WELLS     =           2.1400
+     HEAD DEP BOUNDS     =     6205101.5000       HEAD DEP BOUNDS     =           0.4072
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    26686616.0000             TOTAL OUT =           2.5627
+               TOTAL OUT =    26686616.0000                 TOTAL OUT =           2.5627
 
-            IN - OUT =          -2.0000              IN - OUT =       2.3842E-07
+                IN - OUT =          -2.0000                  IN - OUT =       2.3842E-07
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -4054,27 +4054,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    30197460.0000               STORAGE =           1.2750
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =      990598.0625        STREAM LEAKAGE =           0.3827
+             STORAGE     =    30197460.0000               STORAGE     =           1.2750
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =      990598.0625        STREAM LEAKAGE     =           0.3827
 
-            TOTAL IN =    31188058.0000              TOTAL IN =           1.6576
+                TOTAL IN =    31188058.0000                  TOTAL IN =           1.6576
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      347546.9375               STORAGE =       4.8586E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    23639040.0000                 WELLS =           1.2400
-     HEAD DEP BOUNDS =     7201470.0000       HEAD DEP BOUNDS =           0.3690
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =      347546.9375               STORAGE     =       4.8586E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    23639040.0000                 WELLS     =           1.2400
+     HEAD DEP BOUNDS     =     7201470.0000       HEAD DEP BOUNDS     =           0.3690
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    31188056.0000             TOTAL OUT =           1.6576
+               TOTAL OUT =    31188056.0000                 TOTAL OUT =           1.6576
 
-            IN - OUT =           2.0000              IN - OUT =      -2.3842E-07
+                IN - OUT =           2.0000                  IN - OUT =      -2.3842E-07
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4901,27 +4901,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    32913618.0000               STORAGE =           0.9492
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =     2125342.2500        STREAM LEAKAGE =           0.4839
+             STORAGE     =    32913618.0000               STORAGE     =           0.9492
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =     2125342.2500        STREAM LEAKAGE     =           0.4839
 
-            TOTAL IN =    35038960.0000              TOTAL IN =           1.4331
+                TOTAL IN =    35038960.0000                  TOTAL IN =           1.4331
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      586633.1250               STORAGE =       5.2231E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    26334720.0000                 WELLS =           1.0400
-     HEAD DEP BOUNDS =     8117602.5000       HEAD DEP BOUNDS =           0.3409
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =      586633.1250               STORAGE     =       5.2231E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    26334720.0000                 WELLS     =           1.0400
+     HEAD DEP BOUNDS     =     8117602.5000       HEAD DEP BOUNDS     =           0.3409
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    35038956.0000             TOTAL OUT =           1.4331
+               TOTAL OUT =    35038956.0000                 TOTAL OUT =           1.4331
 
-            IN - OUT =           4.0000              IN - OUT =           0.0000
+                IN - OUT =           4.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5646,27 +5646,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    36618900.0000               STORAGE =           1.3337
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =     3972645.7500        STREAM LEAKAGE =           0.8085
+             STORAGE     =    36618900.0000               STORAGE     =           1.3337
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =     3972645.7500        STREAM LEAKAGE     =           0.8085
 
-            TOTAL IN =    40591544.0000              TOTAL IN =           2.1422
+                TOTAL IN =    40591544.0000                  TOTAL IN =           2.1422
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      804263.8750               STORAGE =       8.8117E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    30792960.0000                 WELLS =           1.7200
-     HEAD DEP BOUNDS =     8994311.0000       HEAD DEP BOUNDS =           0.3340
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =      804263.8750               STORAGE     =       8.8117E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    30792960.0000                 WELLS     =           1.7200
+     HEAD DEP BOUNDS     =     8994311.0000       HEAD DEP BOUNDS     =           0.3340
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    40591536.0000             TOTAL OUT =           2.1422
+               TOTAL OUT =    40591536.0000                 TOTAL OUT =           2.1422
 
-            IN - OUT =           8.0000              IN - OUT =      -2.3842E-07
+                IN - OUT =           8.0000                  IN - OUT =      -2.3842E-07
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6409,27 +6409,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    42331332.0000               STORAGE =           2.1329
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =     6274873.0000        STREAM LEAKAGE =           0.9749
+             STORAGE     =    42331332.0000               STORAGE     =           2.1329
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =     6274873.0000        STREAM LEAKAGE     =           0.9749
 
-            TOTAL IN =    48606204.0000              TOTAL IN =           3.1078
+                TOTAL IN =    48606204.0000                  TOTAL IN =           3.1078
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1071564.5000               STORAGE =           0.1205
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    37687680.0000                 WELLS =           2.6600
-     HEAD DEP BOUNDS =     9846957.0000       HEAD DEP BOUNDS =           0.3273
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     1071564.5000               STORAGE     =           0.1205
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    37687680.0000                 WELLS     =           2.6600
+     HEAD DEP BOUNDS     =     9846957.0000       HEAD DEP BOUNDS     =           0.3273
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    48606200.0000             TOTAL OUT =           3.1078
+               TOTAL OUT =    48606200.0000                 TOTAL OUT =           3.1078
 
-            IN - OUT =           4.0000              IN - OUT =           0.0000
+                IN - OUT =           4.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -7171,27 +7171,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    48857588.0000               STORAGE =           2.5485
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =     8509377.0000        STREAM LEAKAGE =           0.7992
+             STORAGE     =    48857588.0000               STORAGE     =           2.5485
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =     8509377.0000        STREAM LEAKAGE     =           0.7992
 
-            TOTAL IN =    57366964.0000              TOTAL IN =           3.3477
+                TOTAL IN =    57366964.0000                  TOTAL IN =           3.3477
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1283814.5000               STORAGE =       5.9578E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    45411840.0000                 WELLS =           2.9800
-     HEAD DEP BOUNDS =    10671309.0000       HEAD DEP BOUNDS =           0.3081
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     1283814.5000               STORAGE     =       5.9578E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    45411840.0000                 WELLS     =           2.9800
+     HEAD DEP BOUNDS     =    10671309.0000       HEAD DEP BOUNDS     =           0.3081
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    57366964.0000             TOTAL OUT =           3.3477
+               TOTAL OUT =    57366964.0000                 TOTAL OUT =           3.3477
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -7946,27 +7946,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    54472312.0000               STORAGE =           2.1504
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =     9953087.0000        STREAM LEAKAGE =           0.4404
+             STORAGE     =    54472312.0000               STORAGE     =           2.1504
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =     9953087.0000        STREAM LEAKAGE     =           0.4404
 
-            TOTAL IN =    64425400.0000              TOTAL IN =           2.5908
+                TOTAL IN =    64425400.0000                  TOTAL IN =           2.5908
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1351721.3750               STORAGE =       5.3456E-04
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    51654944.0000                 WELLS =           2.3191
-     HEAD DEP BOUNDS =    11418726.0000       HEAD DEP BOUNDS =           0.2711
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     1351721.3750               STORAGE     =       5.3456E-04
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    51654944.0000                 WELLS     =           2.3191
+     HEAD DEP BOUNDS     =    11418726.0000       HEAD DEP BOUNDS     =           0.2711
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    64425392.0000             TOTAL OUT =           2.5908
+               TOTAL OUT =    64425392.0000                 TOTAL OUT =           2.5908
 
-            IN - OUT =           8.0000              IN - OUT =           0.0000
+                IN - OUT =           8.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -8806,27 +8806,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    58216988.0000               STORAGE =           1.3562
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    10952666.0000        STREAM LEAKAGE =           0.3493
+             STORAGE     =    58216988.0000               STORAGE     =           1.3562
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    10952666.0000        STREAM LEAKAGE     =           0.3493
 
-            TOTAL IN =    69169656.0000              TOTAL IN =           1.7055
+                TOTAL IN =    69169656.0000                  TOTAL IN =           1.7055
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1651185.5000               STORAGE =       4.5972E-03
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    55439276.0000                 WELLS =           1.4600
-     HEAD DEP BOUNDS =    12079191.0000       HEAD DEP BOUNDS =           0.2409
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     1651185.5000               STORAGE     =       4.5972E-03
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    55439276.0000                 WELLS     =           1.4600
+     HEAD DEP BOUNDS     =    12079191.0000       HEAD DEP BOUNDS     =           0.2409
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    69169648.0000             TOTAL OUT =           1.7055
+               TOTAL OUT =    69169648.0000                 TOTAL OUT =           1.7055
 
-            IN - OUT =           8.0000              IN - OUT =           0.0000
+                IN - OUT =           8.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -9555,27 +9555,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    61453556.0000               STORAGE =           1.2134
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    11594528.0000        STREAM LEAKAGE =           0.1690
+             STORAGE     =    61453556.0000               STORAGE     =           1.2134
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    11594528.0000        STREAM LEAKAGE     =           0.1690
 
-            TOTAL IN =    73048080.0000              TOTAL IN =           1.3824
+                TOTAL IN =    73048080.0000                  TOTAL IN =           1.3824
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2360133.2500               STORAGE =           0.1762
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    58031272.0000                 WELLS =           1.0000
-     HEAD DEP BOUNDS =    12656679.0000       HEAD DEP BOUNDS =           0.2063
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2360133.2500               STORAGE     =           0.1762
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    58031272.0000                 WELLS     =           1.0000
+     HEAD DEP BOUNDS     =    12656679.0000       HEAD DEP BOUNDS     =           0.2063
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    73048080.0000             TOTAL OUT =           1.3824
+               TOTAL OUT =    73048080.0000                 TOTAL OUT =           1.3824
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10302,27 +10302,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    65406688.0000               STORAGE =           1.5264
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    11932305.0000        STREAM LEAKAGE =           0.1098
+             STORAGE     =    65406688.0000               STORAGE     =           1.5264
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    11932305.0000        STREAM LEAKAGE     =           0.1098
 
-            TOTAL IN =    77338992.0000              TOTAL IN =           1.6362
+                TOTAL IN =    77338992.0000                  TOTAL IN =           1.6362
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2373643.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    61815600.0000                 WELLS =           1.4600
-     HEAD DEP BOUNDS =    13149751.0000       HEAD DEP BOUNDS =           0.1762
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2373643.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    61815600.0000                 WELLS     =           1.4600
+     HEAD DEP BOUNDS     =    13149751.0000       HEAD DEP BOUNDS     =           0.1762
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    77338992.0000             TOTAL OUT =           1.6362
+               TOTAL OUT =    77338992.0000                 TOTAL OUT =           1.6362
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -11211,27 +11211,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    70175136.0000               STORAGE =           1.5298
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    12161162.0000        STREAM LEAKAGE =       7.5245E-02
+             STORAGE     =    70175136.0000               STORAGE     =           1.5298
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    12161162.0000        STREAM LEAKAGE     =       7.5245E-02
 
-            TOTAL IN =    82336296.0000              TOTAL IN =           1.6051
+                TOTAL IN =    82336296.0000                  TOTAL IN =           1.6051
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2373643.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    66393312.0000                 WELLS =           1.4561
-     HEAD DEP BOUNDS =    13569347.0000       HEAD DEP BOUNDS =           0.1489
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2373643.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    66393312.0000                 WELLS     =           1.4561
+     HEAD DEP BOUNDS     =    13569347.0000       HEAD DEP BOUNDS     =           0.1489
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    82336296.0000             TOTAL OUT =           1.6051
+               TOTAL OUT =    82336296.0000                 TOTAL OUT =           1.6051
 
-            IN - OUT =           0.0000              IN - OUT =      -1.1921E-07
+                IN - OUT =           0.0000                  IN - OUT =      -1.1921E-07
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -12134,27 +12134,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    73729944.0000               STORAGE =           1.2473
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    12394122.0000        STREAM LEAKAGE =           0.1138
+             STORAGE     =    73729944.0000               STORAGE     =           1.2473
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    12394122.0000        STREAM LEAKAGE     =           0.1138
 
-            TOTAL IN =    86124064.0000              TOTAL IN =           1.3611
+                TOTAL IN =    86124064.0000                  TOTAL IN =           1.3611
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2373643.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    69826528.0000                 WELLS =           1.2341
-     HEAD DEP BOUNDS =    13923881.0000       HEAD DEP BOUNDS =           0.1270
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2373643.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    69826528.0000                 WELLS     =           1.2341
+     HEAD DEP BOUNDS     =    13923881.0000       HEAD DEP BOUNDS     =           0.1270
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    86124048.0000             TOTAL OUT =           1.3611
+               TOTAL OUT =    86124048.0000                 TOTAL OUT =           1.3611
 
-            IN - OUT =          16.0000              IN - OUT =      -1.1921E-07
+                IN - OUT =          16.0000                  IN - OUT =      -1.1921E-07
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -13156,27 +13156,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    76658192.0000               STORAGE =           1.0391
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    12800763.0000        STREAM LEAKAGE =           0.1920
+             STORAGE     =    76658192.0000               STORAGE     =           1.0391
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    12800763.0000        STREAM LEAKAGE     =           0.1920
 
-            TOTAL IN =    89458952.0000              TOTAL IN =           1.2311
+                TOTAL IN =    89458952.0000                  TOTAL IN =           1.2311
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2373644.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    72856080.0000                 WELLS =           1.1210
-     HEAD DEP BOUNDS =    14229223.0000       HEAD DEP BOUNDS =           0.1101
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2373644.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    72856080.0000                 WELLS     =           1.1210
+     HEAD DEP BOUNDS     =    14229223.0000       HEAD DEP BOUNDS     =           0.1101
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    89458952.0000             TOTAL OUT =           1.2311
+               TOTAL OUT =    89458952.0000                 TOTAL OUT =           1.2311
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -14072,27 +14072,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    78943608.0000               STORAGE =           0.7455
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    13602319.0000        STREAM LEAKAGE =           0.4172
+             STORAGE     =    78943608.0000               STORAGE     =           0.7455
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    13602319.0000        STREAM LEAKAGE     =           0.4172
 
-            TOTAL IN =    92545928.0000              TOTAL IN =           1.1627
+                TOTAL IN =    92545928.0000                  TOTAL IN =           1.1627
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2373705.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    75668272.0000                 WELLS =           1.0587
-     HEAD DEP BOUNDS =    14503972.0000       HEAD DEP BOUNDS =           0.1040
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2373705.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    75668272.0000                 WELLS     =           1.0587
+     HEAD DEP BOUNDS     =    14503972.0000       HEAD DEP BOUNDS     =           0.1040
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    92545952.0000             TOTAL OUT =           1.1627
+               TOTAL OUT =    92545952.0000                 TOTAL OUT =           1.1627
 
-            IN - OUT =         -24.0000              IN - OUT =      -1.1921E-07
+                IN - OUT =         -24.0000                  IN - OUT =      -1.1921E-07
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -14967,27 +14967,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    80646200.0000               STORAGE =           0.6446
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    14796601.0000        STREAM LEAKAGE =           0.4491
+             STORAGE     =    80646200.0000               STORAGE     =           0.6446
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    14796601.0000        STREAM LEAKAGE     =           0.4491
 
-            TOTAL IN =    95442800.0000              TOTAL IN =           1.0938
+                TOTAL IN =    95442800.0000                  TOTAL IN =           1.0938
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2413452.2500               STORAGE =       5.3286E-03
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    78263472.0000                 WELLS =           0.9927
-     HEAD DEP BOUNDS =    14765922.0000       HEAD DEP BOUNDS =       9.5694E-02
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2413452.2500               STORAGE     =       5.3286E-03
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    78263472.0000                 WELLS     =           0.9927
+     HEAD DEP BOUNDS     =    14765922.0000       HEAD DEP BOUNDS     =       9.5694E-02
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    95442848.0000             TOTAL OUT =           1.0938
+               TOTAL OUT =    95442848.0000                 TOTAL OUT =           1.0938
 
-            IN - OUT =         -48.0000              IN - OUT =           0.0000
+                IN - OUT =         -48.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -15892,27 +15892,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    81788936.0000               STORAGE =           0.2657
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    16576326.0000        STREAM LEAKAGE =           0.8439
+             STORAGE     =    81788936.0000               STORAGE     =           0.2657
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    16576326.0000        STREAM LEAKAGE     =           0.8439
 
-            TOTAL IN =    98365264.0000              TOTAL IN =           1.1096
+                TOTAL IN =    98365264.0000                  TOTAL IN =           1.1096
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2421382.5000               STORAGE =       1.3651E-03
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    80917912.0000                 WELLS =           1.0039
-     HEAD DEP BOUNDS =    15025999.0000       HEAD DEP BOUNDS =           0.1043
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2421382.5000               STORAGE     =       1.3651E-03
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    80917912.0000                 WELLS     =           1.0039
+     HEAD DEP BOUNDS     =    15025999.0000       HEAD DEP BOUNDS     =           0.1043
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =    98365296.0000             TOTAL OUT =           1.1096
+               TOTAL OUT =    98365296.0000                 TOTAL OUT =           1.1096
 
-            IN - OUT =         -32.0000              IN - OUT =           0.0000
+                IN - OUT =         -32.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -16786,27 +16786,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    82003440.0000               STORAGE =       6.5167E-05
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    19711232.0000        STREAM LEAKAGE =           1.3890
+             STORAGE     =    82003440.0000               STORAGE     =       6.5167E-05
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    19711232.0000        STREAM LEAKAGE     =           1.3890
 
-            TOTAL IN =   101714672.0000              TOTAL IN =           1.3891
+                TOTAL IN =   101714672.0000                  TOTAL IN =           1.3891
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2839625.7500               STORAGE =           0.2420
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    83537168.0000                 WELLS =           1.0159
-     HEAD DEP BOUNDS =    15337866.0000       HEAD DEP BOUNDS =           0.1311
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     2839625.7500               STORAGE     =           0.2420
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    83537168.0000                 WELLS     =           1.0159
+     HEAD DEP BOUNDS     =    15337866.0000       HEAD DEP BOUNDS     =           0.1311
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   101714656.0000             TOTAL OUT =           1.3891
+               TOTAL OUT =   101714656.0000                 TOTAL OUT =           1.3891
 
-            IN - OUT =          16.0000              IN - OUT =       1.1921E-07
+                IN - OUT =          16.0000                  IN - OUT =       1.1921E-07
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -17793,27 +17793,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    82389808.0000               STORAGE =           0.2504
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    22505748.0000        STREAM LEAKAGE =           0.8963
+             STORAGE     =    82389808.0000               STORAGE     =           0.2504
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    22505748.0000        STREAM LEAKAGE     =           0.8963
 
-            TOTAL IN =   104895552.0000              TOTAL IN =           1.1467
+                TOTAL IN =   104895552.0000                  TOTAL IN =           1.1467
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026918.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    86214216.0000                 WELLS =           1.0324
-     HEAD DEP BOUNDS =    15654440.0000       HEAD DEP BOUNDS =           0.1143
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026918.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    86214216.0000                 WELLS     =           1.0324
+     HEAD DEP BOUNDS     =    15654440.0000       HEAD DEP BOUNDS     =           0.1143
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   104895576.0000             TOTAL OUT =           1.1467
+               TOTAL OUT =   104895576.0000                 TOTAL OUT =           1.1467
 
-            IN - OUT =         -24.0000              IN - OUT =           0.0000
+                IN - OUT =         -24.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -18696,27 +18696,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    83658624.0000               STORAGE =           0.6362
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    24134930.0000        STREAM LEAKAGE =           0.4484
+             STORAGE     =    83658624.0000               STORAGE     =           0.6362
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    24134930.0000        STREAM LEAKAGE     =           0.4484
 
-            TOTAL IN =   107793552.0000              TOTAL IN =           1.0846
+                TOTAL IN =   107793552.0000                  TOTAL IN =           1.0846
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026918.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    88855008.0000                 WELLS =           0.9986
-     HEAD DEP BOUNDS =    15911666.0000       HEAD DEP BOUNDS =       8.5932E-02
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026918.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    88855008.0000                 WELLS     =           0.9986
+     HEAD DEP BOUNDS     =    15911666.0000       HEAD DEP BOUNDS     =       8.5932E-02
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   107793592.0000             TOTAL OUT =           1.0846
+               TOTAL OUT =   107793592.0000                 TOTAL OUT =           1.0846
 
-            IN - OUT =         -40.0000              IN - OUT =      -1.1921E-07
+                IN - OUT =         -40.0000                  IN - OUT =      -1.1921E-07
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -19604,27 +19604,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    85482416.0000               STORAGE =           0.7544
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    25022428.0000        STREAM LEAKAGE =           0.2583
+             STORAGE     =    85482416.0000               STORAGE     =           0.7544
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    25022428.0000        STREAM LEAKAGE     =           0.2583
 
-            TOTAL IN =   110504848.0000              TOTAL IN =           1.0127
+                TOTAL IN =   110504848.0000                  TOTAL IN =           1.0127
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026918.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    91377704.0000                 WELLS =           0.9514
-     HEAD DEP BOUNDS =    16100267.0000       HEAD DEP BOUNDS =       6.1317E-02
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026918.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    91377704.0000                 WELLS     =           0.9514
+     HEAD DEP BOUNDS     =    16100267.0000       HEAD DEP BOUNDS     =       6.1317E-02
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   110504888.0000             TOTAL OUT =           1.0127
+               TOTAL OUT =   110504888.0000                 TOTAL OUT =           1.0127
 
-            IN - OUT =         -40.0000              IN - OUT =           0.0000
+                IN - OUT =         -40.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -20514,27 +20514,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    87460176.0000               STORAGE =           0.7625
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    25577524.0000        STREAM LEAKAGE =           0.1851
+             STORAGE     =    87460176.0000               STORAGE     =           0.7625
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    25577524.0000        STREAM LEAKAGE     =           0.1851
 
-            TOTAL IN =   113037696.0000              TOTAL IN =           0.9476
+                TOTAL IN =   113037696.0000                  TOTAL IN =           0.9476
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026919.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    93779352.0000                 WELLS =           0.9057
-     HEAD DEP BOUNDS =    16231475.0000       HEAD DEP BOUNDS =       4.1880E-02
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026919.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    93779352.0000                 WELLS     =           0.9057
+     HEAD DEP BOUNDS     =    16231475.0000       HEAD DEP BOUNDS     =       4.1880E-02
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   113037744.0000             TOTAL OUT =           0.9476
+               TOTAL OUT =   113037744.0000                 TOTAL OUT =           0.9476
 
-            IN - OUT =         -48.0000              IN - OUT =           0.0000
+                IN - OUT =         -48.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -21424,27 +21424,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    89448688.0000               STORAGE =           0.7854
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    25963538.0000        STREAM LEAKAGE =           0.1039
+             STORAGE     =    89448688.0000               STORAGE     =           0.7854
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    25963538.0000        STREAM LEAKAGE     =           0.1039
 
-            TOTAL IN =   115412224.0000              TOTAL IN =           0.8893
+                TOTAL IN =   115412224.0000                  TOTAL IN =           0.8893
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026919.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    96070168.0000                 WELLS =           0.8660
-     HEAD DEP BOUNDS =    16315191.0000       HEAD DEP BOUNDS =       2.3277E-02
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026919.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    96070168.0000                 WELLS     =           0.8660
+     HEAD DEP BOUNDS     =    16315191.0000       HEAD DEP BOUNDS     =       2.3277E-02
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   115412280.0000             TOTAL OUT =           0.8893
+               TOTAL OUT =   115412280.0000                 TOTAL OUT =           0.8893
 
-            IN - OUT =         -56.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =         -56.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -22439,27 +22439,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    91463728.0000               STORAGE =           0.7657
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =           0.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =    26181110.0000        STREAM LEAKAGE =       6.9987E-02
+             STORAGE     =    91463728.0000               STORAGE     =           0.7657
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =           0.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =    26181110.0000        STREAM LEAKAGE     =       6.9987E-02
 
-            TOTAL IN =   117644840.0000              TOTAL IN =           0.8357
+                TOTAL IN =   117644840.0000                  TOTAL IN =           0.8357
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026919.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    98263672.0000                 WELLS =           0.8280
-     HEAD DEP BOUNDS =    16354278.0000       HEAD DEP BOUNDS =       7.7685E-03
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026919.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    98263672.0000                 WELLS     =           0.8280
+     HEAD DEP BOUNDS     =    16354278.0000       HEAD DEP BOUNDS     =       7.7685E-03
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   117644872.0000             TOTAL OUT =           0.8357
+               TOTAL OUT =   117644872.0000                 TOTAL OUT =           0.8357
 
-            IN - OUT =         -32.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =         -32.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -23349,27 +23349,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    93419016.0000               STORAGE =           0.7392
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =        4345.2583       HEAD DEP BOUNDS =       5.9213E-03
-      STREAM LEAKAGE =    26324392.0000        STREAM LEAKAGE =       4.8703E-02
+             STORAGE     =    93419016.0000               STORAGE     =           0.7392
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =        4345.2583       HEAD DEP BOUNDS     =       5.9213E-03
+      STREAM LEAKAGE     =    26324392.0000        STREAM LEAKAGE     =       4.8703E-02
 
-            TOTAL IN =   119747752.0000              TOTAL IN =           0.7939
+                TOTAL IN =   119747752.0000                  TOTAL IN =           0.7939
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026919.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   100361496.0000                 WELLS =           0.7939
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026919.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   100361496.0000                 WELLS     =           0.7939
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   119747760.0000             TOTAL OUT =           0.7939
+               TOTAL OUT =   119747760.0000                 TOTAL OUT =           0.7939
 
-            IN - OUT =          -8.0000              IN - OUT =      -1.1921E-07
+                IN - OUT =          -8.0000                  IN - OUT =      -1.1921E-07
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -24259,27 +24259,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    95280696.0000               STORAGE =           0.6996
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =       35196.8906       HEAD DEP BOUNDS =       1.7063E-02
-      STREAM LEAKAGE =    26448326.0000        STREAM LEAKAGE =       4.7334E-02
+             STORAGE     =    95280696.0000               STORAGE     =           0.6996
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =       35196.8906       HEAD DEP BOUNDS     =       1.7063E-02
+      STREAM LEAKAGE     =    26448326.0000        STREAM LEAKAGE     =       4.7334E-02
 
-            TOTAL IN =   121764224.0000              TOTAL IN =           0.7640
+                TOTAL IN =   121764224.0000                  TOTAL IN =           0.7640
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026919.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   102377968.0000                 WELLS =           0.7640
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026919.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   102377968.0000                 WELLS     =           0.7640
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   121764240.0000             TOTAL OUT =           0.7640
+               TOTAL OUT =   121764240.0000                 TOTAL OUT =           0.7640
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -25168,27 +25168,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    97028016.0000               STORAGE =           0.6456
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =       92543.6719       HEAD DEP BOUNDS =       2.6081E-02
-      STREAM LEAKAGE =    26586584.0000        STREAM LEAKAGE =       6.5599E-02
+             STORAGE     =    97028016.0000               STORAGE     =           0.6456
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =       92543.6719       HEAD DEP BOUNDS     =       2.6081E-02
+      STREAM LEAKAGE     =    26586584.0000        STREAM LEAKAGE     =       6.5599E-02
 
-            TOTAL IN =   123707144.0000              TOTAL IN =           0.7373
+                TOTAL IN =   123707144.0000                  TOTAL IN =           0.7373
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026920.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   104320880.0000                 WELLS =           0.7373
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026920.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   104320880.0000                 WELLS     =           0.7373
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   123707152.0000             TOTAL OUT =           0.7373
+               TOTAL OUT =   123707152.0000                 TOTAL OUT =           0.7373
 
-            IN - OUT =          -8.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =          -8.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -26076,27 +26076,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    98551944.0000               STORAGE =           0.5192
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      166508.4531       HEAD DEP BOUNDS =       2.9895E-02
-      STREAM LEAKAGE =    26867882.0000        STREAM LEAKAGE =           0.1655
+             STORAGE     =    98551944.0000               STORAGE     =           0.5192
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      166508.4531       HEAD DEP BOUNDS     =       2.9895E-02
+      STREAM LEAKAGE     =    26867882.0000        STREAM LEAKAGE     =           0.1655
 
-            TOTAL IN =   125586336.0000              TOTAL IN =           0.7146
+                TOTAL IN =   125586336.0000                  TOTAL IN =           0.7146
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3026972.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   106200008.0000                 WELLS =           0.7146
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3026972.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   106200008.0000                 WELLS     =           0.7146
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   125586336.0000             TOTAL OUT =           0.7146
+               TOTAL OUT =   125586336.0000                 TOTAL OUT =           0.7146
 
-            IN - OUT =           0.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =           0.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -27086,27 +27086,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    99791424.0000               STORAGE =           0.4540
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      248937.0000       HEAD DEP BOUNDS =       3.3587E-02
-      STREAM LEAKAGE =    27382680.0000        STREAM LEAKAGE =           0.2166
+             STORAGE     =    99791424.0000               STORAGE     =           0.4540
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      248937.0000       HEAD DEP BOUNDS     =       3.3587E-02
+      STREAM LEAKAGE     =    27382680.0000        STREAM LEAKAGE     =           0.2166
 
-            TOTAL IN =   127423040.0000              TOTAL IN =           0.7041
+                TOTAL IN =   127423040.0000                  TOTAL IN =           0.7041
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027575.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   108036088.0000                 WELLS =           0.7041
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027575.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   108036088.0000                 WELLS     =           0.7041
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   127423008.0000             TOTAL OUT =           0.7041
+               TOTAL OUT =   127423008.0000                 TOTAL OUT =           0.7041
 
-            IN - OUT =          32.0000              IN - OUT =           0.0000
+                IN - OUT =          32.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -27992,27 +27992,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   100985792.0000               STORAGE =           0.4696
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      344315.0312       HEAD DEP BOUNDS =       3.9766E-02
-      STREAM LEAKAGE =    27905570.0000        STREAM LEAKAGE =           0.1847
+             STORAGE     =   100985792.0000               STORAGE     =           0.4696
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      344315.0312       HEAD DEP BOUNDS     =       3.9766E-02
+      STREAM LEAKAGE     =    27905570.0000        STREAM LEAKAGE     =           0.1847
 
-            TOTAL IN =   129235672.0000              TOTAL IN =           0.6941
+                TOTAL IN =   129235672.0000                  TOTAL IN =           0.6941
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027673.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   109848624.0000                 WELLS =           0.6941
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027673.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   109848624.0000                 WELLS     =           0.6941
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   129235648.0000             TOTAL OUT =           0.6941
+               TOTAL OUT =   129235648.0000                 TOTAL OUT =           0.6941
 
-            IN - OUT =          24.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =          24.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -28898,27 +28898,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   102160144.0000               STORAGE =           0.4347
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      453206.5938       HEAD DEP BOUNDS =       4.3958E-02
-      STREAM LEAKAGE =    28401114.0000        STREAM LEAKAGE =           0.2012
+             STORAGE     =   102160144.0000               STORAGE     =           0.4347
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      453206.5938       HEAD DEP BOUNDS     =       4.3958E-02
+      STREAM LEAKAGE     =    28401114.0000        STREAM LEAKAGE     =           0.2012
 
-            TOTAL IN =   131014464.0000              TOTAL IN =           0.6798
+                TOTAL IN =   131014464.0000                  TOTAL IN =           0.6798
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027673.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   111627440.0000                 WELLS =           0.6798
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027673.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   111627440.0000                 WELLS     =           0.6798
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   131014464.0000             TOTAL OUT =           0.6798
+               TOTAL OUT =   131014464.0000                 TOTAL OUT =           0.6798
 
-            IN - OUT =           0.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =           0.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -29803,27 +29803,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   103349200.0000               STORAGE =           0.5025
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      578662.7500       HEAD DEP BOUNDS =       5.2994E-02
-      STREAM LEAKAGE =    28832928.0000        STREAM LEAKAGE =           0.1125
+             STORAGE     =   103349200.0000               STORAGE     =           0.5025
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      578662.7500       HEAD DEP BOUNDS     =       5.2994E-02
+      STREAM LEAKAGE     =    28832928.0000        STREAM LEAKAGE     =           0.1125
 
-            TOTAL IN =   132760792.0000              TOTAL IN =           0.6680
+                TOTAL IN =   132760792.0000                  TOTAL IN =           0.6680
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027682.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   113373776.0000                 WELLS =           0.6680
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027682.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   113373776.0000                 WELLS     =           0.6680
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   132760800.0000             TOTAL OUT =           0.6680
+               TOTAL OUT =   132760800.0000                 TOTAL OUT =           0.6680
 
-            IN - OUT =          -8.0000              IN - OUT =           0.0000
+                IN - OUT =          -8.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -30710,27 +30710,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   104664984.0000               STORAGE =           0.5102
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      726626.6250       HEAD DEP BOUNDS =       6.1206E-02
-      STREAM LEAKAGE =    29074230.0000        STREAM LEAKAGE =       7.6989E-02
+             STORAGE     =   104664984.0000               STORAGE     =           0.5102
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      726626.6250       HEAD DEP BOUNDS     =       6.1206E-02
+      STREAM LEAKAGE     =    29074230.0000        STREAM LEAKAGE     =       7.6989E-02
 
-            TOTAL IN =   134465840.0000              TOTAL IN =           0.6484
+                TOTAL IN =   134465840.0000                  TOTAL IN =           0.6484
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027682.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   115078832.0000                 WELLS =           0.6484
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027682.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   115078832.0000                 WELLS     =           0.6484
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   134465856.0000             TOTAL OUT =           0.6484
+               TOTAL OUT =   134465856.0000                 TOTAL OUT =           0.6484
 
-            IN - OUT =         -16.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =         -16.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -31722,27 +31722,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   106009784.0000               STORAGE =           0.5182
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      895923.5000       HEAD DEP BOUNDS =       6.8602E-02
-      STREAM LEAKAGE =    29217194.0000        STREAM LEAKAGE =       4.4380E-02
+             STORAGE     =   106009784.0000               STORAGE     =           0.5182
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      895923.5000       HEAD DEP BOUNDS     =       6.8602E-02
+      STREAM LEAKAGE     =    29217194.0000        STREAM LEAKAGE     =       4.4380E-02
 
-            TOTAL IN =   136122896.0000              TOTAL IN =           0.6312
+                TOTAL IN =   136122896.0000                  TOTAL IN =           0.6312
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027682.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   116735888.0000                 WELLS =           0.6312
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027682.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   116735888.0000                 WELLS     =           0.6312
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   136122912.0000             TOTAL OUT =           0.6312
+               TOTAL OUT =   136122912.0000                 TOTAL OUT =           0.6312
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -32630,27 +32630,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   107336880.0000               STORAGE =           0.5069
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1083075.6250       HEAD DEP BOUNDS =       7.5361E-02
-      STREAM LEAKAGE =    29314022.0000        STREAM LEAKAGE =       3.0861E-02
+             STORAGE     =   107336880.0000               STORAGE     =           0.5069
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1083075.6250       HEAD DEP BOUNDS     =       7.5361E-02
+      STREAM LEAKAGE     =    29314022.0000        STREAM LEAKAGE     =       3.0861E-02
 
-            TOTAL IN =   137733968.0000              TOTAL IN =           0.6131
+                TOTAL IN =   137733968.0000                  TOTAL IN =           0.6131
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027683.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   118346984.0000                 WELLS =           0.6131
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027683.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   118346984.0000                 WELLS     =           0.6131
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   137734016.0000             TOTAL OUT =           0.6131
+               TOTAL OUT =   137734016.0000                 TOTAL OUT =           0.6131
 
-            IN - OUT =         -48.0000              IN - OUT =           0.0000
+                IN - OUT =         -48.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -33538,27 +33538,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   108633096.0000               STORAGE =           0.4927
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1286485.5000       HEAD DEP BOUNDS =       8.1152E-02
-      STREAM LEAKAGE =    29380370.0000        STREAM LEAKAGE =       2.2685E-02
+             STORAGE     =   108633096.0000               STORAGE     =           0.4927
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1286485.5000       HEAD DEP BOUNDS     =       8.1152E-02
+      STREAM LEAKAGE     =    29380370.0000        STREAM LEAKAGE     =       2.2685E-02
 
-            TOTAL IN =   139299952.0000              TOTAL IN =           0.5966
+                TOTAL IN =   139299952.0000                  TOTAL IN =           0.5966
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027683.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   119912936.0000                 WELLS =           0.5966
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027683.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   119912936.0000                 WELLS     =           0.5966
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   139299968.0000             TOTAL OUT =           0.5966
+               TOTAL OUT =   139299968.0000                 TOTAL OUT =           0.5966
 
-            IN - OUT =         -16.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =         -16.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -34446,27 +34446,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   109885456.0000               STORAGE =           0.4675
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1502667.5000       HEAD DEP BOUNDS =       8.3341E-02
-      STREAM LEAKAGE =    29437908.0000        STREAM LEAKAGE =       3.1204E-02
+             STORAGE     =   109885456.0000               STORAGE     =           0.4675
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1502667.5000       HEAD DEP BOUNDS     =       8.3341E-02
+      STREAM LEAKAGE     =    29437908.0000        STREAM LEAKAGE     =       3.1204E-02
 
-            TOTAL IN =   140826032.0000              TOTAL IN =           0.5820
+                TOTAL IN =   140826032.0000                  TOTAL IN =           0.5820
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3027968.2500               STORAGE =       4.1273E-04
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   121438712.0000                 WELLS =           0.5816
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3027968.2500               STORAGE     =       4.1273E-04
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   121438712.0000                 WELLS     =           0.5816
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   140826032.0000             TOTAL OUT =           0.5820
+               TOTAL OUT =   140826032.0000                 TOTAL OUT =           0.5820
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -35352,27 +35352,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   110930840.0000               STORAGE =           0.3779
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1720154.7500       HEAD DEP BOUNDS =       8.5004E-02
-      STREAM LEAKAGE =    29662994.0000        STREAM LEAKAGE =           0.1045
+             STORAGE     =   110930840.0000               STORAGE     =           0.3779
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1720154.7500       HEAD DEP BOUNDS     =       8.5004E-02
+      STREAM LEAKAGE     =    29662994.0000        STREAM LEAKAGE     =           0.1045
 
-            TOTAL IN =   142313984.0000              TOTAL IN =           0.5674
+                TOTAL IN =   142313984.0000                  TOTAL IN =           0.5674
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3028030.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   122926624.0000                 WELLS =           0.5674
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3028030.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   122926624.0000                 WELLS     =           0.5674
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   142314000.0000             TOTAL OUT =           0.5674
+               TOTAL OUT =   142314000.0000                 TOTAL OUT =           0.5674
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -36362,27 +36362,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   111881376.0000               STORAGE =           0.3662
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1944436.7500       HEAD DEP BOUNDS =       8.8055E-02
-      STREAM LEAKAGE =    29948798.0000        STREAM LEAKAGE =           0.1066
+             STORAGE     =   111881376.0000               STORAGE     =           0.3662
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1944436.7500       HEAD DEP BOUNDS     =       8.8055E-02
+      STREAM LEAKAGE     =    29948798.0000        STREAM LEAKAGE     =           0.1066
 
-            TOTAL IN =   143774608.0000              TOTAL IN =           0.5608
+                TOTAL IN =   143774608.0000                  TOTAL IN =           0.5608
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3028706.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   124386568.0000                 WELLS =           0.5608
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3028706.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   124386568.0000                 WELLS     =           0.5608
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   143774624.0000             TOTAL OUT =           0.5608
+               TOTAL OUT =   143774624.0000                 TOTAL OUT =           0.5608
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -37268,27 +37268,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   112628176.0000               STORAGE =           0.1713
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2161875.0000       HEAD DEP BOUNDS =       7.7902E-02
-      STREAM LEAKAGE =    30454104.0000        STREAM LEAKAGE =           0.3310
+             STORAGE     =   112628176.0000               STORAGE     =           0.1713
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2161875.0000       HEAD DEP BOUNDS     =       7.7902E-02
+      STREAM LEAKAGE     =    30454104.0000        STREAM LEAKAGE     =           0.3310
 
-            TOTAL IN =   145244160.0000              TOTAL IN =           0.5802
+                TOTAL IN =   145244160.0000                  TOTAL IN =           0.5802
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3055053.7500               STORAGE =       2.7133E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   125829760.0000                 WELLS =           0.5531
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3055053.7500               STORAGE     =       2.7133E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   125829760.0000                 WELLS     =           0.5531
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   145244160.0000             TOTAL OUT =           0.5802
+               TOTAL OUT =   145244160.0000                 TOTAL OUT =           0.5802
 
-            IN - OUT =           0.0000              IN - OUT =           0.0000
+                IN - OUT =           0.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -38168,27 +38168,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   113062168.0000               STORAGE =           0.2058
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2364076.0000       HEAD DEP BOUNDS =       7.8573E-02
-      STREAM LEAKAGE =    31310494.0000        STREAM LEAKAGE =           0.2771
+             STORAGE     =   113062168.0000               STORAGE     =           0.2058
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2364076.0000       HEAD DEP BOUNDS     =       7.8573E-02
+      STREAM LEAKAGE     =    31310494.0000        STREAM LEAKAGE     =           0.2771
 
-            TOTAL IN =   146736736.0000              TOTAL IN =           0.5615
+                TOTAL IN =   146736736.0000                  TOTAL IN =           0.5615
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3099923.7500               STORAGE =       2.2573E-03
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   127277488.0000                 WELLS =           0.5592
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3099923.7500               STORAGE     =       2.2573E-03
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   127277488.0000                 WELLS     =           0.5592
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   146736752.0000             TOTAL OUT =           0.5615
+               TOTAL OUT =   146736752.0000                 TOTAL OUT =           0.5615
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -39067,27 +39067,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   113567424.0000               STORAGE =           0.1814
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2567783.5000       HEAD DEP BOUNDS =       7.8428E-02
-      STREAM LEAKAGE =    32055878.0000        STREAM LEAKAGE =           0.2995
+             STORAGE     =   113567424.0000               STORAGE     =           0.1814
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2567783.5000       HEAD DEP BOUNDS     =       7.8428E-02
+      STREAM LEAKAGE     =    32055878.0000        STREAM LEAKAGE     =           0.2995
 
-            TOTAL IN =   148191088.0000              TOTAL IN =           0.5594
+                TOTAL IN =   148191088.0000                  TOTAL IN =           0.5594
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3104346.5000               STORAGE =       8.4913E-04
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   128727408.0000                 WELLS =           0.5585
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3104346.5000               STORAGE     =       8.4913E-04
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   128727408.0000                 WELLS     =           0.5585
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   148191104.0000             TOTAL OUT =           0.5594
+               TOTAL OUT =   148191104.0000                 TOTAL OUT =           0.5594
 
-            IN - OUT =         -16.0000              IN - OUT =           0.0000
+                IN - OUT =         -16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -39966,27 +39966,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   114083208.0000               STORAGE =           0.2272
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2774817.5000       HEAD DEP BOUNDS =       8.1568E-02
-      STREAM LEAKAGE =    32779522.0000        STREAM LEAKAGE =           0.2476
+             STORAGE     =   114083208.0000               STORAGE     =           0.2272
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2774817.5000       HEAD DEP BOUNDS     =       8.1568E-02
+      STREAM LEAKAGE     =    32779522.0000        STREAM LEAKAGE     =           0.2476
 
-            TOTAL IN =   149637552.0000              TOTAL IN =           0.5564
+                TOTAL IN =   149637552.0000                  TOTAL IN =           0.5564
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3105392.7500               STORAGE =       3.7106E-06
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   130172840.0000                 WELLS =           0.5564
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3105392.7500               STORAGE     =       3.7106E-06
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   130172840.0000                 WELLS     =           0.5564
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   149637584.0000             TOTAL OUT =           0.5564
+               TOTAL OUT =   149637584.0000                 TOTAL OUT =           0.5564
 
-            IN - OUT =         -32.0000              IN - OUT =           0.0000
+                IN - OUT =         -32.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -40971,27 +40971,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   114765088.0000               STORAGE =           0.3048
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2993712.7500       HEAD DEP BOUNDS =       8.7184E-02
-      STREAM LEAKAGE =    33312350.0000        STREAM LEAKAGE =           0.1580
+             STORAGE     =   114765088.0000               STORAGE     =           0.3048
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2993712.7500       HEAD DEP BOUNDS     =       8.7184E-02
+      STREAM LEAKAGE     =    33312350.0000        STREAM LEAKAGE     =           0.1580
 
-            TOTAL IN =   151071152.0000              TOTAL IN =           0.5500
+                TOTAL IN =   151071152.0000                  TOTAL IN =           0.5500
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3105392.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   131606400.0000                 WELLS =           0.5500
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3105392.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   131606400.0000                 WELLS     =           0.5500
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   151071136.0000             TOTAL OUT =           0.5500
+               TOTAL OUT =   151071136.0000                 TOTAL OUT =           0.5500
 
-            IN - OUT =          16.0000              IN - OUT =           0.0000
+                IN - OUT =          16.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -41874,27 +41874,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   115587896.0000               STORAGE =           0.3381
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3227296.7500       HEAD DEP BOUNDS =       9.3593E-02
-      STREAM LEAKAGE =    33664716.0000        STREAM LEAKAGE =           0.1064
+             STORAGE     =   115587896.0000               STORAGE     =           0.3381
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3227296.7500       HEAD DEP BOUNDS     =       9.3593E-02
+      STREAM LEAKAGE     =    33664716.0000        STREAM LEAKAGE     =           0.1064
 
-            TOTAL IN =   152479904.0000              TOTAL IN =           0.5381
+                TOTAL IN =   152479904.0000                  TOTAL IN =           0.5381
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3105392.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   133015144.0000                 WELLS =           0.5381
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3105392.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   133015144.0000                 WELLS     =           0.5381
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   152479888.0000             TOTAL OUT =           0.5381
+               TOTAL OUT =   152479888.0000                 TOTAL OUT =           0.5381
 
-            IN - OUT =          16.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =          16.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -42779,27 +42779,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   116526560.0000               STORAGE =           0.3653
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3476393.0000       HEAD DEP BOUNDS =       9.7259E-02
-      STREAM LEAKAGE =    33857172.0000        STREAM LEAKAGE =       6.4053E-02
+             STORAGE     =   116526560.0000               STORAGE     =           0.3653
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3476393.0000       HEAD DEP BOUNDS     =       9.7259E-02
+      STREAM LEAKAGE     =    33857172.0000        STREAM LEAKAGE     =       6.4053E-02
 
-            TOTAL IN =   153860128.0000              TOTAL IN =           0.5267
+                TOTAL IN =   153860128.0000                  TOTAL IN =           0.5267
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3105399.2500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   134395392.0000                 WELLS =           0.5267
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3105399.2500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   134395392.0000                 WELLS     =           0.5267
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   153860128.0000             TOTAL OUT =           0.5267
+               TOTAL OUT =   153860128.0000                 TOTAL OUT =           0.5267
 
-            IN - OUT =           0.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =           0.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -43683,27 +43683,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   117375280.0000               STORAGE =           0.2837
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3729319.0000       HEAD DEP BOUNDS =       9.7422E-02
-      STREAM LEAKAGE =    34102936.0000        STREAM LEAKAGE =           0.1326
+             STORAGE     =   117375280.0000               STORAGE     =           0.2837
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3729319.0000       HEAD DEP BOUNDS     =       9.7422E-02
+      STREAM LEAKAGE     =    34102936.0000        STREAM LEAKAGE     =           0.1326
 
-            TOTAL IN =   155207536.0000              TOTAL IN =           0.5137
+                TOTAL IN =   155207536.0000                  TOTAL IN =           0.5137
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3105541.7500               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   135742656.0000                 WELLS =           0.5137
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3105541.7500               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   135742656.0000                 WELLS     =           0.5137
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   155207536.0000             TOTAL OUT =           0.5137
+               TOTAL OUT =   155207536.0000                 TOTAL OUT =           0.5137
 
-            IN - OUT =           0.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =           0.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -44586,27 +44586,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   118086032.0000               STORAGE =           0.3013
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3986264.5000       HEAD DEP BOUNDS =           0.1019
-      STREAM LEAKAGE =    34459752.0000        STREAM LEAKAGE =           0.1062
+             STORAGE     =   118086032.0000               STORAGE     =           0.3013
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3986264.5000       HEAD DEP BOUNDS     =           0.1019
+      STREAM LEAKAGE     =    34459752.0000        STREAM LEAKAGE     =           0.1062
 
-            TOTAL IN =   156532048.0000              TOTAL IN =           0.5094
+                TOTAL IN =   156532048.0000                  TOTAL IN =           0.5094
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3106051.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   137066688.0000                 WELLS =           0.5094
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3106051.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   137066688.0000                 WELLS     =           0.5094
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   156532080.0000             TOTAL OUT =           0.5094
+               TOTAL OUT =   156532080.0000                 TOTAL OUT =           0.5094
 
-            IN - OUT =         -32.0000              IN - OUT =      -5.9605E-08
+                IN - OUT =         -32.0000                  IN - OUT =      -5.9605E-08
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -45595,27 +45595,27 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   118953840.0000               STORAGE =           0.3502
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4257820.5000       HEAD DEP BOUNDS =           0.1070
-      STREAM LEAKAGE =    34631220.0000        STREAM LEAKAGE =       4.4042E-02
+             STORAGE     =   118953840.0000               STORAGE     =           0.3502
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4257820.5000       HEAD DEP BOUNDS     =           0.1070
+      STREAM LEAKAGE     =    34631220.0000        STREAM LEAKAGE     =       4.4042E-02
 
-            TOTAL IN =   157842880.0000              TOTAL IN =           0.5012
+                TOTAL IN =   157842880.0000                  TOTAL IN =           0.5012
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     3106051.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   138377520.0000                 WELLS =           0.5012
-     HEAD DEP BOUNDS =    16359348.0000       HEAD DEP BOUNDS =           0.0000
-      STREAM LEAKAGE =           0.0000        STREAM LEAKAGE =           0.0000
+             STORAGE     =     3106051.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   138377520.0000                 WELLS     =           0.5012
+     HEAD DEP BOUNDS     =    16359348.0000       HEAD DEP BOUNDS     =           0.0000
+      STREAM LEAKAGE     =           0.0000        STREAM LEAKAGE     =           0.0000
 
-           TOTAL OUT =   157842912.0000             TOTAL OUT =           0.5012
+               TOTAL OUT =   157842912.0000                 TOTAL OUT =           0.5012
 
-            IN - OUT =         -32.0000              IN - OUT =           0.0000
+                IN - OUT =         -32.0000                  IN - OUT =           0.0000
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -45630,6 +45630,6 @@
          TOTAL TIME 1.29600E+08 2.16000E+06  36000.      1500.0      4.1068    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:55:30
- Elapsed run time: 30.025 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/12 16:03:04
+ Elapsed run time: 28.524 Seconds
 

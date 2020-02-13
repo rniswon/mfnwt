@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.5 09/10/2019
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Ex_prob2\Pr2MF2005.LST
@@ -34,7 +34,11 @@
  FILE TYPE:LPF   UNIT   34   STATUS:OLD    
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT    2
+ OPENING .\Ex_prob2\Pr2_2005.out
+ FILE TYPE:DATA   UNIT   51   STATUS:UNKNOWN
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ BAS -- BASIC PACKAGE, VERSION 1.2.0, 3/01/2020 INPUT READ FROM UNIT    2
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -6087,23 +6091,23 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =       8.4003E-02               STORAGE =       4.4212E-03
-       CONSTANT HEAD =       3.7485E-02         CONSTANT HEAD =       1.9729E-03
-            RECHARGE =       59375.0000              RECHARGE =        3125.0000
+             STORAGE     =       8.4003E-02               STORAGE     =       4.4212E-03
+       CONSTANT HEAD     =       3.7485E-02         CONSTANT HEAD     =       1.9729E-03
+            RECHARGE     =       59375.0000              RECHARGE     =        3125.0000
 
-            TOTAL IN =       59375.1211              TOTAL IN =        3125.0063
+                TOTAL IN =       59375.1211                  TOTAL IN =        3125.0063
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       59376.2305               STORAGE =        3125.0647
-       CONSTANT HEAD =       3.4182E-02         CONSTANT HEAD =       1.7991E-03
-            RECHARGE =           0.0000              RECHARGE =           0.0000
+             STORAGE     =       59376.2305               STORAGE     =        3125.0647
+       CONSTANT HEAD     =       3.4182E-02         CONSTANT HEAD     =       1.7991E-03
+            RECHARGE     =           0.0000              RECHARGE     =           0.0000
 
-           TOTAL OUT =       59376.2656             TOTAL OUT =        3125.0664
+               TOTAL OUT =       59376.2656                 TOTAL OUT =        3125.0664
 
-            IN - OUT =          -1.1445              IN - OUT =      -6.0059E-02
+                IN - OUT =          -1.1445                  IN - OUT =      -6.0059E-02
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -8955,23 +8959,23 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.3390               STORAGE =           0.0000
-       CONSTANT HEAD =           0.1205         CONSTANT HEAD =           0.0000
-            RECHARGE =      593750.0000              RECHARGE =        3125.0000
+             STORAGE     =           0.3390               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.1205         CONSTANT HEAD     =           0.0000
+            RECHARGE     =      593750.0000              RECHARGE     =        3125.0000
 
-            TOTAL IN =      593750.4375              TOTAL IN =        3125.0000
+                TOTAL IN =      593750.4375                  TOTAL IN =        3125.0000
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      593742.5625               STORAGE =        3124.7981
-       CONSTANT HEAD =           8.7407         CONSTANT HEAD =           0.2004
-            RECHARGE =           0.0000              RECHARGE =           0.0000
+             STORAGE     =      593742.5625               STORAGE     =        3124.7981
+       CONSTANT HEAD     =           8.7407         CONSTANT HEAD     =           0.2004
+            RECHARGE     =           0.0000              RECHARGE     =           0.0000
 
-           TOTAL OUT =      593751.3125             TOTAL OUT =        3124.9985
+               TOTAL OUT =      593751.3125                 TOTAL OUT =        3124.9985
 
-            IN - OUT =          -0.8750              IN - OUT =       1.4648E-03
+                IN - OUT =          -0.8750                  IN - OUT =       1.4648E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -11587,23 +11591,23 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.3390               STORAGE =           0.0000
-       CONSTANT HEAD =           0.1205         CONSTANT HEAD =           0.0000
-            RECHARGE =     2212500.0000              RECHARGE =        3125.0000
+             STORAGE     =           0.3390               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.1205         CONSTANT HEAD     =           0.0000
+            RECHARGE     =     2212500.0000              RECHARGE     =        3125.0000
 
-            TOTAL IN =     2212500.5000              TOTAL IN =        3125.0000
+                TOTAL IN =     2212500.5000                  TOTAL IN =        3125.0000
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2184968.0000               STORAGE =        3050.0029
-       CONSTANT HEAD =       27534.4023         CONSTANT HEAD =          74.9979
-            RECHARGE =           0.0000              RECHARGE =           0.0000
+             STORAGE     =     2184968.0000               STORAGE     =        3050.0029
+       CONSTANT HEAD     =       27534.4023         CONSTANT HEAD     =          74.9979
+            RECHARGE     =           0.0000              RECHARGE     =           0.0000
 
-           TOTAL OUT =     2212502.5000             TOTAL OUT =        3125.0007
+               TOTAL OUT =     2212502.5000                 TOTAL OUT =        3125.0007
 
-            IN - OUT =          -2.0000              IN - OUT =      -7.3242E-04
+                IN - OUT =          -2.0000                  IN - OUT =      -7.3242E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -20097,23 +20101,23 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =       23005.8008               STORAGE =          46.6875
-       CONSTANT HEAD =           0.1205         CONSTANT HEAD =           0.0000
-            RECHARGE =     8218751.5000              RECHARGE =        3125.0000
+             STORAGE     =       23005.8008               STORAGE     =          46.6875
+       CONSTANT HEAD     =           0.1205         CONSTANT HEAD     =           0.0000
+            RECHARGE     =     8218751.5000              RECHARGE     =        3125.0000
 
-            TOTAL IN =     8241757.5000              TOTAL IN =        3171.6875
+                TOTAL IN =     8241757.5000                  TOTAL IN =        3171.6875
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     7936557.5000               STORAGE =        2970.5422
-       CONSTANT HEAD =      305198.3125         CONSTANT HEAD =         201.1449
-            RECHARGE =           0.0000              RECHARGE =           0.0000
+             STORAGE     =     7936557.5000               STORAGE     =        2970.5422
+       CONSTANT HEAD     =      305198.3125         CONSTANT HEAD     =         201.1449
+            RECHARGE     =           0.0000              RECHARGE     =           0.0000
 
-           TOTAL OUT =     8241756.0000             TOTAL OUT =        3171.6870
+               TOTAL OUT =     8241756.0000                 TOTAL OUT =        3171.6870
 
-            IN - OUT =           1.5000              IN - OUT =       4.8828E-04
+                IN - OUT =           1.5000                  IN - OUT =       4.8828E-04
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -20128,6 +20132,6 @@
          TOTAL TIME 2.27232E+08 3.78720E+06  63120.      2630.0      7.2005    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:55:32
- Elapsed run time:  1.156 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/12 16:03:06
+ Elapsed run time:  1.098 Seconds
 

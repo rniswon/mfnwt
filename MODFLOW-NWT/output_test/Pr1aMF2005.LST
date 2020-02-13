@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.5 09/10/2019
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Ex_prob1a\Pr1aMF2005.LST
@@ -30,7 +30,11 @@
  FILE TYPE:DATA(BINARY)   UNIT   50   STATUS:UNKNOWN
  FORMAT:BINARY                 ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT    4
+ OPENING .\Ex_prob1a\Pr1aMF2005.out
+ FILE TYPE:DATA   UNIT   51   STATUS:UNKNOWN
+ FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
+
+ BAS -- BASIC PACKAGE, VERSION 1.2.0, 3/01/2020 INPUT READ FROM UNIT    4
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -255,21 +259,21 @@
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =         605.9722         CONSTANT HEAD =         605.9722
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =         605.9722         CONSTANT HEAD     =         605.9722
 
-            TOTAL IN =         605.9722              TOTAL IN =         605.9722
+                TOTAL IN =         605.9722                  TOTAL IN =         605.9722
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =         605.9722         CONSTANT HEAD =         605.9722
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =         605.9722         CONSTANT HEAD     =         605.9722
 
-           TOTAL OUT =         605.9722             TOTAL OUT =         605.9722
+               TOTAL OUT =         605.9722                 TOTAL OUT =         605.9722
 
-            IN - OUT =       6.1035E-05              IN - OUT =       6.1035E-05
+                IN - OUT =       6.1035E-05                  IN - OUT =       6.1035E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -284,6 +288,6 @@
          TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:55:30
- Elapsed run time:  0.026 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/12 16:03:04
+ Elapsed run time:  0.021 Seconds
 

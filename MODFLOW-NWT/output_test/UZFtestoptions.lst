@@ -1,6 +1,6 @@
                                   MODFLOW-NWT-SWR1 
       U.S. GEOLOGICAL SURVEY MODULAR FINITE-DIFFERENCE GROUNDWATER-FLOW MODEL
-                            VERSION 1.1.5 09/10/2019
+                            VERSION 1.2.0 03/01/2020
                     BASED ON MODFLOW-2005 VERSION 1.12.00 02/03/2017
 
  LIST FILE: .\Uzf_testoptions\UZFtestoptions.lst
@@ -118,7 +118,7 @@
  FILE TYPE:DATA   UNIT   91   STATUS:UNKNOWN
  FORMAT:FORMATTED              ACCESS:SEQUENTIAL          
 
- BAS -- BASIC PACKAGE, VERSION 1.1.5, 9/10/2019 INPUT READ FROM UNIT   75
+ BAS -- BASIC PACKAGE, VERSION 1.2.0, 3/01/2020 INPUT READ FROM UNIT   75
  
  MODFLOW was compiled using mixed precision
  Precision of REAL variables:           6
@@ -266,7 +266,7 @@
  # Test Problem 3 for MODFLOW-NWT
  #HEADTOL  FLUXTOL MAXITEROUT THICKFACT LINMETH IPRNWT IBOTAV OPTIONS DBDREDUCE DBDINCREASE DBDGAMMA MOMFACT BACKFLAG MAXBACKITER BACKTOL BACKREDUCE
 
- NWT1 -- Newton Solver, VERSION 1.1.5, 9/10/2019
+ NWT1 -- Newton Solver, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT 13
 
  SPECIFIED OPTION:
@@ -300,7 +300,7 @@
  MAX. NUMBER OF LINEAR ITERATIONS  (MXITERXMD) =        50
 
 
- UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.1.5, 9/10/2019
+ UPW1 -- UPSTREAM WEIGHTING FLOW PACKAGE, VERSION 1.2.0, 3/01/2020
          INPUT READ FROM UNIT  7
 
  #Layer-Property Flow Package input for test simulation 2
@@ -368,7 +368,7 @@
   14    0.000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.1000      0.2000       0.000    
   15    0.000       0.000      0.1000      0.1000      0.1000      0.1000       0.000       0.000       0.000       0.000    
 
- WEL -- WELL PACKAGE FOR NWT VERSION 1.1.4,  4/01/2018 INPUT READ FROM UNIT   16
+ WEL -- WELL PACKAGE FOR NWT VERSION 1.2.0,  3/01/2020 INPUT READ FROM UNIT   16
  #Well Package input for test simulation 2
  No named parameters
  MAXIMUM OF     10 ACTIVE WELLS AT ONE TIME
@@ -463,7 +463,7 @@ Stream loss will be calculated as a factor of the streambed hydraulic conductivi
 
 
 
- UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.4, 02/06/2012
+ UZF1 -- UNSATURATED FLOW PACKAGE, VERSION 1.5, 09/10/2019
          INPUT READ FROM UNIT 19
  #UZF Package input for test simulation 2
  No named parameters
@@ -921,33 +921,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      771757.1875       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =    38759968.0000        STREAM LEAKAGE =          14.7488
-        UZF RECHARGE =     7621205.5000          UZF RECHARGE =           2.9000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      771757.1875       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =    38759968.0000        STREAM LEAKAGE     =          14.7488
+        UZF RECHARGE     =     7621205.5000          UZF RECHARGE     =           2.9000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    47152928.0000              TOTAL IN =          17.9425
+                TOTAL IN =    47152928.0000                  TOTAL IN =          17.9425
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =           0.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    26280000.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =      752755.8750       HEAD DEP BOUNDS =           0.2864
-      STREAM LEAKAGE =    16835130.0000        STREAM LEAKAGE =           6.4061
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     3285000.0000                 GW ET =           1.2500
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =           0.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    26280000.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =      752755.8750       HEAD DEP BOUNDS     =           0.2864
+      STREAM LEAKAGE     =    16835130.0000        STREAM LEAKAGE     =           6.4061
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     3285000.0000                 GW ET     =           1.2500
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    47152888.0000             TOTAL OUT =          17.9425
+               TOTAL OUT =    47152888.0000                 TOTAL OUT =          17.9425
 
-            IN - OUT =          40.0000              IN - OUT =       1.5259E-05
+                IN - OUT =          40.0000                  IN - OUT =       1.5259E-05
 
- PERCENT DISCREPANCY =           0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =           0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -1157,33 +1157,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     2835483.5000               STORAGE =          34.2810
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      796048.5000       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =    40074776.0000        STREAM LEAKAGE =          15.8960
-        UZF RECHARGE =     7624214.0000          UZF RECHARGE =       3.6370E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     2835483.5000               STORAGE     =          34.2810
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      796048.5000       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =    40074776.0000        STREAM LEAKAGE     =          15.8960
+        UZF RECHARGE     =     7624214.0000          UZF RECHARGE     =       3.6370E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    51330520.0000              TOTAL IN =          50.5070
+                TOTAL IN =    51330520.0000                  TOTAL IN =          50.5070
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =       59963.7617               STORAGE =           0.7250
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    29588522.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =      776433.8750       HEAD DEP BOUNDS =           0.2863
-      STREAM LEAKAGE =    17103864.0000        STREAM LEAKAGE =           3.2490
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     3801837.5000                 GW ET =           6.2486
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =       59963.7617               STORAGE     =           0.7250
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    29588522.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =      776433.8750       HEAD DEP BOUNDS     =           0.2863
+      STREAM LEAKAGE     =    17103864.0000        STREAM LEAKAGE     =           3.2490
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     3801837.5000                 GW ET     =           6.2486
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    51330620.0000             TOTAL OUT =          50.5088
+               TOTAL OUT =    51330620.0000                 TOTAL OUT =          50.5088
 
-            IN - OUT =        -100.0000              IN - OUT =      -1.7357E-03
+                IN - OUT =        -100.0000                  IN - OUT =      -1.7357E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -1334,33 +1334,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     2 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     5945613.0000               STORAGE =          34.1831
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      822770.3750       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =    41522208.0000        STREAM LEAKAGE =          15.9086
-        UZF RECHARGE =     7627106.5000          UZF RECHARGE =       3.1792E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     5945613.0000               STORAGE     =          34.1831
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      822770.3750       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =    41522208.0000        STREAM LEAKAGE     =          15.9086
+        UZF RECHARGE     =     7627106.5000          UZF RECHARGE     =       3.1792E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    55917700.0000              TOTAL IN =          50.4172
+                TOTAL IN =    55917700.0000                  TOTAL IN =          50.4172
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      117638.3594               STORAGE =           0.6339
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    33227898.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =      802463.6875       HEAD DEP BOUNDS =           0.2861
-      STREAM LEAKAGE =    17399738.0000        STREAM LEAKAGE =           3.2519
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     4370216.5000                 GW ET =           6.2470
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      117638.3594               STORAGE     =           0.6339
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    33227898.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =      802463.6875       HEAD DEP BOUNDS     =           0.2861
+      STREAM LEAKAGE     =    17399738.0000        STREAM LEAKAGE     =           3.2519
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     4370216.5000                 GW ET     =           6.2470
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    55917952.0000             TOTAL OUT =          50.4189
+               TOTAL OUT =    55917952.0000                 TOTAL OUT =          50.4189
 
-            IN - OUT =        -252.0000              IN - OUT =      -1.7319E-03
+                IN - OUT =        -252.0000                  IN - OUT =      -1.7319E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -1511,33 +1511,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     3 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =     9359449.0000               STORAGE =          34.1101
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      852166.1250       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =    43115724.0000        STREAM LEAKAGE =          15.9220
-        UZF RECHARGE =     7629977.0000          UZF RECHARGE =       2.8681E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     9359449.0000               STORAGE     =          34.1101
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      852166.1250       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =    43115724.0000        STREAM LEAKAGE     =          15.9220
+        UZF RECHARGE     =     7629977.0000          UZF RECHARGE     =       2.8681E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    60957316.0000              TOTAL IN =          50.3545
+                TOTAL IN =    60957316.0000                  TOTAL IN =          50.3545
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      174844.4375               STORAGE =           0.5716
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    37231212.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =      831078.5000       HEAD DEP BOUNDS =           0.2859
-      STREAM LEAKAGE =    17725348.0000        STREAM LEAKAGE =           3.2534
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     4995262.5000                 GW ET =           6.2453
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      174844.4375               STORAGE     =           0.5716
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    37231212.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =      831078.5000       HEAD DEP BOUNDS     =           0.2859
+      STREAM LEAKAGE     =    17725348.0000        STREAM LEAKAGE     =           3.2534
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     4995262.5000                 GW ET     =           6.2453
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    60957748.0000             TOTAL OUT =          50.3562
+               TOTAL OUT =    60957748.0000                 TOTAL OUT =          50.3562
 
-            IN - OUT =        -432.0000              IN - OUT =      -1.7281E-03
+                IN - OUT =        -432.0000                  IN - OUT =      -1.7281E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -1688,33 +1688,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     4 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    13106190.0000               STORAGE =          34.0331
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      884503.5000       HEAD DEP BOUNDS =           0.2937
-      STREAM LEAKAGE =    44870160.0000        STREAM LEAKAGE =          15.9362
-        UZF RECHARGE =     7632784.0000          UZF RECHARGE =       2.5499E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    13106190.0000               STORAGE     =          34.0331
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      884503.5000       HEAD DEP BOUNDS     =           0.2937
+      STREAM LEAKAGE     =    44870160.0000        STREAM LEAKAGE     =          15.9362
+        UZF RECHARGE     =     7632784.0000          UZF RECHARGE     =       2.5499E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    66493640.0000              TOTAL IN =          50.2885
+                TOTAL IN =    66493640.0000                  TOTAL IN =          50.2885
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      230754.2969               STORAGE =           0.5079
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    41634856.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =      862534.6875       HEAD DEP BOUNDS =           0.2857
-      STREAM LEAKAGE =    18083504.0000        STREAM LEAKAGE =           3.2533
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     5682608.0000                 GW ET =           6.2434
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      230754.2969               STORAGE     =           0.5079
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    41634856.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =      862534.6875       HEAD DEP BOUNDS     =           0.2857
+      STREAM LEAKAGE     =    18083504.0000        STREAM LEAKAGE     =           3.2533
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     5682608.0000                 GW ET     =           6.2434
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    66494260.0000             TOTAL OUT =          50.2903
+               TOTAL OUT =    66494260.0000                 TOTAL OUT =          50.2903
 
-            IN - OUT =        -620.0000              IN - OUT =      -1.7242E-03
+                IN - OUT =        -620.0000                  IN - OUT =      -1.7242E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -1859,33 +1859,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    17218388.0000               STORAGE =          33.9570
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =      920077.0625       HEAD DEP BOUNDS =           0.2938
-      STREAM LEAKAGE =    46801872.0000        STREAM LEAKAGE =          15.9514
-        UZF RECHARGE =     7635508.0000          UZF RECHARGE =       2.2496E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    17218388.0000               STORAGE     =          33.9570
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =      920077.0625       HEAD DEP BOUNDS     =           0.2938
+      STREAM LEAKAGE     =    46801872.0000        STREAM LEAKAGE     =          15.9514
+        UZF RECHARGE     =     7635508.0000          UZF RECHARGE     =       2.2496E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =    72575840.0000              TOTAL IN =          50.2246
+                TOTAL IN =    72575840.0000                  TOTAL IN =          50.2246
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      285010.0000               STORAGE =           0.4480
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    46478864.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =      897114.1250       HEAD DEP BOUNDS =           0.2855
-      STREAM LEAKAGE =    18477242.0000        STREAM LEAKAGE =           3.2513
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =     6438442.5000                 GW ET =           6.2414
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      285010.0000               STORAGE     =           0.4480
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    46478864.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =      897114.1250       HEAD DEP BOUNDS     =           0.2855
+      STREAM LEAKAGE     =    18477242.0000        STREAM LEAKAGE     =           3.2513
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =     6438442.5000                 GW ET     =           6.2414
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =    72576672.0000             TOTAL OUT =          50.2263
+               TOTAL OUT =    72576672.0000                 TOTAL OUT =          50.2263
 
-            IN - OUT =        -832.0000              IN - OUT =      -1.7204E-03
+                IN - OUT =        -832.0000                  IN - OUT =      -1.7204E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -2090,33 +2090,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    44618172.0000               STORAGE =          33.5278
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1159039.6250       HEAD DEP BOUNDS =           0.2939
-      STREAM LEAKAGE =    59819292.0000        STREAM LEAKAGE =          16.0403
-        UZF RECHARGE =     7646029.5000          UZF RECHARGE =       7.3106E-03
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    44618172.0000               STORAGE     =          33.5278
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1159039.6250       HEAD DEP BOUNDS     =           0.2939
+      STREAM LEAKAGE     =    59819292.0000        STREAM LEAKAGE     =          16.0403
+        UZF RECHARGE     =     7646029.5000          UZF RECHARGE     =       7.3106E-03
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   113242536.0000              TOTAL IN =          49.8693
+                TOTAL IN =   113242536.0000                  TOTAL IN =          49.8693
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      494060.5938               STORAGE =           0.1448
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =    79009344.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     1128864.8750       HEAD DEP BOUNDS =           0.2846
-      STREAM LEAKAGE =    21104306.0000        STREAM LEAKAGE =           3.2124
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    11508182.0000                 GW ET =           6.2292
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      494060.5938               STORAGE     =           0.1448
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =    79009344.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     1128864.8750       HEAD DEP BOUNDS     =           0.2846
+      STREAM LEAKAGE     =    21104306.0000        STREAM LEAKAGE     =           3.2124
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    11508182.0000                 GW ET     =           6.2292
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   113244760.0000             TOTAL OUT =          49.8710
+               TOTAL OUT =   113244760.0000                 TOTAL OUT =          49.8710
 
-            IN - OUT =       -2224.0000              IN - OUT =      -1.6937E-03
+                IN - OUT =       -2224.0000                  IN - OUT =      -1.6937E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -2349,33 +2349,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    88242208.0000               STORAGE =          33.2025
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1544113.7500       HEAD DEP BOUNDS =           0.2941
-      STREAM LEAKAGE =    80918512.0000        STREAM LEAKAGE =          16.1507
-        UZF RECHARGE =     7649202.5000          UZF RECHARGE =       1.1749E-03
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    88242208.0000               STORAGE     =          33.2025
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1544113.7500       HEAD DEP BOUNDS     =           0.2941
+      STREAM LEAKAGE     =    80918512.0000        STREAM LEAKAGE     =          16.1507
+        UZF RECHARGE     =     7649202.5000          UZF RECHARGE     =       1.1749E-03
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   178354032.0000              TOTAL IN =          49.6484
+                TOTAL IN =   178354032.0000                  TOTAL IN =          49.6484
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      556942.9375               STORAGE =       2.2892E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   131399992.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     1501063.7500       HEAD DEP BOUNDS =           0.2839
-      STREAM LEAKAGE =    25246450.0000        STREAM LEAKAGE =           3.1304
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    19652474.0000                 GW ET =           6.2111
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      556942.9375               STORAGE     =       2.2892E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   131399992.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     1501063.7500       HEAD DEP BOUNDS     =           0.2839
+      STREAM LEAKAGE     =    25246450.0000        STREAM LEAKAGE     =           3.1304
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    19652474.0000                 GW ET     =           6.2111
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   178356928.0000             TOTAL OUT =          49.6483
+               TOTAL OUT =   178356928.0000                 TOTAL OUT =          49.6483
 
-            IN - OUT =       -2896.0000              IN - OUT =       1.0681E-04
+                IN - OUT =       -2896.0000                  IN - OUT =       1.0681E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -2579,33 +2579,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =    90955792.0000               STORAGE =          32.8072
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1568438.7500       HEAD DEP BOUNDS =           0.2941
-      STREAM LEAKAGE =    82281024.0000        STREAM LEAKAGE =          16.4728
-        UZF RECHARGE =     7650841.5000          UZF RECHARGE =       1.9817E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    90955792.0000               STORAGE     =          32.8072
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1568438.7500       HEAD DEP BOUNDS     =           0.2941
+      STREAM LEAKAGE     =    82281024.0000        STREAM LEAKAGE     =          16.4728
+        UZF RECHARGE     =     7650841.5000          UZF RECHARGE     =       1.9817E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   182456096.0000              TOTAL IN =          49.5939
+                TOTAL IN =   182456096.0000                  TOTAL IN =          49.5939
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      624103.0625               STORAGE =           0.8120
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   134708512.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     1524557.6250       HEAD DEP BOUNDS =           0.2840
-      STREAM LEAKAGE =    25435940.0000        STREAM LEAKAGE =           2.2909
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    20166004.0000                 GW ET =           6.2086
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      624103.0625               STORAGE     =           0.8120
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   134708512.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     1524557.6250       HEAD DEP BOUNDS     =           0.2840
+      STREAM LEAKAGE     =    25435940.0000        STREAM LEAKAGE     =           2.2909
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    20166004.0000                 GW ET     =           6.2086
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   182459104.0000             TOTAL OUT =          49.5955
+               TOTAL OUT =   182459104.0000                 TOTAL OUT =          49.5955
 
-            IN - OUT =       -3008.0000              IN - OUT =      -1.6365E-03
+                IN - OUT =       -3008.0000                  IN - OUT =      -1.6365E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -2795,33 +2795,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   104785896.0000               STORAGE =          32.7224
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1692635.6250       HEAD DEP BOUNDS =           0.2941
-      STREAM LEAKAGE =    89243456.0000        STREAM LEAKAGE =          16.4977
-        UZF RECHARGE =     7658512.5000          UZF RECHARGE =       2.0295E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   104785896.0000               STORAGE     =          32.7224
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1692635.6250       HEAD DEP BOUNDS     =           0.2941
+      STREAM LEAKAGE     =    89243456.0000        STREAM LEAKAGE     =          16.4977
+        UZF RECHARGE     =     7658512.5000          UZF RECHARGE     =       2.0295E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   203380496.0000              TOTAL IN =          49.5345
+                TOTAL IN =   203380496.0000                  TOTAL IN =          49.5345
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =      890930.8750               STORAGE =           0.5410
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   151598864.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     1644624.6250       HEAD DEP BOUNDS =           0.2845
-      STREAM LEAKAGE =    26463628.0000        STREAM LEAKAGE =           2.5076
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    22786168.0000                 GW ET =           6.2031
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =      890930.8750               STORAGE     =           0.5410
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   151598864.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     1644624.6250       HEAD DEP BOUNDS     =           0.2845
+      STREAM LEAKAGE     =    26463628.0000        STREAM LEAKAGE     =           2.5076
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    22786168.0000                 GW ET     =           6.2031
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   203384224.0000             TOTAL OUT =          49.5361
+               TOTAL OUT =   203384224.0000                 TOTAL OUT =          49.5361
 
-            IN - OUT =       -3728.0000              IN - OUT =      -1.6441E-03
+                IN - OUT =       -3728.0000                  IN - OUT =      -1.6441E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -3026,33 +3026,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   131334264.0000               STORAGE =          32.5973
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     1931906.1250       HEAD DEP BOUNDS =           0.2943
-      STREAM LEAKAGE =   102681872.0000        STREAM LEAKAGE =          16.5410
-        UZF RECHARGE =     7668079.5000          UZF RECHARGE =       7.4881E-03
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   131334264.0000               STORAGE     =          32.5973
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     1931906.1250       HEAD DEP BOUNDS     =           0.2943
+      STREAM LEAKAGE     =   102681872.0000        STREAM LEAKAGE     =          16.5410
+        UZF RECHARGE     =     7668079.5000          UZF RECHARGE     =       7.4881E-03
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   243616112.0000              TOTAL IN =          49.4400
+                TOTAL IN =   243616112.0000                  TOTAL IN =          49.4400
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1167397.2500               STORAGE =           0.2365
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   184129344.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     1876345.2500       HEAD DEP BOUNDS =           0.2852
-      STREAM LEAKAGE =    28621916.0000        STREAM LEAKAGE =           2.7263
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    27826186.0000                 GW ET =           6.1937
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     1167397.2500               STORAGE     =           0.2365
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   184129344.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     1876345.2500       HEAD DEP BOUNDS     =           0.2852
+      STREAM LEAKAGE     =    28621916.0000        STREAM LEAKAGE     =           2.7263
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    27826186.0000                 GW ET     =           6.1937
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   243621200.0000             TOTAL OUT =          49.4417
+               TOTAL OUT =   243621200.0000                 TOTAL OUT =          49.4417
 
-            IN - OUT =       -5088.0000              IN - OUT =      -1.6441E-03
+                IN - OUT =       -5088.0000                  IN - OUT =      -1.6441E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -3283,33 +3283,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   173918480.0000               STORAGE =          32.4722
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2317435.5000       HEAD DEP BOUNDS =           0.2944
-      STREAM LEAKAGE =   124397128.0000        STREAM LEAKAGE =          16.6043
-        UZF RECHARGE =     7671725.5000          UZF RECHARGE =       1.2785E-03
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   173918480.0000               STORAGE     =          32.4722
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2317435.5000       HEAD DEP BOUNDS     =           0.2944
+      STREAM LEAKAGE     =   124397128.0000        STREAM LEAKAGE     =          16.6043
+        UZF RECHARGE     =     7671725.5000          UZF RECHARGE     =       1.2785E-03
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   308304768.0000              TOTAL IN =          49.3722
+                TOTAL IN =   308304768.0000                  TOTAL IN =          49.3722
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     1314929.7500               STORAGE =       6.6958E-02
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   236520000.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     2250338.7500       HEAD DEP BOUNDS =           0.2857
-      STREAM LEAKAGE =    32298556.0000        STREAM LEAKAGE =           2.8393
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    35927608.0000                 GW ET =           6.1802
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     1314929.7500               STORAGE     =       6.6958E-02
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   236520000.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     2250338.7500       HEAD DEP BOUNDS     =           0.2857
+      STREAM LEAKAGE     =    32298556.0000        STREAM LEAKAGE     =           2.8393
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    35927608.0000                 GW ET     =           6.1802
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   308311424.0000             TOTAL OUT =          49.3721
+               TOTAL OUT =   308311424.0000                 TOTAL OUT =          49.3721
 
-            IN - OUT =       -6656.0000              IN - OUT =       1.0300E-04
+                IN - OUT =       -6656.0000                  IN - OUT =       1.0300E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -3573,33 +3573,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   189652544.0000               STORAGE =          31.0723
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2466120.2500       HEAD DEP BOUNDS =           0.2945
-      STREAM LEAKAGE =   133589824.0000        STREAM LEAKAGE =          18.1549
-        UZF RECHARGE =     7744306.5000          UZF RECHARGE =           0.1430
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   189652544.0000               STORAGE     =          31.0723
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2466120.2500       HEAD DEP BOUNDS     =           0.2945
+      STREAM LEAKAGE     =   133589824.0000        STREAM LEAKAGE     =          18.1549
+        UZF RECHARGE     =     7744306.5000          UZF RECHARGE     =           0.1430
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   333452800.0000              TOTAL IN =          49.6646
+                TOTAL IN =   333452800.0000                  TOTAL IN =          49.6646
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     2981428.2500               STORAGE =           3.0633
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   256718880.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     2395563.0000       HEAD DEP BOUNDS =           0.2888
-      STREAM LEAKAGE =    32317962.0000        STREAM LEAKAGE =           0.1398
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    39046416.0000                 GW ET =           6.1743
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     2981428.2500               STORAGE     =           3.0633
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   256718880.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     2395563.0000       HEAD DEP BOUNDS     =           0.2888
+      STREAM LEAKAGE     =    32317962.0000        STREAM LEAKAGE     =           0.1398
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    39046416.0000                 GW ET     =           6.1743
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   333460224.0000             TOTAL OUT =          49.6662
+               TOTAL OUT =   333460224.0000                 TOTAL OUT =          49.6662
 
-            IN - OUT =       -7424.0000              IN - OUT =      -1.5564E-03
+                IN - OUT =       -7424.0000                  IN - OUT =      -1.5564E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -3804,33 +3804,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   214790624.0000               STORAGE =          30.8203
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     2705631.7500       HEAD DEP BOUNDS =           0.2945
-      STREAM LEAKAGE =   148317760.0000        STREAM LEAKAGE =          18.1017
-        UZF RECHARGE =     7827704.5000          UZF RECHARGE =       7.4737E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   214790624.0000               STORAGE     =          30.8203
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     2705631.7500       HEAD DEP BOUNDS     =           0.2945
+      STREAM LEAKAGE     =   148317760.0000        STREAM LEAKAGE     =          18.1017
+        UZF RECHARGE     =     7827704.5000          UZF RECHARGE     =       7.4737E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   373641728.0000              TOTAL IN =          49.2913
+                TOTAL IN =   373641728.0000                  TOTAL IN =          49.2913
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     4779422.0000               STORAGE =           1.6251
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   289249344.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     2632691.0000       HEAD DEP BOUNDS =           0.2932
-      STREAM LEAKAGE =    32924680.0000        STREAM LEAKAGE =           1.2072
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    44064280.0000                 GW ET =           6.1675
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     4779422.0000               STORAGE     =           1.6251
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   289249344.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     2632691.0000       HEAD DEP BOUNDS     =           0.2932
+      STREAM LEAKAGE     =    32924680.0000        STREAM LEAKAGE     =           1.2072
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    44064280.0000                 GW ET     =           6.1675
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   373650432.0000             TOTAL OUT =          49.2929
+               TOTAL OUT =   373650432.0000                 TOTAL OUT =          49.2929
 
-            IN - OUT =       -8704.0000              IN - OUT =      -1.5526E-03
+                IN - OUT =       -8704.0000                  IN - OUT =      -1.5526E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4060,33 +4060,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   254961072.0000               STORAGE =          30.5934
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3091501.7500       HEAD DEP BOUNDS =           0.2947
-      STREAM LEAKAGE =   172022976.0000        STREAM LEAKAGE =          18.0995
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =       2.3973E-02
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   254961072.0000               STORAGE     =          30.5934
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3091501.7500       HEAD DEP BOUNDS     =           0.2947
+      STREAM LEAKAGE     =   172022976.0000        STREAM LEAKAGE     =          18.0995
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =       2.3973E-02
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   437955264.0000              TOTAL IN =          49.0116
+                TOTAL IN =   437955264.0000                  TOTAL IN =          49.0116
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     5876473.0000               STORAGE =           0.4845
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   341640000.0000                 WELLS =          40.0000
-     HEAD DEP BOUNDS =     3019791.2500       HEAD DEP BOUNDS =           0.2967
-      STREAM LEAKAGE =    35295408.0000        STREAM LEAKAGE =           2.0742
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    52134316.0000                 GW ET =           6.1577
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     5876473.0000               STORAGE     =           0.4845
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   341640000.0000                 WELLS     =          40.0000
+     HEAD DEP BOUNDS     =     3019791.2500       HEAD DEP BOUNDS     =           0.2967
+      STREAM LEAKAGE     =    35295408.0000        STREAM LEAKAGE     =           2.0742
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    52134316.0000                 GW ET     =           6.1577
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   437965984.0000             TOTAL OUT =          49.0131
+               TOTAL OUT =   437965984.0000                 TOTAL OUT =          49.0131
 
-            IN - OUT =      -10720.0000              IN - OUT =      -1.5411E-03
+                IN - OUT =      -10720.0000                  IN - OUT =      -1.5411E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4350,33 +4350,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   268813312.0000               STORAGE =          26.7480
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3240313.5000       HEAD DEP BOUNDS =           0.2947
-      STREAM LEAKAGE =   180003152.0000        STREAM LEAKAGE =          15.8237
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   268813312.0000               STORAGE     =          26.7480
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3240313.5000       HEAD DEP BOUNDS     =           0.2947
+      STREAM LEAKAGE     =   180003152.0000        STREAM LEAKAGE     =          15.8237
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   459936480.0000              TOTAL IN =          42.8664
+                TOTAL IN =   459936480.0000                  TOTAL IN =          42.8664
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     5876607.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   356789152.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3168265.2500       HEAD DEP BOUNDS =           0.2924
-      STREAM LEAKAGE =    38871544.0000        STREAM LEAKAGE =           6.4219
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    55242328.0000                 GW ET =           6.1535
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     5876607.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   356789152.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3168265.2500       HEAD DEP BOUNDS     =           0.2924
+      STREAM LEAKAGE     =    38871544.0000        STREAM LEAKAGE     =           6.4219
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    55242328.0000                 GW ET     =           6.1535
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   459947904.0000             TOTAL OUT =          42.8677
+               TOTAL OUT =   459947904.0000                 TOTAL OUT =          42.8677
 
-            IN - OUT =      -11424.0000              IN - OUT =      -1.3504E-03
+                IN - OUT =      -11424.0000                  IN - OUT =      -1.3504E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4581,33 +4581,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   289654080.0000               STORAGE =          25.0317
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3480041.5000       HEAD DEP BOUNDS =           0.2948
-      STREAM LEAKAGE =   192911856.0000        STREAM LEAKAGE =          15.9047
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   289654080.0000               STORAGE     =          25.0317
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3480041.5000       HEAD DEP BOUNDS     =           0.2948
+      STREAM LEAKAGE     =   192911856.0000        STREAM LEAKAGE     =          15.9047
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   493925664.0000              TOTAL IN =          41.2312
+                TOTAL IN =   493925664.0000                  TOTAL IN =          41.2312
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     5876607.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   381187008.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3403509.5000       HEAD DEP BOUNDS =           0.2875
-      STREAM LEAKAGE =    43226692.0000        STREAM LEAKAGE =           4.7960
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    60244368.0000                 GW ET =           6.1489
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     5876607.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   381187008.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3403509.5000       HEAD DEP BOUNDS     =           0.2875
+      STREAM LEAKAGE     =    43226692.0000        STREAM LEAKAGE     =           4.7960
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    60244368.0000                 GW ET     =           6.1489
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   493938176.0000             TOTAL OUT =          41.2324
+               TOTAL OUT =   493938176.0000                 TOTAL OUT =          41.2324
 
-            IN - OUT =      -12512.0000              IN - OUT =      -1.2627E-03
+                IN - OUT =      -12512.0000                  IN - OUT =      -1.2627E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -4812,33 +4812,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   321342944.0000               STORAGE =          23.7833
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3866283.2500       HEAD DEP BOUNDS =           0.2949
-      STREAM LEAKAGE =   213839152.0000        STREAM LEAKAGE =          16.0246
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   321342944.0000               STORAGE     =          23.7833
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3866283.2500       HEAD DEP BOUNDS     =           0.2949
+      STREAM LEAKAGE     =   213839152.0000        STREAM LEAKAGE     =          16.0246
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   546928064.0000              TOTAL IN =          40.1029
+                TOTAL IN =   546928064.0000                  TOTAL IN =          40.1029
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =     5876607.5000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   420480000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     3776196.0000       HEAD DEP BOUNDS =           0.2830
-      STREAM LEAKAGE =    48513260.0000        STREAM LEAKAGE =           3.6741
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    68296136.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =     5876607.5000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   420480000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     3776196.0000       HEAD DEP BOUNDS     =           0.2830
+      STREAM LEAKAGE     =    48513260.0000        STREAM LEAKAGE     =           3.6741
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    68296136.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   546942208.0000             TOTAL OUT =          40.1041
+               TOTAL OUT =   546942208.0000                 TOTAL OUT =          40.1041
 
-            IN - OUT =      -14144.0000              IN - OUT =      -1.2016E-03
+                IN - OUT =      -14144.0000                  IN - OUT =      -1.2016E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -5077,33 +5077,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   329097696.0000               STORAGE =          14.3877
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4015237.5000       HEAD DEP BOUNDS =           0.2950
-      STREAM LEAKAGE =   222353552.0000        STREAM LEAKAGE =          16.8720
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   329097696.0000               STORAGE     =          14.3877
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4015237.5000       HEAD DEP BOUNDS     =           0.2950
+      STREAM LEAKAGE     =   222353552.0000        STREAM LEAKAGE     =          16.8720
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   563346176.0000              TOTAL IN =          31.5547
+                TOTAL IN =   563346176.0000                  TOTAL IN =          31.5547
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    18170864.0000               STORAGE =          23.2087
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   420480000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     3919350.5000       HEAD DEP BOUNDS =           0.2838
-      STREAM LEAKAGE =    49389548.0000        STREAM LEAKAGE =           1.9146
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    71400304.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    18170864.0000               STORAGE     =          23.2087
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   420480000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     3919350.5000       HEAD DEP BOUNDS     =           0.2838
+      STREAM LEAKAGE     =    49389548.0000        STREAM LEAKAGE     =           1.9146
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    71400304.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   563360064.0000             TOTAL OUT =          31.5542
+               TOTAL OUT =   563360064.0000                 TOTAL OUT =          31.5542
 
-            IN - OUT =      -13888.0000              IN - OUT =       4.5013E-04
+                IN - OUT =      -13888.0000                  IN - OUT =       4.5013E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5296,33 +5296,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   339187008.0000               STORAGE =          11.2125
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4255179.0000       HEAD DEP BOUNDS =           0.2951
-      STREAM LEAKAGE =   236095744.0000        STREAM LEAKAGE =          16.9144
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   339187008.0000               STORAGE     =          11.2125
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4255179.0000       HEAD DEP BOUNDS     =           0.2951
+      STREAM LEAKAGE     =   236095744.0000        STREAM LEAKAGE     =          16.9144
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   587417600.0000              TOTAL IN =          28.4220
+                TOTAL IN =   587417600.0000                  TOTAL IN =          28.4220
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    35233624.0000               STORAGE =          19.6674
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   420480000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4150592.2500       HEAD DEP BOUNDS =           0.2847
-      STREAM LEAKAGE =    51167228.0000        STREAM LEAKAGE =           2.3213
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    76399720.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    35233624.0000               STORAGE     =          19.6674
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   420480000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4150592.2500       HEAD DEP BOUNDS     =           0.2847
+      STREAM LEAKAGE     =    51167228.0000        STREAM LEAKAGE     =           2.3213
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    76399720.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   587431168.0000             TOTAL OUT =          28.4216
+               TOTAL OUT =   587431168.0000                 TOTAL OUT =          28.4216
 
-            IN - OUT =      -13568.0000              IN - OUT =       4.3297E-04
+                IN - OUT =      -13568.0000                  IN - OUT =       4.3297E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5540,33 +5540,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   351711776.0000               STORAGE =           8.8363
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4641732.0000       HEAD DEP BOUNDS =           0.2952
-      STREAM LEAKAGE =   258301904.0000        STREAM LEAKAGE =          16.9802
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   351711776.0000               STORAGE     =           8.8363
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4641732.0000       HEAD DEP BOUNDS     =           0.2952
+      STREAM LEAKAGE     =   258301904.0000        STREAM LEAKAGE     =          16.9802
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   622535104.0000              TOTAL IN =          26.1117
+                TOTAL IN =   622535104.0000                  TOTAL IN =          26.1117
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    58680028.0000               STORAGE =          17.1364
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   420480000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4524108.5000       HEAD DEP BOUNDS =           0.2854
-      STREAM LEAKAGE =    54412536.0000        STREAM LEAKAGE =           2.5425
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    84451424.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    58680028.0000               STORAGE     =          17.1364
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   420480000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4524108.5000       HEAD DEP BOUNDS     =           0.2854
+      STREAM LEAKAGE     =    54412536.0000        STREAM LEAKAGE     =           2.5425
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    84451424.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   622548096.0000             TOTAL OUT =          26.1113
+               TOTAL OUT =   622548096.0000                 TOTAL OUT =          26.1113
 
-            IN - OUT =      -12992.0000              IN - OUT =       4.2725E-04
+                IN - OUT =      -12992.0000                  IN - OUT =       4.2725E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -5830,33 +5830,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   359762432.0000               STORAGE =          15.3023
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     4790802.0000       HEAD DEP BOUNDS =           0.2952
-      STREAM LEAKAGE =   266300944.0000        STREAM LEAKAGE =          15.8591
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   359762432.0000               STORAGE     =          15.3023
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     4790802.0000       HEAD DEP BOUNDS     =           0.2952
+      STREAM LEAKAGE     =   266300944.0000        STREAM LEAKAGE     =          15.8591
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   638733888.0000              TOTAL IN =          31.4566
+                TOTAL IN =   638733888.0000                  TOTAL IN =          31.4566
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    58998900.0000               STORAGE =           0.3421
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   430579456.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     4667519.5000       HEAD DEP BOUNDS =           0.2831
-      STREAM LEAKAGE =    56945788.0000        STREAM LEAKAGE =           4.6849
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    87555592.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    58998900.0000               STORAGE     =           0.3421
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   430579456.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     4667519.5000       HEAD DEP BOUNDS     =           0.2831
+      STREAM LEAKAGE     =    56945788.0000        STREAM LEAKAGE     =           4.6849
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    87555592.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   638747264.0000             TOTAL OUT =          31.4573
+               TOTAL OUT =   638747264.0000                 TOTAL OUT =          31.4573
 
-            IN - OUT =      -13376.0000              IN - OUT =      -7.5340E-04
+                IN - OUT =      -13376.0000                  IN - OUT =      -7.5340E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6061,33 +6061,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   371508992.0000               STORAGE =          14.0497
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5030934.5000       HEAD DEP BOUNDS =           0.2953
-      STREAM LEAKAGE =   279233664.0000        STREAM LEAKAGE =          15.9301
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   371508992.0000               STORAGE     =          14.0497
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5030934.5000       HEAD DEP BOUNDS     =           0.2953
+      STREAM LEAKAGE     =   279233664.0000        STREAM LEAKAGE     =          15.9301
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   663653248.0000              TOTAL IN =          30.2751
+                TOTAL IN =   663653248.0000                  TOTAL IN =          30.2751
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    59060316.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   446844672.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     4896387.0000       HEAD DEP BOUNDS =           0.2804
-      STREAM LEAKAGE =    60310820.0000        STREAM LEAKAGE =           3.8471
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =    92555008.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    59060316.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   446844672.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     4896387.0000       HEAD DEP BOUNDS     =           0.2804
+      STREAM LEAKAGE     =    60310820.0000        STREAM LEAKAGE     =           3.8471
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =    92555008.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   663667200.0000             TOTAL OUT =          30.2758
+               TOTAL OUT =   663667200.0000                 TOTAL OUT =          30.2758
 
-            IN - OUT =      -13952.0000              IN - OUT =      -7.0572E-04
+                IN - OUT =      -13952.0000                  IN - OUT =      -7.0572E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6317,33 +6317,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   389291872.0000               STORAGE =          13.3381
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5417803.5000       HEAD DEP BOUNDS =           0.2954
-      STREAM LEAKAGE =   300179776.0000        STREAM LEAKAGE =          16.0314
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   389291872.0000               STORAGE     =          13.3381
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5417803.5000       HEAD DEP BOUNDS     =           0.2954
+      STREAM LEAKAGE     =   300179776.0000        STREAM LEAKAGE     =          16.0314
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   702769152.0000              TOTAL IN =          29.6649
+                TOTAL IN =   702769152.0000                  TOTAL IN =          29.6649
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    59060316.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   473040000.0000                 WELLS =          20.0000
-     HEAD DEP BOUNDS =     5261582.0000       HEAD DEP BOUNDS =           0.2780
-      STREAM LEAKAGE =    64815324.0000        STREAM LEAKAGE =           3.2406
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   100606712.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    59060316.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   473040000.0000                 WELLS     =          20.0000
+     HEAD DEP BOUNDS     =     5261582.0000       HEAD DEP BOUNDS     =           0.2780
+      STREAM LEAKAGE     =    64815324.0000        STREAM LEAKAGE     =           3.2406
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   100606712.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   702783936.0000             TOTAL OUT =          29.6656
+               TOTAL OUT =   702783936.0000                 TOTAL OUT =          29.6656
 
-            IN - OUT =      -14784.0000              IN - OUT =      -6.7139E-04
+                IN - OUT =      -14784.0000                  IN - OUT =      -6.7139E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -6582,33 +6582,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   393771104.0000               STORAGE =           8.3225
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5566994.5000       HEAD DEP BOUNDS =           0.2955
-      STREAM LEAKAGE =   308459200.0000        STREAM LEAKAGE =          16.4073
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   393771104.0000               STORAGE     =           8.3225
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5566994.5000       HEAD DEP BOUNDS     =           0.2955
+      STREAM LEAKAGE     =   308459200.0000        STREAM LEAKAGE     =          16.4073
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   715676992.0000              TOTAL IN =          25.0252
+                TOTAL IN =   715676992.0000                  TOTAL IN =          25.0252
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    67500616.0000               STORAGE =          16.1230
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   473040000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5401996.0000       HEAD DEP BOUNDS =           0.2781
-      STREAM LEAKAGE =    66038104.0000        STREAM LEAKAGE =           2.4765
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   103710880.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    67500616.0000               STORAGE     =          16.1230
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   473040000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5401996.0000       HEAD DEP BOUNDS     =           0.2781
+      STREAM LEAKAGE     =    66038104.0000        STREAM LEAKAGE     =           2.4765
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   103710880.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   715691520.0000             TOTAL OUT =          25.0248
+               TOTAL OUT =   715691520.0000                 TOTAL OUT =          25.0248
 
-            IN - OUT =      -14528.0000              IN - OUT =       3.9864E-04
+                IN - OUT =      -14528.0000                  IN - OUT =       3.9864E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -6801,33 +6801,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   400076992.0000               STORAGE =           7.4458
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5807316.0000       HEAD DEP BOUNDS =           0.2955
-      STREAM LEAKAGE =   321824128.0000        STREAM LEAKAGE =          16.4508
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   400076992.0000               STORAGE     =           7.4458
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5807316.0000       HEAD DEP BOUNDS     =           0.2955
+      STREAM LEAKAGE     =   321824128.0000        STREAM LEAKAGE     =          16.4508
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   735588096.0000              TOTAL IN =          24.1921
+                TOTAL IN =   735588096.0000                  TOTAL IN =          24.1921
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    80106568.0000               STORAGE =          15.1700
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   473040000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5628276.5000       HEAD DEP BOUNDS =           0.2783
-      STREAM LEAKAGE =    68117296.0000        STREAM LEAKAGE =           2.5952
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   108710296.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    80106568.0000               STORAGE     =          15.1700
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   473040000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5628276.5000       HEAD DEP BOUNDS     =           0.2783
+      STREAM LEAKAGE     =    68117296.0000        STREAM LEAKAGE     =           2.5952
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   108710296.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   735602432.0000             TOTAL OUT =          24.1917
+               TOTAL OUT =   735602432.0000                 TOTAL OUT =          24.1917
 
-            IN - OUT =      -14336.0000              IN - OUT =       3.9673E-04
+                IN - OUT =      -14336.0000                  IN - OUT =       3.9673E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -7045,33 +7045,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   409022688.0000               STORAGE =           6.4438
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6194476.5000       HEAD DEP BOUNDS =           0.2956
-      STREAM LEAKAGE =   343421344.0000        STREAM LEAKAGE =          16.5138
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   409022688.0000               STORAGE     =           6.4438
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6194476.5000       HEAD DEP BOUNDS     =           0.2956
+      STREAM LEAKAGE     =   343421344.0000        STREAM LEAKAGE     =          16.5138
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   766518144.0000              TOTAL IN =          23.2533
+                TOTAL IN =   766518144.0000                  TOTAL IN =          23.2533
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =    99171432.0000               STORAGE =          14.1823
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   473040000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     5992940.5000       HEAD DEP BOUNDS =           0.2785
-      STREAM LEAKAGE =    71565648.0000        STREAM LEAKAGE =           2.6452
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   116762000.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =    99171432.0000               STORAGE     =          14.1823
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   473040000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     5992940.5000       HEAD DEP BOUNDS     =           0.2785
+      STREAM LEAKAGE     =    71565648.0000        STREAM LEAKAGE     =           2.6452
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   116762000.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   766532032.0000             TOTAL OUT =          23.2529
+               TOTAL OUT =   766532032.0000                 TOTAL OUT =          23.2529
 
-            IN - OUT =      -13888.0000              IN - OUT =       3.9864E-04
+                IN - OUT =      -13888.0000                  IN - OUT =       3.9864E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -7331,33 +7331,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   412754560.0000               STORAGE =           7.1022
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6343779.0000       HEAD DEP BOUNDS =           0.2957
-      STREAM LEAKAGE =   351593248.0000        STREAM LEAKAGE =          16.1944
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   412754560.0000               STORAGE     =           7.1022
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6343779.0000       HEAD DEP BOUNDS     =           0.2957
+      STREAM LEAKAGE     =   351593248.0000        STREAM LEAKAGE     =          16.1944
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   778571264.0000              TOTAL IN =          23.5922
+                TOTAL IN =   778571264.0000                  TOTAL IN =          23.5922
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   101222800.0000               STORAGE =           3.8893
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   478089728.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     6133340.5000       HEAD DEP BOUNDS =           0.2778
-      STREAM LEAKAGE =    73272184.0000        STREAM LEAKAGE =           3.2781
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   119866168.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   101222800.0000               STORAGE     =           3.8893
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   478089728.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     6133340.5000       HEAD DEP BOUNDS     =           0.2778
+      STREAM LEAKAGE     =    73272184.0000        STREAM LEAKAGE     =           3.2781
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   119866168.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   778584192.0000             TOTAL OUT =          23.5924
+               TOTAL OUT =   778584192.0000                 TOTAL OUT =          23.5924
 
-            IN - OUT =      -12928.0000              IN - OUT =      -1.5640E-04
+                IN - OUT =      -12928.0000                  IN - OUT =      -1.5640E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -7562,33 +7562,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   418122656.0000               STORAGE =           6.3376
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6584280.5000       HEAD DEP BOUNDS =           0.2958
-      STREAM LEAKAGE =   364785088.0000        STREAM LEAKAGE =          16.2379
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   418122656.0000               STORAGE     =           6.3376
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6584280.5000       HEAD DEP BOUNDS     =           0.2958
+      STREAM LEAKAGE     =   364785088.0000        STREAM LEAKAGE     =          16.2379
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   797371712.0000              TOTAL IN =          22.8713
+                TOTAL IN =   797371712.0000                  TOTAL IN =          22.8713
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   104137976.0000               STORAGE =           3.4292
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   486222336.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     6358814.5000       HEAD DEP BOUNDS =           0.2769
-      STREAM LEAKAGE =    75800048.0000        STREAM LEAKAGE =           3.0171
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   124865584.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   104137976.0000               STORAGE     =           3.4292
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   486222336.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     6358814.5000       HEAD DEP BOUNDS     =           0.2769
+      STREAM LEAKAGE     =    75800048.0000        STREAM LEAKAGE     =           3.0171
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   124865584.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   797384768.0000             TOTAL OUT =          22.8714
+               TOTAL OUT =   797384768.0000                 TOTAL OUT =          22.8714
 
-            IN - OUT =      -13056.0000              IN - OUT =      -1.4114E-04
+                IN - OUT =      -13056.0000                  IN - OUT =      -1.4114E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -7818,33 +7818,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   425829376.0000               STORAGE =           5.6257
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6971736.0000       HEAD DEP BOUNDS =           0.2959
-      STREAM LEAKAGE =   386102432.0000        STREAM LEAKAGE =          16.2994
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   425829376.0000               STORAGE     =           5.6257
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6971736.0000       HEAD DEP BOUNDS     =           0.2959
+      STREAM LEAKAGE     =   386102432.0000        STREAM LEAKAGE     =          16.2994
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   826783232.0000              TOTAL IN =          22.2210
+                TOTAL IN =   826783232.0000                  TOTAL IN =          22.2210
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   108259936.0000               STORAGE =           2.9792
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   499320032.0000                 WELLS =          10.0000
-     HEAD DEP BOUNDS =     6720890.0000       HEAD DEP BOUNDS =           0.2762
-      STREAM LEAKAGE =    79578384.0000        STREAM LEAKAGE =           2.8188
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   132917288.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   108259936.0000               STORAGE     =           2.9792
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   499320032.0000                 WELLS     =          10.0000
+     HEAD DEP BOUNDS     =     6720890.0000       HEAD DEP BOUNDS     =           0.2762
+      STREAM LEAKAGE     =    79578384.0000        STREAM LEAKAGE     =           2.8188
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   132917288.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   826796544.0000             TOTAL OUT =          22.2211
+               TOTAL OUT =   826796544.0000                 TOTAL OUT =          22.2211
 
-            IN - OUT =      -13312.0000              IN - OUT =      -1.2779E-04
+                IN - OUT =      -13312.0000                  IN - OUT =      -1.2779E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -8083,33 +8083,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   428860160.0000               STORAGE =           5.8440
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7121153.0000       HEAD DEP BOUNDS =           0.2959
-      STREAM LEAKAGE =   394250464.0000        STREAM LEAKAGE =          16.1454
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   428860160.0000               STORAGE     =           5.8440
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7121153.0000       HEAD DEP BOUNDS     =           0.2959
+      STREAM LEAKAGE     =   394250464.0000        STREAM LEAKAGE     =          16.1454
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   838111488.0000              TOTAL IN =          22.2854
+                TOTAL IN =   838111488.0000                  TOTAL IN =          22.2854
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   114747576.0000               STORAGE =          12.7673
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   499320032.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     6860173.0000       HEAD DEP BOUNDS =           0.2756
-      STREAM LEAKAGE =    81175328.0000        STREAM LEAKAGE =           3.0949
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   136021440.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   114747576.0000               STORAGE     =          12.7673
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   499320032.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     6860173.0000       HEAD DEP BOUNDS     =           0.2756
+      STREAM LEAKAGE     =    81175328.0000        STREAM LEAKAGE     =           3.0949
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   136021440.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   838124480.0000             TOTAL OUT =          22.2850
+               TOTAL OUT =   838124480.0000                 TOTAL OUT =          22.2850
 
-            IN - OUT =      -12992.0000              IN - OUT =       3.5477E-04
+                IN - OUT =      -12992.0000                  IN - OUT =       3.5477E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -8302,33 +8302,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   433314592.0000               STORAGE =           5.2408
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7361839.0000       HEAD DEP BOUNDS =           0.2960
-      STREAM LEAKAGE =   407399232.0000        STREAM LEAKAGE =          16.1823
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   433314592.0000               STORAGE     =           5.2408
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7361839.0000       HEAD DEP BOUNDS     =           0.2960
+      STREAM LEAKAGE     =   407399232.0000        STREAM LEAKAGE     =          16.1823
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   855955328.0000              TOTAL IN =          21.7190
+                TOTAL IN =   855955328.0000                  TOTAL IN =          21.7190
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   124944776.0000               STORAGE =          12.3787
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   499320032.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7083974.5000       HEAD DEP BOUNDS =           0.2750
-      STREAM LEAKAGE =    83598488.0000        STREAM LEAKAGE =           2.9168
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   141020848.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   124944776.0000               STORAGE     =          12.3787
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   499320032.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7083974.5000       HEAD DEP BOUNDS     =           0.2750
+      STREAM LEAKAGE     =    83598488.0000        STREAM LEAKAGE     =           2.9168
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   141020848.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   855968128.0000             TOTAL OUT =          21.7187
+               TOTAL OUT =   855968128.0000                 TOTAL OUT =          21.7187
 
-            IN - OUT =      -12800.0000              IN - OUT =       3.6621E-04
+                IN - OUT =      -12800.0000                  IN - OUT =       3.6621E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -8546,33 +8546,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   439532960.0000               STORAGE =           4.4488
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7749595.0000       HEAD DEP BOUNDS =           0.2961
-      STREAM LEAKAGE =   428635584.0000        STREAM LEAKAGE =          16.2336
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   439532960.0000               STORAGE     =           4.4488
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7749595.0000       HEAD DEP BOUNDS     =           0.2961
+      STREAM LEAKAGE     =   428635584.0000        STREAM LEAKAGE     =          16.2336
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   883797824.0000              TOTAL IN =          20.9784
+                TOTAL IN =   883797824.0000                  TOTAL IN =          20.9784
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   140677808.0000               STORAGE =          11.7810
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   499320032.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7443570.5000       HEAD DEP BOUNDS =           0.2743
-      STREAM LEAKAGE =    87296128.0000        STREAM LEAKAGE =           2.7757
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   149072560.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   140677808.0000               STORAGE     =          11.7810
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   499320032.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7443570.5000       HEAD DEP BOUNDS     =           0.2743
+      STREAM LEAKAGE     =    87296128.0000        STREAM LEAKAGE     =           2.7757
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   149072560.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   883810112.0000             TOTAL OUT =          20.9780
+               TOTAL OUT =   883810112.0000                 TOTAL OUT =          20.9780
 
-            IN - OUT =      -12288.0000              IN - OUT =       3.7766E-04
+                IN - OUT =      -12288.0000                  IN - OUT =       3.7766E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -8836,33 +8836,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   452178080.0000               STORAGE =          24.1825
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     7899129.0000       HEAD DEP BOUNDS =           0.2961
-      STREAM LEAKAGE =   436747456.0000        STREAM LEAKAGE =          16.0723
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   452178080.0000               STORAGE     =          24.1825
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     7899129.0000       HEAD DEP BOUNDS     =           0.2961
+      STREAM LEAKAGE     =   436747456.0000        STREAM LEAKAGE     =          16.0723
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   904704384.0000              TOTAL IN =          40.5509
+                TOTAL IN =   904704384.0000                  TOTAL IN =          40.5509
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   141612288.0000               STORAGE =           1.0631
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   514469152.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     7581934.5000       HEAD DEP BOUNDS =           0.2738
-      STREAM LEAKAGE =    88877120.0000        STREAM LEAKAGE =           3.0679
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   152176720.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   141612288.0000               STORAGE     =           1.0631
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   514469152.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     7581934.5000       HEAD DEP BOUNDS     =           0.2738
+      STREAM LEAKAGE     =    88877120.0000        STREAM LEAKAGE     =           3.0679
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   152176720.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   904717184.0000             TOTAL OUT =          40.5520
+               TOTAL OUT =   904717184.0000                 TOTAL OUT =          40.5520
 
-            IN - OUT =      -12800.0000              IN - OUT =      -1.1711E-03
+                IN - OUT =      -12800.0000                  IN - OUT =      -1.1711E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -9067,33 +9067,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   471121152.0000               STORAGE =          23.0237
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8140004.5000       HEAD DEP BOUNDS =           0.2962
-      STREAM LEAKAGE =   449833792.0000        STREAM LEAKAGE =          16.1033
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   471121152.0000               STORAGE     =          23.0237
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8140004.5000       HEAD DEP BOUNDS     =           0.2962
+      STREAM LEAKAGE     =   449833792.0000        STREAM LEAKAGE     =          16.1033
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   936974592.0000              TOTAL IN =          39.4231
+                TOTAL IN =   936974592.0000                  TOTAL IN =          39.4231
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   141856192.0000               STORAGE =           0.1007
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   538867008.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     7804287.0000       HEAD DEP BOUNDS =           0.2732
-      STREAM LEAKAGE =    91284816.0000        STREAM LEAKAGE =           2.9022
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   157176128.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   141856192.0000               STORAGE     =           0.1007
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   538867008.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     7804287.0000       HEAD DEP BOUNDS     =           0.2732
+      STREAM LEAKAGE     =    91284816.0000        STREAM LEAKAGE     =           2.9022
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   157176128.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   936988416.0000             TOTAL OUT =          39.4243
+               TOTAL OUT =   936988416.0000                 TOTAL OUT =          39.4243
 
-            IN - OUT =      -13824.0000              IN - OUT =      -1.1559E-03
+                IN - OUT =      -13824.0000                  IN - OUT =      -1.1559E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -9323,33 +9323,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   501004832.0000               STORAGE =          22.7463
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8528069.0000       HEAD DEP BOUNDS =           0.2963
-      STREAM LEAKAGE =   470960640.0000        STREAM LEAKAGE =          16.1473
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   501004832.0000               STORAGE     =          22.7463
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8528069.0000       HEAD DEP BOUNDS     =           0.2963
+      STREAM LEAKAGE     =   470960640.0000        STREAM LEAKAGE     =          16.1473
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =   988373248.0000              TOTAL IN =          39.1900
+                TOTAL IN =   988373248.0000                  TOTAL IN =          39.1900
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   141866656.0000               STORAGE =           0.0000
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   578160000.0000                 WELLS =          30.0000
-     HEAD DEP BOUNDS =     8161589.5000       HEAD DEP BOUNDS =           0.2726
-      STREAM LEAKAGE =    94972408.0000        STREAM LEAKAGE =           2.7716
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   165227840.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   141866656.0000               STORAGE     =           0.0000
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   578160000.0000                 WELLS     =          30.0000
+     HEAD DEP BOUNDS     =     8161589.5000       HEAD DEP BOUNDS     =           0.2726
+      STREAM LEAKAGE     =    94972408.0000        STREAM LEAKAGE     =           2.7716
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   165227840.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =   988388480.0000             TOTAL OUT =          39.1911
+               TOTAL OUT =   988388480.0000                 TOTAL OUT =          39.1911
 
-            IN - OUT =      -15232.0000              IN - OUT =      -1.1482E-03
+                IN - OUT =      -15232.0000                  IN - OUT =      -1.1482E-03
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =          -0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =          -0.00
 
 
 
@@ -9588,33 +9588,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   504761632.0000               STORAGE =           6.8384
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8677721.0000       HEAD DEP BOUNDS =           0.2964
-      STREAM LEAKAGE =   479119424.0000        STREAM LEAKAGE =          16.1632
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   504761632.0000               STORAGE     =           6.8384
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8677721.0000       HEAD DEP BOUNDS     =           0.2964
+      STREAM LEAKAGE     =   479119424.0000        STREAM LEAKAGE     =          16.1632
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1000438464.0000              TOTAL IN =          23.2980
+                TOTAL IN =  1000438464.0000                  TOTAL IN =          23.2980
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   149300048.0000               STORAGE =          14.1371
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   578160000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8299196.0000       HEAD DEP BOUNDS =           0.2724
-      STREAM LEAKAGE =    96362312.0000        STREAM LEAKAGE =           2.7409
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   168332000.0000                 GW ET =           6.1472
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   149300048.0000               STORAGE     =          14.1371
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   578160000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8299196.0000       HEAD DEP BOUNDS     =           0.2724
+      STREAM LEAKAGE     =    96362312.0000        STREAM LEAKAGE     =           2.7409
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   168332000.0000                 GW ET     =           6.1472
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =  1000453504.0000             TOTAL OUT =          23.2976
+               TOTAL OUT =  1000453504.0000                 TOTAL OUT =          23.2976
 
-            IN - OUT =      -15040.0000              IN - OUT =       3.7384E-04
+                IN - OUT =      -15040.0000                  IN - OUT =       3.7384E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -9807,33 +9807,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   509347456.0000               STORAGE =           4.9705
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8918789.0000       HEAD DEP BOUNDS =           0.2965
-      STREAM LEAKAGE =   492276320.0000        STREAM LEAKAGE =          16.1875
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   509347456.0000               STORAGE     =           4.9705
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8918789.0000       HEAD DEP BOUNDS     =           0.2965
+      STREAM LEAKAGE     =   492276320.0000        STREAM LEAKAGE     =          16.1875
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1018422272.0000              TOTAL IN =          21.4545
+                TOTAL IN =  1018422272.0000                  TOTAL IN =          21.4545
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   159851792.0000               STORAGE =          12.3284
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   578160000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8520680.0000       HEAD DEP BOUNDS =           0.2723
-      STREAM LEAKAGE =    98573152.0000        STREAM LEAKAGE =           2.7052
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   173331408.0000                 GW ET =           6.1482
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   159851792.0000               STORAGE     =          12.3284
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   578160000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8520680.0000       HEAD DEP BOUNDS     =           0.2723
+      STREAM LEAKAGE     =    98573152.0000        STREAM LEAKAGE     =           2.7052
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   173331408.0000                 GW ET     =           6.1482
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =  1018437056.0000             TOTAL OUT =          21.4541
+               TOTAL OUT =  1018437056.0000                 TOTAL OUT =          21.4541
 
-            IN - OUT =      -14784.0000              IN - OUT =       3.7956E-04
+                IN - OUT =      -14784.0000                  IN - OUT =       3.7956E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10051,33 +10051,33 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
 
            IN:                                      IN:
            ---                                      ---
-             STORAGE =   515412160.0000               STORAGE =           4.3940
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =           0.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     9307164.0000       HEAD DEP BOUNDS =           0.2966
-      STREAM LEAKAGE =   513507104.0000        STREAM LEAKAGE =          16.2237
-        UZF RECHARGE =     7879697.5000          UZF RECHARGE =           0.0000
-               GW ET =           0.0000                 GW ET =           0.0000
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   515412160.0000               STORAGE     =           4.3940
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =           0.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     9307164.0000       HEAD DEP BOUNDS     =           0.2966
+      STREAM LEAKAGE     =   513507104.0000        STREAM LEAKAGE     =          16.2237
+        UZF RECHARGE     =     7879697.5000          UZF RECHARGE     =           0.0000
+               GW ET     =           0.0000                 GW ET     =           0.0000
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-            TOTAL IN =  1046106112.0000              TOTAL IN =          20.9142
+                TOTAL IN =  1046106112.0000                  TOTAL IN =          20.9142
 
           OUT:                                     OUT:
           ----                                     ----
-             STORAGE =   175615760.0000               STORAGE =          11.8280
-       CONSTANT HEAD =           0.0000         CONSTANT HEAD =           0.0000
-               WELLS =   578160000.0000                 WELLS =           0.0000
-     HEAD DEP BOUNDS =     8877156.0000       HEAD DEP BOUNDS =           0.2721
-      STREAM LEAKAGE =   102084392.0000        STREAM LEAKAGE =           2.6668
-        UZF RECHARGE =           0.0000          UZF RECHARGE =           0.0000
-               GW ET =   181383120.0000                 GW ET =           6.1469
-     SURFACE LEAKAGE =           0.0000       SURFACE LEAKAGE =           0.0000
+             STORAGE     =   175615760.0000               STORAGE     =          11.8280
+       CONSTANT HEAD     =           0.0000         CONSTANT HEAD     =           0.0000
+               WELLS     =   578160000.0000                 WELLS     =           0.0000
+     HEAD DEP BOUNDS     =     8877156.0000       HEAD DEP BOUNDS     =           0.2721
+      STREAM LEAKAGE     =   102084392.0000        STREAM LEAKAGE     =           2.6668
+        UZF RECHARGE     =           0.0000          UZF RECHARGE     =           0.0000
+               GW ET     =   181383120.0000                 GW ET     =           6.1469
+     SURFACE LEAKAGE     =           0.0000       SURFACE LEAKAGE     =           0.0000
 
-           TOTAL OUT =  1046120448.0000             TOTAL OUT =          20.9139
+               TOTAL OUT =  1046120448.0000                 TOTAL OUT =          20.9139
 
-            IN - OUT =      -14336.0000              IN - OUT =       3.8147E-04
+                IN - OUT =      -14336.0000                  IN - OUT =       3.8147E-04
 
- PERCENT DISCREPANCY =          -0.00     PERCENT DISCREPANCY =           0.00
+     PERCENT DISCREPANCY =          -0.00         PERCENT DISCREPANCY =           0.00
 
 
 
@@ -10092,6 +10092,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2019/11/15 15:55:00
- Elapsed run time:  1.514 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/12 16:02:35
+ Elapsed run time:  1.293 Seconds
 
