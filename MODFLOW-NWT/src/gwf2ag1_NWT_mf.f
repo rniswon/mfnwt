@@ -1114,7 +1114,7 @@
       !1 - ------RESET DEMAND IF IT CHANGES
       DEMAND = 0.0
       TOTAL = 0.0
-      DO i = 1, NUMIRRDIVERSION
+      DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
             if (IUNIT(44) > 0) then
@@ -1884,8 +1884,8 @@
      +                DVRPERC(ICOUNT, istsg)
                dvt = (1.0 - DVEFF(ICOUNT, istsg))*dvt
          ! Keep irrigation for PRMS as volume
-               DIVERSIONIRRPRMS(icount, l) = 
-     +         DIVERSIONIRRPRMS(icount, l) + dvt
+               DIVERSIONIRRPRMS(icount, istsg) = 
+     +         DIVERSIONIRRPRMS(icount, istsg) + dvt
             END DO
          END IF
       END DO
@@ -2193,7 +2193,7 @@
                DO icount = 1, DVRCH(istsg)
                   ihru = IRRROW_SW(icount, istsg)
                   WRITE (IBD3, 66) ISTSG, IHRU, 
-     +                             DIVERSIONIRRPRMS(icount, l)
+     +                             DIVERSIONIRRPRMS(icount, istsg)
                END DO
             END IF
          END DO
@@ -2794,20 +2794,14 @@
       det = (aettotal - aetold)
       factor = etdif
       dq = sup - supold
-      if (kiter == 1) then
-         !if (det < zerod5*pettotal) then
-         !  factor = dzero
-         !else
-           factor = etdif
-         !end if
-      else if (det < zerod5*pettotal) then
-         factor = dzero
-      else if (abs(det) > dzero) then
-         factor = dq*etdif/det
+      if (kiter > 1) then
+        if (abs(det) > dzero) then
+          factor = dq*etdif/det
+        end if
       end if
-      if ( kiter > 1 ) then
-        if( factor > accel*etdif ) factor = accel*etdif
-      end if
+      if( factor > accel*etdif ) factor = accel*etdif
+      if( factor < etdif ) factor = etdif
+      if( factor < dzero ) factor = dzero
 !      open(222,file='debug.out')
 !      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
 !     +aetold,factor
