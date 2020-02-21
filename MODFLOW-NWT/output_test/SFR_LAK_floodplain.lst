@@ -1655,7 +1655,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -1914,7 +1914,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -2188,7 +2188,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -2460,7 +2460,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -2821,7 +2821,7 @@ USING ET RATE FROM PREVIOUS STRESS PERIOD. CURRENT PERIOD IS:       3
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -3080,7 +3080,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     1 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -3354,7 +3354,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -3630,7 +3630,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -4051,7 +4051,7 @@ USING ET RATE FROM PREVIOUS STRESS PERIOD. CURRENT PERIOD IS:       4
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -4325,7 +4325,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -4603,7 +4603,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    10 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -5024,7 +5024,7 @@ USING ET RATE FROM PREVIOUS STRESS PERIOD. CURRENT PERIOD IS:       5
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -5299,7 +5299,7 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP     5 STRESS PERIOD   
 
       CONNECTED LAKE   TIME-STEP         STAGE-CHANGE          PERCENT
  LAKE    INFLUX      SURFACE AREA   TIME STEP  CUMULATIVE    DISCREPANCY
-   1   0.0000E+00     0.0000E+00   0.0000E+00  0.0000E+00       0.000
+   1   0.0000E+00     0.0000E+00   1.3563E-19  0.0000E+00       0.000
  --------------------------------------------------------------------------------
 
 
@@ -13866,6 +13866,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP   120 STRESS PERIOD   
          TOTAL TIME 4.99320E+07 8.32200E+05  13870.      577.92      1.5822    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/13  8:29:14
- Elapsed run time:  2.235 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2020/02/21 14:55:36
+ Elapsed run time:  2.065 Seconds
 
