@@ -22,7 +22,11 @@ o Version 1.2.0 03/01/2020:
 
 Agricultural (AG) Water Use Package
 • This is the first version of MODFLOW-NWT that includes this package.
-Refer to Niswonger (2020) for detailes.
+Refer to Niswonger (2020) for details. Documentation for the AG Package
+in included in the pdf document called AG_Package_EM&S.pdf located in
+the "doc" folder. Additionally, input instructions for the AG Package are
+included in the document called Input_instructions_AG.pdf located in
+the "doc" folder.
 
 Streamflow Routing (SFR2) Package
 • A check was added to allow stream reaches to have altitudes below the 
@@ -55,6 +59,10 @@ output and does not affect any other calculated values.
 This aption simulates root water uptake using a capillary gradient between
 a user specified root pressure and the simulated capillary pressure in the
 root zone. This formulation is documented in Lappala and others (1987).
+
+Lappala, E. G., Healy, R. W., & Weeks, E. P. (1987). Documentation of computer 
+program VS2D to solve the equations of fluid flow in variably saturated porous 
+media. Water-Resour. Invest. Rep, 83, 4099.
 
 Lake (LAK) Package
 • The interval for which derivatives are smoothed to zero in the calculation 
@@ -92,10 +100,6 @@ Upstream Weighting (UPW) Package
 observation packages are active. IPHDRY should be set to zero because
 if IPHDY is set to 1 then observation values could erroneously be
 calculated using HDRY.
-
-Lappala, E. G., Healy, R. W., & Weeks, E. P. (1987). Documentation of computer 
-program VS2D to solve the equations of fluid flow in variably saturated porous 
-media. Water-Resour. Invest. Rep, 83, 4099.
 
 
 o Version 1.1.4 04/01/2018:
