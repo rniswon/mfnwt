@@ -1,4 +1,4 @@
-LIST                  9 ./Ag_EP1b/output/Agwater1_high.lst
+LIST                  9 ./Ag_EP1b/output/Agwater1b_high.lst
 BAS6                 75 ./Ag_EP1b/input/Agwater1.ba6
 UPW                   7 ./Ag_EP1b/input/Agwater1.upw
 DIS                   8 ./Ag_EP1b/input/Agwater1.dis

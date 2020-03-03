@@ -1,5 +1,14 @@
 @ECHO OFF
-
+DEL  ..\output_test\output_test_swi\*.*
+DEL  ..\output_test\output_test_swr1\*.*
+DEL  ..\output_test\*.*
+DEL  ..\output_test_64\output_test_swi\*.*
+DEL  ..\output_test_64\output_test_swr1\*.*
+DEL  ..\output_test_64\*.*
+MOVE /Y .\Ag_EP1a\output\Agwater1a_high.lst ..\output_test
+MOVE /Y .\Ag_EP1a\output\Agwater1a_low.lst ..\output_test
+MOVE /Y .\Ag_EP1b\output\Agwater1b_high.lst ..\output_test
+MOVE /Y .\Ag_EP1b\output\Agwater1b_low.lst ..\output_test
 MOVE /Y .\Ex_prob1a\Pr1aMF2005.LST ..\output_test
 MOVE /Y .\Ex_prob1a\Pr1aMFNWT.LST ..\output_test
 MOVE /Y .\Ex_prob1b\Pr1bMF2005.LST ..\output_test
@@ -24,6 +33,8 @@ MOVE /Y .\Uzf_testoptions\UZFtestoptions.lst ..\output_test
 MOVE /Y .\UZF_testproblem1\Prob1.lst ..\output_test
 MOVE /Y .\UZF_testproblem2\UZFtest2.lst ..\output_test
 
+DEL  .\Ag_EP1a\output\*.*
+DEL  .\Ag_EP1b\output\*.*
 DEL /S *.lst
 DEL /S *.bud
 DEL /S *.flw

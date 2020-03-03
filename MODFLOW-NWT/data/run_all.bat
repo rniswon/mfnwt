@@ -1,5 +1,8 @@
 @ECHO OFF
-
+..\bin\MODFLOW-NWT.exe .\Ag_EP1a\Agwater1_high.nam
+..\bin\MODFLOW-NWT.exe .\Ag_EP1a\Agwater1_low.nam
+..\bin\MODFLOW-NWT.exe .\Ag_EP1b\Agwater1_high.nam
+..\bin\MODFLOW-NWT.exe .\Ag_EP1b\Agwater1_low.nam
 ..\bin\MODFLOW-NWT.exe .\SFR_LAK_floodplain\SFR_LAK_floodplain.nam
 ..\bin\MODFLOW-NWT.exe .\UZF_cap_ET\UZF_cap_ET.nam
 ..\bin\MODFLOW-NWT.exe .\Uzf_testoptions\UZFtestoptions.nam
