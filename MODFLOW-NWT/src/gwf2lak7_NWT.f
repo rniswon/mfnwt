@@ -428,7 +428,7 @@ C     ------------------------------------------------------------------
       DOUBLE PRECISION VOLTERP
       EXTERNAL VOLTERP
 C     ------------------------------------------------------------------
-      INTEGER IGRID,ISS,LM,IUNITGWT,IN,ISOL,L1,I,J,K,KK,LK,ITMP1,ITMP,
+      INTEGER IGRID,ISS,LM,IUNITGWT,IN,ISOL,L1,I,J,K,KK,LK,ITMP,ITMP1,
      &        INC,NSOL,N,I2,K1,K2,K3,K4,I1,IC,IS,JK,NSLMS,
      &        IUNITSFR,LAKEFLG,LAKE,NTYP,J2,KKPER,IOUTS,IUNITNUM,L,
      &        IL,IR,ITYPE,IUNITBCF,IUNITLPF,IUNITHUF,IUNITUPW,
@@ -1131,7 +1131,6 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     FUNCTIONS
 C     ------------------------------------------------------------------
-      integer test
       DOUBLE PRECISION VOLTERP
       EXTERNAL VOLTERP
 C     ------------------------------------------------------------------
