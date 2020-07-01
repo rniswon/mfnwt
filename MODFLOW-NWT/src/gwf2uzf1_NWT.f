@@ -5664,7 +5664,7 @@ C     ------------------------------------------------------------------
 C
 C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
 !        IF ( il.GT.0 ) THEN
-          ZEROD9 = 1.0d0-9
+          ZEROD9 = 1.0d-9
           ghdif = celtop - H
           totalwc = 0.0
           iset = 1

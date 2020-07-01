@@ -72,7 +72,7 @@
 !         This is the residual of the linear equations scaled by
 !         the norm of the rhs.
 !         Usually 10^-8 to 10^-12 works ok.  
-      Stop_toldum = 1.0D0-10
+      Stop_toldum = 1.0D-10
 ! Idir  - index for reordering direction permutation [1-6]
 !        the actual order is not needed to be known by the
 !        user. But the convergence rate will depend on the 
