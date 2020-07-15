@@ -37,7 +37,7 @@ def cleanup(srcdir, tempdir):
 
 if __name__ == "__main__":
 
-    args = pymake.pymake.parser()
+    args = pymake.parser()
 
     srcdir = args.srcdir
 
@@ -49,10 +49,15 @@ if __name__ == "__main__":
 
     #call main -- note that this form allows main to be called
     #from python as a function.
-
-    pymake.pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
-                       args.expedite, args.dryrun, False, args.debug,
-                       args.subdirs, "--static", syslibs="-lc", arch=args.arch,
-                       makefile=args.makefile)
+    try:
+        pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
+                    args.expedite, args.dryrun, False, args.debug,
+                    args.subdirs, "--static", syslibs="-lc", arch=args.arch,
+                    makefile=args.makefile)
+    except AttributeError:
+        pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
+                    args.expedite, args.dryrun, False, args.debug,
+                    args.subdirs, "--static", arch=args.arch,
+                    makefile=args.makefile)
 
     shutil.rmtree(srcdir)
