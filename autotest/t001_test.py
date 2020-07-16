@@ -110,12 +110,15 @@ def do_model(model):
     elif name in ("UZFtest2.nam", ):
         # UZFtest2.nam: avoid loading the OC file, because it gives us
         # an unspecified difference between head outputs. Can't figure out why
-        ml = fp.modflow.Modflow.load(name,
-                                     exe_name=nwt_exe,
-                                     model_ws=model_ws,
-                                     check=False,
-                                     load_only=["DIS", "BAS6", "GAGE",
-                                                "WEL", ])
+        if platform.system().lower() != "windows":
+            return
+        else:
+            ml = fp.modflow.Modflow.load(name,
+                                         exe_name=nwt_exe,
+                                         model_ws=model_ws,
+                                         check=False,
+                                         load_only=["DIS", "BAS6", "GAGE",
+                                                    "WEL", ])
 
     else:
         ml = fp.modflow.Modflow.load(name,
