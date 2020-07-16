@@ -2,6 +2,7 @@
 import os
 import numpy as np
 import flopy as fp
+import platform
 
 
 t_dir = os.path.join(".", "temp")
@@ -24,6 +25,20 @@ formatted = ("Pr1aMFNWT.out",
              "Agwater1b_high.hed",
              "Agwater1b_low.hed",
              "UZFtest2hd.out",)
+
+if platform.system().lower() != "windows":
+    formatted = ("Pr1aMFNWT.out",
+                 "Pr1bMFNWT.out",
+                 "Pr2.out",
+                 "Pr3_higher.out",
+                 "Pr3_lower.out",
+                 "SFR_LAK_floodplainhd.out",
+                 "Sfr2weltab.out",
+                 "UZFtestoptions.out",
+                 "Agwater1a_high.hed",
+                 "Agwater1a_low.hed",
+                 "Agwater1b_high.hed",
+                 "Agwater1b_low.hed",)
 
 
 def validate(sim_array, valid_array):
