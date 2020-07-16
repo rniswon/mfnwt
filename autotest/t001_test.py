@@ -55,25 +55,15 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                                      "ConstantStage.dat")),
                 "UZF_cap_ET.nam": (os.path.join("input", "seg1.tab"),
                                    os.path.join("input", "seg9.tab"),),
-                                   # os.path.join("input", "UZF_cap_ET.uzf")),
                 "UZFtestoptions.nam": (),
                 "Agwater1a_high.nam": (os.path.join("input", "seg1_high.tab"),
                                        os.path.join("input", "seg9.tab"),),
-                                       # os.path.join("input", "Agwater1.uzf"),
-                                       # os.path.join("input", "Agwater1.ag")),
                 "Agwater1a_low.nam": (os.path.join("input", "seg1_low.tab"),
                                       os.path.join("input", "seg9.tab")),
-                                     # os.path.join("input", "Agwater1.uzf"),
-                                     # os.path.join("input", "Agwater1.ag")),
                 "Agwater1b_high.nam": (os.path.join("input", "seg1.tab"),
                                        os.path.join("input", "seg9.tab")),
-                                      # os.path.join("input", "Agwater1_high.uzf"),
-                                      # os.path.join("input", "Agwater1.ag")),
                 "Agwater1b_low.nam": (os.path.join("input", "seg1.tab"),
                                       os.path.join("input", "seg9.tab")),}
-                                     # os.path.join("input", "Agwater1_low.uzf"),
-                                     # os.path.join("input", "Agwater1.ag")),
-                # "UZFtest2.nam": ("UZFTest2.uzf",)}
 
 
 def external_files(model, ows, f):
@@ -107,27 +97,19 @@ def do_model(model):
 
     if name in ("Sfr2weltab.nam", ):
         # Sfr2weltab: need to avoid loading WEL file due to tabfiles
-        # UZF_cap_ET: need to avoid for now unitl PR to update flopy
-        # Agwater1: avoid loading AG and UZF until AgOptions PR to flopy
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
                                      model_ws=model_ws,
                                      check=False,
                                      load_only=["DIS", "GHB", "BAS6", "UPW",
                                                 "NWT", "OC", "SFR", "GAGE"])
-    # elif name == "UZFtest2.nam":
-    #     ml = fp.modflow.Modflow.load(name,
-    #                                  exe_name=nwt_exe,
-    #                                  model_ws=model_ws,
-    #                                  check=False,
-    #                                  load_only=["DIS", "GHB", "BAS6", "UPW",
-    #                                             "NWT", "OC", "SFR", "GAGE",
-    #                                             "WEL"])
+
     else:
         ml = fp.modflow.Modflow.load(name,
                                      exe_name=nwt_exe,
                                      model_ws=model_ws,
                                      check=False)
+
     # remove the temporary name file
     if copyfile:
         os.remove(os.path.join(model_ws, name))
@@ -148,7 +130,7 @@ def do_model(model):
     ml.write_input()
 
     # fix the name files that we can't load a package with in flopy
-    if name in ("Sfr2Weltab.nam", "UZF_cap_ET.nam", "Prob1.nam"):
+    if name in ("Sfr2Weltab.nam", "Prob1.nam"):
         with open(os.path.join(out_dir, name)) as foo:
             tmp = [line for line in foo]
         with open(os.path.join(out_dir, name), "w") as foo:
@@ -156,13 +138,6 @@ def do_model(model):
 
             if name == "Sfr2Weltab.nam":
                 foo.write("WEL   91   Sfr2weltab.wel")
-            # elif name == "UZF_cap_ET.nam":
-            #     foo.write("UZF   19  UZF_cap_ET.uzf")
-            # elif name == "UZFtest2.nam":
-            #     foo.write("UZF   19  UZFtest2.uzf")
-            # elif name in ("Agwater1a_high.nam", "Agwater1a_low.nam"):
-            #     foo.write("UZF  19  Agwater1.uzf\n")
-            #     foo.write("AG   57  Agwater1.ag\n")
             else:
                 pass
 
@@ -171,10 +146,9 @@ def do_model(model):
                                  model_ws=out_dir,
                                  check=False,
                                  forgive=True)
-    # try:
+
     success, _ = ml.run_model()
-    # except:
-    #     success = False
+
     assert success, ismfnwt
 
 
