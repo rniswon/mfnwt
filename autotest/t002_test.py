@@ -38,8 +38,7 @@ if platform.system().lower() != "windows":
                  "Agwater1a_high.hed",
                  "Agwater1a_low.hed",
                  "Agwater1b_high.hed",
-                 "Agwater1b_low.hed",
-                 "UZFtest2hd.out",)
+                 "Agwater1b_low.hed",)
 
 
 def validate(sim_array, valid_array):
