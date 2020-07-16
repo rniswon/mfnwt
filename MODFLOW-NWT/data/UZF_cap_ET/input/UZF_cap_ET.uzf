@@ -7,7 +7,7 @@ rejectsurfk
 specifysurfk
 end
 1  1  1  1   0  61 15 100 4  1.0   NUZTOP IUZFOPT IRUNFLG IETFLG IUZFCB1 IUZFCB2 NTRAIL NSETS NUZGAGES surfdep
-INTERNAL          1 (20I4)    6         UZFBND
+INTERNAL          1 (FREE)    6         UZFBND
    1   1   0   0   0   0   0   0   0   0
    1   1   1   0   0   1   1   1   0   0
    0   1   1   1   1   1   1   1   0   0
@@ -23,7 +23,7 @@ INTERNAL          1 (20I4)    6         UZFBND
    1   1   1   1   1   1   1   1   1   0
    0   1   1   1   1   1   1   1   1   0
    0   0   1   1   1   1   0   0   0   0
-INTERNAL          1 (20I4)    6         IRUNBND
+INTERNAL          1 (FREE)    6         IRUNBND
    1   1   0   0   0   0   0   0   0   0
    1   1   1   0   0   3   3   3   0   0
    0   1   1   1   3   3   3   3   0   0
