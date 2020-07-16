@@ -66,7 +66,7 @@ has_external = {"l1b2k_bath.nam": ("lak1b_bath.txt",),
                                       os.path.join("input", "seg9.tab")),
                 "UZFtest2.nam": ("UZFtest2.uzf", "UZFtest2.ghb",
                                  "UZFtest2.oc", "UZFtest2.nwt",
-                                 "UZFtest2.upw")}
+                                 "UZFtest2.upw", "UZFtest2.sfr")}
 
 
 def external_files(model, ows, f):
@@ -114,7 +114,7 @@ def do_model(model):
                                      exe_name=nwt_exe,
                                      model_ws=model_ws,
                                      check=False,
-                                     load_only=["DIS", "BAS6", "GAGE", "SFR",
+                                     load_only=["DIS", "BAS6", "GAGE",
                                                 "WEL", ])
 
     else:
@@ -156,7 +156,8 @@ def do_model(model):
                 foo.write("GHB   17   UZFtest2.ghb\n")
                 foo.write("NWT   13   UZFtest2.nwt\n")
                 foo.write("OC    14   UZFtest2.oc\n")
-                foo.write("UPW   7    UZFtest2.upw")
+                foo.write("UPW   7    UZFtest2.upw\n")
+                foo.write("SFR   15   UZFtest2.sfr")
             else:
                 pass
 
