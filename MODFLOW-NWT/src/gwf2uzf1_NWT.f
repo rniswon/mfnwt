@@ -4237,6 +4237,13 @@ C67-----FORMATS.
  9014 FORMAT (62X, 2(1PE14.7, 1X))
  9015 FORMAT (//)
  9016 FORMAT (9X, 1PE14.7, 1X, 9(2X,1PE14.7))
+      !delete
+!      DO j = 1, NWAVST(2, 1)
+!        write(999,22)j,totim,uzthst(j,2),uzdpst(j,2),uzflst(j,2),
+!     +     uzspst(j,2)
+!      END DO
+!22    format(i5,5e15.5)
+      !to here
 C
       RETURN
       END SUBROUTINE GWF2UZF1BD
