@@ -56,7 +56,7 @@ this bug could cause the model to stop suddenly.
 file option 4 was incorrect. This variable only is used for gage file 
 output and does not affect any other calculated values.
 • A new option was added to simulate root uptake from the unsaturated zone.
-This aption simulates root water uptake using a capillary gradient between
+This option simulates root water uptake using a capillary gradient between
 a user specified root pressure and the simulated capillary pressure in the
 root zone. This formulation is documented in Lappala and others (1987).
 
@@ -85,6 +85,9 @@ the node from which flow is diverted to the diversion segment.
 • Bug fix for writing cross-sectional area to linker file for MT3D-USGS.  
 Previously, when a diversion diverts all flow, the code was using the wrong 
 variable for flow for calculating stream cross-sectional area.
+• IUZFRCH was not properly initialized (allocated) for a steady state 
+simulation.  This variable is now a part of the LMTMODULE and is allocated
+in the AR routine of LMT.
 
 Gage Package
 • A minor output problem occurred when writing output for lakes when the Lake 
