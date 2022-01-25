@@ -829,13 +829,12 @@
             end do
          end select
          !2 - ---READ WELL LIST
-         if (found5) then
+         if (found5 .and. NUMIRRWEL > 0) then
             CALL URDCOM(In, IOUT, line)
             LLOC = 1
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
             ISTARTSAVE = ISTART
             CALL URWORD(LINE, LLOC, ISTART, ISTOP, 1, I, R, IOUT, IN)
-         end if
          do
             select case (LINE(ISTARTSAVE:ISTOP))
             case ('WELL LIST')
@@ -924,6 +923,7 @@
          CWELL = ' WELLS'
          IF (NWELLS .EQ. 1) CWELL = ' WELL '
          WRITE (IOUT, 101) NWELLS, CWELL
+         end if
 101      FORMAT(1X, /1X, I6, A)
 100      FORMAT(1X, /1X, '****MODEL STOPPING**** ',
      +      'UNIT NUMBER FOR TABULAR INPUT FILE SPECIFIED AS ZERO.')

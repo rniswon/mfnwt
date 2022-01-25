@@ -223,7 +223,7 @@ C----------READ USING PACKAGE READ AND PREPARE MODULES.
 !        IF(IUNIT(61).GT.0) CALL FMP2RP(IUNIT(61),ISTARTFL,KKPER,        !FMP2AR CALL ADDED BY SCHMID
 !     1                          IUNIT(44),IUNIT(52),IGRID)     
         IF(IUNIT(64).GT.0) CALL GWF2SWR7RP(IUNIT(64),KKPER,IGRID)  !SWR - JDH
-        IF(IUNIT(66).GT.0 ) CALL GWF2AG7AD(IUNIT(66),KKPER)                           
+        !IF(IUNIT(66).GT.0 ) CALL GWF2AG7AD(IUNIT(66),KKPER)      not sure why this is here.                     
 C
 C7C-----SIMULATE EACH TIME STEP.
         DO 90 KSTP = 1, NSTP(KPER)
