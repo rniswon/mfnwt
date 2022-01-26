@@ -2571,8 +2571,8 @@
          SEG(2, iseg) = 0.0
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
-               SEG(2, iseg) = DEMAND(iseg)
-               TIMEINPERIODSEG(ISEG) = done
+                SEG(2, iseg) = DEMAND(iseg)
+                TIMEINPERIODSEG(ISEG) = done
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
@@ -2583,6 +2583,7 @@
          k = IDIVAR(1, ISEG)
          fmaxflow = STRM(9, LASTREACH(K))
          IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+!
          write(999,121)kper,kstp,kiter,factor,aetseg(iseg),petseg(iseg),
      +    SEG(2, iseg),TIMEINPERIODSEG(ISEG)
 121   format(3i5,5e20.10)
