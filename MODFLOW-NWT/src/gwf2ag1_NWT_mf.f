@@ -2572,7 +2572,7 @@
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
                SEG(2, iseg) = DEMAND(iseg)
-               TIMEINPERIODSEG(ISEG) = 0.0
+               TIMEINPERIODSEG(ISEG) = done
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
