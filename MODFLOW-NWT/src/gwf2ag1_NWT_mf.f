@@ -751,7 +751,9 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
+      
+      
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1080,6 +1082,15 @@
             ISTARTSAVE = ISTART
          end if
       end do
+!
+! Set demand to specified diversion flows in SFR.
+!
+      DO i = 1, NUMIRRDIVERSIONSP
+         iseg = IRRSEG(i)
+         if (iseg > 0 .and. IUNITSFR > 0) then
+               DEMAND(ISEG) = SEG(2, ISEG)
+         END IF
+      END DO
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1100,7 +1111,7 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: NSS, SEG
+      USE GWFSFRMODULE, ONLY: NSS, SEG, NUMTAB_SFR
       USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
@@ -1108,27 +1119,20 @@
       INTEGER, INTENT(IN)::IN, KPER
       !
       INTEGER ISEG, i
-      DOUBLE PRECISION :: TOTAL
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      DEMAND = 0.0
-      TOTAL = 0.0
+      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         if (iseg > 0) then
-            if (IUNIT(44) > 0) then
+         if (iseg > 0 .and. IUNIT(44) > 0) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
-               DEMAND(ISEG) = SEG(2, ISEG)
-               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
-               TOTAL = TOTAL + DEMAND(ISEG)
-            elseif (GSFLOW_flag_local == 1) then
-            end if
-            SUPACT(ISEG) = 0.0
-            ACTUAL(ISEG) = 0.0
-         END IF
+           IF ( NUMTAB_SFR > 0 ) DEMAND(ISEG) = SEG(2, ISEG)
+           SUPACT(ISEG) = 0.0
+           ACTUAL(ISEG) = 0.0
+         end if
       END DO
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
@@ -2579,6 +2583,9 @@
          k = IDIVAR(1, ISEG)
          fmaxflow = STRM(9, LASTREACH(K))
          IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
+         write(999,121)kper,kstp,kiter,factor,aetseg(iseg),petseg(iseg),
+     +    SEG(2, iseg),TIMEINPERIODSEG(ISEG)
+121   format(3i5,5e20.10)
 300    continue
        deallocate (petseg, aetseg)
        return
