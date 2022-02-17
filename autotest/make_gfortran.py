@@ -49,15 +49,17 @@ if __name__ == "__main__":
 
     #call main -- note that this form allows main to be called
     #from python as a function.
+    fflags = "--static " + "-ffree-line-length-512 " + "-ffixed-line-length-132 " + "-Wuninitialized " + "-O2"
     try:
+        syslibs="-lc"
         pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
                     args.expedite, args.dryrun, False, args.debug,
-                    args.subdirs, "--static", syslibs="-lc", arch=args.arch,
+                    args.subdirs, fflags, arch=args.arch,
                     makefile=args.makefile)
     except AttributeError:
         pymake.main(srcdir, args.target, args.fc, args.cc, args.makeclean,
                     args.expedite, args.dryrun, False, args.debug,
-                    args.subdirs, "--static", arch=args.arch,
+                    args.subdirs, fflags, arch=args.arch,
                     makefile=args.makefile)
 
     shutil.rmtree(srcdir)
