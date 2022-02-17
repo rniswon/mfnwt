@@ -1,4 +1,4 @@
-name: gsflow continuous integration
+name: modflow-nwt continuous integration
 
 on:
   push:
