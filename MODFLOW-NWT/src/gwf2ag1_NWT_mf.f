@@ -90,6 +90,7 @@
         REAL, SAVE, DIMENSION(:), POINTER :: DEMAND, SUPACT, SUPACTOLD
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUAL
         REAL, SAVE, DIMENSION(:), POINTER :: ACTUALOLD
+        INTEGER, SAVE, POINTER :: KPEROLD
       END MODULE GWFAGMODULE
 
       SUBROUTINE GWF2AG7AR(IN, IUNITSFR, IUNITNWT)
@@ -127,6 +128,7 @@
       ALLOCATE (TSACTIVEGWET, TSACTIVESWET, NUMSWET, NUMGWET)
       ALLOCATE (TSGWALLUNIT, TSGWETALLUNIT, NSEGDIMTEMP)
       ALLOCATE (GSFLOW_flag_local)
+      ALLOCATE (KPEROLD)
       GSFLOW_flag_local = 0
 !      IF ( GSFLOW_flag > 0 ) GSFLOW_flag_local = GSFLOW_flag
       VBVLAG = 0.0
@@ -174,6 +176,7 @@
       NUMIRRDIVERSION = 0
       NUMIRRDIVERSIONSP = 0
       TRIGGERFLAG = 0
+      KPEROLD = 0
       !
       !2 - --- IDENTIFY PACKAGE AND INITIALIZE AG OPTIONS.
       WRITE (IOUT, 1) IN
@@ -751,9 +754,7 @@
       ! - -----------------------------------------------------------------
       USE GLOBAL, ONLY: IOUT, NCOL, NROW, NLAY, IFREFM
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS, SEG, NUMTAB_SFR
-      
-      
+      USE GWFSFRMODULE, ONLY: ISTRM, NSTRM, NSS
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
@@ -1082,15 +1083,6 @@
             ISTARTSAVE = ISTART
          end if
       end do
-!
-! Set demand to specified diversion flows in SFR.
-!
-      DO i = 1, NUMIRRDIVERSIONSP
-         iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNITSFR > 0) then
-               DEMAND(ISEG) = SEG(2, ISEG)
-         END IF
-      END DO
 6     FORMAT(1X, /
      +       1X, 'NO IRRDIVERSION DATA OR REUSING IRRDIVERSION DATA ',
      +       'FROM LAST STRESS PERIOD ')
@@ -1111,29 +1103,66 @@
       ! SPECIFICATIONS:
       ! - -----------------------------------------------------------------
       USE GWFAGMODULE
-      USE GWFSFRMODULE, ONLY: NSS, SEG, NUMTAB_SFR
+      USE GWFSFRMODULE, ONLY: NSS, SEG, NUMTAB_SFR, ISFRLIST
       USE GLOBAL, ONLY: IUNIT
       IMPLICIT NONE
       ! - -----------------------------------------------------------------
       ! ARGUMENTS:
       INTEGER, INTENT(IN)::IN, KPER
       !
-      INTEGER ISEG, i
+      INTEGER ISEG, i, ii, tabseg, istab
+      DOUBLE PRECISION :: TOTAL
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      if ( NUMTAB_SFR > 0 ) DEMAND = 0.0
+      if (NUMTAB_SFR.ne.0) then
+          DO ii = 1, NUMTAB_SFR
+             tabseg = ISFRLIST(1, ii)
+             DEMAND(tabseg) = 0.0
+          END DO
+      endif
+      ! RESET ALL DEMAND if new stress period 
+      if (KPEROLD.ne.KPER) then
+	   DEMAND = 0.0
+	endif	  
+      TOTAL = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
-         if (iseg > 0 .and. IUNIT(44) > 0) then
+         if (iseg > 0) then
+            if (IUNIT(44) > 0) then
                ! Because SFR7AD has just been called (prior to AG7AD) and MODSIM
                ! has not yet overwritten values in SEG(2,x), SEG(2,x) still 
                ! contains the TABFILE values at this point.
-           IF ( NUMTAB_SFR > 0 ) DEMAND(ISEG) = SEG(2, ISEG)
-           SUPACT(ISEG) = 0.0
-           ACTUAL(ISEG) = 0.0
-         end if
+               if (NUMTAB_SFR.ne.0) then
+			    ! check if this segment has a tabfile associated with it
+                  istab = 0
+                  DO ii = 1, NUMTAB_SFR
+                     tabseg = ISFRLIST(1, ii)
+                     if (iseg.eq.tabseg) then
+                         istab = 1
+                     endif
+                  END DO
+                  ! update demand if there is a tabfile or if it is a new
+                  ! stress period
+                  if ((istab.eq.1) .OR. (KPEROLD.ne.KPER)) then
+			       DEMAND(ISEG) = SEG(2, ISEG)
+                  endif
+                 ! update demand if this is a new stress period
+               elseif (KPEROLD.ne.KPER) then
+			    DEMAND(ISEG) = SEG(2, ISEG)
+			 endif
+            IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
+               TOTAL = TOTAL + DEMAND(ISEG)
+            elseif (GSFLOW_flag_local == 1) then
+            end if
+            SUPACT(ISEG) = 0.0
+            ACTUAL(ISEG) = 0.0
+         END IF
       END DO
+      ! update kperold to track new stress periods and set data accordingly
+      if (KPEROLD.ne.KPER) then
+          KPEROLD = KPEROLD + 1
+      endif
       !2 - ------SET ALL SPECIFIED DIVERSIONS TO ZERO FOR ETDEMAND AND TRIGGER
       IF (ETDEMANDFLAG > 0 .OR. TRIGGERFLAG > 0) THEN
          DO i = 1, NUMSEGLIST
@@ -2571,8 +2600,8 @@
          SEG(2, iseg) = 0.0
          if (TIMEINPERIODSEG(ISEG) > IRRPERIODSEG(ISEG)) then
             if (factor <= TRIGGERPERIODSEG(ISEG)) then
-                SEG(2, iseg) = DEMAND(iseg)
-                TIMEINPERIODSEG(ISEG) = done
+               SEG(2, iseg) = DEMAND(iseg)
+               TIMEINPERIODSEG(ISEG) = 0.0
             end if
          end if
          if (TIMEINPERIODSEG(ISEG) - DELT < IRRPERIODSEG(ISEG))
@@ -2583,10 +2612,6 @@
          k = IDIVAR(1, ISEG)
          fmaxflow = STRM(9, LASTREACH(K))
          IF (SEG(2, iseg) > fmaxflow) SEG(2, iseg) = fmaxflow
-!
-         write(999,121)kper,kstp,kiter,factor,aetseg(iseg),petseg(iseg),
-     +    SEG(2, iseg),TIMEINPERIODSEG(ISEG)
-121   format(3i5,5e20.10)
 300    continue
        deallocate (petseg, aetseg)
        return
@@ -2810,10 +2835,6 @@
       if( factor > accel*etdif ) factor = accel*etdif
       if( factor < etdif ) factor = etdif
       if( factor < dzero ) factor = dzero
-!      open(222,file='debug.out')
-!      if(l==207)write(222,333)kiter,pettotal,aettotal,dq,det,aettotal,
-!     +aetold,factor
-!333   format(i5,7e20.10)
       set_factor = factor
       end function set_factor
 !

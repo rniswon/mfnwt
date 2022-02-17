@@ -1,5 +1,5 @@
 # mfnwt
-[![Build Status](https://travis-ci.com/rniswon/mfnwt.svg?token=vEKgKzYeJvd2ZaJyNFiH&branch=develop)](https://travis-ci.com/rniswon/mfnwt)   
+[![GSFLOW CI](https://github.com/rniswon/mfnwt/actions/workflows/ci.yml/badge.svg)](https://github.com/rniswon/mfnwt/actions/workflows/ci.yml)   
 MODFLOW-NWT - Version: 1.1.0  
 Newton Formulation for MODFLOW-2005
 
