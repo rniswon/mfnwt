@@ -445,12 +445,12 @@ C     Read and print a list of drain and optional associated
 C     return-flow recipient cells.  NAUX of the values in the list are
 C     optional -- auxiliary data.
 C     ******************************************************************
+      use openspec
       CHARACTER*57 LABEL1, LABEL2, LABEL3
       CHARACTER*16 DRTAUX(NCAUX)
       DIMENSION DRTF(NDRTVL,MXDRT)
       CHARACTER*200 LINE,FNAME
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
       IERR = 0
