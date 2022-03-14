@@ -203,6 +203,7 @@ C     ******************************************************************
 C     Read and print a list.  NAUX of the values in the list are
 C     optional -- auxiliary data.
 C     ******************************************************************
+      use openspec
       CHARACTER*(*) LABEL
       CHARACTER*16 CAUX(NCAUX)
       DIMENSION RLIST(LDIM,MXLIST)
@@ -212,7 +213,6 @@ C     ******************************************************************
       CHARACTER*30 CERR
       LOGICAL LVAL
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
 C1------If the list is empty, return.
@@ -222,6 +222,7 @@ C2------Check for and decode EXTERNAL and OPEN/CLOSE records.
       IN=INPACK
       ICLOSE=0
       IBINARY=0
+      JAUX=0
       READ(IN,'(A)') LINE
       SFAC=1.
       LLOC=1
@@ -454,13 +455,13 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
+      use openspec
       CHARACTER*24 ANAME
       DIMENSION A(JJ)
       CHARACTER*20 FMTIN
       CHARACTER*200 CNTRL
       CHARACTER*200 FNAME
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
 C1------READ ARRAY CONTROL RECORD AS CHARACTER DATA.
@@ -568,13 +569,13 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
+      use openspec
       CHARACTER*24 ANAME
       DIMENSION IA(JJ,II)
       CHARACTER*20 FMTIN
       CHARACTER*200 CNTRL
       CHARACTER*200 FNAME
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
 C1------READ ARRAY CONTROL RECORD AS CHARACTER DATA.
@@ -796,6 +797,7 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
+      use openspec
       CHARACTER*24 ANAME
       DIMENSION A(JJ,II)
       CHARACTER*20 FMTIN
@@ -803,7 +805,6 @@ C     ------------------------------------------------------------------
       CHARACTER*16 TEXT
       CHARACTER*200 FNAME
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
 C1------READ ARRAY CONTROL RECORD AS CHARACTER DATA.

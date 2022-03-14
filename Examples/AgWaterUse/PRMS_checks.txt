@@ -1,12 +1,47 @@
 1) veg_type should not bare soil ( soil_type=0).  soil_type should be set to soil_type=1 or higher, depending on the crop
 2) soil_moist_max is greater than daily max PET (>1inch)
 3) pref_flow_den=0 for all HRUs that are irrigated.
-4)Only one of these options (TRIGGER, ETDEMAND) can be used at a time.
+4) Only one of these options (TRIGGER, ETDEMAND) can be used at a time.
 5) Check if the well has a very small thickness or very low conductivity. If this true, the well not be able to deliver requested water. If drawdown resulting from pumping cause the water table to go below cell bottom then this will cause convergence issues
 6) If water is supplied from a stream, make sure that the model produces flow that can satisfy the demand.
 7) In case you have information about deep percolation, use ssr2gw_rate and sat_threshold to impose these information.
-8) When cov_type = 1 (grass), ETa will be insensitive to applied irrigation. For now use  cov_type = 2 (shrubs). A Permanent solution is needed in PRMS
+8) ag_cov_type = 1 or 2 (grass or shrubs); Need to add support for  ag_cov_type = 2 (shrubs).
 9) As much as possible assign upper bounds to water demand that is consistent with local practices.
-10) Make sure that you used Kc values that are reasonable; and make sure that you multiplied kc by jh_coef and NOT jh_coef_hru in the parameter file.  
-11) In general, you must go through all your HRUs that are used for Ag and make sure they are parameterized to represent Ag (soil_type, veg_type,
-   soil_moist_max, soil_rechr_max, pref_flow_den, percent_imperv, etc.).
+10) Make sure that you use Kc values that are reasonable; and make sure that you multiplied kc by jh_coef and NOT jh_coef_hru in the parameter file.  
+11) In general, you must go through all your HRUs that are used for Ag and make sure they are parameterized to represent Ag (ag_soil_type, ag_veg_type,
+   ag_soil_moist_max, ag_soil_rechr_max_frac, pref_flow_den, percent_imperv, etc.).
+   
+New PRMS parameters for using AG capabilities
+ag_soil_moist_max
+ag_soil_rechr_max_frac
+ag_cov_type
+ag_frac
+ag_soil_type
+
+New control vars
+
+####
+model_mode
+1
+4
+GSFLOW_AG
+####
+agriculture_soil_flag
+1
+1
+1
+####
+agriculture_dprst_flag
+1
+1
+1
+####
+agriculture_soil_flag
+1
+1
+1
+#### 
+soilzone_aet_flag
+1
+1
+0

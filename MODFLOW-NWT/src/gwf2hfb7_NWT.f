@@ -376,13 +376,13 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
+      use openspec
       CHARACTER*(*) LABEL
       DIMENSION HFB(7,MXHFB)
       CHARACTER*200 LINE,FNAME
       CHARACTER*1 DASH(120)
       DATA DASH/120*'-'/
       DATA NUNOPN/99/
-      INCLUDE 'openspec.inc'
 C     ------------------------------------------------------------------
 C
 C1------Check for and decode EXTERNAL and SFAC records.

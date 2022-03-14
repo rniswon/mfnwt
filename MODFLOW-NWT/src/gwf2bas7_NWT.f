@@ -1781,7 +1781,7 @@ C     ******************************************************************
 C
 C        SPECIFICATIONS:
 C     ------------------------------------------------------------------
-      INCLUDE 'openspec.inc'
+      use openspec
       DIMENSION IUNIT(NIUNIT)
       CHARACTER*4 CUNIT(NIUNIT)
       CHARACTER*7 FILSTAT

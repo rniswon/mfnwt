@@ -1125,7 +1125,6 @@
       if (KPEROLD.ne.KPER) then
 	   DEMAND = 0.0
 	endif	  
-      TOTAL = 0.0
       DO i = 1, NUMIRRDIVERSIONSP
          iseg = IRRSEG(i)
          if (iseg > 0) then
@@ -1151,9 +1150,7 @@
                elseif (KPEROLD.ne.KPER) then
 			    DEMAND(ISEG) = SEG(2, ISEG)
 			 endif
-            IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
-               TOTAL = TOTAL + DEMAND(ISEG)
-            elseif (GSFLOW_flag_local == 1) then
+               IF (ETDEMANDFLAG > 0) SEG(2, ISEG) = 0.0
             end if
             SUPACT(ISEG) = 0.0
             ACTUAL(ISEG) = 0.0

@@ -6,10 +6,19 @@
 *.mod
 *_genmod.f90
 
-# Executables
+
+# Executables and associated files
 *.out
 *.app
-
+*.lib
+*.exp
+*.pdb
+*.suo
+*.user
+*.u2d
+MF_NWT/MF_NWT/x64/Debug/
+MF_NWT/MF_NWT/x64/Release/
+*.manifest
 !MODFLOW-NWT.exe
 !MODFLOW-NWT_64.exe
 !AgTest1A.exe
