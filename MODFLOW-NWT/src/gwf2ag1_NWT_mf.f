@@ -1115,11 +1115,13 @@
       ! - -----------------------------------------------------------------
       !
       !1 - ------RESET DEMAND IF IT CHANGES
-      if (NUMTAB_SFR.ne.0) then
-          DO ii = 1, NUMTAB_SFR
-             tabseg = ISFRLIST(1, ii)
-             DEMAND(tabseg) = 0.0
-          END DO
+      if(IUNIT(44).GT.0) then
+         if (NUMTAB_SFR.ne.0) then
+            DO ii = 1, NUMTAB_SFR
+               tabseg = ISFRLIST(1, ii)
+               DEMAND(tabseg) = 0.0
+            END DO
+	 endif
       endif
       ! RESET ALL DEMAND if new stress period 
       if (KPEROLD.ne.KPER) then
