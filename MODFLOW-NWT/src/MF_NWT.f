@@ -19,7 +19,7 @@ C1------USE package modules.
       USE DE4MODULE
       USE GMGMODULE
 !      USE PCGN
-      INCLUDE 'openspec.inc'
+      use openspec
 C
 C-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3

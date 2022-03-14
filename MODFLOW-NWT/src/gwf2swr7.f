@@ -13640,6 +13640,7 @@ C     Determine if data should be processed from an internal, external,
 C     or temporary file.
 C     ******************************************************************
         USE GWFSWRMODULE, ONLY: NREACHES, IPTFLG
+        use openspec
         IMPLICIT NONE
 C     + + + DUMMY ARGUMENTS + + +
         INTEGER, INTENT(IN)    :: Iswr
@@ -13657,7 +13658,6 @@ C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/9999/
 C     + + + INCLUDE STATEMENTS + + +
-        INCLUDE 'openspec.inc'
 C     + + + INPUT FORMATS + + +
 C     + + + OUTPUT FORMATS + + +
 2000    FORMAT(1X,'Reading SWR1 Process data on unit ',I4)
@@ -13702,6 +13702,7 @@ C     Read and print a list.  NAUX of the values in the list are
 C     optional -- auxiliary data.
 C     ******************************************************************
         USE GWFSWRMODULE, ONLY: NREACHES, IPTFLG
+        use openspec
         IMPLICIT NONE
 C     + + + DUMMY ARGUMENTS + + +
         INTEGER, INTENT(IN) :: Iswr
@@ -13726,7 +13727,6 @@ C     + + + FUNCTIONS + + +
 C     + + + DATA + + +
         DATA nunopn/99/
 C     + + + INCLUDE STATEMENTS + + +
-        INCLUDE 'openspec.inc'
 C     + + + INPUT FORMATS + + +
 C     + + + OUTPUT FORMATS + + +
 2000    FORMAT(1X,'Reading list on unit ',I4)
