@@ -5,10 +5,10 @@ DEL  ..\output_test\*.*
 DEL  ..\output_test_64\output_test_swi\*.*
 DEL  ..\output_test_64\output_test_swr1\*.*
 DEL  ..\output_test_64\*.*
-MOVE /Y .\Ag_EP1a\output\Agwater1a_high.lst ..\output_test
-MOVE /Y .\Ag_EP1a\output\Agwater1a_low.lst ..\output_test
-MOVE /Y .\Ag_EP1b\output\Agwater1b_high.lst ..\output_test
-MOVE /Y .\Ag_EP1b\output\Agwater1b_low.lst ..\output_test
+MOVE /Y .\Ag_EP1a\output\high\Agwater1a_high.lst ..\output_test
+MOVE /Y .\Ag_EP1a\output\low\Agwater1a_low.lst ..\output_test
+MOVE /Y .\Ag_EP1b\output\high\Agwater1b_high.lst ..\output_test
+MOVE /Y .\Ag_EP1b\output\low\Agwater1b_low.lst ..\output_test
 MOVE /Y .\Ex_prob1a\Pr1aMF2005.LST ..\output_test
 MOVE /Y .\Ex_prob1a\Pr1aMFNWT.LST ..\output_test
 MOVE /Y .\Ex_prob1b\Pr1bMF2005.LST ..\output_test

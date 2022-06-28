@@ -60,7 +60,7 @@ C     ******************************************************************
       double precision, intent(in) :: hh,s,x,c,smoothet
       double precision, intent(inout) :: trhs,thcof,dET
 ! local
-      double precision depth,gwet,smint,etgw,detdh
+      double precision depth,smint,etgw,detdh !,gwet 
       external smoothuz
       double precision smoothuz
 !
@@ -139,15 +139,15 @@ C     ------------------------------------------------------------------
       INTEGER istart, istop, lloc, ivol, numactive, ic, ir
       INTEGER ibndflg, ichld, iflgbnd, igage, igunit, irhld, isyflg, 
      +        iuzcol, iuzflg, iuzlay, iuzopt, iuzrow, l, ncck, ncth, 
-     +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL,
-     +        llocsave, icheck2
+     +        nlth, nrck, nrnc, nrth, i, icheck, kkrch, k, NPP, MXVL !,
+!     +        llocsave, icheck2
       REAL r, sy, fkmin, fkmax, range, finc, thick, smooth
-      INTEGER intchk, Iostat
+!      INTEGER intchk, Iostat
       CHARACTER(LEN=200) line
       CHARACTER(LEN=24) aname(9)
       character(len=16)  :: text        = 'UZF'
-      logical :: found
-      character(len=40) :: keyvalue
+!      logical :: found
+!      character(len=40) :: keyvalue
       DATA aname(1)/' AREAL EXTENT OF UZ FLOW'/
       DATA aname(2)/' ROUTING OVERLAND RUNOFF'/
       DATA aname(3)/' SATURATED WATER CONTENT'/
@@ -158,7 +158,6 @@ C     ------------------------------------------------------------------
       DATA aname(8)/'   INITIAL WATER CONTENT'/
       DATA aname(9)/' LAND SURFACE VERTICAL K'/
 C     ------------------------------------------------------------------
-      Version_uzf = 'gwf2uzf1_NWT.f 2017-03-08 09:56:00Z'
       ALLOCATE(NUMCELLS, TOTCELLS, Iseepsupress, IPRCNT, Isavefinf)
       ALLOCATE(Isurfkreject, Ireadsurfk, Iseepreject,ETOFH_FLAG)
       Iseepsupress = 0   ! Iseepsupress = 1 means seepout not calculated
@@ -169,6 +168,7 @@ C     ------------------------------------------------------------------
       NUMCELLS = NCOL*NROW
       TOTCELLS = NUMCELLS*NLAY
       IPRCNT = 0
+      ETOFH_FLAG = 0
       ALLOCATE (LAYNUM(NCOL,NROW))
       ALLOCATE (NUZTOP, IUZFOPT, IRUNFLG, IETFLG, IUZM)
       ALLOCATE (IUZFCB1, IUZFCB2, NTRAIL, NWAV, NSETS, IUZFB22, IUZFB11)
@@ -970,7 +970,7 @@ C     ******************************************************************
 C     PARSE KEYWORD OPTIONS
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: IUNIT, IOUT
+      USE GLOBAL,       ONLY: IOUT !, IUNIT
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -983,7 +983,7 @@ C     ------------------------------------------------------------------
 C     ------------------------------------------------------------------
 C     LOCAL VARIABLES
 C     ------------------------------------------------------------------
-      DOUBLE PRECISION test
+!      DOUBLE PRECISION test
       INTEGER istart, istop, lloc, iheader, i
       REAL r, SMOOTH
       INTEGER intchk, Iostat
@@ -1837,8 +1837,8 @@ C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.2.0:  March 1, 2020
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
-     +                        HNEW, BOTM, LBOTM
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+!     +                        HNEW, BOTM, LBOTM
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1849,8 +1849,8 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      DOUBLE PRECISION h
-      INTEGER :: IC, IR, IL, ILL, LL, IBND
+!      DOUBLE PRECISION h
+!      INTEGER :: IC, IR, IL, ILL, LL, IBND
 C     -----------------------------------------------------------------
 C
       IF ( NUZTOP.NE.4 ) RETURN
@@ -1871,8 +1871,10 @@ C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
 C     VERSION 1.2.0:  March 01, 2020
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
-     +                        HNEW, BOTM, LBOTM
+!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
+!     +                        HNEW, BOTM, LBOTM
+      USE GLOBAL,       ONLY: NLAY, IOUT, IBOUND, 
+     +                        HNEW, BOTM
       IMPLICIT NONE
 C     -----------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -1882,7 +1884,7 @@ C     -----------------------------------------------------------------
 C     -----------------------------------------------------------------
 C     LOCAL VARIABLES
 C     -----------------------------------------------------------------
-      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, IBND2, ILACTIVE
+      INTEGER :: IC, IR, IL, ILL, LL, IBND, KKSTP, ILACTIVE
       DOUBLE PRECISION :: S1, S2
 C     -----------------------------------------------------------------
 C      
@@ -1936,7 +1938,7 @@ C     SURFACE LEAKAGE AND ADD OR SUBTRACT TERMS RHS AND HCOF
 C     VERSION 1.0.5:  April 5, 2012
 C     ******************************************************************
       USE GWFUZFMODULE
-      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
+      USE GLOBAL,       ONLY: NLAY, HNEW, ISSFLG, DELR,
      +                        DELC, BOTM, IBOUND, HCOF, RHS,
      +                        ITMUNI, IUNIT
 !!      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, HNEW, ISSFLG, DELR,
@@ -1964,8 +1966,8 @@ C     -----------------------------------------------------------------
       REAL epsilon, fks, rootdp, ths, wiltwc,celthick, finfact, finfhold
       REAL finfsaveadd
       INTEGER ic, il, ill, ir, iset, iss, iwav, l, numwaves,
-     +        land, idelt, ik, ll, idr
-      INTEGER lakflg, lakid, ibnd, i, ij, nlayp1, lakflginf
+     +        land, idelt, ik, ll !, idr, i
+      INTEGER lakflg, lakid, ibnd, ij, nlayp1, lakflginf
       DOUBLE PRECISION oldsflx, surflux, dlength, h, celtop, deltinc,
      +                 zoldist, totflux, etact, rateud, hld, htest1,
      +                 htest2, flength, width, thr, cellarea, fact,
@@ -1975,7 +1977,7 @@ C     -----------------------------------------------------------------
 !!     +                 dcsep
 !!     +                 rhsnew, hcofold, hcofnew, rhsold, bbot, ttop, 
 !!     +                 dcsep
-      DOUBLE PRECISION s, x, c, etdp, etgw, trhs, thcof, hh, dET
+      DOUBLE PRECISION s, x, c, etgw, trhs, thcof, hh, dET ! , etdp
 C     -----------------------------------------------------------------
 C
 C1------SET POINTERS FOR THE CURRENT GRID.
@@ -2328,6 +2330,7 @@ C7------CALCULATE ET DEMAND LEFT FOR GROUND WATER.
             hh = H
             IF ( c.LT.0.0d0 ) c = 0.0d0
             call simuzet(etopt,smoothet,hh,s,x,c,trhs,thcof,dET,etgw)
+            GWET(ic, ir) = etgw          !RGN 8/24/2020
             RHS(ic, ir, il) = RHS(ic, ir, il) + trhs
             HCOF(ic, ir, il) = HCOF(ic, ir, il) + thcof
 ! Derivative for RHS
@@ -2502,7 +2505,7 @@ C     -----------------------------------------------------------------
      +                 deltinc, fkseep, trhs, thcof, hh, dET, s, x, c, 
      +                 etgw, fkreject
       REAL avdpt, avwat, bigvl1, bigvl2, depthinc, epsilon, 
-     +     etdp, eps_m1, ftheta1, ftheta2, finfsaveadd
+     +     eps_m1, ftheta1, ftheta2, finfsaveadd ! , etdp
       REAL fhold, fks, fminn, gcumin, gcumrch, gdelstor, gdlstr, ghdif, 
      +     ghnw, ginfltr, grchr, gseep, gseepr, guzstore, prcntercum,
      +     prcnterrat, ratin, ratout, cumapplinf, dum1, dum2
@@ -2510,18 +2513,18 @@ C     -----------------------------------------------------------------
       REAL csepmx, csep, finfact, finfhold, gcumapl, gaplinfltr
       REAL totalwc, totrin, totrot, totvin, totvot, volet, volflwtb, 
      +     volinflt, wiltwc, zero, celthick
-      REAL error
+!      REAL error
       INTEGER ibd, ibduzf, ic, ick, iftunit, igflg, ii, il, ill,
      +        iog, ir, iset, iss, iuzcol, iuzn, iuzopt, iuzrat, iuzrow, 
      +        j, jj, jk, land, nwavm1, nwaves, idelt, ik, ll, ibnd, iret
       INTEGER k, kknt, l, loop, numwaves, numwavhld, nuzc, nuzr, jm1
       INTEGER lakflg, lakid, nlayp1, lakflginf
-      CHARACTER(LEN=16) textrch, textet, textexfl, textinf, textinf2
+      CHARACTER(LEN=16) textrch, textet, textexfl, textinf !, textinf2
       CHARACTER(LEN=16) uzsttext, uzettext, uzinftxt, txthold,textrej
       CHARACTER(LEN=16) netrchtext, netdistext
       CHARACTER(LEN=17) val1, val2
       DATA textinf/'    UZF INFILTR.'/
-      DATA textinf2/'SFR-DIV. INFLTR.'/
+!      DATA textinf2/'SFR-DIV. INFLTR.'/
       DATA textrch/'    UZF RECHARGE'/
       DATA textet/'           GW ET'/
       DATA textexfl/' SURFACE LEAKAGE'/
@@ -2602,7 +2605,7 @@ CDEP 05/05/2006
         fks = VKS(ic, ir)
         fkreject = fks
         fkseep = fks
-        IF ( Iseepreject > 0 .and. IGSFLOW == 0 ) fkseep = surfk(ic,ir)
+        IF ( Iseepreject > 0 ) fkseep = surfk(ic,ir)
         IF ( Isurfkreject > 0 ) fkreject = surfk(ic, ir)
         volinflt = 0.0D0
         finfsaveadd = 0.0
@@ -4237,13 +4240,6 @@ C67-----FORMATS.
  9014 FORMAT (62X, 2(1PE14.7, 1X))
  9015 FORMAT (//)
  9016 FORMAT (9X, 1PE14.7, 1X, 9(2X,1PE14.7))
-      !delete
-!      DO j = 1, NWAVST(2, 1)
-!        write(999,22)j,totim,uzthst(j,2),uzdpst(j,2),uzflst(j,2),
-!     +     uzspst(j,2)
-!      END DO
-!22    format(i5,5e15.5)
-      !to here
 C
       RETURN
       END SUBROUTINE GWF2UZF1BD
@@ -5646,10 +5642,10 @@ C--------SUBROUTINE CELL_AVERAGE
 C     ******************************************************************
 C     AVEARGE WATER CONTENT AND FLUX FOR MT3DMS
 C     ******************************************************************
-      USE GLOBAL,       ONLY: BOTM, IOUT, NLAY
+      USE GLOBAL,       ONLY: BOTM, NLAY !, IOUT
       USE GWFBASMODULE, ONLY: DELT
       USE GWFUZFMODULE, ONLY: NWAV, CLOSEZERO, IUZFBND, NWAVST,
-     +                        RTSOLUTE, GRIDSTOR, GRIDET, IUZFOPT
+     +                        GRIDSTOR, GRIDET, IUZFOPT !, RTSOLUTE
       IMPLICIT NONE
 C     ------------------------------------------------------------------
 C     SPECIFICATIONS:
@@ -5671,7 +5667,7 @@ C     ------------------------------------------------------------------
 C
 C65-----TOTAL WATER CONTENT AND FLUX OVER SPECIFIED DEPTH.
 !        IF ( il.GT.0 ) THEN
-          ZEROD9 = 1.0d-9
+          ZEROD9 = 1.0d0-9
           ghdif = celtop - H
           totalwc = 0.0
           iset = 1
@@ -5790,53 +5786,6 @@ C
         IF ( THO-THSAT.LT.ZEROD15 ) CAPH = HA*STAR**(-1.0/LAMBDA)
       END IF 
       END FUNCTION CAPH
-! ----------------------------------------------------------------------
-
-      function unsat_stor(d1,uzthst,uzdpst,ic,ir,nwav)
-!     ******************************************************************
-!     unsat_stor---- sums up mobile water over depth interval
-!     ******************************************************************
-!     SPECIFICATIONS:
-      USE GWFUZFMODULE, ONLY:NWAVST
-! ----------------------------------------------------------------------
-      !modules
-      !arguments
-      DOUBLE PRECISION, intent(inout) :: d1
-      DOUBLE PRECISION, intent(inout) :: uzthst(NWAV), uzdpst(NWAV)
-      ! -- dummy
-      DOUBLE PRECISION :: fm, unsat_stor
-      integer :: j, k,nwavm1,jj, numwaves
-! ----------------------------------------------------------------------
-      fm = 0.0d0
-      DEM30 = 1.0d-30
-      numwaves = NWAVST(ic, ir)
-      j = numwaves + 1
-      k = numwaves
-      nwavm1 = k-1
-      if ( d1 > uzdpst(1) ) d1 = uzdpst(1)
-      !
-      !find deepest wave above depth d1, counter held as j
-      do while ( k > 0 )
-        if ( uzdpst(k) - d1 < -DEM30) j = k
-          k = k - 1
-      end do
-      if ( j > numwaves ) then
-        fm = fm + (uzthst(numwaves)-thtr)*d1
-      elseif ( numwaves > 1 ) then
-        if ( j > 1 ) then
-          fm = fm + (uzthst(j-1)-thtr)*(d1-uzdpst(j))
-        end if
-        do jj = j, nwavm1
-          fm = fm + (uzthst(jj)-thtr)*(uzdpst(jj)-uzdpst(jj+1))
-        end do
-        fm = fm + (uzthst(numwaves)-thtr)*(uzdpst(numwaves))
-      else
-        fm = fm + (uzthst(1)-thtr)*d1
-      end if
-      unsat_stor = fm
-      end function unsat_stor
-!
-C
 ! ----------------------------------------------------------------------
 C-------SUBROUTINE GWF2UZF1DA
       SUBROUTINE GWF2UZF1DA(Igrid)

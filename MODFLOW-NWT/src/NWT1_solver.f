@@ -4,7 +4,7 @@
 !
       SUBROUTINE GWF2NWT1AR(In, Mxiter, Iunitlak, Igrid)
 !
-!------NEWTON SOLVER VERSION NUMBER 1.2.0, 3/01/2020
+!------NEWTON SOLVER VERSION NUMBER 1.3.0, 4/01/2018
 !      RICHARD G. NISWONGER
       USE GLOBAL,     ONLY:NCOL,NROW,NLAY,IBOUND,BOTM,IOUT,LBOTM,HNEW
 !!      USE GLOBAL,     ONLY:NCOL,NROW,NLAY,ITRSS,LAYHDT,LAYHDS,LAYCBD,
@@ -46,16 +46,18 @@
       ALLOCATE (RMSAVE)
       ALLOCATE (Numnonzero, Numactive, Numcell, II)
       ALLOCATE (Akappa,Gamma,Amomentum,Btrack,Breduc,Numtrack)
-      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Itreal, Ibt)
-      ALLOCATE (IBOTAV)
+!      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Itreal, Ibt) ! removed Itreal
+      ALLOCATE (Nonmeth, Linmeth, IPRNWT, Ibt)
+      ALLOCATE (IBOTAV,ITREAL)
 !1------IDENTIFY PACKAGE AND INITIALIZE.
       WRITE (Iout, 9001) In
  9001 FORMAT (1X, /' NWT1 -- Newton Solver, ',
-     +    'VERSION 1.2.0, 3/01/2020', /, 9X, 'INPUT READ FROM UNIT',
+     +    'VERSION 1.1.4, 4/01/2018', /, 9X, 'INPUT READ FROM UNIT',
      +        I3,/)
       i = 1
-      Itreal = 0
+!      Itreal = 0
       Ibt = 0
+      ITREAL = 0
       RMS2 = 0.0D0
       RMS1 = 0.0D0
       RMSAVE = 0.0D0
@@ -656,7 +658,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 ! Order system for MODFLOW storage scheme by relating Row, Col, and Lay to
 ! Jacobian order
       USE GLOBAL, ONLY:Ncol, Nrow, Nlay, Ibound, Iout, HNEW
-      USE GWFBASMODULE, ONLY: HDRY
+      USE GWFBASMODULE, ONLY: HNOFLO
       USE GWFNWTMODULE
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -708,7 +710,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
             WRITE(IOUT,*)'ROW=',ir,'COL=',ic,'LAY=',il
             WRITE(IOUT,*)
             Ibound(ic, ir, il) = 0
-            HNEW(ic,ir,il) = HDRY
+            HNEW(ic,ir,il) = HNOFLO
           END IF
         ENDIF
         ic = ic + 1
@@ -860,7 +862,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !
 !     -----------------------------------------------------------------
       SUBROUTINE GWF2NWT1FM(Kkiter, ICNVG, KSTP, KPER, Maxiter, 
-     +                      Iunitchd, Igrid)
+     +                      Iunitchd, agconverge, Igrid)
 ! Builds and Solves Jacobian
 ! Calls various unstructured linear solvers to solve Jacobian
       USE GLOBAL, ONLY:Iout,ISSFLG
@@ -885,6 +887,7 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
 !     ARGUMENTS
 !     ------------------------------------------------------------------
       INTEGER Iss, Igrid, Kkiter, Icnvg, Maxiter, KSTP, KPER, Iunitchd
+      INTEGER agconverge
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
@@ -948,11 +951,13 @@ C-------STRAIGHT LINE WITH PARABOLIC SMOOTHING
       RMS1 = RMS_func(icfld,irfld,ilfld)
       Icnvg = 0
       IF ( RMS1.GT.FTOL .OR. ABS(Fheadsave).GT.Tol .OR. 
-     +                           kkiter.LT.2 ) THEN
+     +                           kkiter.LT.2 .or.
+     +                           agconverge == 0 ) THEN
         Ibt = 1
         IF ( BTRACK.EQ.0 .OR. II.GE.Numtrack ) Ibt = 0
         IF ( RMS1.LT.Btol*rmsave .OR. Kkiter.EQ.1 ) Ibt = 0
         IF ( II.GT.0 .AND. RMS1.GT.RMS2 ) Ibt = 0
+        IF ( agconverge == 0 ) Ibt = 0
         IF ( Ibt.EQ.0 ) THEN
           II = 0
           jj = 1
@@ -995,6 +1000,7 @@ c
             ELSE
               call xmdprecd(a, bb, epsrn, ia, ja, nja, numactive,
      [                      level, ierr)
+
 cmi
 C
             ENDIF                                                     
@@ -1099,6 +1105,7 @@ C--Update heads.
  !     end do
  !     end if
       END IF
+      IF ( AGCONVERGE.EQ.0 ) ICNVG = 0
  ! 888 format(256E20.10)
 !
 !  Calculate maximum head change and residuals
@@ -1412,7 +1419,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     Return value of groundwater flow equation
       DOUBLE PRECISION FUNCTION GW_func(Ic, Ir, Il)
       USE GWFNWTMODULE
-      USE GLOBAL,      ONLY:iout, ibound
+!      USE GLOBAL,      ONLY:iout
       USE GWFBASMODULE, ONLY:HNOFLO
       IMPLICIT NONE
 !     ------------------------------------------------------------------
@@ -1425,7 +1432,7 @@ C-----SET HNEW TO HDRY IF IPHRY>0
 !     -----------------------------------------------------------------
 !     LOCAL VARIABLES
 !     -----------------------------------------------------------------
-      DOUBLE PRECISION term1, term2, term3, sum
+      DOUBLE PRECISION term1, term2, term3
 !     -----------------------------------------------------------------   
       GW_func = 0.0D0
       IF ( H==HNOFLO ) RETURN    
