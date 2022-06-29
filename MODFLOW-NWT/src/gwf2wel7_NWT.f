@@ -62,8 +62,8 @@ C     ------------------------------------------------------------------
 C
 C1------IDENTIFY PACKAGE AND INITIALIZE NWELLS.
       WRITE(IOUT,1)IN
-    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.2.0, ',
-     1' 3/01/2020 INPUT READ FROM UNIT ',I4)
+    1 FORMAT(1X,/1X,'WEL -- WELL PACKAGE FOR NWT VERSION 1.3.0, ',
+     1' 7/01/2022 INPUT READ FROM UNIT ',I4)
       NWELLS=0
       NNPWEL=0
       IUNITRAMP=IOUT

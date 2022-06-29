@@ -33,8 +33,10 @@ MOVE /Y .\Uzf_testoptions\UZFtestoptions.lst ..\output_test
 MOVE /Y .\UZF_testproblem1\Prob1.lst ..\output_test
 MOVE /Y .\UZF_testproblem2\UZFtest2.lst ..\output_test
 
-DEL  .\Ag_EP1a\output\*.*
-DEL  .\Ag_EP1b\output\*.*
+DEL  .\Ag_EP1a\output\high\*.*
+DEL  .\Ag_EP1a\output\low\*.*
+DEL  .\Ag_EP1b\output\high\*.* 
+DEL  .\Ag_EP1b\output\low\*.*
 DEL /S *.lst
 DEL /S *.bud
 DEL /S *.flw

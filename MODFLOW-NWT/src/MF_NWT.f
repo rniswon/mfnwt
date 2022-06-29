@@ -1,7 +1,7 @@
 C     ******************************************************************
 C     MAIN CODE FOR U.S. GEOLOGICAL SURVEY MODULAR MODEL -- MODFLOW-NWT
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.2.0, 2/10/2020
+!rgn------NEW VERSION NUMBER 1.3.0, 7/01/2022
 C     ******************************************************************
 C
 C        SPECIFICATIONS:
@@ -24,7 +24,7 @@ C
 C-------ASSIGN VERSION NUMBER AND DATE
       CHARACTER*40 VERSION,VERSION2,VERSION3
       CHARACTER*10 MFVNAM
-      PARAMETER (VERSION='1.2.0 03/01/2020')
+      PARAMETER (VERSION='1.3.0 07/01/2022')
       PARAMETER (VERSION2='1.12.0 02/03/2017')
       PARAMETER (VERSION3='1.05.0 03/10/2022')
       PARAMETER (MFVNAM='-NWT-SWR1')

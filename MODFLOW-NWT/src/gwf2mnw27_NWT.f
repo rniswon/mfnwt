@@ -29,7 +29,7 @@
 C     ******************************************************************
 C     ALLOCATE ARRAY STORAGE FOR MNW2 PACKAGE.
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.2.0, 3/01/2020
+!rgn------NEW VERSION NUMBER 1.3.0, 7/01/2022
 C     ******************************************************************
 C     LFK  May 2015  Revision in GWF2MNW2BH to fix possible error in borehole flow calculation.
 C     LFK  May 2015  Revision in GWF2MNW27RP to add optional printout of data if PUMPLOC option selected.

@@ -1,6 +1,6 @@
 
 
-                     MODFLOW-NWT - Version: 1.2.0
+                     MODFLOW-NWT - Version: 1.3.0
                  Newton Formulation for MODFLOW-2005
 
       
@@ -53,7 +53,7 @@ A. DISTRIBUTION FILE
 
 The following distribution file is for use on personal computers:
 
-         MODFLOW-NWT_1.2.0.zip
+         MODFLOW-NWT_1.3.0.zip
 
 The distribution file contains:
 

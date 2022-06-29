@@ -16,7 +16,49 @@ MODFLOW-NWT (http://water.usgs.gov/ogw/modflow-nwt/MODFLOW-NWT-Guide/).
 
 
 NOTE: Any use of trade, product or firm names is for descriptive purposes
-only and does not imply endorsement by the U.S. Government.
+only and does not imply endorsement by the U.S. Government.         
+
+o Version 1.3.0 06/01/2022:
+
+Changed files: gwf2sfr7_NWT.f, gwf2uzf1_NWT.f, gwf2lak7_NWT.f, gwf2ag1_NWT.f, 
+Irestart.f, gwf2mnw27_NWT.f, NWT1_solver.f, NWT1_module.f
+
+Multi-Node Well (MNW2) Package
+• Checks were added to the code to ensure head in the well bore (Hb) is not set 
+equal to the intake altitude (HLIM) if HLIM is greater than head in the aquifer. 
+This stops an extraction well from becoming a recharge well when HLIM is at a 
+high elevation relative to regional groundwater levels. Similarly, for injection 
+wells, a check was added to ensure Hb is not set equal to HLIM if HLIM is less 
+than the head in the aquifer.
+
+Newton-Raphson Solver (NWT) Package
+• A variable used to track the number of outer iterations during a times step was 
+moved from the NWT module to GSFMODFLOW module.
+
+Lake (LAK) Package
+• A check was added to initialize state variables for transient simulations that 
+are not using restart data for initial conditions. Previously, lake stage was 
+not getting set to the value specified in the LAK input file if the model was 
+starting after modflow_time_zero.
+
+Restart utility for MODFLOW
+• A flag created in the LAK Package was added to the list of variables saved 
+for the Lake Package for restart simulations.
+
+Streamflow Routing (SFR2) Package
+• A bug was fixed to correct the output variable for net seepage from streams 
+through the UZF Package net seepage output option to account for multiple stream 
+reaches within a single model cell.
+
+Agriculture (AG) Package
+• Two bugs were fixed in this package. The first bug resulted in an error in how 
+the supplemental pumping was calculated for models that conjunctively use surface 
+water and groundwater. The second bug fixes how results were output to the 
+timeseries output files for diversions and supplemental pumping. 
+
+Unsaturated-Zone Flow (UZF1) Package
+• The groundwater ET variable was added to the formulate routine to allow groundwater 
+ET to be included in the crop water consumption in the Agricultural Water Use Package.
 
 o Version 1.2.0 03/01/2020:
 
