@@ -761,7 +761,7 @@
     5   17   15   64   142.7    
     5   17   16   64   141.1    
 
- LAK7 -- LAKE PACKAGE, VERSION 7, 1/07/2013 INPUT READ FROM UNIT 16
+ LAK7 -- LAKE PACKAGE, VERSION 7, 7/01/2022 INPUT READ FROM UNIT 16
  # Example input for specifying lake bathymetry information using external
  # text files using key word option “TABLEINPUT”
  No named parameters
@@ -1578,6 +1578,6 @@
          TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/28 17:31:15
- Elapsed run time:  0.103 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/30 15:44:54
+ Elapsed run time:  0.117 Seconds
 

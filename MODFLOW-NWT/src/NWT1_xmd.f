@@ -1,5 +1,5 @@
 
-c      for XMD package for NWT solver (NWT version 1.06; 12-05-12)
+c      for XMD package for NWT solver (NWT version 1.3; 07-01-2022)
 c
 c                     M. Ibaraki
 c

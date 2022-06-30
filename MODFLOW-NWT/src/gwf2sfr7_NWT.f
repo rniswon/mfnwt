@@ -57,7 +57,7 @@ C     READ STREAM DATA THAT IS CONSTANT FOR ENTIRE SIMULATION:
 C     REACH DATA AND PARAMETER DEFINITIONS
 !--------REVISED FOR MODFLOW-2005 RELEASE 1.9, FEBRUARY 6, 2012
 !rgn------REVISION NUMBER CHANGED TO BE CONSISTENT WITH NWT RELEASE
-!rgn------NEW VERSION NUMBER 1.1.3, 4/01/2018
+!rgn------NEW VERSION NUMBER 1.3.0, 7/01/2022
 C     ******************************************************************
 C     SPECIFICATIONS:
 C     ------------------------------------------------------------------
@@ -120,7 +120,7 @@ C     ------------------------------------------------------------------
 C1------IDENTIFY PACKAGE AND INITIALIZE NSTRM.
       WRITE (IOUT, 9001) In
  9001 FORMAT (1X, /, ' SFR7 -- STREAMFLOW ROUTING PACKAGE, '
-     +        ,'VERSION 1.0.5, 2012-04-05', /, 9X, 
+     +        ,'VERSION 1.3.0, 2022-07-01', /, 9X, 
      +         'INPUT READ FROM UNIT', I4)
 C
 C2------READ COMMENT RECORDS, NSTRM, NSS, NSFRPAR, NPARSEG, CONST,

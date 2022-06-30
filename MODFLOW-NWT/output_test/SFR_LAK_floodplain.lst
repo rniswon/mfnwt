@@ -313,7 +313,7 @@
  HEADS WILL BE SAVED ON UNIT   58    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT
 
- NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
+ NWT1 -- Newton Solver, VERSION 1.3.0, 7/01/2022
          INPUT READ FROM UNIT 13
 
  SPECIFIED OPTION:
@@ -486,7 +486,7 @@
 
      0 GHB parameters
 
- SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.0.5, 2012-04-05
+ SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.3.0, 2022-07-01
          INPUT READ FROM UNIT  15
  #SFR2 Package input for Test Simulation 2
  No named parameters
@@ -662,7 +662,7 @@ SELECTED MODEL CELLS ARE:
        4             5                 67                 3
        0             0                 68                 4
 
- LAK7 -- LAKE PACKAGE, VERSION 7, 1/07/2013 INPUT READ FROM UNIT 33
+ LAK7 -- LAKE PACKAGE, VERSION 7, 7/01/2022 INPUT READ FROM UNIT 33
  # Example input for specifying lake bathymetry information using external
  # text files using key word option “TABLEINPUT”
  No named parameters
@@ -13866,6 +13866,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP   120 STRESS PERIOD   
          TOTAL TIME 4.99320E+07 8.32200E+05  13870.      577.92      1.5822    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/28 17:31:11
- Elapsed run time:  1.100 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/30 15:44:50
+ Elapsed run time:  1.169 Seconds
 

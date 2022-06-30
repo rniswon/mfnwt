@@ -325,7 +325,7 @@
  HEADS WILL BE SAVED ON UNIT   58    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT
 
- NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
+ NWT1 -- Newton Solver, VERSION 1.3.0, 7/01/2022
          INPUT READ FROM UNIT 13
 
  SPECIFIED OPTION:
@@ -498,7 +498,7 @@
 
      0 GHB parameters
 
- SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.0.5, 2012-04-05
+ SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.3.0, 2022-07-01
          INPUT READ FROM UNIT  15
  #SFR2 Package input for Test Simulation 2
  No named parameters
@@ -10895,6 +10895,6 @@ UNSATURATED ZONE PACKAGE VOLUMETRIC BUDGET FOR  TIME STEP    15 STRESS PERIOD   
          TOTAL TIME 3.15360E+07 5.25600E+05  8760.0      365.00     0.99932    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/28 17:43:16
- Elapsed run time:  2.747 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/30 15:56:39
+ Elapsed run time:  2.608 Seconds
 

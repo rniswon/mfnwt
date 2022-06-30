@@ -133,7 +133,7 @@
  HEADS WILL BE SAVED ON UNIT   51    DRAWDOWNS WILL BE SAVED ON UNIT    0
  # MODFLOW-NWT Input File Problem 1a
 
- NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
+ NWT1 -- Newton Solver, VERSION 1.3.0, 7/01/2022
          INPUT READ FROM UNIT 23
 
  SPECIFIED OPTION:
@@ -278,6 +278,6 @@
          TOTAL TIME  86400.      1440.0      24.000      1.0000     2.73785E-03
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/28 17:31:37
- Elapsed run time:  0.014 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/30 15:45:15
+ Elapsed run time:  0.028 Seconds
 

@@ -302,7 +302,7 @@
  # Test Problem 3 for MODFLOW-NWT
  #HEADTOL  FLUXTOL MAXITEROUT THICKFACT LINMETH IPRNWT IBOTAV OPTIONS DBDREDUCE DBDINCREASE DBDGAMMA MOMFACT BACKFLAG MAXBACKITER BACKTOL BACKREDUCE
 
- NWT1 -- Newton Solver, VERSION 1.1.4, 4/01/2018
+ NWT1 -- Newton Solver, VERSION 1.3.0, 7/01/2022
          INPUT READ FROM UNIT 43
 
  SPECIFIED OPTION:
@@ -391,7 +391,7 @@
 
      0 GHB parameters
 
- SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.0.5, 2012-04-05
+ SFR7 -- STREAMFLOW ROUTING PACKAGE, VERSION 1.3.0, 2022-07-01
          INPUT READ FROM UNIT  45
  # SFR2 Package input file for hypothetical test simulation
  # Test of SFR2 Package; revised May 20, 2006
@@ -46188,6 +46188,6 @@
          TOTAL TIME 1.29600E+08 2.16000E+06  36000.      1500.0      4.1068    
 1
 
- Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/28 17:31:37
- Elapsed run time: 22.105 Seconds
+ Run end date and time (yyyy/mm/dd hh:mm:ss): 2022/06/30 15:45:15
+ Elapsed run time: 20.778 Seconds
 

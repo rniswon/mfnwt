@@ -402,12 +402,12 @@
       END IF
       ALLOCATE (WELL(NWELVL, MXWELL))
       WELL = 0.0
-      IF (NUMIRRPOND .LT. 1) THEN
-         WRITE (IOUT, 18)
-18       FORMAT(1X,
-     +        'No ponds active in the AG Package')
-        ! NUMIRRPOND = 1
-      END IF
+!      IF (NUMIRRPOND .LT. 1) THEN
+!         WRITE (IOUT, 18)
+!18       FORMAT(1X,
+!     +        'No ponds active in the AG Package')
+!        ! NUMIRRPOND = 1
+!      END IF
       ALLOCATE (POND(4, maxirr))
       !
       !9 - --- ALLOCATE SUPPLEMENTAL AND IRRIGATION WELL ARRAYS
@@ -1542,9 +1542,9 @@
               if (.not. found3) then
                  WRITE (IOUT, 8)
               end if
-              if (.not. found7) then
-                 WRITE (IOUT, 9)
-              end if
+              !if (.not. found7) then
+              !   WRITE (IOUT, 9)
+              !end if
 !           end if
             write (iout, '(/1x,a)') 'END PROCESSING '//
      +      trim(adjustl(text))//' OPTIONS'
@@ -1567,9 +1567,9 @@
 8     FORMAT(1X, /
      +       1X, 'NO SUPWEL OR REUSING SUPWEL DATA ',
      +       'FROM LAST STRESS PERIOD')
-9     FORMAT(1X, /
-     +       1X, 'NO IRRPOND OR REUSING IRRPOND DATA ',
-     +       'FROM LAST STRESS PERIOD')
+!9     FORMAT(1X, /
+!     +       1X, 'NO IRRPOND OR REUSING IRRPOND DATA ',
+!     +       'FROM LAST STRESS PERIOD')
       RETURN
       END
 !
@@ -2340,8 +2340,8 @@
         write (iout, 7) NUMGW + NUMGWALL
         write (iout, 8) NUMSWET
         write (iout, 9) NUMGWET + NUMGWETALL        
-        write (iout, 10) NUMPONDET + NUMPONDETALL
-        write (iout, 11) NUMPOND + NUMPONDALL
+        !write (iout, 10) NUMPONDET + NUMPONDETALL
+        !write (iout, 11) NUMPOND + NUMPONDALL
       ELSE
         BACKSPACE(IN)
       END IF
@@ -3096,25 +3096,25 @@
       MSUMAG = MSUMAG + 1
       !19 - ------POND RELEASES
       
-      QPOND = DZERO
-      DO L = 1, NUMIRRPOND
-        QPOND = QPOND + PONDFLOW(L)
-      END DO
-      RIN = QPOND
-      QPOND = DZERO
-      !19b ------POND IRRIGATION
-      STOR = DZERO
-      DELSTOR = DZERO
-      DO L = 1, NUMIRRPOND
-        K = NUMCELLSPOND(L)
-        SUBVOL = PONDFLOW(L)
-        DO IPC = 1, K
-          QPOND = QPOND + PONDIRRPRMS(IPC, L)
-        END DO
-      END DO
-      ROUT = QPOND
-      DELIN = 0.0D0
-      DELOUT = 0.0D0
+      !QPOND = DZERO
+      !DO L = 1, NUMIRRPOND
+      !  QPOND = QPOND + PONDFLOW(L)
+      !END DO
+      !RIN = QPOND
+      !QPOND = DZERO
+      !!19b ------POND IRRIGATION
+      !STOR = DZERO
+      !DELSTOR = DZERO
+      !DO L = 1, NUMIRRPOND
+      !  K = NUMCELLSPOND(L)
+      !  SUBVOL = PONDFLOW(L)
+      !  DO IPC = 1, K
+      !    QPOND = QPOND + PONDIRRPRMS(IPC, L)
+      !  END DO
+      !END DO
+      !ROUT = QPOND
+      !DELIN = 0.0D0
+      !DELOUT = 0.0D0
      !! IF ( ISSFLG(kkper) == 0 ) THEN
      !!   DO L = 1, NUMIRRPOND
      !!     ipond = IRRPONDVAR(L)
@@ -3125,22 +3125,22 @@
      !!     DELSTOR = DELSTOR + PONDSTORNEW(L) - PONDSTOROLD(L)
      !!   END DO  
      !! END IF
-      DELIN = DELIN - RIN
-      DELOUT = DELOUT - ROUT
-      DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
-      RIN_SNGL = SNGL(RIN)
-      ROUT_SNGL = SNGL(ROUT)
-      IF ( DELSTOR >= DZERO ) THEN
-          ROUT_SNGL = ROUT_SNGL + SNGL(DELSTOR)
-      ELSE
-          RIN_SNGL = RIN_SNGL + SNGL(DELSTOR)
-      END IF
-      VBVLAG(3, MSUMAG) = RIN_SNGL
-      VBVLAG(4, MSUMAG) = ROUT_SNGL
-      VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
-      VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
-      VBNMAG(MSUMAG) = TEXT13
-      MSUMAG = MSUMAG + 1
+      !DELIN = DELIN - RIN
+      !DELOUT = DELOUT - ROUT
+      !DELSTOR = (DELSTOR - DELIN + DELOUT)/DELT
+      !RIN_SNGL = SNGL(RIN)
+      !ROUT_SNGL = SNGL(ROUT)
+      !IF ( DELSTOR >= DZERO ) THEN
+      !    ROUT_SNGL = ROUT_SNGL + SNGL(DELSTOR)
+      !ELSE
+      !    RIN_SNGL = RIN_SNGL + SNGL(DELSTOR)
+      !END IF
+      !VBVLAG(3, MSUMAG) = RIN_SNGL
+      !VBVLAG(4, MSUMAG) = ROUT_SNGL
+      !VBVLAG(1, MSUMAG) = VBVLAG(1, MSUMAG) + RIN_SNGL*DELT
+      !VBVLAG(2, MSUMAG) = VBVLAG(2, MSUMAG) + ROUT_SNGL*DELT
+      !VBNMAG(MSUMAG) = TEXT13
+      !MSUMAG = MSUMAG + 1
       !
       !18 - ------GW IRRIGATION
       RIN = DZERO
@@ -3284,8 +3284,13 @@
         factor = set_factor(iseg, aetold, pettotal, aettotal, sup,
      +           supold, kper, kstp, kiter)
         AETITERSW(ISEG) = SNGL(aettotal)
-        SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        if ( kiter == 2 ) then
+          SUPACT(iseg) = SNGL(factor)
+          SUPACTOLD(ISEG) = dzero
+        else
+          SUPACTOLD(ISEG) = DVRSFLW(iseg)
+          SUPACT(iseg) = SUPACT(iseg) + SNGL(factor)
+        end if
         !
         !1 - -----set diversion to demand
         !
@@ -3377,9 +3382,14 @@
         RMSESW(ISEG) = SQRT((aetold - aettotal)**dtwo)
         IF ( RMSESW(ISEG) > zerod3*pettotal ) AGCONVERGE = 0
         AETITERSW(ISEG) = SNGL(aettotal)
-        SUPACTOLD(ISEG) = DVRSFLW(iseg)
-        SUPACT(iseg) = SUPACT(iseg) + 
+        if ( kiter == 2 ) then
+          SUPACT(iseg) = SNGL(factor)
+          SUPACTOLD(ISEG) = dzero
+        else
+          SUPACTOLD(ISEG) = DVRSFLW(iseg)
+          SUPACT(iseg) = SUPACT(iseg) + 
      +                 (sone - REAL(AGCONVERGE))*SNGL(factor)
+        end if
 !        if (SUPACT(iseg) < 0.0) SUPACT(iseg) = 0.0
         !
         !1 - -----set diversion to demand
@@ -3419,6 +3429,7 @@
    !   USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
    !  +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
+      USE GWFSFRMODULE, ONLY: DVRSFLW
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3430,7 +3441,7 @@
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
       real :: Q, saveflow, pondstor
-      integer :: k, ipond, hru_id, i
+      integer :: k, ipond, hru_id, i, iseg
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------------------
@@ -3480,13 +3491,14 @@
      +                     AGCONVERGE = 0
         AETITERPOND(i) = SNGL(aettotal)
         saveflow = PONDFLOW(i)
-        PONDFLOW(i) = PONDFLOW(i) + 
+        if ( kiter == 2 ) then
+          PONDFLOW(i) = SNGL(factor)
+          PONDFLOWOLD(i) = dzero
+        else
+          PONDFLOWOLD(i) = DVRSFLW(iseg)
+          PONDFLOW(i) = PONDFLOW(i) + 
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
-        !
-        !set pond inflow using demand.
-        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
-          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
-        END IF
+        end if
         !
         !set max pond irrigation rate
         !
@@ -3496,6 +3508,11 @@
 !        pondstor = Dprst_vol_open(ipond)/MFQ_to_inch_acres
         IF ( PONDFLOW(i) > pondstor/DELT ) PONDFLOW(i) = pondstor/DELT
         IF ( PONDFLOW(i) < saveflow ) PONDFLOW(i) = saveflow
+        !
+        !set pond inflow using demand.
+        IF ( FLOWTHROUGH_POND(i) == 1 .and. NUMCELLSPOND(i) > 0 ) THEN
+          PONDSEGFLOW(i) = PONDSEGFLOW(i) + PONDFLOW(i)  !need to constrain to available flow in segment
+        END IF
 !        if(i==2)then
       !etdif = pettotal - aettotal
 !          write(999,33)i,kper,kstp,kiter,PONDFLOW(I),

@@ -1868,7 +1868,7 @@ C-------SUBROUTINE SETLAY
       SUBROUTINE SETLAY(kkstp)
 C     ******************************************************************
 C     SET LAYER FOR GROUNDWATER RECHARGE AND DISCHARGE
-C     VERSION 1.3.0:  March 01, 2020
+C     VERSION 1.3.0:  07/01/2022
 C     ******************************************************************
       USE GWFUZFMODULE
 !      USE GLOBAL,       ONLY: NCOL, NROW, NLAY, IOUT, ISSFLG, IBOUND, 
