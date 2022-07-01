@@ -31,9 +31,6 @@ high elevation relative to regional groundwater levels. Similarly, for injection
 wells, a check was added to ensure Hb is not set equal to HLIM if HLIM is less 
 than the head in the aquifer.
 
-Newton-Raphson Solver (NWT) Package
-• A variable used to track the number of outer iterations during a times step was 
-moved from the NWT module to GSFMODFLOW module.
 
 Lake (LAK) Package
 • A check was added to initialize state variables for transient simulations that 
@@ -41,9 +38,6 @@ are not using restart data for initial conditions. Previously, lake stage was
 not getting set to the value specified in the LAK input file if the model was 
 starting after modflow_time_zero.
 
-Restart utility for MODFLOW
-• A flag created in the LAK Package was added to the list of variables saved 
-for the Lake Package for restart simulations.
 
 Streamflow Routing (SFR2) Package
 • A bug was fixed to correct the output variable for net seepage from streams 
