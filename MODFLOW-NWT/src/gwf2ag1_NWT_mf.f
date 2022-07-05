@@ -3429,7 +3429,6 @@
    !   USE GSFMODFLOW, ONLY: Mfl2_to_acre, Mfl_to_inch,
    !  +                      MFQ_to_inch_acres
       USE GLOBAL, ONLY: ISSFLG
-      USE GWFSFRMODULE, ONLY: DVRSFLW
       IMPLICIT NONE
 ! --------------------------------------------------
       !modules
@@ -3441,7 +3440,7 @@
       double precision :: pettotal,aettotal, prms_inch2mf_q,
      +                    aetold, supold, sup !, etdif
       real :: Q, saveflow, pondstor
-      integer :: k, ipond, hru_id, i, iseg
+      integer :: k, ipond, hru_id, i
       external :: set_factor
       double precision :: set_factor
 ! --------------------------------------------------
@@ -3495,7 +3494,7 @@
           PONDFLOW(i) = SNGL(factor)
           PONDFLOWOLD(i) = dzero
         else
-          PONDFLOWOLD(i) = DVRSFLW(iseg)
+          PONDFLOWOLD(i) = PONDFLOW(i)
           PONDFLOW(i) = PONDFLOW(i) + 
      +                (sone - REAL(AGCONVERGE))*SNGL(factor)
         end if
