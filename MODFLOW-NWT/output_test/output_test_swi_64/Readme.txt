@@ -1,1 +1,0 @@
-32 bit output for SWI test problem for NWT

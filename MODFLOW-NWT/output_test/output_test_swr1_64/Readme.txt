@@ -1,1 +1,0 @@
-32 bit output for SWR test problem for NWT
