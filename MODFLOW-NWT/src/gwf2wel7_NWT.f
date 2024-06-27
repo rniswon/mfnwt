@@ -807,6 +807,7 @@ C     ******************************************************************
       DOUBLE PRECISION, INTENT(OUT) :: dQ
       smooth3 = 0.0D0
       s = PSIRAMP
+      IF ( PSIRAMP > 1. ) s = PSIRAMP/(T-B)  !for Farag
       s = s*(T-B)   ! puming rate begins to be ramped down.
       x = (H-B)
       aa = -6.0d0/(s**3.0d0)
