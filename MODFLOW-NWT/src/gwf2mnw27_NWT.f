@@ -4045,7 +4045,7 @@ c
       IMPLICIT NONE
       DOUBLE PRECISION h, s, aa, ad, b, x, y, dc
       smooth2 = 0.0D0
-      s = 1.0d-5
+      s = 1.0d-1
       x = h
       IF ( x-s.GT.-1.0d-14 ) THEN
         y = 1.0D0
