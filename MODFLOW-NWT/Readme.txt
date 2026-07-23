@@ -23,12 +23,12 @@ computers are provided as well as the source code at the following URL:
 http://water.usgs.gov/ogw/modflow-nwt/
 
 The executable files were compiled on a personal computer with the Intel(R) 
-Core(TM) i7-7820HQ CPU, running the Microsoft Windows 10 Enterprise 
-operating system, using the Microsoft Visual Studio 2017 Version 15.9.13
-development environment and the Intel® Parallel Studio XE 2019 Update 4 Composer 
-Edition for Fortran Windows* Integration for Microsoft Visual Studio* 2017, 
-Version 19.0.0052.15 compiler. The source code is provided to aid users in  
-compilation on other computers. However, no support is provided for compilation.
+Core(TM) i7-10750H CPU, running the Microsoft Windows 10 Enterprise 
+operating system, using the Microsoft Visual Studio 2019 Version 16.11.7
+development environment and the Intel(R) Fortran Compiler – toolkit version: 
+2021.4.0, extension version 19.2.0063.16 compiler. The source code is provided   
+to aid users in compilation on other computers. However, no support is provided 
+for compilation.
 
 IMPORTANT: Users should review the file Summary_MODFLOW-NWT.txt for a description
 of, and references for, this software. Users should also review the file 
